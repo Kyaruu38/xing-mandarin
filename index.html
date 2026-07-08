@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Xing Mandarin</title>
+  <style>
+    :root{
+      --bg:#0d1220; --panel:#141b2e; --panel-2:#1b2337;
+      --line:#26304a; --text:#e8ecf6; --muted:#8b96b0;
+      --gold:#d8a24a; --gold-soft:#e8c07f; --danger:#e0685f; --ok:#5fb27a;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; min-height:100vh; background:
+        radial-gradient(1200px 500px at 50% -10%, #1a2440 0%, transparent 60%), var(--bg);
+      color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+      display:flex; align-items:center; justify-content:center; padding:20px;
+    }
+    .hidden{display:none !important}
+    .card{
+      width:100%; max-width:400px; background:var(--panel);
+      border:1px solid var(--line); border-radius:18px; padding:32px;
+      box-shadow:0 20px 60px rgba(0,0,0,.45);
+    }
+    .brand{display:flex; align-items:center; gap:10px; margin-bottom:6px}
+    .star{color:var(--gold); font-size:26px; line-height:1}
+    .brand h1{font-size:20px; margin:0; letter-spacing:.3px}
+    .brand .cn{color:var(--gold-soft); font-weight:600}
+    .sub{color:var(--muted); font-size:13px; margin:0 0 26px}
+    label{display:block; font-size:12px; color:var(--muted); margin:14px 0 6px}
+    input{
+      width:100%; padding:12px 14px; background:var(--panel-2); color:var(--text);
+      border:1px solid var(--line); border-radius:10px; font-size:15px; outline:none;
+    }
+    input:focus{border-color:var(--gold)}
+    button{
+      width:100%; margin-top:22px; padding:13px; border:none; border-radius:10px;
+      background:linear-gradient(180deg,var(--gold-soft),var(--gold));
+      color:#241a08; font-weight:700; font-size:15px; cursor:pointer;
+    }
+    button:disabled{opacity:.6; cursor:not-allowed}
+    .msg{margin-top:16px; font-size:13px; padding:10px 12px; border-radius:9px; display:none}
+    .msg.err{display:block; background:rgba(224,104,95,.12); color:var(--danger); border:1px solid rgba(224,104,95,.3)}
+    .msg.ok{display:block; background:rgba(95,178,122,.12); color:var(--ok); border:1px solid rgba(95,178,122,.3)}
+    /* dashboard */
+    .dash .hello{font-size:22px; margin:2px 0 2px}
+    .dash .hello b{color:var(--gold-soft)}
+    .rowline{display:flex; justify-content:space-between; padding:14px 0; border-bottom:1px solid var(--line); font-size:14px}
+    .rowline:last-child{border-bottom:none}
+    .rowline .k{color:var(--muted)}
+    .rowline .v{font-weight:600}
+    .pill{padding:3px 10px; border-radius:999px; font-size:12px; font-weight:700}
+    .pill.on{background:rgba(95,178,122,.15); color:var(--ok)}
+    .logout{margin-top:24px; background:transparent; border:1px solid var(--line); color:var(--muted); font-weight:600}
+    .foot{margin-top:22px; text-align:center; color:var(--muted); font-size:11px}
+  </style>
+</head>
+<body>
+
+  <!-- ============ LOGIN ============ -->
+  <div id="loginCard" class="card">
+    <div class="brand"><span class="star">✦</span><h1>Xing Mandarin <span class="cn">星</span></h1></div>
+    <p class="sub">Masuk ke akun belajar kamu</p>
+    <label>Email</label>
+    <input id="email" type="email" autocomplete="username" placeholder="kamu@email.com" />
+    <label>Password</label>
+    <input id="password" type="password" autocomplete="current-password" placeholder="••••••••" />
+    <button id="loginBtn">Masuk</button>
+    <div id="loginMsg" class="msg"></div>
+    <p class="foot">Belum punya akun? Hubungi admin untuk daftar.</p>
+  </div>
+
+  <!-- ============ DASHBOARD ============ -->
+  <div id="dashCard" class="card dash hidden">
+    <div class="brand"><span class="star">✦</span><h1>Xing Mandarin <span class="cn">星</span></h1></div>
+    <p class="hello">Halo, <b id="dName">—</b> 👋</p>
+    <p class="sub" id="dGreet">Siap belajar hari ini?</p>
+    <div class="rowline"><span class="k">Track</span><span class="v" id="dTrack">—</span></div>
+    <div class="rowline"><span class="k">Target Level</span><span class="v" id="dLevel">—</span></div>
+    <div class="rowline"><span class="k">Status</span><span class="pill on" id="dStatus">—</span></div>
+    <div class="rowline"><span class="k">Langganan s/d</span><span class="v" id="dSub">—</span></div>
+    <button class="logout" id="logoutBtn">Keluar</button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+  /* ==========================================================
+     KONFIG — dua nilai ini aman ditaruh di client (public-safe)
+     ========================================================== */
+  const SUPABASE_URL  = 'https://xzgvhzmmqbijpbrhagjf.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6Z3Zoem1tcWJpanBicmhhZ2pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0OTA4NjMsImV4cCI6MjA5OTA2Njg2M30.9OtBJIBDDUhhSsvtz9Pql12hWToGzmULOGh7Tj-vzNs';
+
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  const SESSION_KEY = 'xm_session_id';   // simpen id sesi lokal (buat cocokin device)
+  let watchChannel = null;
+  let heartbeat = null;
+
+  /* ---------- util tampilan ---------- */
+  const $ = id => document.getElementById(id);
+  const TRACK_LABEL = {hsk:'HSK Exam', business:'Bisnis', daily:'Percakapan Harian', travel:'Travel', academic:'Akademik'};
+
+  function showLogin(msg, type){
+    $('dashCard').classList.add('hidden');
+    $('loginCard').classList.remove('hidden');
+    const m = $('loginMsg');
+    if(msg){ m.textContent = msg; m.className = 'msg ' + (type||'err'); }
+    else { m.className='msg'; m.textContent=''; }
+    $('loginBtn').disabled = false;
+  }
+
+  function deviceLabel(){
+    const ua = navigator.userAgent;
+    let os = 'Perangkat';
+    if(/Windows/i.test(ua)) os='Windows';
+    else if(/Android/i.test(ua)) os='Android';
+    else if(/iPhone|iPad/i.test(ua)) os='iOS';
+    else if(/Mac/i.test(ua)) os='Mac';
+    else if(/Linux/i.test(ua)) os='Linux';
+    return os;
+  }
+
+  /* ---------- cek gerbang status langganan ---------- */
+  function gateReason(profile){
+    if(profile.role === 'admin') return null;            // admin selalu lolos
+    if(profile.status === 'expired') return 'Langganan kamu sudah berakhir. Hubungi admin untuk perpanjang.';
+    if(profile.subscription_end){
+      const today = new Date(); today.setHours(0,0,0,0);
+      const end = new Date(profile.subscription_end + 'T00:00:00');
+      if(end < today) return 'Masa langganan kamu sudah lewat. Hubungi admin untuk perpanjang.';
+    }
+    return null;
+  }
+
+  /* ---------- render dashboard ---------- */
+  function renderDash(profile){
+    $('loginCard').classList.add('hidden');
+    $('dashCard').classList.remove('hidden');
+    $('dName').textContent   = profile.display_name || 'Murid';
+    $('dTrack').textContent  = TRACK_LABEL[profile.active_track] || 'Belum diset';
+    $('dLevel').textContent  = profile.target_level ? ('HSK ' + profile.target_level) : '—';
+    $('dStatus').textContent = profile.role==='admin' ? 'Admin' : 'Aktif';
+    $('dSub').textContent    = profile.subscription_end || '—';
+  }
+
+  /* ---------- dengerin perebutan sesi (realtime) ---------- */
+  function watchSession(userId){
+    if(watchChannel) sb.removeChannel(watchChannel);
+    watchChannel = sb.channel('profile-watch')
+      .on('postgres_changes',
+        { event:'UPDATE', schema:'public', table:'profiles', filter:'id=eq.'+userId },
+        payload => {
+          const mine = localStorage.getItem(SESSION_KEY);
+          if(payload.new.active_session_id !== mine){
+            forceLogout('Akun kamu login di perangkat lain. Kamu keluar otomatis.');
+          }
+        })
+      .subscribe();
+  }
+
+  /* ---------- keluar paksa ---------- */
+  async function forceLogout(reason){
+    if(heartbeat){ clearInterval(heartbeat); heartbeat=null; }
+    if(watchChannel){ sb.removeChannel(watchChannel); watchChannel=null; }
+    localStorage.removeItem(SESSION_KEY);
+    await sb.auth.signOut();
+    showLogin(reason || null, 'err');
+  }
+
+  /* ---------- ambil profil + jalanin gerbang + sesi ---------- */
+  async function loadProfile(userId){
+    const { data:profile, error } = await sb
+      .from('profiles').select('*').eq('id', userId).single();
+    if(error || !profile){ await forceLogout('Profil tidak ditemukan. Hubungi admin.'); return; }
+
+    const blocked = gateReason(profile);
+    if(blocked){ await forceLogout(blocked); return; }
+
+    renderDash(profile);
+    watchSession(userId);
+
+    // heartbeat: perbarui last_seen tiap 2 menit
+    if(heartbeat) clearInterval(heartbeat);
+    heartbeat = setInterval(()=>{
+      const sid = localStorage.getItem(SESSION_KEY);
+      if(sid) sb.rpc('claim_session', { p_session_id: sid, p_device_label: deviceLabel() });
+    }, 120000);
+  }
+
+  /* ---------- alur LOGIN ---------- */
+  async function doLogin(){
+    const email = $('email').value.trim();
+    const pass  = $('password').value;
+    if(!email || !pass){ showLogin('Isi email dan password dulu.', 'err'); return; }
+    $('loginBtn').disabled = true;
+    showLogin(null);
+
+    const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+    if(error){ showLogin('Email atau password salah.', 'err'); return; }
+
+    const userId = data.user.id;
+    // cek gerbang dulu sebelum klaim sesi
+    const { data:profile } = await sb.from('profiles').select('*').eq('id', userId).single();
+    if(!profile){ await forceLogout('Profil tidak ditemukan. Hubungi admin.'); return; }
+    const blocked = gateReason(profile);
+    if(blocked){ await forceLogout(blocked); return; }
+
+    // klaim sesi baru → ini yang nendang device lama
+    const sid = crypto.randomUUID();
+    const { error:rpcErr } = await sb.rpc('claim_session', { p_session_id: sid, p_device_label: deviceLabel() });
+    if(rpcErr){ await forceLogout('Gagal memulai sesi. Coba lagi.'); return; }
+    localStorage.setItem(SESSION_KEY, sid);
+
+    await loadProfile(userId);
+  }
+
+  /* ---------- boot: cek kalau udah login sebelumnya ---------- */
+  async function boot(){
+    const { data:{ session } } = await sb.auth.getSession();
+    if(!session){ showLogin(); return; }
+
+    const userId = session.user.id;
+    const storedSid = localStorage.getItem(SESSION_KEY);
+
+    const { data:profile } = await sb.from('profiles').select('*').eq('id', userId).single();
+    if(!profile){ await forceLogout('Profil tidak ditemukan. Hubungi admin.'); return; }
+
+    const blocked = gateReason(profile);
+    if(blocked){ await forceLogout(blocked); return; }
+
+    // kalau sesi di server beda dari punya device ini → device ini udah kalah
+    if(!storedSid || profile.active_session_id !== storedSid){
+      await forceLogout('Sesi kamu diambil alih perangkat lain. Silakan login ulang.');
+      return;
+    }
+    await loadProfile(userId);
+  }
+
+  /* ---------- events ---------- */
+  $('loginBtn').addEventListener('click', doLogin);
+  $('password').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+  $('logoutBtn').addEventListener('click', ()=> forceLogout(null));
+
+  boot();
+  </script>
+</body>
+</html>

@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Xing Mandarin — Question Set Importer</title>
+<style>
+  :root{
+    --bg:#0d1220; --panel:#141b2e; --panel-2:#1b2337;
+    --line:#26304a; --text:#e8ecf6; --muted:#8b96b0;
+    --gold:#d8a24a; --gold-soft:#e8c07f; --danger:#e0685f; --ok:#5fb27a;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; min-height:100vh; background:
+      radial-gradient(1200px 500px at 50% -10%, #1a2440 0%, transparent 60%), var(--bg);
+    color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    padding:24px;
+  }
+  .wrap{max-width:900px; margin:0 auto}
+  h1{font-size:20px; margin:0 0 4px}
+  .cn{color:var(--gold-soft); font-weight:600}
+  .sub{color:var(--muted); font-size:13px; margin:0 0 20px}
+  .card{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    padding:20px; margin-bottom:16px;
+  }
+  .hidden{display:none !important}
+  label{display:block; font-size:12px; color:var(--muted); margin:12px 0 6px}
+  label:first-child{margin-top:0}
+  input[type=text], input[type=number], textarea{
+    width:100%; padding:10px 12px; background:var(--panel-2); color:var(--text);
+    border:1px solid var(--line); border-radius:8px; font-size:13px; outline:none;
+    font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
+  }
+  textarea{resize:vertical; line-height:1.5}
+  input[type=file]{color:var(--muted); font-size:13px}
+  input:focus, textarea:focus{border-color:var(--gold)}
+  button{
+    padding:10px 18px; border:none; border-radius:8px; margin-top:14px; margin-right:8px;
+    background:linear-gradient(180deg,var(--gold-soft),var(--gold));
+    color:#241a08; font-weight:700; font-size:13px; cursor:pointer;
+  }
+  button.secondary{background:var(--panel-2); color:var(--text); border:1px solid var(--line)}
+  button:disabled{opacity:.5; cursor:not-allowed}
+  .row{display:flex; flex-wrap:wrap; gap:8px}
+  .error{background:rgba(224,104,95,.12); border:1px solid var(--danger); color:#f2a8a2; padding:10px 12px; border-radius:8px; font-size:13px; margin-top:10px; white-space:pre-wrap}
+  .warn{background:rgba(216,162,74,.1); border:1px solid var(--gold); color:var(--gold-soft); padding:10px 12px; border-radius:8px; font-size:13px; margin-top:10px; white-space:pre-wrap}
+  .ok{background:rgba(95,178,122,.1); border:1px solid var(--ok); color:#a6e0b7; padding:10px 12px; border-radius:8px; font-size:13px; margin-top:10px}
+  .summary-grid{display:flex; gap:16px; flex-wrap:wrap; margin-top:10px}
+  .stat{background:var(--panel-2); border:1px solid var(--line); border-radius:8px; padding:8px 14px; font-size:13px}
+  .stat b{color:var(--gold-soft); font-size:16px; display:block}
+  details{margin-top:10px; font-size:12px; color:var(--muted)}
+  details pre{background:var(--panel-2); padding:10px; border-radius:8px; overflow:auto; font-size:11px}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+  @media (max-width:640px){.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>⭐ Xing Mandarin <span class="cn">题库导入</span> — Question Set Importer</h1>
+  <p class="sub">Ubah JSON soal mentah (fill_blank / ordering / reading_mc / sentence_match) jadi SQL INSERT untuk <code>test_sets</code> + <code>question_bank</code>. Semua proses jalan lokal di browser ini — JSON tidak dikirim ke mana pun. Review SQL yang dihasilkan sebelum dijalankan di Supabase SQL Editor.</p>
+
+  <div class="card">
+    <label>1. Upload atau paste JSON mentah</label>
+    <input type="file" id="file-input" accept=".json,application/json" />
+    <label>...atau paste di sini</label>
+    <textarea id="json-input" rows="8" placeholder="{ &quot;meta&quot;: {...}, &quot;parts&quot;: [...] }"></textarea>
+    <div class="row">
+      <button id="btn-parse">Parse JSON</button>
+    </div>
+    <div id="parse-error" class="error hidden"></div>
+
+    <details>
+      <summary>Format JSON mentah yang diterima (klik untuk lihat contoh)</summary>
+      <pre id="format-help"></pre>
+    </details>
+  </div>
+
+  <div class="card hidden" id="config-card">
+    <label>2. Konfigurasi test set (auto-terisi dari meta, boleh diedit)</label>
+    <div class="grid2">
+      <div>
+        <label>Set ID (PK di test_sets, harus unik)</label>
+        <input type="text" id="f-setid" />
+      </div>
+      <div>
+        <label>Batas waktu (detik)</label>
+        <input type="number" id="f-timelimit" />
+      </div>
+    </div>
+    <label>Judul</label>
+    <input type="text" id="f-title" />
+
+    <div class="summary-grid" id="summary"></div>
+    <div id="warnings" class="warn hidden"></div>
+
+    <div class="row">
+      <button id="btn-generate">3. Generate SQL</button>
+    </div>
+  </div>
+
+  <div class="card hidden" id="output-card">
+    <label>4. SQL hasil — review dulu, lalu jalankan di Supabase SQL Editor</label>
+    <textarea id="sql-output" rows="22" readonly></textarea>
+    <div class="row">
+      <button id="btn-copy" class="secondary">Copy</button>
+      <button id="btn-download" class="secondary">Download .sql</button>
+    </div>
+    <div id="copy-ok" class="ok hidden">Disalin ke clipboard.</div>
+  </div>
+</div>
+
+<script>
+const FORMAT_HELP = `fill_blank part:
+{ "part":1, "type":"fill_blank", "instruction_zh":"选词填空",
+  "subsections":[
+    { "range":"1-5",
+      "word_bank":[{"key":"A","word":"坚持","pinyin":"jiānchí","id":"bertahan"}, ...],
+      "questions":[{"no":1,"text_zh":"...(　)...","text_id":"terjemahan","answer":"A"}, ...]
+    }
+  ]
+}
+
+ordering part:
+{ "part":2, "type":"ordering", "instruction_zh":"排列顺序",
+  "questions":[
+    {"no":11,"fragments":{"A":"...","B":"...","C":"..."},
+     "fragments_id":{"A":"...","B":"...","C":"..."},"answer":"BAC"}
+  ]
+}
+
+reading_mc part:
+{ "part":3, "type":"reading_mc", "instruction_zh":"阅读理解",
+  "passages":[
+    { "no":[21], "passage_zh":"...", "passage_id":"...",
+      "questions":[
+        {"no":21,"q_zh":"...","q_id":"...",
+         "options":{"A":"选项 (terjemahan)","B":"...","C":"...","D":"..."},"answer":"B"}
+      ]
+    }
+  ]
+}
+
+sentence_match part (HSK3 第一部分):
+{ "part":1, "type":"sentence_match", "instruction_zh":"选择对应的句子",
+  "questions":[
+    {"no":1,"prompt_zh":"...","prompt_id":"...",
+     "choices":{"A":"... (terjemahan)","B":"...","C":"..."},"answer":"C"}
+  ]
+}
+
+Top-level meta wajib:
+{ "meta": { "level":4, "section":"reading", "set_code":"HSK4-R-001", "total_questions":40 }, "parts":[...] }`;
+document.getElementById('format-help').textContent = FORMAT_HELP;
+
+const TIME_DEFAULTS = {
+  1:{listening:900,  reading:1020, writing:600},
+  2:{listening:1500, reading:1500, writing:600},
+  3:{listening:2100, reading:1800, writing:900},
+  4:{listening:1800, reading:2400, writing:1500},
+  5:{listening:2400, reading:2700, writing:2700},
+  6:{listening:2400, reading:3000, writing:2700}
+};
+
+function slugify(s){
+  return String(s).toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/(^-+|-+$)/g,'');
+}
+
+function splitHanziId(text){
+  const m = /^(.*?)\s*\(([^()]+)\)\s*$/s.exec(String(text).trim());
+  if(m) return {hanzi:m[1].trim(), id:m[2].trim()};
+  return {hanzi:String(text).trim(), id:null};
+}
+
+function sectionLabel(section){
+  return {reading:'Membaca (阅读)', listening:'Mendengar (听力)', writing:'Menulis (写作)'}[section] || section;
+}
+
+function buildDefaultTitle(meta){
+  return `HSK ${meta.level} — ${sectionLabel(meta.section)} — ${meta.set_code}`;
+}
+
+function defaultTimeLimit(level, section){
+  return (TIME_DEFAULTS[level] && TIME_DEFAULTS[level][section]) || 1800;
+}
+
+function transformSet(raw){
+  const meta = raw.meta;
+  if(!meta || !meta.level || !meta.section || !meta.set_code){
+    throw new Error('meta.level / meta.section / meta.set_code wajib ada.');
+  }
+  const hsk_level = meta.level;
+  const section = meta.section;
+  const warnings = [];
+  const questions = [];
+
+  for(const part of (raw.parts || [])){
+    if(part.type === 'fill_blank'){
+      const subs = part.subsections || [part];
+      for(const sub of subs){
+        if(!sub.word_bank || !sub.questions){
+          warnings.push(`fill_blank part ${part.part}: subsection tanpa word_bank/questions, dilewati.`);
+          continue;
+        }
+        const choices = sub.word_bank.map(w=>({key:w.key, hanzi:w.word, pinyin:w.pinyin}));
+        for(const q of sub.questions){
+          const correct = sub.word_bank.find(w=>w.key===q.answer);
+          if(!correct) warnings.push(`fill_blank no.${q.no}: jawaban "${q.answer}" tidak ada di word_bank.`);
+          questions.push({
+            order_index: q.no,
+            question_type: 'fill_blank',
+            payload: {
+              instruction: part.instruction_zh,
+              stem: q.text_zh,
+              stem_id: q.text_id,
+              choices
+            },
+            answer: {correct: q.answer},
+            explanation: correct
+              ? `答案 ${q.answer}：${correct.word}（${correct.pinyin}，${correct.id}）。${q.text_id || ''}`
+              : `答案：${q.answer}`
+          });
+        }
+      }
+    } else if(part.type === 'ordering'){
+      for(const q of (part.questions || [])){
+        const keys = Object.keys(q.fragments || {});
+        if(!keys.length){ warnings.push(`ordering no.${q.no}: tidak ada fragments.`); continue; }
+        const segments = keys.map(k=>({
+          key:k, hanzi:q.fragments[k],
+          id:(q.fragments_id && q.fragments_id[k]) || null
+        }));
+        const order = String(q.answer).split('');
+        const invalid = order.filter(k=>!keys.includes(k));
+        if(invalid.length) warnings.push(`ordering no.${q.no}: answer punya key tak dikenal: ${invalid.join(',')}`);
+        const orderedIdText = q.fragments_id ? order.map(k=>q.fragments_id[k]).filter(Boolean).join(', ') : '';
+        questions.push({
+          order_index: q.no,
+          question_type: 'ordering',
+          payload: {
+            instruction: part.instruction_zh,
+            segments
+          },
+          answer: {order},
+          explanation: `Urutan benar: ${order.join('')}.${orderedIdText ? ' ' + orderedIdText : ''}`
+        });
+      }
+    } else if(part.type === 'reading_mc'){
+      for(const passage of (part.passages || [])){
+        for(const q of (passage.questions || [])){
+          const choices = Object.entries(q.options || {}).map(([key,text])=>{
+            const {hanzi,id} = splitHanziId(text);
+            return {key, hanzi, id};
+          });
+          const correct = choices.find(c=>c.key===q.answer);
+          if(!correct) warnings.push(`reading_mc no.${q.no}: jawaban "${q.answer}" tidak ada di options.`);
+          questions.push({
+            order_index: q.no,
+            question_type: 'reading_mc',
+            payload: {
+              instruction: part.instruction_zh,
+              passage: passage.passage_zh,
+              passage_id: passage.passage_id,
+              question: q.q_zh,
+              question_id: q.q_id,
+              choices
+            },
+            answer: {correct: q.answer},
+            explanation: correct ? `答案 ${q.answer}：${correct.hanzi}${correct.id ? `（${correct.id}）` : ''}` : `答案：${q.answer}`
+          });
+        }
+      }
+    } else if(part.type === 'sentence_match'){
+      for(const q of (part.questions || [])){
+        const choices = Object.entries(q.choices || {}).map(([key,text])=>{
+          const {hanzi,id} = splitHanziId(text);
+          return {key, hanzi, id};
+        });
+        const correct = choices.find(c=>c.key===q.answer);
+        if(!correct) warnings.push(`sentence_match no.${q.no}: jawaban "${q.answer}" tidak ada di choices.`);
+        questions.push({
+          order_index: q.no,
+          question_type: 'sentence_match',
+          payload: {
+            instruction: part.instruction_zh,
+            prompt: q.prompt_zh,
+            prompt_id: q.prompt_id,
+            choices
+          },
+          answer: {correct: q.answer},
+          explanation: correct ? `答案 ${q.answer}：${correct.hanzi}${correct.id ? `（${correct.id}）` : ''}` : `答案：${q.answer}`
+        });
+      }
+    } else {
+      warnings.push(`Tipe part tidak dikenal: "${part.type}" (part ${part.part}), dilewati.`);
+    }
+  }
+
+  const seen = new Set();
+  for(const q of questions){
+    if(seen.has(q.order_index)) warnings.push(`order_index ${q.order_index} duplikat.`);
+    seen.add(q.order_index);
+  }
+  questions.sort((a,b)=>a.order_index-b.order_index);
+
+  if(meta.total_questions && questions.length !== meta.total_questions){
+    warnings.push(`meta.total_questions=${meta.total_questions} tapi hasil parse = ${questions.length} soal.`);
+  }
+
+  return {
+    testSet: {
+      set_id: slugify(meta.set_code),
+      hsk_level,
+      section,
+      title: buildDefaultTitle(meta),
+      time_limit_seconds: defaultTimeLimit(hsk_level, section),
+      total_questions: questions.length
+    },
+    questions,
+    warnings
+  };
+}
+
+function sqlStr(v){
+  if(v === null || v === undefined) return 'NULL';
+  return `'${String(v).replace(/'/g,"''")}'`;
+}
+function sqlJsonb(obj){
+  return `'${JSON.stringify(obj).replace(/'/g,"''")}'::jsonb`;
+}
+
+function generateSQL(result){
+  const {testSet, questions} = result;
+  let sql = '';
+  sql += `-- Auto-generated by tools/importer.html\n`;
+  sql += `-- Set: ${testSet.set_id} (HSK${testSet.hsk_level} ${testSet.section}) — ${questions.length} soal\n`;
+  sql += `-- Aman dijalankan ulang: DELETE di bawah scoped ke set_id ini saja, tidak menyentuh set lain.\n\n`;
+  sql += `BEGIN;\n\n`;
+  sql += `INSERT INTO test_sets (set_id, hsk_level, section, title, time_limit_seconds, total_questions, is_published)\n`;
+  sql += `VALUES (${sqlStr(testSet.set_id)}, ${testSet.hsk_level}, ${sqlStr(testSet.section)}, ${sqlStr(testSet.title)}, ${testSet.time_limit_seconds}, ${testSet.total_questions}, true)\n`;
+  sql += `ON CONFLICT (set_id) DO UPDATE SET\n`;
+  sql += `  hsk_level = EXCLUDED.hsk_level,\n`;
+  sql += `  section = EXCLUDED.section,\n`;
+  sql += `  title = EXCLUDED.title,\n`;
+  sql += `  time_limit_seconds = EXCLUDED.time_limit_seconds,\n`;
+  sql += `  total_questions = EXCLUDED.total_questions,\n`;
+  sql += `  is_published = EXCLUDED.is_published;\n\n`;
+  sql += `DELETE FROM question_bank WHERE set_id = ${sqlStr(testSet.set_id)};\n\n`;
+  sql += `INSERT INTO question_bank (set_id, hsk_level, section, question_type, order_index, payload, answer, explanation, points)\nVALUES\n`;
+  sql += questions.map(q =>
+    `  (${sqlStr(testSet.set_id)}, ${testSet.hsk_level}, ${sqlStr(testSet.section)}, ${sqlStr(q.question_type)}, ${q.order_index}, ${sqlJsonb(q.payload)}, ${sqlJsonb(q.answer)}, ${sqlStr(q.explanation)}, 1)`
+  ).join(',\n');
+  sql += ';\n\nCOMMIT;\n';
+  return sql;
+}
+
+let lastResult = null;
+
+document.getElementById('file-input').addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => { document.getElementById('json-input').value = reader.result; };
+  reader.readAsText(file);
+});
+
+document.getElementById('btn-parse').addEventListener('click', ()=>{
+  const errEl = document.getElementById('parse-error');
+  errEl.classList.add('hidden');
+  document.getElementById('config-card').classList.add('hidden');
+  document.getElementById('output-card').classList.add('hidden');
+  let raw;
+  try{
+    raw = JSON.parse(document.getElementById('json-input').value);
+  }catch(e){
+    errEl.textContent = 'JSON tidak valid: ' + e.message;
+    errEl.classList.remove('hidden');
+    return;
+  }
+  try{
+    lastResult = transformSet(raw);
+  }catch(e){
+    errEl.textContent = 'Gagal parse: ' + e.message;
+    errEl.classList.remove('hidden');
+    return;
+  }
+
+  document.getElementById('f-setid').value = lastResult.testSet.set_id;
+  document.getElementById('f-title').value = lastResult.testSet.title;
+  document.getElementById('f-timelimit').value = lastResult.testSet.time_limit_seconds;
+
+  const byType = {};
+  for(const q of lastResult.questions) byType[q.question_type] = (byType[q.question_type]||0) + 1;
+  const summary = document.getElementById('summary');
+  summary.innerHTML = `
+    <div class="stat"><b>${lastResult.questions.length}</b>total soal</div>
+    ${Object.entries(byType).map(([t,c])=>`<div class="stat"><b>${c}</b>${t}</div>`).join('')}
+  `;
+
+  const warnEl = document.getElementById('warnings');
+  if(lastResult.warnings.length){
+    warnEl.textContent = 'Peringatan:\n' + lastResult.warnings.map(w=>'- '+w).join('\n');
+    warnEl.classList.remove('hidden');
+  } else {
+    warnEl.classList.add('hidden');
+  }
+
+  document.getElementById('config-card').classList.remove('hidden');
+});
+
+document.getElementById('btn-generate').addEventListener('click', ()=>{
+  if(!lastResult) return;
+  lastResult.testSet.set_id = document.getElementById('f-setid').value.trim();
+  lastResult.testSet.title = document.getElementById('f-title').value.trim();
+  lastResult.testSet.time_limit_seconds = parseInt(document.getElementById('f-timelimit').value, 10) || 1800;
+
+  const sql = generateSQL(lastResult);
+  document.getElementById('sql-output').value = sql;
+  document.getElementById('output-card').classList.remove('hidden');
+  document.getElementById('copy-ok').classList.add('hidden');
+});
+
+document.getElementById('btn-copy').addEventListener('click', async ()=>{
+  const ta = document.getElementById('sql-output');
+  await navigator.clipboard.writeText(ta.value);
+  document.getElementById('copy-ok').classList.remove('hidden');
+});
+
+document.getElementById('btn-download').addEventListener('click', ()=>{
+  const setId = lastResult ? lastResult.testSet.set_id : 'question-set';
+  const blob = new Blob([document.getElementById('sql-output').value], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${setId}.sql`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+</script>
+</body>
+</html>

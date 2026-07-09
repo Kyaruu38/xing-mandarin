@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Xing Mandarin</title>
+  <style>
+    :root{
+      --bg:#0d1220; --panel:#141b2e; --panel-2:#1b2337;
+      --line:#26304a; --text:#e8ecf6; --muted:#8b96b0;
+      --gold:#d8a24a; --gold-soft:#e8c07f; --danger:#e0685f; --ok:#5fb27a;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; min-height:100vh; background:
+        radial-gradient(1200px 500px at 50% -10%, #1a2440 0%, transparent 60%), var(--bg);
+      color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+      display:flex; align-items:center; justify-content:center; padding:20px;
+    }
+    .hidden{display:none !important}
+    .card{
+      width:100%; max-width:400px; background:var(--panel);
+      border:1px solid var(--line); border-radius:18px; padding:32px;
+      box-shadow:0 20px 60px rgba(0,0,0,.45);
+    }
+    .brand{display:flex; align-items:center; gap:10px; margin-bottom:6px}
+    .star{color:var(--gold); font-size:26px; line-height:1}
+    .brand h1{font-size:20px; margin:0; letter-spacing:.3px}
+    .brand .cn{color:var(--gold-soft); font-weight:600}
+    .sub{color:var(--muted); font-size:13px; margin:0 0 26px}
+    label{display:block; font-size:12px; color:var(--muted); margin:14px 0 6px}
+    input{
+      width:100%; padding:12px 14px; background:var(--panel-2); color:var(--text);
+      border:1px solid var(--line); border-radius:10px; font-size:15px; outline:none;
+    }
+    input:focus{border-color:var(--gold)}
+    button{
+      width:100%; margin-top:22px; padding:13px; border:none; border-radius:10px;
+      background:linear-gradient(180deg,var(--gold-soft),var(--gold));
+      color:#241a08; font-weight:700; font-size:15px; cursor:pointer;
+    }
+    button:disabled{opacity:.6; cursor:not-allowed}
+    .msg{margin-top:16px; font-size:13px; padding:10px 12px; border-radius:9px; display:none}
+    .msg.err{display:block; background:rgba(224,104,95,.12); color:var(--danger); border:1px solid rgba(224,104,95,.3)}
+    .msg.ok{display:block; background:rgba(95,178,122,.12); color:var(--ok); border:1px solid rgba(95,178,122,.3)}
+    /* dashboard */
+    .dash .hello{font-size:22px; margin:2px 0 2px}
+    .dash .hello b{color:var(--gold-soft)}
+    .rowline{display:flex; justify-content:space-between; padding:14px 0; border-bottom:1px solid var(--line); font-size:14px}
+    .rowline:last-child{border-bottom:none}
+    .rowline .k{color:var(--muted)}
+    .rowline .v{font-weight:600}
+    .pill{padding:3px 10px; border-radius:999px; font-size:12px; font-weight:700}
+    .pill.on{background:rgba(95,178,122,.15); color:var(--ok)}
+    .logout{margin-top:24px; background:transparent; border:1px solid var(--line); color:var(--muted); font-weight:600}
+    .foot{margin-top:22px; text-align:center; color:var(--muted); font-size:11px}
+    /* practice / flashcard */
+    .practice{max-width:460px}
+    .levelPicker{display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 20px}
+    .levelBtn{
+      flex:1 1 auto; min-width:50px; padding:10px 0; text-align:center;
+      background:var(--panel-2); border:1px solid var(--line); border-radius:10px;
+      color:var(--text); font-weight:700; cursor:pointer; font-size:14px;
+    }
+    .levelBtn.active{background:linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#241a08; border-color:transparent}
+    .cardArea{
+      background:var(--panel-2); border:1px solid var(--line); border-radius:14px;
+      padding:36px 20px; text-align:center; min-height:180px;
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
+    }
+    .hanzi-big{
+      font-size:52px; font-weight:700; letter-spacing:1px;
+      font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif;
+    }
+    .pinyin-line{font-size:18px; color:var(--gold-soft)}
+    .meaning-line{font-size:15px; color:var(--text); margin-top:4px}
+    .revealBtn{margin-top:18px}
+    .gradeRow{display:flex; gap:8px; margin-top:16px}
+    .gradeBtn{flex:1; margin-top:0; padding:11px 0; font-size:13px; border-radius:9px}
+    .gradeBtn.again{background:linear-gradient(180deg,#e88b83,var(--danger)); color:#3a0f0c}
+    .gradeBtn.hard{background:linear-gradient(180deg,#e0c07f,#c99a3f); color:#241a08}
+    .gradeBtn.good{background:linear-gradient(180deg,#8fd1a6,var(--ok)); color:#0d2414}
+    .gradeBtn.easy{background:linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#241a08}
+    .exampleBtn{margin-top:10px; background:transparent; border:1px solid var(--line); color:var(--muted); font-weight:600; font-size:13px}
+    .sessionMeta{display:flex; justify-content:space-between; font-size:12px; color:var(--muted); margin-bottom:8px}
+    .practiceExit{margin-top:20px; background:transparent; border:1px solid var(--line); color:var(--muted); font-weight:600}
+    .emptyState{text-align:center; color:var(--muted); font-size:14px; padding:30px 10px}
+    /* raport */
+    .raport{max-width:480px}
+    .statRow{display:flex; gap:10px; margin:14px 0 20px}
+    .statBox{flex:1; background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:16px 10px; text-align:center}
+    .statNum{display:block; font-size:26px; font-weight:700; color:var(--gold-soft)}
+    .statLabel{display:block; font-size:11px; color:var(--muted); margin-top:4px}
+    .sectionTitle{font-size:13px; color:var(--muted); margin:20px 0 10px; font-weight:700; letter-spacing:.3px}
+    .levelRow{display:flex; align-items:center; gap:10px; padding:8px 0; font-size:12px}
+    .levelName{width:52px; flex-shrink:0; font-weight:700}
+    .levelBar{flex:1; height:8px; background:var(--panel-2); border-radius:99px; overflow:hidden}
+    .levelBarFill{height:100%; background:linear-gradient(90deg,var(--gold-soft),var(--gold))}
+    .levelNums{width:130px; flex-shrink:0; color:var(--muted); text-align:right; font-size:11px}
+    .weakItem{display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--line); font-size:13px}
+    .weakItem:last-child{border-bottom:none}
+    .weakHanzi{font-size:20px; font-weight:700; width:40px; flex-shrink:0; font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif}
+    .weakPinyin{width:70px; flex-shrink:0; color:var(--gold-soft)}
+    .weakMeaning{flex:1; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+    .weakMastery{color:var(--muted); font-size:11px; flex-shrink:0}
+    /* browse / kamus */
+    .browse{max-width:480px}
+    .browseSearchInput{margin:14px 0 4px}
+    .browseList{max-height:360px; overflow-y:auto; margin-top:10px}
+    .browseItem{display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--line); font-size:13px}
+    .browseItem:last-child{border-bottom:none}
+    .browseHanzi{font-size:20px; font-weight:700; width:44px; flex-shrink:0; font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif}
+    .browsePinyin{width:76px; flex-shrink:0; color:var(--gold-soft)}
+    .browseMeaning{flex:1; color:var(--text)}
+    .browseCount{font-size:11px; color:var(--muted); text-align:center; margin:10px 0 0}
+    /* mock test list */
+    .mocklist{max-width:480px}
+    .mockSetCard{background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:14px 16px; margin-bottom:10px}
+    .mockSetTitle{font-weight:700; font-size:14px; margin-bottom:4px}
+    .mockSetMeta{font-size:12px; color:var(--muted); margin-bottom:8px}
+    .mockSetScore{font-size:12px; color:var(--gold-soft); margin-bottom:10px}
+    .mockSetBtn{margin-top:0}
+  </style>
+</head>
+<body>
+
+  <!-- ============ LOGIN ============ -->
+  <div id="loginCard" class="card">
+    <div class="brand"><span class="star">✦</span><h1>Xing Mandarin <span class="cn">星</span></h1></div>
+    <p class="sub">Masuk ke akun belajar kamu</p>
+    <label>Email</label>
+    <input id="email" type="email" autocomplete="username" placeholder="kamu@email.com" />
+    <label>Password</label>
+    <input id="password" type="password" autocomplete="current-password" placeholder="••••••••" />
+    <button id="loginBtn">Masuk</button>
+    <div id="loginMsg" class="msg"></div>
+    <p class="foot">Belum punya akun? Hubungi admin untuk daftar.</p>
+  </div>
+
+  <!-- ============ DASHBOARD ============ -->
+  <div id="dashCard" class="card dash hidden">
+    <div class="brand"><span class="star">✦</span><h1>Xing Mandarin <span class="cn">星</span></h1></div>
+    <p class="hello">Halo, <b id="dName">—</b> 👋</p>
+    <p class="sub" id="dGreet">Siap belajar hari ini?</p>
+    <div class="rowline"><span class="k">Track</span><span class="v" id="dTrack">—</span></div>
+    <div class="rowline"><span class="k">Target Level</span><span class="v" id="dLevel">—</span></div>
+    <div class="rowline"><span class="k">Status</span><span class="pill on" id="dStatus">—</span></div>
+    <div class="rowline"><span class="k">Langganan s/d</span><span class="v" id="dSub">—</span></div>
+    <button id="practiceBtn">Mulai Latihan</button>
+    <button id="mockTestBtn">Mock Test</button>
+    <button id="raportBtn">Raport</button>
+    <button id="browseBtn">Kamus</button>
+    <button class="logout" id="logoutBtn">Keluar</button>
+  </div>
+
+  <!-- ============ PRACTICE (FLASHCARD + SRS) ============ -->
+  <div id="practiceCard" class="card practice hidden">
+    <div class="brand"><span class="star">✦</span><h1>Xing Mandarin <span class="cn">星</span></h1></div>
+
+    <div id="levelPickerView">
+      <p class="sub">Pilih level HSK buat latihan</p>
+      <div class="levelPicker" id="levelPicker"></div>
+      <button id="practiceExitBtn1" class="practiceExit">Kembali</button>
+    </div>
+
+    <div id="sessionView" class="hidden">
+      <div class="sessionMeta"><span id="sessionProgress">0 / 0</span><span id="sessionLevelLabel">—</span></div>
+      <div class="cardArea">
+        <div class="hanzi-big" id="cardHanzi">—</div>
+        <div class="pinyin-line hidden" id="cardPinyin"></div>
+        <div class="meaning-line hidden" id="cardMeaning"></div>
+      </div>
+      <button id="revealBtn" class="revealBtn">Lihat Jawaban</button>
+      <div class="gradeRow hidden" id="gradeRow">
+        <button class="gradeBtn again" data-grade="again">Lupa</button>
+        <button class="gradeBtn hard" data-grade="hard">Susah</button>
+        <button class="gradeBtn good" data-grade="good">Oke</button>
+        <button class="gradeBtn easy" data-grade="easy">Gampang</button>
+      </div>
+      <button id="exampleBtn" class="exampleBtn hidden">Contoh Kalimat</button>
+      <button id="practiceExitBtn2" class="practiceExit">Selesai / Kembali</button>
+    </div>
+
+    <div id="emptyView" class="hidden">
+      <p class="emptyState" id="emptyMsg">—</p>
+      <button id="practiceExitBtn3" class="practiceExit">Kembali ke Dashboard</button>
+    </div>
+  </div>
+
+  <!-- ============ RAPORT ============ -->
+  <div id="raportCard" class="card raport hidden">
+    <div class="brand"><span class="star">✦</span><h1>Xing Mandarin <span class="cn">星</span></h1></div>
+    <p class="sub">Raport Belajar</p>
+
+    <div class="statRow">
+      <div class="statBox"><span class="statNum" id="rDue">—</span><span class="statLabel">Due Hari Ini</span></div>
+      <div class="statBox"><span class="statNum" id="rStreak">—</span><span class="statLabel">Streak (hari)</span></div>
+    </div>
+
+    <p class="sectionTitle">Progres per Level</p>
+    <div id="rLevels"></div>
+
+    <p class="sectionTitle">Kata Terlemah</p>
+    <div id="rWeak"></div>
+
+    <button id="raportExitBtn" class="practiceExit">Kembali ke Dashboard</button>
+  </div>
+
+  <!-- ============ BROWSE / KAMUS ============ -->
+  <div id="browseCard" class="card browse hidden">
+    <div class="brand"><span class="star">✦</span><h1>Xing Mandarin <span class="cn">星</span></h1></div>
+    <p class="sub">Kamus Kosakata</p>
+
+    <div class="levelPicker" id="browseLevelPicker"></div>
+    <input id="browseSearch" class="browseSearchInput" type="text" placeholder="Cari hanzi, pinyin, atau arti..." />
+
+    <div class="browseList" id="browseList"></div>
+    <p class="browseCount" id="browseCount"></p>
+    <button id="browseMoreBtn" class="practiceExit hidden">Muat Lebih Banyak</button>
+    <button id="browseExitBtn" class="practiceExit">Kembali ke Dashboard</button>
+  </div>
+
+  <!-- ============ MOCK TEST — LIST SET ============ -->
+  <div id="mockListCard" class="card mocklist hidden">
+    <div class="brand"><span class="star">✦</span><h1>Xing Mandarin <span class="cn">星</span></h1></div>
+    <p class="sub">Mock Test</p>
+
+    <div class="levelPicker" id="mockLevelPicker"></div>
+    <div id="mockList"></div>
+
+    <button id="mockListExitBtn" class="practiceExit">Kembali ke Dashboard</button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+  /* ==========================================================
+     KONFIG — dua nilai ini aman ditaruh di client (public-safe)
+     ========================================================== */
+  const SUPABASE_URL  = 'https://xzgvhzmmqbijpbrhagjf.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6Z3Zoem1tcWJpanBicmhhZ2pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0OTA4NjMsImV4cCI6MjA5OTA2Njg2M30.9OtBJIBDDUhhSsvtz9Pql12hWToGzmULOGh7Tj-vzNs';
+
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  const SESSION_KEY = 'xm_session_id';   // simpen id sesi lokal (buat cocokin device)
+  let watchChannel = null;
+  let heartbeat = null;
+  let currentUser = null, currentProfile = null;
+  let practiceLevel = null;
+  let sessionQueue = [];
+  let sessionIndex = 0;
+  let sessionStats = { correct:0, total:0 };
+  let revealed = false;
+
+  const DUE_LIMIT = 20;
+  const NEW_CANDIDATE_LIMIT = 200;
+  const NEW_LIMIT = 10;
+
+  /* ---------- util tampilan ---------- */
+  const $ = id => document.getElementById(id);
+  const TRACK_LABEL = {hsk:'HSK Exam', business:'Bisnis', daily:'Percakapan Harian', travel:'Travel', academic:'Akademik'};
+
+  function showLogin(msg, type){
+    $('dashCard').classList.add('hidden');
+    $('practiceCard').classList.add('hidden');
+    $('raportCard').classList.add('hidden');
+    $('browseCard').classList.add('hidden');
+    $('mockListCard').classList.add('hidden');
+    $('loginCard').classList.remove('hidden');
+    const m = $('loginMsg');
+    if(msg){ m.textContent = msg; m.className = 'msg ' + (type||'err'); }
+    else { m.className='msg'; m.textContent=''; }
+    $('loginBtn').disabled = false;
+  }
+
+  function deviceLabel(){
+    const ua = navigator.userAgent;
+    let os = 'Perangkat';
+    if(/Windows/i.test(ua)) os='Windows';
+    else if(/Android/i.test(ua)) os='Android';
+    else if(/iPhone|iPad/i.test(ua)) os='iOS';
+    else if(/Mac/i.test(ua)) os='Mac';
+    else if(/Linux/i.test(ua)) os='Linux';
+    return os;
+  }
+
+  /* ---------- cek gerbang status langganan ---------- */
+  function gateReason(profile){
+    if(profile.role === 'admin') return null;            // admin selalu lolos
+    if(profile.status === 'expired') return 'Langganan kamu sudah berakhir. Hubungi admin untuk perpanjang.';
+    if(profile.subscription_end){
+      const today = new Date(); today.setHours(0,0,0,0);
+      const end = new Date(profile.subscription_end + 'T00:00:00');
+      if(end < today) return 'Masa langganan kamu sudah lewat. Hubungi admin untuk perpanjang.';
+    }
+    return null;
+  }
+
+  /* ---------- render dashboard ---------- */
+  function renderDash(profile){
+    $('loginCard').classList.add('hidden');
+    $('dashCard').classList.remove('hidden');
+    $('dName').textContent   = profile.display_name || 'Murid';
+    $('dTrack').textContent  = TRACK_LABEL[profile.active_track] || 'Belum diset';
+    $('dLevel').textContent  = profile.target_level ? ('HSK ' + profile.target_level) : '—';
+    $('dStatus').textContent = profile.role==='admin' ? 'Admin' : 'Aktif';
+    $('dSub').textContent    = profile.subscription_end || '—';
+  }
+
+  /* ---------- dengerin perebutan sesi (realtime) ---------- */
+  function watchSession(userId){
+    if(watchChannel) sb.removeChannel(watchChannel);
+    watchChannel = sb.channel('profile-watch')
+      .on('postgres_changes',
+        { event:'UPDATE', schema:'public', table:'profiles', filter:'id=eq.'+userId },
+        payload => {
+          const mine = localStorage.getItem(SESSION_KEY);
+          if(payload.new.active_session_id !== mine){
+            forceLogout('Akun kamu login di perangkat lain. Kamu keluar otomatis.');
+          }
+        })
+      .subscribe();
+  }
+
+  /* ---------- keluar paksa ---------- */
+  async function forceLogout(reason){
+    if(heartbeat){ clearInterval(heartbeat); heartbeat=null; }
+    if(watchChannel){ sb.removeChannel(watchChannel); watchChannel=null; }
+    currentUser = null; currentProfile = null;
+    localStorage.removeItem(SESSION_KEY);
+    await sb.auth.signOut();
+    showLogin(reason || null, 'err');
+  }
+
+  /* ---------- ambil profil + jalanin gerbang + sesi ---------- */
+  async function loadProfile(userId){
+    const { data:profile, error } = await sb
+      .from('profiles').select('*').eq('id', userId).single();
+    if(error || !profile){ await forceLogout('Profil tidak ditemukan. Hubungi admin.'); return; }
+
+    const blocked = gateReason(profile);
+    if(blocked){ await forceLogout(blocked); return; }
+
+    renderDash(profile);
+    currentUser = userId; currentProfile = profile;
+    watchSession(userId);
+
+    // heartbeat: perbarui last_seen tiap 2 menit
+    if(heartbeat) clearInterval(heartbeat);
+    heartbeat = setInterval(()=>{
+      const sid = localStorage.getItem(SESSION_KEY);
+      if(sid) sb.rpc('claim_session', { p_session_id: sid, p_device_label: deviceLabel() });
+    }, 120000);
+  }
+
+  /* ---------- alur LOGIN ---------- */
+  async function doLogin(){
+    const email = $('email').value.trim();
+    const pass  = $('password').value;
+    if(!email || !pass){ showLogin('Isi email dan password dulu.', 'err'); return; }
+    $('loginBtn').disabled = true;
+    showLogin(null);
+
+    const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+    if(error){ showLogin('Email atau password salah.', 'err'); return; }
+
+    const userId = data.user.id;
+    // cek gerbang dulu sebelum klaim sesi
+    const { data:profile } = await sb.from('profiles').select('*').eq('id', userId).single();
+    if(!profile){ await forceLogout('Profil tidak ditemukan. Hubungi admin.'); return; }
+    const blocked = gateReason(profile);
+    if(blocked){ await forceLogout(blocked); return; }
+
+    // klaim sesi baru → ini yang nendang device lama
+    const sid = crypto.randomUUID();
+    const { error:rpcErr } = await sb.rpc('claim_session', { p_session_id: sid, p_device_label: deviceLabel() });
+    if(rpcErr){ await forceLogout('Gagal memulai sesi. Coba lagi.'); return; }
+    localStorage.setItem(SESSION_KEY, sid);
+
+    await loadProfile(userId);
+  }
+
+  /* ---------- boot: cek kalau udah login sebelumnya ---------- */
+  async function boot(){
+    const { data:{ session } } = await sb.auth.getSession();
+    if(!session){ showLogin(); return; }
+
+    const userId = session.user.id;
+    const storedSid = localStorage.getItem(SESSION_KEY);
+
+    const { data:profile } = await sb.from('profiles').select('*').eq('id', userId).single();
+    if(!profile){ await forceLogout('Profil tidak ditemukan. Hubungi admin.'); return; }
+
+    const blocked = gateReason(profile);
+    if(blocked){ await forceLogout(blocked); return; }
+
+    // kalau sesi di server beda dari punya device ini → device ini udah kalah
+    if(!storedSid || profile.active_session_id !== storedSid){
+      await forceLogout('Sesi kamu diambil alih perangkat lain. Silakan login ulang.');
+      return;
+    }
+    await loadProfile(userId);
+  }
+
+  /* ==========================================================
+     FLASHCARD + SRS (Task 2)
+     ========================================================== */
+  function todayStr(){ return new Date().toISOString().slice(0,10); }
+
+  function openPractice(){
+    $('dashCard').classList.add('hidden');
+    $('practiceCard').classList.remove('hidden');
+    $('levelPickerView').classList.remove('hidden');
+    $('sessionView').classList.add('hidden');
+    $('emptyView').classList.add('hidden');
+    renderLevelPicker();
+  }
+
+  function backToDash(){
+    $('practiceCard').classList.add('hidden');
+    $('dashCard').classList.remove('hidden');
+  }
+
+  function renderLevelPicker(){
+    const defaultLevel = currentProfile?.target_level || 1;
+    const wrap = $('levelPicker');
+    wrap.innerHTML = '';
+    for(let lv=1; lv<=6; lv++){
+      const b = document.createElement('div');
+      b.className = 'levelBtn' + (lv===defaultLevel ? ' active' : '');
+      b.textContent = 'HSK ' + lv;
+      b.addEventListener('click', ()=>{
+        [...wrap.children].forEach(c=>c.classList.remove('active'));
+        b.classList.add('active');
+        startSession(lv);
+      });
+      wrap.appendChild(b);
+    }
+  }
+
+  // Due-review ditarik LINTAS SEMUA LEVEL (time-critical, bukan level-critical).
+  // Kandidat kata baru dibatasi NEW_CANDIDATE_LIMIT per level (known limitation,
+  // lihat catatan Task 2 — optimize belakangan kalau ada user yang mentok).
+  async function startSession(level){
+    practiceLevel = level;
+
+    const { data: seenRows, error: seenErr } = await sb
+      .from('user_mastery').select('item_key')
+      .eq('user_id', currentUser).eq('item_type', 'word');
+    if(seenErr){ alert('Gagal ambil data progres: ' + seenErr.message); return; }
+    const seenSet = new Set((seenRows||[]).map(r=>r.item_key));
+
+    const { data: dueRows, error: dueErr } = await sb
+      .from('user_mastery').select('*')
+      .eq('user_id', currentUser).eq('item_type', 'word')
+      .lte('srs_due', todayStr())
+      .order('srs_due', { ascending:true })
+      .limit(DUE_LIMIT);
+    if(dueErr){ alert('Gagal ambil kartu review: ' + dueErr.message); return; }
+
+    let dueCards = [];
+    if(dueRows && dueRows.length){
+      const dueHanzi = dueRows.map(r=>r.item_key);
+      const { data: dueVocab, error: dvErr } = await sb
+        .from('vocab').select('hanzi,pinyin,meaning_en,meaning_id')
+        .in('hanzi', dueHanzi);
+      if(dvErr){ alert('Gagal ambil detail kartu: ' + dvErr.message); return; }
+      const vocabMap = new Map((dueVocab||[]).map(v=>[v.hanzi, v]));
+      dueCards = dueRows
+        .map(r=>{
+          const v = vocabMap.get(r.item_key);
+          if(!v) return null;
+          return { ...v, isDue:true, prev: r };
+        })
+        .filter(Boolean);
+    }
+
+    const { data: levelVocab, error: lvErr } = await sb
+      .from('vocab').select('hanzi,pinyin,meaning_en,meaning_id,frequency')
+      .eq('hsk_level', level)
+      .order('frequency', { ascending:true })
+      .limit(NEW_CANDIDATE_LIMIT);
+    if(lvErr){ alert('Gagal ambil kata baru: ' + lvErr.message); return; }
+
+    const newCards = (levelVocab||[])
+      .filter(v => !seenSet.has(v.hanzi))
+      .slice(0, NEW_LIMIT)
+      .map(v => ({ ...v, isDue:false, prev:null }));
+
+    sessionQueue = [...dueCards, ...newCards];
+    sessionIndex = 0;
+    sessionStats = { correct:0, total:0 };
+
+    if(sessionQueue.length === 0){
+      $('levelPickerView').classList.add('hidden');
+      $('sessionView').classList.add('hidden');
+      $('emptyView').classList.remove('hidden');
+      $('emptyMsg').textContent = 'Belum ada kartu due-review, dan semua kata populer di HSK ' + level + ' udah pernah kamu lihat. Coba lagi nanti atau pilih level lain.';
+      return;
+    }
+
+    $('levelPickerView').classList.add('hidden');
+    $('emptyView').classList.add('hidden');
+    $('sessionView').classList.remove('hidden');
+    $('sessionLevelLabel').textContent = 'HSK ' + level;
+    renderCard();
+  }
+
+  function renderCard(){
+    revealed = false;
+    const card = sessionQueue[sessionIndex];
+    $('sessionProgress').textContent = (sessionIndex+1) + ' / ' + sessionQueue.length;
+    $('cardHanzi').textContent = card.hanzi;
+    $('cardPinyin').textContent = card.pinyin;
+    $('cardMeaning').textContent = card.meaning_id || card.meaning_en;
+    $('cardPinyin').classList.add('hidden');
+    $('cardMeaning').classList.add('hidden');
+    $('revealBtn').classList.remove('hidden');
+    $('gradeRow').classList.add('hidden');
+  }
+
+  function revealCard(){
+    revealed = true;
+    $('cardPinyin').classList.remove('hidden');
+    $('cardMeaning').classList.remove('hidden');
+    $('revealBtn').classList.add('hidden');
+    $('gradeRow').classList.remove('hidden');
+  }
+
+  async function gradeCard(grade){
+    if(!revealed) return;
+    const card = sessionQueue[sessionIndex];
+    const next = sm2Update(card.prev, grade);
+
+    sessionStats.total += 1;
+    if(grade !== 'again') sessionStats.correct += 1;
+
+    const { error } = await sb.from('user_mastery').upsert({
+      user_id: currentUser,
+      item_key: card.hanzi,
+      item_type: 'word',
+      mastery_level: next.mastery_level,
+      srs_interval: next.srs_interval,
+      srs_ease: next.srs_ease,
+      srs_reps: next.srs_reps,
+      srs_due: next.srs_due,
+      times_seen: next.times_seen,
+      times_correct: next.times_correct,
+      last_reviewed: next.last_reviewed
+    }, { onConflict: 'user_id,item_key' });
+
+    if(error){ alert('Gagal simpan progres: ' + error.message); return; }
+
+    sessionIndex += 1;
+    if(sessionIndex >= sessionQueue.length){
+      $('sessionView').classList.add('hidden');
+      $('emptyView').classList.remove('hidden');
+      $('emptyMsg').textContent = 'Sesi selesai! ' + sessionStats.correct + ' / ' + sessionStats.total + ' kartu terjawab benar.';
+      return;
+    }
+    renderCard();
+  }
+
+  // SM-2 disederhanakan ke 4 tombol grade. mastery_level = counter 0-5
+  // (naik pas benar, turun/reset pas "Lupa") — asumsi, gampang disesuaikan.
+  function sm2Update(prev, grade){
+    let interval = prev?.srs_interval ?? 0;
+    let ease = prev?.srs_ease ?? 2.5;
+    let reps = prev?.srs_reps ?? 0;
+    let timesSeen = (prev?.times_seen ?? 0) + 1;
+    let timesCorrect = prev?.times_correct ?? 0;
+    let mastery = prev?.mastery_level ?? 0;
+
+    if(grade === 'again'){
+      reps = 0;
+      interval = 1;
+      ease = Math.max(1.3, ease - 0.2);
+      mastery = Math.max(0, mastery - 1);
+    } else {
+      timesCorrect += 1;
+      if(grade === 'hard'){
+        ease = Math.max(1.3, ease - 0.15);
+        interval = reps === 0 ? 1 : Math.max(1, Math.round(interval * 1.2));
+        reps += 1;
+      } else if(grade === 'good'){
+        reps += 1;
+        interval = reps === 1 ? 1 : (reps === 2 ? 6 : Math.round(interval * ease));
+        mastery = Math.min(5, mastery + 1);
+      } else if(grade === 'easy'){
+        reps += 1;
+        interval = reps === 1 ? 4 : Math.round(interval * ease * 1.3);
+        ease = ease + 0.15;
+        mastery = Math.min(5, mastery + 2);
+      }
+    }
+
+    const d = new Date();
+    d.setDate(d.getDate() + interval);
+
+    return {
+      srs_interval: interval,
+      srs_ease: Math.round(ease * 100) / 100,
+      srs_reps: reps,
+      srs_due: d.toISOString().slice(0,10),   // cocok kolom `date`
+      times_seen: timesSeen,
+      times_correct: timesCorrect,
+      mastery_level: mastery,
+      last_reviewed: new Date().toISOString()
+    };
+  }
+
+  /* ==========================================================
+     RAPORT (Task 3)
+     ========================================================== */
+  const MASTERED_THRESHOLD = 4;
+  const WEAK_LIMIT = 10;
+
+  async function openRaport(){
+    $('dashCard').classList.add('hidden');
+    $('raportCard').classList.remove('hidden');
+    $('rDue').textContent = '…';
+    $('rStreak').textContent = '…';
+    $('rLevels').innerHTML = '';
+    $('rWeak').innerHTML = '';
+    await loadRaport();
+  }
+
+  function closeRaport(){
+    $('raportCard').classList.add('hidden');
+    $('dashCard').classList.remove('hidden');
+  }
+
+  async function loadRaport(){
+    const { data: vocabAll, error: vErr } = await sb.from('vocab').select('hanzi,hsk_level');
+    if(vErr){ alert('Gagal ambil data vocab: ' + vErr.message); return; }
+    const levelOf = new Map(vocabAll.map(v=>[v.hanzi, v.hsk_level]));
+    const levelTotals = {1:0,2:0,3:0,4:0,5:0,6:0};
+    vocabAll.forEach(v=>{ levelTotals[v.hsk_level] = (levelTotals[v.hsk_level]||0) + 1; });
+
+    const { data: mastery, error: mErr } = await sb
+      .from('user_mastery').select('item_key,mastery_level,times_seen,times_correct,srs_due,last_reviewed')
+      .eq('user_id', currentUser).eq('item_type', 'word');
+    if(mErr){ alert('Gagal ambil data progres: ' + mErr.message); return; }
+
+    const dueCount = mastery.filter(m => m.srs_due && m.srs_due <= todayStr()).length;
+    $('rDue').textContent = dueCount;
+
+    const dateSet = new Set(mastery.filter(m=>m.last_reviewed).map(m=>m.last_reviewed.slice(0,10)));
+    $('rStreak').textContent = computeStreak(dateSet);
+
+    const seenPerLevel = {1:0,2:0,3:0,4:0,5:0,6:0};
+    const masteredPerLevel = {1:0,2:0,3:0,4:0,5:0,6:0};
+    mastery.forEach(m=>{
+      const lv = levelOf.get(m.item_key);
+      if(!lv) return;
+      seenPerLevel[lv] += 1;
+      if(m.mastery_level >= MASTERED_THRESHOLD) masteredPerLevel[lv] += 1;
+    });
+
+    const levelsWrap = $('rLevels');
+    levelsWrap.innerHTML = '';
+    for(let lv=1; lv<=6; lv++){
+      const total = levelTotals[lv] || 0;
+      const seen = seenPerLevel[lv] || 0;
+      const mastered = masteredPerLevel[lv] || 0;
+      const pct = total ? Math.round((seen/total)*100) : 0;
+      const row = document.createElement('div');
+      row.className = 'levelRow';
+      row.innerHTML = `<span class="levelName">HSK ${lv}</span>
+        <div class="levelBar"><div class="levelBarFill" style="width:${pct}%"></div></div>
+        <span class="levelNums">${seen} dilihat · ${mastered} dikuasai / ${total}</span>`;
+      levelsWrap.appendChild(row);
+    }
+
+    const weakSorted = mastery
+      .filter(m=>m.times_seen > 0)
+      .sort((a,b)=>{
+        if(a.mastery_level !== b.mastery_level) return a.mastery_level - b.mastery_level;
+        return (a.times_correct/a.times_seen) - (b.times_correct/b.times_seen);
+      })
+      .slice(0, WEAK_LIMIT);
+
+    const weakWrap = $('rWeak');
+    weakWrap.innerHTML = '';
+    if(weakSorted.length === 0){
+      weakWrap.innerHTML = '<p class="emptyState">Belum ada kata yang direview.</p>';
+    } else {
+      const weakHanzi = weakSorted.map(m=>m.item_key);
+      const { data: weakVocab, error: wvErr } = await sb
+        .from('vocab').select('hanzi,pinyin,meaning_en,meaning_id')
+        .in('hanzi', weakHanzi);
+      if(wvErr){ alert('Gagal ambil detail kata terlemah: ' + wvErr.message); return; }
+      const vocabMap = new Map(weakVocab.map(v=>[v.hanzi, v]));
+      weakSorted.forEach(m=>{
+        const v = vocabMap.get(m.item_key);
+        if(!v) return;
+        const item = document.createElement('div');
+        item.className = 'weakItem';
+        item.innerHTML = `<span class="weakHanzi">${v.hanzi}</span>
+          <span class="weakPinyin">${v.pinyin}</span>
+          <span class="weakMeaning">${v.meaning_id || v.meaning_en}</span>
+          <span class="weakMastery">Lv ${m.mastery_level}</span>`;
+        weakWrap.appendChild(item);
+      });
+    }
+  }
+
+  function computeStreak(dateSet){
+    let streak = 0;
+    let d = new Date(todayStr() + 'T00:00:00Z');
+    if(!dateSet.has(d.toISOString().slice(0,10))) d.setUTCDate(d.getUTCDate() - 1);
+    while(dateSet.has(d.toISOString().slice(0,10))){
+      streak++;
+      d.setUTCDate(d.getUTCDate() - 1);
+    }
+    return streak;
+  }
+
+  /* ==========================================================
+     BROWSE / KAMUS (Task 4)
+     ========================================================== */
+  let browseLevel = null;
+  let browseCache = [];
+  let browseFiltered = [];
+  let browseShown = 0;
+  const BROWSE_PAGE_SIZE = 50;
+
+  const DIACRITIC_RANGE = new RegExp('[' + String.fromCharCode(0x0300) + '-' + String.fromCharCode(0x036f) + ']', 'g');
+  function stripDiacritics(s){
+    return (s||'').normalize('NFD').replace(DIACRITIC_RANGE,'').toLowerCase();
+  }
+
+  function openBrowse(){
+    $('dashCard').classList.add('hidden');
+    $('browseCard').classList.remove('hidden');
+    $('browseSearch').value = '';
+    renderBrowseLevelPicker();
+  }
+
+  function closeBrowse(){
+    $('browseCard').classList.add('hidden');
+    $('dashCard').classList.remove('hidden');
+  }
+
+  function renderBrowseLevelPicker(){
+    const defaultLevel = currentProfile?.target_level || 1;
+    const wrap = $('browseLevelPicker');
+    wrap.innerHTML = '';
+    for(let lv=1; lv<=6; lv++){
+      const b = document.createElement('div');
+      b.className = 'levelBtn' + (lv===defaultLevel ? ' active' : '');
+      b.textContent = 'HSK ' + lv;
+      b.addEventListener('click', ()=>{
+        [...wrap.children].forEach(c=>c.classList.remove('active'));
+        b.classList.add('active');
+        loadBrowseLevel(lv);
+      });
+      wrap.appendChild(b);
+    }
+    loadBrowseLevel(defaultLevel);
+  }
+
+  async function loadBrowseLevel(level){
+    browseLevel = level;
+    $('browseList').innerHTML = '<p class="emptyState">Memuat...</p>';
+    $('browseCount').textContent = '';
+    $('browseMoreBtn').classList.add('hidden');
+    const { data, error } = await sb
+      .from('vocab').select('hanzi,pinyin,meaning_en,meaning_id,frequency')
+      .eq('hsk_level', level)
+      .order('frequency', { ascending:true });
+    if(error){ alert('Gagal ambil daftar kata: ' + error.message); return; }
+    browseCache = (data||[]).map(v => ({
+      ...v,
+      _search: stripDiacritics(v.hanzi + ' ' + v.pinyin + ' ' + v.meaning_en + ' ' + (v.meaning_id||''))
+    }));
+    applyBrowseFilter();
+  }
+
+  function applyBrowseFilter(){
+    const q = stripDiacritics($('browseSearch').value.trim());
+    browseFiltered = q ? browseCache.filter(v => v._search.includes(q)) : browseCache;
+    browseShown = 0;
+    $('browseList').innerHTML = '';
+    renderBrowseChunk();
+  }
+
+  function renderBrowseChunk(){
+    const wrap = $('browseList');
+    if(browseFiltered.length === 0){
+      wrap.innerHTML = '<p class="emptyState">Nggak ada kata yang cocok.</p>';
+      $('browseCount').textContent = '0 kata';
+      $('browseMoreBtn').classList.add('hidden');
+      return;
+    }
+    const next = browseFiltered.slice(browseShown, browseShown + BROWSE_PAGE_SIZE);
+    next.forEach(v=>{
+      const item = document.createElement('div');
+      item.className = 'browseItem';
+      item.innerHTML = `<span class="browseHanzi">${v.hanzi}</span>
+        <span class="browsePinyin">${v.pinyin}</span>
+        <span class="browseMeaning">${v.meaning_id || v.meaning_en}</span>`;
+      wrap.appendChild(item);
+    });
+    browseShown += next.length;
+    $('browseCount').textContent = browseShown + ' / ' + browseFiltered.length + ' kata';
+    $('browseMoreBtn').classList.toggle('hidden', browseShown >= browseFiltered.length);
+  }
+
+  /* ==========================================================
+     MOCK TEST — LIST SET (Task 2)
+     ========================================================== */
+  const SECTION_LABEL = {reading:'Membaca', listening:'Mendengar', writing:'Menulis'};
+  let mockLevel = null;
+
+  function openMockList(){
+    $('dashCard').classList.add('hidden');
+    $('mockListCard').classList.remove('hidden');
+    renderMockLevelPicker();
+  }
+
+  function closeMockList(){
+    $('mockListCard').classList.add('hidden');
+    $('dashCard').classList.remove('hidden');
+  }
+
+  function renderMockLevelPicker(){
+    const defaultLevel = currentProfile?.target_level || 1;
+    const wrap = $('mockLevelPicker');
+    wrap.innerHTML = '';
+    for(let lv=1; lv<=6; lv++){
+      const b = document.createElement('div');
+      b.className = 'levelBtn' + (lv===defaultLevel ? ' active' : '');
+      b.textContent = 'HSK ' + lv;
+      b.addEventListener('click', ()=>{
+        [...wrap.children].forEach(c=>c.classList.remove('active'));
+        b.classList.add('active');
+        loadMockList(lv);
+      });
+      wrap.appendChild(b);
+    }
+    loadMockList(defaultLevel);
+  }
+
+  function formatMockDate(iso){
+    const d = new Date(iso);
+    return d.toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' });
+  }
+
+  async function loadMockList(level){
+    mockLevel = level;
+    const wrap = $('mockList');
+    wrap.innerHTML = '<p class="emptyState">Memuat...</p>';
+
+    const { data: sets, error: setErr } = await sb
+      .from('test_sets').select('set_id,hsk_level,section,title,time_limit_seconds,total_questions')
+      .eq('is_published', true).eq('hsk_level', level)
+      .order('section', { ascending:true }).order('set_id', { ascending:true });
+    if(setErr){ alert('Gagal ambil daftar mock test: ' + setErr.message); return; }
+
+    if(!sets || sets.length === 0){
+      wrap.innerHTML = '<p class="emptyState">Belum ada mock test untuk HSK ' + level + '.</p>';
+      return;
+    }
+
+    const { data: attempts, error: attErr } = await sb
+      .from('test_attempts').select('set_id,score,total_points,correct_count,total_questions,created_at')
+      .eq('user_id', currentUser).eq('hsk_level', level)
+      .order('created_at', { ascending:false });
+    if(attErr){ alert('Gagal ambil riwayat attempt: ' + attErr.message); return; }
+
+    const lastAttempt = new Map();
+    (attempts||[]).forEach(a=>{ if(!lastAttempt.has(a.set_id)) lastAttempt.set(a.set_id, a); });
+
+    wrap.innerHTML = '';
+    sets.forEach(s=>{
+      const attempt = lastAttempt.get(s.set_id);
+      const minutes = Math.round(s.time_limit_seconds / 60);
+      const card = document.createElement('div');
+      card.className = 'mockSetCard';
+      card.innerHTML = `
+        <div class="mockSetTitle">${s.title}</div>
+        <div class="mockSetMeta">HSK ${s.hsk_level} · ${SECTION_LABEL[s.section] || s.section} · ${s.total_questions} soal · ${minutes} menit</div>
+        ${attempt ? `<div class="mockSetScore">Terakhir: ${attempt.score}/${attempt.total_points} · Benar ${attempt.correct_count}/${attempt.total_questions} · ${formatMockDate(attempt.created_at)}</div>` : ''}
+        <button class="mockSetBtn" data-set="${s.set_id}">${attempt ? 'Ulangi' : 'Mulai'}</button>
+      `;
+      wrap.appendChild(card);
+    });
+  }
+
+  function startAttempt(setId){
+    // TODO Task 3: halaman ngerjain soal. Untuk sekarang cuma placeholder.
+    alert('Halaman ngerjain soal (Task 3) belum dibangun. Set dipilih: ' + setId);
+  }
+
+  /* ---------- events ---------- */
+  $('loginBtn').addEventListener('click', doLogin);
+  $('password').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+  $('logoutBtn').addEventListener('click', ()=> forceLogout(null));
+  $('practiceBtn').addEventListener('click', openPractice);
+  $('practiceExitBtn1').addEventListener('click', backToDash);
+  $('practiceExitBtn2').addEventListener('click', backToDash);
+  $('practiceExitBtn3').addEventListener('click', backToDash);
+  $('revealBtn').addEventListener('click', revealCard);
+  $('gradeRow').addEventListener('click', e=>{
+    const btn = e.target.closest('.gradeBtn');
+    if(btn) gradeCard(btn.dataset.grade);
+  });
+  $('raportBtn').addEventListener('click', openRaport);
+  $('raportExitBtn').addEventListener('click', closeRaport);
+  $('browseBtn').addEventListener('click', openBrowse);
+  $('browseExitBtn').addEventListener('click', closeBrowse);
+  $('browseSearch').addEventListener('input', applyBrowseFilter);
+  $('browseMoreBtn').addEventListener('click', renderBrowseChunk);
+  $('mockTestBtn').addEventListener('click', openMockList);
+  $('mockListExitBtn').addEventListener('click', closeMockList);
+  $('mockList').addEventListener('click', e=>{
+    const btn = e.target.closest('button[data-set]');
+    if(btn) startAttempt(btn.dataset.set);
+  });
+
+  boot();
+  </script>
+</body>
+</html>

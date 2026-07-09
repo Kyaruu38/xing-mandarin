@@ -1,0 +1,222 @@
+{
+  "meta": {
+    "level": 4,
+    "section": "reading",
+    "set_code": "HSK4-R-001",
+    "note": "Konten 100% original (bukan comot soal resmi). Format mengikuti struktur HSK 4 阅读: 3 bagian. Terjemahan Indonesia disediakan untuk bantu murid.",
+    "total_questions": 40
+  },
+  "parts": [
+    {
+      "part": 1,
+      "type": "fill_blank",
+      "instruction_zh": "选词填空",
+      "instruction_id": "Pilih kata yang tepat dari bank untuk mengisi bagian rumpang.",
+      "subsections": [
+        {
+          "range": "1-5",
+          "style": "single_sentence",
+          "word_bank": [
+            {"key": "A", "word": "严格", "pinyin": "yángé", "id": "ketat/tegas"},
+            {"key": "B", "word": "温度", "pinyin": "wēndù", "id": "suhu"},
+            {"key": "C", "word": "详细", "pinyin": "xiángxì", "id": "rinci/detail"},
+            {"key": "D", "word": "推迟", "pinyin": "tuīchí", "id": "menunda"},
+            {"key": "E", "word": "坚持", "pinyin": "jiānchí", "id": "bertahan/konsisten"},
+            {"key": "F", "word": "打扰", "pinyin": "dǎrǎo", "id": "mengganggu (pengecoh)"}
+          ],
+          "questions": [
+            {"no": 1, "text_zh": "医生说，只要每天（　）锻炼，身体就会越来越好。", "text_id": "Dokter bilang, asal tiap hari ( ) olahraga, badan akan makin sehat.", "answer": "E"},
+            {"no": 2, "text_zh": "今天的（　）比昨天低多了，出门记得多穿件衣服。", "text_id": "( ) hari ini jauh lebih rendah dari kemarin, kalau keluar inget pakai baju lebih tebal.", "answer": "B"},
+            {"no": 3, "text_zh": "这位老师对学生要求非常（　），作业错一个字都要重写。", "text_id": "Guru ini sangat ( ) ke murid, PR salah satu huruf pun harus tulis ulang.", "answer": "A"},
+            {"no": 4, "text_zh": "会议因为经理临时有事，只好（　）到下午三点。", "text_id": "Rapat terpaksa ( ) ke jam 3 sore karena manajer ada urusan mendadak.", "answer": "D"},
+            {"no": 5, "text_zh": "关于这个计划，请你写一份更（　）的报告给我。", "text_id": "Soal rencana ini, tolong buatkan laporan yang lebih ( ) untuk saya.", "answer": "C"}
+          ]
+        },
+        {
+          "range": "6-10",
+          "style": "dialogue",
+          "word_bank": [
+            {"key": "A", "word": "提醒", "pinyin": "tíxǐng", "id": "mengingatkan"},
+            {"key": "B", "word": "后悔", "pinyin": "hòuhuǐ", "id": "menyesal"},
+            {"key": "C", "word": "直接", "pinyin": "zhíjiē", "id": "langsung"},
+            {"key": "D", "word": "重点", "pinyin": "zhòngdiǎn", "id": "poin penting"},
+            {"key": "E", "word": "修改", "pinyin": "xiūgǎi", "id": "merevisi"},
+            {"key": "F", "word": "意见", "pinyin": "yìjiàn", "id": "pendapat (pengecoh)"}
+          ],
+          "questions": [
+            {"no": 6, "text_zh": "A：明天的火车是早上七点的。\nB：谢谢你（　），不然我肯定睡过头。", "text_id": "A: Kereta besok jam 7 pagi. B: Makasih udah ( ), kalau nggak pasti aku kesiangan.", "answer": "A"},
+            {"no": 7, "text_zh": "A：你的文章写得不错，就是结尾需要再（　）一下。\nB：好的，我今天就改。", "text_id": "A: Artikelmu bagus, cuma bagian akhir perlu di( ) sedikit. B: Oke, hari ini aku ubah.", "answer": "E"},
+            {"no": 8, "text_zh": "A：这次没去成，你会不会（　）？\nB：不会，机会以后还有。", "text_id": "A: Kali ini gagal ikut, kamu ( ) nggak? B: Nggak, kesempatan masih ada nanti.", "answer": "B"},
+            {"no": 9, "text_zh": "A：报告太长了，能不能说说（　）就行？\nB：好，我简单说三点。", "text_id": "A: Laporannya kepanjangan, bisa nggak sebutin ( )-nya aja? B: Oke, aku sebutin 3 poin.", "answer": "D"},
+            {"no": 10, "text_zh": "A：你有话就（　）说吧，不用客气。\nB：那我就说了啊。", "text_id": "A: Kalau ada yang mau diomongin ( ) aja, nggak usah sungkan. B: Ya udah aku omongin ya.", "answer": "C"}
+          ]
+        }
+      ]
+    },
+    {
+      "part": 2,
+      "type": "ordering",
+      "instruction_zh": "排列顺序",
+      "instruction_id": "Susun potongan kalimat A/B/C menjadi urutan yang benar.",
+      "questions": [
+        {"no": 11, "fragments": {"A": "可是他一点也不骄傲", "B": "他是我们班成绩最好的学生", "C": "还经常帮助别的同学"}, "fragments_id": {"A": "tapi dia sama sekali nggak sombong", "B": "dia murid dengan nilai terbaik di kelas", "C": "malah sering bantu teman lain"}, "answer": "BAC"},
+        {"no": 12, "fragments": {"A": "于是我决定坐地铁去", "B": "今天早上路上特别堵", "C": "果然比平时早到了半小时"}, "fragments_id": {"A": "jadi aku putuskan naik kereta bawah tanah", "B": "pagi ini jalanan macet banget", "C": "ternyata sampai setengah jam lebih awal dari biasanya"}, "answer": "BAC"},
+        {"no": 13, "fragments": {"A": "首先要选好合适的地点", "B": "开一家饭馆并不容易", "C": "然后还得考虑菜的味道和价格"}, "fragments_id": {"A": "pertama harus pilih lokasi yang pas", "B": "buka restoran itu nggak gampang", "C": "lalu masih harus pikirkan rasa dan harga makanan"}, "answer": "BAC"},
+        {"no": 14, "fragments": {"A": "这本书我看了三遍", "B": "每次都有新的收获", "C": "所以我特别推荐给你"}, "fragments_id": {"A": "buku ini sudah kubaca tiga kali", "B": "tiap kali selalu ada pelajaran baru", "C": "makanya aku sangat merekomendasikannya ke kamu"}, "answer": "ABC"},
+        {"no": 15, "fragments": {"A": "但是坚持了一个月以后", "B": "刚开始跑步的时候我很累", "C": "我发现自己的身体好多了"}, "fragments_id": {"A": "tapi setelah bertahan satu bulan", "B": "waktu awal lari aku capek banget", "C": "aku sadar badanku jauh lebih sehat"}, "answer": "BAC"},
+        {"no": 16, "fragments": {"A": "因为外面下起了大雨", "B": "我们原来打算去公园", "C": "只好改在家里看电影"}, "fragments_id": {"A": "karena di luar hujan deras", "B": "kami awalnya mau ke taman", "C": "terpaksa ganti nonton film di rumah"}, "answer": "BAC"},
+        {"no": 17, "fragments": {"A": "它不仅方便了我们的生活", "B": "手机现在越来越重要", "C": "也改变了人们交流的方式"}, "fragments_id": {"A": "ia bukan cuma memudahkan hidup kita", "B": "HP sekarang makin penting", "C": "tapi juga mengubah cara orang berkomunikasi"}, "answer": "BAC"},
+        {"no": 18, "fragments": {"A": "老师让我们分成几个小组", "B": "这样大家都能说出自己的想法", "C": "讨论今天学的内容"}, "fragments_id": {"A": "guru menyuruh kami bagi jadi beberapa kelompok", "B": "dengan begini semua bisa menyampaikan pendapatnya", "C": "mendiskusikan materi yang dipelajari hari ini"}, "answer": "ACB"},
+        {"no": 19, "fragments": {"A": "记得带上雨伞", "B": "天气预报说明天有雨", "C": "免得被雨淋湿"}, "fragments_id": {"A": "inget bawa payung", "B": "ramalan cuaca bilang besok hujan", "C": "biar nggak kehujanan"}, "answer": "BAC"},
+        {"no": 20, "fragments": {"A": "虽然价格比别的贵一些", "B": "这家店的水果很新鲜", "C": "但是我还是愿意来买"}, "fragments_id": {"A": "walaupun harganya agak lebih mahal dari yang lain", "B": "buah di toko ini segar sekali", "C": "tapi aku tetap mau beli di sini"}, "answer": "BAC"}
+      ]
+    },
+    {
+      "part": 3,
+      "type": "reading_mc",
+      "instruction_zh": "阅读理解",
+      "instruction_id": "Baca teks lalu pilih jawaban yang benar (A/B/C/D).",
+      "passages": [
+        {
+          "no": [21],
+          "passage_zh": "很多人喜欢在睡觉前玩手机，其实这个习惯对身体不好。手机的光会影响睡眠，让人更难入睡。专家建议，睡觉前一个小时最好别看手机。",
+          "passage_id": "Banyak orang suka main HP sebelum tidur, padahal kebiasaan ini nggak baik buat tubuh. Cahaya HP mengganggu tidur, bikin lebih susah terlelap. Pakar menyarankan, sejam sebelum tidur sebaiknya jangan lihat HP.",
+          "questions": [
+            {"no": 21, "q_zh": "睡前玩手机有什么影响？", "q_id": "Apa dampak main HP sebelum tidur?", "options": {"A": "对眼睛好 (baik untuk mata)", "B": "更难入睡 (lebih susah tidur)", "C": "让人开心 (bikin senang)", "D": "提高效率 (menaikkan efisiensi)"}, "answer": "B"}
+          ]
+        },
+        {
+          "no": [22],
+          "passage_zh": "我家附近新开了一家图书馆，里面又大又安静。周末的时候，我常常带孩子去那儿看书。孩子很喜欢，每次都不想回家。",
+          "passage_id": "Di dekat rumahku baru buka perpustakaan, di dalamnya luas dan tenang. Kalau akhir pekan, aku sering ajak anak baca di sana. Anaknya suka banget, tiap kali nggak mau pulang.",
+          "questions": [
+            {"no": 22, "q_zh": "关于那家图书馆，可以知道什么？", "q_id": "Apa yang bisa diketahui tentang perpustakaan itu?", "options": {"A": "离得很远 (jauh)", "B": "环境很吵 (berisik)", "C": "很受孩子欢迎 (disukai anak)", "D": "只有周末开门 (buka cuma akhir pekan)"}, "answer": "C"}
+          ]
+        },
+        {
+          "no": [23],
+          "passage_zh": "做菜的时候，盐不能放得太早。太早放盐，菜里的水分会流出来，味道反而不好。最好等菜快熟的时候再放。",
+          "passage_id": "Saat masak, garam jangan ditaruh terlalu awal. Kalau terlalu awal, air dalam sayur keluar, rasanya malah nggak enak. Sebaiknya tunggu sampai masakan hampir matang baru ditaruh.",
+          "questions": [
+            {"no": 23, "q_zh": "这段话主要谈什么？", "q_id": "Paragraf ini terutama membahas apa?", "options": {"A": "怎么买菜 (cara beli sayur)", "B": "放盐的时间 (waktu menaruh garam)", "C": "菜的价格 (harga sayur)", "D": "做菜的工具 (alat masak)"}, "answer": "B"}
+          ]
+        },
+        {
+          "no": [24],
+          "passage_zh": "小王刚来公司的时候，什么都不会，经常出错。但他很努力，遇到不懂的就问同事。半年以后，他已经成了部门里最能干的人之一。",
+          "passage_id": "Waktu Xiao Wang baru masuk perusahaan, dia nggak bisa apa-apa, sering salah. Tapi dia rajin, kalau nggak ngerti langsung tanya rekan. Setengah tahun kemudian, dia sudah jadi salah satu yang paling cakap di divisinya.",
+          "questions": [
+            {"no": 24, "q_zh": "小王现在怎么样？", "q_id": "Xiao Wang sekarang bagaimana?", "options": {"A": "还是常出错 (masih sering salah)", "B": "离开了公司 (keluar dari perusahaan)", "C": "工作能力强 (kemampuan kerjanya kuat)", "D": "不爱问问题 (nggak suka bertanya)"}, "answer": "C"}
+          ]
+        },
+        {
+          "no": [25],
+          "passage_zh": "旅行不一定要去很远的地方。有时候，就在自己生活的城市里走一走，也能发现很多以前没注意到的美丽风景。",
+          "passage_id": "Traveling nggak harus ke tempat jauh. Kadang, cukup jalan-jalan di kota tempat kita tinggal, kita bisa menemukan banyak pemandangan indah yang dulu nggak kita perhatikan.",
+          "questions": [
+            {"no": 25, "q_zh": "这段话告诉我们：", "q_id": "Paragraf ini memberitahu kita:", "options": {"A": "旅行很花钱 (traveling boros)", "B": "近处也有美景 (dekat pun ada pemandangan indah)", "C": "远方更好玩 (tempat jauh lebih seru)", "D": "别一个人旅行 (jangan traveling sendirian)"}, "answer": "B"}
+          ]
+        },
+        {
+          "no": [26],
+          "passage_zh": "很多年轻人找工作时只看工资，其实这样不太好。除了工资，还应该考虑这份工作能不能让自己学到东西，有没有发展的机会。",
+          "passage_id": "Banyak anak muda cari kerja cuma lihat gaji, padahal itu kurang bagus. Selain gaji, harus juga dipikir apakah kerjaan ini bisa bikin kita belajar sesuatu, ada peluang berkembang atau nggak.",
+          "questions": [
+            {"no": 26, "q_zh": "找工作时，作者认为应该：", "q_id": "Saat cari kerja, menurut penulis sebaiknya:", "options": {"A": "只看工资 (cuma lihat gaji)", "B": "选离家近的 (pilih yang dekat rumah)", "C": "考虑发展机会 (pertimbangkan peluang berkembang)", "D": "听父母的意见 (ikuti pendapat ortu)"}, "answer": "C"}
+          ]
+        },
+        {
+          "no": [27],
+          "passage_zh": "养成读书的习惯很重要。每天哪怕只读十分钟，时间长了，你读过的书也会变成一笔很大的财富，让你变得更聪明。",
+          "passage_id": "Membangun kebiasaan membaca itu penting. Tiap hari meski cuma 10 menit, lama-lama buku yang sudah kamu baca akan jadi kekayaan besar, bikin kamu lebih pintar.",
+          "questions": [
+            {"no": 27, "q_zh": "根据这段话，读书：", "q_id": "Menurut paragraf ini, membaca:", "options": {"A": "浪费时间 (buang waktu)", "B": "要读得很快 (harus cepat)", "C": "每天读很久 (tiap hari harus lama)", "D": "贵在坚持 (yang penting konsisten)"}, "answer": "D"}
+          ]
+        },
+        {
+          "no": [28],
+          "passage_zh": "笑对身体有很多好处。经常笑的人不容易生病，看起来也更年轻。所以，遇到不开心的事，试着笑一笑，也许问题就没那么难了。",
+          "passage_id": "Tertawa punya banyak manfaat buat tubuh. Orang yang sering tertawa nggak gampang sakit, kelihatan lebih muda juga. Jadi, kalau ada hal yang nggak menyenangkan, coba tersenyum, mungkin masalahnya jadi nggak seberat itu.",
+          "questions": [
+            {"no": 28, "q_zh": "这段话主要想告诉我们：", "q_id": "Paragraf ini terutama ingin memberitahu:", "options": {"A": "别乱开玩笑 (jangan sembarangan bercanda)", "B": "笑对身体好 (tertawa baik untuk tubuh)", "C": "年轻人爱笑 (anak muda suka tertawa)", "D": "生病要看医生 (sakit harus ke dokter)"}, "answer": "B"}
+          ]
+        },
+        {
+          "no": [29, 30],
+          "passage_zh": "每个人都会遇到失败。失败并不可怕，可怕的是失败以后就放弃。其实，失败能让我们发现自己的问题，只要认真总结，下次就能做得更好。所以说，失败也是一种财富。",
+          "passage_id": "Setiap orang pasti mengalami kegagalan. Gagal itu nggak menakutkan, yang menakutkan adalah menyerah setelah gagal. Sebenarnya, kegagalan membuat kita menemukan masalah kita sendiri; asal serius mengevaluasi, lain kali bisa lebih baik. Jadi, kegagalan juga sebuah kekayaan.",
+          "questions": [
+            {"no": 29, "q_zh": "作者觉得失败以后最不应该：", "q_id": "Menurut penulis, setelah gagal yang paling tidak boleh:", "options": {"A": "总结经验 (mengevaluasi pengalaman)", "B": "马上放弃 (langsung menyerah)", "C": "继续努力 (terus berusaha)", "D": "找出问题 (mencari masalah)"}, "answer": "B"},
+            {"no": 30, "q_zh": "这段话主要想告诉我们：", "q_id": "Paragraf ini terutama ingin memberitahu:", "options": {"A": "失败很可怕 (kegagalan menakutkan)", "B": "别怕失败 (jangan takut gagal)", "C": "成功很容易 (sukses itu gampang)", "D": "要少犯错误 (harus sedikit berbuat salah)"}, "answer": "B"}
+          ]
+        },
+        {
+          "no": [31],
+          "passage_zh": "现在很多人习惯用电脑打字，很少用笔写字了。时间长了，有些字虽然认识，但是拿起笔却写不出来。所以，我们平时也应该多练习写字。",
+          "passage_id": "Sekarang banyak orang terbiasa mengetik pakai komputer, jarang nulis pakai pena. Lama-lama, ada huruf yang meski kenal, tapi begitu pegang pena malah nggak bisa nulisnya. Jadi, sehari-hari kita juga perlu lebih banyak latihan menulis.",
+          "questions": [
+            {"no": 31, "q_zh": "为什么有些字写不出来？", "q_id": "Kenapa ada huruf yang nggak bisa ditulis?", "options": {"A": "太难了 (terlalu susah)", "B": "没学过 (belum pernah belajar)", "C": "很少用笔写 (jarang nulis pakai pena)", "D": "电脑坏了 (komputer rusak)"}, "answer": "C"}
+          ]
+        },
+        {
+          "no": [32],
+          "passage_zh": "这家餐厅的服务很有特点。客人还没开口，服务员就能猜到他们需要什么。正因为这样，很多客人都愿意常常来这儿吃饭。",
+          "passage_id": "Pelayanan restoran ini punya ciri khas. Sebelum tamu buka mulut, pelayannya sudah bisa menebak apa yang mereka butuh. Justru karena itu, banyak tamu mau sering makan di sini.",
+          "questions": [
+            {"no": 32, "q_zh": "客人为什么愿意常来？", "q_id": "Kenapa tamu mau sering datang?", "options": {"A": "菜很便宜 (masakan murah)", "B": "离家很近 (dekat rumah)", "C": "服务很好 (pelayanan bagus)", "D": "环境安静 (suasana tenang)"}, "answer": "C"}
+          ]
+        },
+        {
+          "no": [33],
+          "passage_zh": "别人给你提意见的时候，先别急着生气。有时候，正是这些意见能帮我们看到自己看不到的缺点，让我们进步得更快。",
+          "passage_id": "Waktu orang memberi masukan, jangan buru-buru marah. Kadang, justru masukan itulah yang membantu kita melihat kekurangan yang nggak kita lihat sendiri, bikin kita maju lebih cepat.",
+          "questions": [
+            {"no": 33, "q_zh": "应该怎样对待别人的意见？", "q_id": "Bagaimana seharusnya menyikapi masukan orang lain?", "options": {"A": "马上生气 (langsung marah)", "B": "完全不听 (sama sekali nggak dengar)", "C": "认真接受 (menerima dengan serius)", "D": "直接拒绝 (langsung menolak)"}, "answer": "C"}
+          ]
+        },
+        {
+          "no": [34, 35],
+          "passage_zh": "小张大学学的是音乐，毕业后却当了一名记者。有人觉得可惜，但他说，虽然工作和专业不一样，可是大学学到的东西让他做事更认真、更有耐心，这些对他现在的工作帮助很大。",
+          "passage_id": "Xiao Zhang kuliah jurusan musik, tapi setelah lulus malah jadi wartawan. Ada yang merasa sayang, tapi dia bilang, meski kerjaan dan jurusannya beda, hal-hal yang dia pelajari di kuliah membuatnya lebih teliti dan sabar, dan itu sangat membantu pekerjaannya sekarang.",
+          "questions": [
+            {"no": 34, "q_zh": "小张现在做什么工作？", "q_id": "Xiao Zhang sekarang kerja apa?", "options": {"A": "音乐老师 (guru musik)", "B": "记者 (wartawan)", "C": "歌手 (penyanyi)", "D": "医生 (dokter)"}, "answer": "B"},
+            {"no": 35, "q_zh": "小张觉得大学的学习：", "q_id": "Menurut Xiao Zhang, kuliahnya:", "options": {"A": "没有用 (nggak berguna)", "B": "很浪费时间 (buang waktu)", "C": "对现在有帮助 (membantu sekarang)", "D": "应该换专业 (harusnya ganti jurusan)"}, "answer": "C"}
+          ]
+        },
+        {
+          "no": [36],
+          "passage_zh": "天气越来越热了，很多人喜欢喝冰的东西。但是医生提醒，一次喝太多冰水对胃不好，特别是运动以后，最好先休息一会儿再喝。",
+          "passage_id": "Cuaca makin panas, banyak orang suka minum yang dingin. Tapi dokter mengingatkan, sekali minum es terlalu banyak nggak baik buat lambung, apalagi setelah olahraga, sebaiknya istirahat dulu sebentar baru minum.",
+          "questions": [
+            {"no": 36, "q_zh": "医生提醒我们什么？", "q_id": "Dokter mengingatkan kita apa?", "options": {"A": "别喝水 (jangan minum air)", "B": "多运动 (banyak olahraga)", "C": "别一次喝太多冰水 (jangan sekali minum banyak air es)", "D": "运动后马上喝水 (langsung minum setelah olahraga)"}, "answer": "C"}
+          ]
+        },
+        {
+          "no": [37],
+          "passage_zh": "父母的一言一行都会影响孩子。如果父母自己天天看手机，却让孩子去读书，孩子往往是不会听的。想教育好孩子，父母首先要做好自己。",
+          "passage_id": "Setiap ucapan dan tindakan orang tua memengaruhi anak. Kalau orang tua sendiri tiap hari main HP, tapi menyuruh anak baca buku, anak biasanya nggak akan nurut. Kalau mau mendidik anak dengan baik, orang tua harus lebih dulu memperbaiki diri.",
+          "questions": [
+            {"no": 37, "q_zh": "这段话主要谈：", "q_id": "Paragraf ini terutama membahas:", "options": {"A": "手机的坏处 (bahaya HP)", "B": "孩子爱读书 (anak suka membaca)", "C": "父母的影响 (pengaruh orang tua)", "D": "怎么买手机 (cara beli HP)"}, "answer": "C"}
+          ]
+        },
+        {
+          "no": [38],
+          "passage_zh": "很多事情，看起来很难，其实只要开始去做，就会发现没有想象中那么难。最难的往往不是事情本身，而是开始的那一步。",
+          "passage_id": "Banyak hal kelihatannya susah, padahal asal mulai dikerjakan, kita akan sadar nggak sesusah yang dibayangkan. Yang paling sulit sering bukan hal itu sendiri, melainkan langkah pertama untuk memulai.",
+          "questions": [
+            {"no": 38, "q_zh": "作者认为最难的是：", "q_id": "Menurut penulis, yang paling sulit adalah:", "options": {"A": "事情本身 (hal itu sendiri)", "B": "开始去做 (mulai mengerjakan)", "C": "坚持下去 (bertahan)", "D": "找到方法 (menemukan cara)"}, "answer": "B"}
+          ]
+        },
+        {
+          "no": [39, 40],
+          "passage_zh": "有一位老人在海边散步，看到很多小鱼被海水冲到了沙滩上。他一条一条地把鱼扔回海里。有人问他：“这么多鱼，你救得过来吗？谁会在乎呢？”老人一边扔一边说：“这条鱼在乎，这条也在乎。”",
+          "passage_id": "Seorang kakek berjalan-jalan di pantai, melihat banyak ikan kecil terhempas ombak ke atas pasir. Ia melempar ikan-ikan itu kembali ke laut satu per satu. Ada yang bertanya: 'Ikan sebanyak ini, memang kamu bisa selamatkan semua? Siapa yang peduli?' Sambil melempar, kakek itu menjawab: 'Ikan ini peduli, yang ini juga peduli.'",
+          "questions": [
+            {"no": 39, "q_zh": "老人在做什么？", "q_id": "Kakek itu sedang apa?", "options": {"A": "钓鱼 (memancing)", "B": "游泳 (berenang)", "C": "把鱼扔回海里 (melempar ikan kembali ke laut)", "D": "在沙滩上睡觉 (tidur di pantai)"}, "answer": "C"},
+            {"no": 40, "q_zh": "这个故事主要想告诉我们：", "q_id": "Cerita ini terutama ingin memberitahu:", "options": {"A": "老人很有钱 (kakek itu kaya)", "B": "每一个都值得在乎 (setiap satu layak dipedulikan)", "C": "海边很危险 (pantai berbahaya)", "D": "小鱼很好吃 (ikan kecil enak)"}, "answer": "B"}
+          ]
+        }
+      ]
+    }
+  ]
+}

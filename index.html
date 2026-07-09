@@ -148,6 +148,7 @@
     .segmentBadge{width:24px; height:24px; border-radius:50%; background:var(--panel-2); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; color:var(--muted)}
     .segmentItem.picked .segmentBadge{background:linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#241a08; border-color:transparent}
     .segmentHanzi{font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif; font-size:15px}
+    .segmentPinyin{color:var(--gold-soft); font-size:12px}
     .segmentTrans{color:var(--muted); font-size:12px; margin-left:auto; text-align:right}
     .attemptNav{display:flex; gap:8px; margin-top:16px}
     .navBtn{margin-top:0; flex:1; background:var(--panel-2); border:1px solid var(--line); color:var(--text); font-weight:600}
@@ -156,6 +157,34 @@
     .gridBtn{width:34px; height:34px; border-radius:8px; background:var(--panel-2); border:1px solid var(--line); color:var(--muted); font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; cursor:pointer}
     .gridBtn.answered{background:rgba(95,178,122,.15); border-color:var(--ok); color:var(--ok)}
     .gridBtn.current{border-color:var(--gold); color:var(--gold-soft)}
+    /* mock test result / review */
+    .result{max-width:560px}
+    .reviewItem{background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:14px 16px; margin-bottom:12px}
+    .reviewHead{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:12px; color:var(--muted)}
+    .reviewBadge{padding:2px 10px; border-radius:999px; font-size:11px; font-weight:700}
+    .reviewBadge.correct{background:rgba(95,178,122,.15); color:var(--ok)}
+    .reviewBadge.wrong{background:rgba(224,104,95,.15); color:var(--danger)}
+    .reviewPassage{font-size:14px; line-height:1.75; margin-bottom:6px; font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif; white-space:pre-line}
+    .reviewPassageTrans{font-size:12px; color:var(--muted); margin-bottom:10px}
+    .reviewStem{font-size:14px; margin-bottom:4px; font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif; white-space:pre-line}
+    .reviewStemTrans{font-size:12px; color:var(--muted); margin-bottom:10px}
+    .reviewChoiceList{display:flex; flex-direction:column; gap:6px; margin-top:6px}
+    .reviewChoice{display:flex; flex-wrap:wrap; align-items:baseline; gap:8px; padding:8px 10px; border-radius:8px; font-size:13px; border:1px solid var(--line); background:var(--panel)}
+    .reviewChoice.isCorrect{background:rgba(95,178,122,.12); border-color:var(--ok)}
+    .reviewChoice.isWrongPick{background:rgba(224,104,95,.12); border-color:var(--danger)}
+    .reviewChoiceKey{font-weight:700; color:var(--gold-soft)}
+    .reviewChoicePinyin{color:var(--gold-soft); font-size:11px}
+    .reviewChoiceTrans{color:var(--muted); font-size:11px}
+    .reviewMark{color:var(--muted); font-size:11px; margin-left:auto}
+    .reviewOrderRow{font-size:13px; margin-bottom:6px; line-height:1.6}
+    .reviewOrderLabel{color:var(--muted); font-size:11px; display:block; margin-bottom:2px}
+    .reviewExplain{font-size:12px; color:var(--text); margin-top:10px; padding-top:10px; border-top:1px solid var(--line)}
+    .reviewExplainLabel{color:var(--muted); font-size:11px; display:block; margin-bottom:2px}
+    /* raport - riwayat mock test */
+    .historyItem{padding:10px 0; border-bottom:1px solid var(--line); font-size:13px}
+    .historyItem:last-child{border-bottom:none}
+    .historyTitle{font-weight:700; margin-bottom:2px}
+    .historyMeta{color:var(--muted); font-size:12px}
   </style>
 </head>
 <body>
@@ -239,6 +268,9 @@
     <p class="sectionTitle">Kata Terlemah</p>
     <div id="rWeak"></div>
 
+    <p class="sectionTitle">Riwayat Mock Test</p>
+    <div id="rMockHistory"></div>
+
     <button id="raportExitBtn" class="practiceExit">Kembali ke Dashboard</button>
   </div>
 
@@ -291,6 +323,23 @@
 
     <button id="attemptSubmitBtn">Submit</button>
     <button id="attemptExitBtn" class="practiceExit">Keluar (batal)</button>
+  </div>
+
+  <!-- ============ MOCK TEST — HASIL & REVIEW ============ -->
+  <div id="resultCard" class="card result hidden">
+    <div class="brand"><span class="star">✦</span><h1>Xing Mandarin <span class="cn">星</span></h1></div>
+    <p class="sub" id="resultSetTitle">Hasil Mock Test</p>
+
+    <div class="statRow">
+      <div class="statBox"><span class="statNum" id="resScore">—</span><span class="statLabel">Skor</span></div>
+      <div class="statBox"><span class="statNum" id="resCorrect">—</span><span class="statLabel">Benar</span></div>
+      <div class="statBox"><span class="statNum" id="resTime">—</span><span class="statLabel">Waktu</span></div>
+    </div>
+
+    <p class="sectionTitle">Review Jawaban</p>
+    <div id="resultReview"></div>
+
+    <button id="resultCloseBtn" class="practiceExit">Kembali ke Daftar Mock Test</button>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -347,6 +396,7 @@
     $('browseCard').classList.add('hidden');
     $('mockListCard').classList.add('hidden');
     $('attemptCard').classList.add('hidden');
+    $('resultCard').classList.add('hidden');
     $('loginCard').classList.remove('hidden');
     const m = $('loginMsg');
     if(msg){ m.textContent = msg; m.className = 'msg ' + (type||'err'); }
@@ -704,7 +754,8 @@
     $('rStreak').textContent = '…';
     $('rLevels').innerHTML = '';
     $('rWeak').innerHTML = '';
-    await loadRaport();
+    $('rMockHistory').innerHTML = '';
+    await Promise.all([ loadRaport(), loadMockHistory() ]);
   }
 
   function closeRaport(){
@@ -796,6 +847,37 @@
       d.setUTCDate(d.getUTCDate() - 1);
     }
     return streak;
+  }
+
+  async function loadMockHistory(){
+    const wrap = $('rMockHistory');
+    wrap.innerHTML = '<p class="emptyState">Memuat...</p>';
+
+    const { data: history, error } = await sb
+      .from('test_attempts').select('set_id,hsk_level,section,score,total_points,correct_count,total_questions,created_at')
+      .eq('user_id', currentUser)
+      .order('created_at', { ascending:false });
+    if(error){ wrap.innerHTML = '<p class="emptyState">Gagal ambil riwayat mock test.</p>'; return; }
+    if(!history || history.length === 0){
+      wrap.innerHTML = '<p class="emptyState">Belum ada mock test yang dikerjakan.</p>';
+      return;
+    }
+
+    const setIds = [...new Set(history.map(h => h.set_id))];
+    const { data: setsInfo } = await sb.from('test_sets').select('set_id,title').in('set_id', setIds);
+    const titleMap = new Map((setsInfo || []).map(s => [s.set_id, s.title]));
+
+    wrap.innerHTML = '';
+    history.forEach(h => {
+      const pct = h.total_points ? Math.round((h.score / h.total_points) * 100) : 0;
+      const row = document.createElement('div');
+      row.className = 'historyItem';
+      row.innerHTML = `
+        <div class="historyTitle">${titleMap.get(h.set_id) || h.set_id}</div>
+        <div class="historyMeta">HSK ${h.hsk_level} · ${SECTION_LABEL[h.section] || h.section} · Skor ${pct}% · Benar ${h.correct_count}/${h.total_questions} · ${formatMockDate(h.created_at)}</div>
+      `;
+      wrap.appendChild(row);
+    });
   }
 
   /* ==========================================================
@@ -1093,11 +1175,12 @@
       const idx = order.indexOf(s.key);
       const picked = idx >= 0 ? ' picked' : '';
       const badge = idx >= 0 ? (idx + 1) : '';
+      const pinyin = (attemptShowPinyin && s.pinyin) ? `<span class="segmentPinyin">${s.pinyin}</span>` : '';
       const trans = (attemptShowTranslation && s.id) ? `<span class="segmentTrans">${s.id}</span>` : '';
       return `<div class="segmentItem${picked}" data-key="${s.key}">
         <span class="segmentBadge">${badge}</span>
         <span class="segmentHanzi">${s.hanzi}</span>
-        ${trans}
+        ${pinyin}${trans}
       </div>`;
     }).join('');
     return `<div class="segmentList">${items}</div>`;
@@ -1135,26 +1218,32 @@
     return out;
   }
 
-  function submitAttempt(force){
+  async function submitAttempt(force){
     const unanswered = attemptQuestions.filter(q => !isQuestionAnswered(q)).length;
     if(!force && unanswered > 0){
       const ok = confirm(`Masih ada ${unanswered} soal belum dijawab. Yakin mau submit?`);
       if(!ok) return;
     }
     stopAttemptTimer();
+    $('attemptSubmitBtn').disabled = true;
     const answers = gatherAttemptAnswers();
     const timeTaken = attemptSet.time_limit_seconds - Math.max(0, Math.round((attemptDeadline - Date.now()) / 1000));
 
-    // TODO Task 4: ganti console.log ini dengan sb.rpc('submit_attempt', { p_set_id, p_answers, p_time_taken })
-    // lalu render halaman hasil dari return value RPC-nya.
-    console.log('[MockTest] submit_attempt (Task 4 belum wire ke RPC beneran):', {
+    const { data, error } = await sb.rpc('submit_attempt', {
       p_set_id: attemptSet.set_id,
-      p_time_taken: timeTaken,
-      p_answers: answers
+      p_answers: answers,
+      p_time_taken: timeTaken
     });
 
-    alert(`Submit (sementara, belum dinilai): ${Object.keys(answers).length} / ${attemptQuestions.length} soal terjawab. Detail jawaban ada di console (Task 4 bakal nyambungin ke skor beneran).`);
-    closeAttempt();
+    if(error){
+      alert('Gagal submit: ' + error.message);
+      $('attemptSubmitBtn').disabled = false;
+      const remain = Math.max(0, Math.round((attemptDeadline - Date.now()) / 1000));
+      if(remain > 0) startAttemptTimer(remain);
+      return;
+    }
+
+    showResult(data, timeTaken);
   }
 
   function closeAttempt(){
@@ -1168,6 +1257,119 @@
     const answered = attemptQuestions.filter(isQuestionAnswered).length;
     if(answered > 0 && !confirm('Keluar sekarang? Progres jawaban bakal ilang (belum di-submit).')) return;
     closeAttempt();
+  }
+
+  function formatDuration(totalSec){
+    const mm = String(Math.floor(totalSec / 60)).padStart(2,'0');
+    const ss = String(totalSec % 60).padStart(2,'0');
+    return `${mm}:${ss}`;
+  }
+
+  function showResult(result, timeTakenSec){
+    $('attemptCard').classList.add('hidden');
+    $('resultCard').classList.remove('hidden');
+    $('resultSetTitle').textContent = attemptSet.title;
+    $('resScore').textContent = `${result.score}/${result.total_points}`;
+    $('resCorrect').textContent = `${result.correct_count}/${result.total_questions}`;
+    $('resTime').textContent = formatDuration(timeTakenSec);
+    renderReview(result.review || []);
+  }
+
+  function closeResult(){
+    $('resultCard').classList.add('hidden');
+    $('mockListCard').classList.remove('hidden');
+    if(mockLevel) loadMockList(mockLevel);
+  }
+
+  function renderReview(reviewArr){
+    const qMap = new Map(attemptQuestions.map(q => [q.id, q]));
+    const wrap = $('resultReview');
+    wrap.innerHTML = '';
+    const sorted = [...reviewArr].sort((a,b) => a.order_index - b.order_index);
+    sorted.forEach(item => {
+      const q = qMap.get(item.id);
+      const div = document.createElement('div');
+      div.className = 'reviewItem';
+      div.innerHTML = buildReviewHTML(item, q);
+      wrap.appendChild(div);
+    });
+  }
+
+  // Review selalu nampilin pinyin & terjemahan (nggak ngikut toggle attemptShowPinyin/Translation),
+  // karena murid udah selesai ngerjain -- beda dari attemptBody yang default nyembunyiin buat simulasi ujian.
+  function buildReviewHTML(item, q){
+    const badge = item.is_correct
+      ? '<span class="reviewBadge correct">Benar</span>'
+      : '<span class="reviewBadge wrong">Salah</span>';
+    let html = `<div class="reviewHead"><span>Soal ${item.order_index}</span>${badge}</div>`;
+
+    if(!q || !q.payload){
+      html += `<div class="reviewExplain"><span class="reviewExplainLabel">Penjelasan</span>${item.explanation || '-'}</div>`;
+      return html;
+    }
+
+    const p = q.payload;
+    if(q.question_type === 'reading_mc'){
+      html += `<div class="reviewPassage">${p.passage}</div>`;
+      if(p.passage_id) html += `<div class="reviewPassageTrans">${p.passage_id}</div>`;
+      html += `<div class="reviewStem">${p.question}</div>`;
+      if(p.question_id) html += `<div class="reviewStemTrans">${p.question_id}</div>`;
+      html += buildReviewChoices(p.choices, item.user_answer, item.correct_answer);
+    } else if(q.question_type === 'fill_blank'){
+      html += `<div class="reviewStem">${p.stem}</div>`;
+      if(p.stem_id) html += `<div class="reviewStemTrans">${p.stem_id}</div>`;
+      html += buildReviewChoices(p.choices, item.user_answer, item.correct_answer, true);
+    } else if(q.question_type === 'sentence_match'){
+      html += `<div class="reviewStem">${p.prompt}</div>`;
+      if(p.prompt_id) html += `<div class="reviewStemTrans">${p.prompt_id}</div>`;
+      html += buildReviewChoices(p.choices, item.user_answer, item.correct_answer);
+    } else if(q.question_type === 'ordering'){
+      html += buildReviewOrdering(p.segments, item.user_answer, item.correct_answer);
+    }
+
+    html += `<div class="reviewExplain"><span class="reviewExplainLabel">Penjelasan</span>${item.explanation || '-'}</div>`;
+    return html;
+  }
+
+  function buildReviewChoices(choices, userAns, correctAns, withPinyin){
+    const userKey = userAns?.correct;
+    const correctKey = correctAns?.correct;
+    const items = choices.map(c => {
+      let cls = '';
+      if(c.key === correctKey) cls += ' isCorrect';
+      if(c.key === userKey && userKey !== correctKey) cls += ' isWrongPick';
+      const pinyin = (withPinyin && c.pinyin) ? `<span class="reviewChoicePinyin">${c.pinyin}</span>` : '';
+      const trans = c.id ? `<span class="reviewChoiceTrans">${c.id}</span>` : '';
+      const mark = c.key === userKey ? 'jawaban kamu' : (c.key === correctKey ? 'jawaban benar' : '');
+      return `<div class="reviewChoice${cls}">
+        <span class="reviewChoiceKey">${c.key}</span>
+        <span class="choiceHanzi">${c.hanzi}</span>
+        ${pinyin}${trans}
+        <span class="reviewMark">${mark}</span>
+      </div>`;
+    }).join('');
+    return `<div class="reviewChoiceList">${items}</div>`;
+  }
+
+  function buildReviewOrdering(segments, userAns, correctAns){
+    const segMap = new Map(segments.map(s => [s.key, s]));
+    const describe = (keys) => (keys || []).map(k => {
+      const s = segMap.get(k);
+      if(!s) return k;
+      const pinyin = s.pinyin ? ` (${s.pinyin})` : '';
+      const trans = s.id ? ` — ${s.id}` : '';
+      return `${s.hanzi}${pinyin}${trans}`;
+    }).join('  →  ');
+
+    const userOrder = userAns?.order;
+    const correctOrder = correctAns?.order || [];
+    const isMatch = userOrder && JSON.stringify(userOrder) === JSON.stringify(correctOrder);
+
+    let html = `<div class="reviewOrderRow"><span class="reviewOrderLabel">Jawaban kamu</span>${userOrder ? describe(userOrder) : '(belum dijawab)'}</div>`;
+    if(!isMatch){
+      html += `<div class="reviewOrderRow"><span class="reviewOrderLabel">Urutan benar</span>${describe(correctOrder)}</div>`;
+    }
+    return html;
   }
 
   /* ---------- events ---------- */
@@ -1201,6 +1403,7 @@
   $('attemptNextBtn').addEventListener('click', ()=> goToAttemptQuestion(attemptIndex + 1));
   $('attemptSubmitBtn').addEventListener('click', ()=> submitAttempt(false));
   $('attemptExitBtn').addEventListener('click', exitAttempt);
+  $('resultCloseBtn').addEventListener('click', closeResult);
   $('attemptBody').addEventListener('click', e=>{
     const q = attemptQuestions[attemptIndex];
     if(!q) return;

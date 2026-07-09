@@ -120,6 +120,42 @@
     .mockSetMeta{font-size:12px; color:var(--muted); margin-bottom:8px}
     .mockSetScore{font-size:12px; color:var(--gold-soft); margin-bottom:10px}
     .mockSetBtn{margin-top:0}
+    /* mock test attempt */
+    .attempt{max-width:540px}
+    .attemptHeader{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px}
+    .attemptTitle{font-weight:700; font-size:14px}
+    .attemptTimer{font-weight:700; font-size:17px; font-variant-numeric:tabular-nums; color:var(--gold-soft)}
+    .attemptTimer.low{color:var(--danger)}
+    .attemptToggles{display:flex; gap:16px; margin-bottom:12px; font-size:12px; color:var(--muted)}
+    .attemptToggles label{display:flex; align-items:center; gap:6px; cursor:pointer}
+    .attemptProgress{font-size:12px; color:var(--muted); margin-bottom:8px}
+    .attemptBody{background:var(--panel-2); border:1px solid var(--line); border-radius:14px; padding:18px; min-height:160px}
+    .qInstruction{font-size:11px; color:var(--muted); margin-bottom:10px; text-transform:uppercase; letter-spacing:.4px}
+    .qPassage{font-size:15px; line-height:1.85; margin-bottom:14px; padding-bottom:14px; border-bottom:1px solid var(--line); font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif; white-space:pre-line}
+    .qPassageTrans{font-size:13px; color:var(--muted); margin-top:8px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+    .qStem{font-size:16px; line-height:1.75; margin-bottom:6px; font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif; white-space:pre-line}
+    .qStemTrans{font-size:13px; color:var(--muted); margin-bottom:14px}
+    .choiceList{display:flex; flex-direction:column; gap:8px; margin-top:10px}
+    .choiceItem{display:flex; align-items:baseline; flex-wrap:wrap; gap:8px; padding:12px 14px; background:var(--panel); border:1px solid var(--line); border-radius:10px; cursor:pointer; font-size:14px}
+    .choiceItem.active{border-color:var(--gold); background:rgba(216,162,74,.12)}
+    .choiceKey{font-weight:700; color:var(--gold-soft); flex-shrink:0}
+    .choiceHanzi{font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif; font-size:16px}
+    .choicePinyin{color:var(--gold-soft); font-size:12px}
+    .choiceTrans{color:var(--muted); font-size:12px}
+    .segmentList{display:flex; flex-direction:column; gap:8px; margin-top:10px}
+    .segmentItem{display:flex; align-items:center; gap:10px; padding:12px 14px; background:var(--panel); border:1px solid var(--line); border-radius:10px; cursor:pointer}
+    .segmentItem.picked{border-color:var(--gold); background:rgba(216,162,74,.12)}
+    .segmentBadge{width:24px; height:24px; border-radius:50%; background:var(--panel-2); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; color:var(--muted)}
+    .segmentItem.picked .segmentBadge{background:linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#241a08; border-color:transparent}
+    .segmentHanzi{font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif; font-size:15px}
+    .segmentTrans{color:var(--muted); font-size:12px; margin-left:auto; text-align:right}
+    .attemptNav{display:flex; gap:8px; margin-top:16px}
+    .navBtn{margin-top:0; flex:1; background:var(--panel-2); border:1px solid var(--line); color:var(--text); font-weight:600}
+    .navBtn:disabled{opacity:.4; cursor:not-allowed}
+    .questionGrid{display:flex; flex-wrap:wrap; gap:6px; margin-top:16px}
+    .gridBtn{width:34px; height:34px; border-radius:8px; background:var(--panel-2); border:1px solid var(--line); color:var(--muted); font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; cursor:pointer}
+    .gridBtn.answered{background:rgba(95,178,122,.15); border-color:var(--ok); color:var(--ok)}
+    .gridBtn.current{border-color:var(--gold); color:var(--gold-soft)}
   </style>
 </head>
 <body>
@@ -231,6 +267,32 @@
     <button id="mockListExitBtn" class="practiceExit">Kembali ke Dashboard</button>
   </div>
 
+  <!-- ============ MOCK TEST — NGERJAIN SOAL ============ -->
+  <div id="attemptCard" class="card attempt hidden">
+    <div class="attemptHeader">
+      <div class="attemptTitle" id="attemptTitle">—</div>
+      <div class="attemptTimer" id="attemptTimer">00:00</div>
+    </div>
+
+    <div class="attemptToggles">
+      <label><input type="checkbox" id="togglePinyin" /> Pinyin</label>
+      <label><input type="checkbox" id="toggleTranslation" /> Terjemahan</label>
+    </div>
+
+    <div class="attemptProgress" id="attemptProgress">Soal 1 / 1</div>
+    <div class="attemptBody" id="attemptBody"></div>
+
+    <div class="attemptNav">
+      <button id="attemptPrevBtn" class="navBtn">‹ Sebelumnya</button>
+      <button id="attemptNextBtn" class="navBtn">Berikutnya ›</button>
+    </div>
+
+    <div class="questionGrid" id="questionGrid"></div>
+
+    <button id="attemptSubmitBtn">Submit</button>
+    <button id="attemptExitBtn" class="practiceExit">Keluar (batal)</button>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
   /* ==========================================================
@@ -284,6 +346,7 @@
     $('raportCard').classList.add('hidden');
     $('browseCard').classList.add('hidden');
     $('mockListCard').classList.add('hidden');
+    $('attemptCard').classList.add('hidden');
     $('loginCard').classList.remove('hidden');
     const m = $('loginMsg');
     if(msg){ m.textContent = msg; m.className = 'msg ' + (type||'err'); }
@@ -342,6 +405,7 @@
 
   /* ---------- keluar paksa ---------- */
   async function forceLogout(reason){
+    stopAttemptTimer();
     if(heartbeat){ clearInterval(heartbeat); heartbeat=null; }
     if(watchChannel){ sb.removeChannel(watchChannel); watchChannel=null; }
     currentUser = null; currentProfile = null;
@@ -906,9 +970,204 @@
     });
   }
 
-  function startAttempt(setId){
-    // TODO Task 3: halaman ngerjain soal. Untuk sekarang cuma placeholder.
-    alert('Halaman ngerjain soal (Task 3) belum dibangun. Set dipilih: ' + setId);
+  /* ==========================================================
+     MOCK TEST — NGERJAIN SOAL (Task 3)
+     ========================================================== */
+  let attemptSet = null;
+  let attemptQuestions = [];
+  let attemptAnswers = {};
+  let attemptIndex = 0;
+  let attemptDeadline = null;
+  let attemptTimerInterval = null;
+  let attemptShowPinyin = false;
+  let attemptShowTranslation = false;
+
+  async function startAttempt(setId){
+    const { data: setRow, error: setErr } = await sb
+      .from('test_sets').select('set_id,hsk_level,section,title,time_limit_seconds,total_questions')
+      .eq('set_id', setId).single();
+    if(setErr || !setRow){ alert('Gagal ambil data set: ' + (setErr?.message || 'tidak ditemukan')); return; }
+
+    // PENTING: kolom answer/explanation TIDAK di-select — nggak di-grant ke murid.
+    const { data: qRows, error: qErr } = await sb
+      .from('question_bank').select('id,question_type,order_index,payload,points')
+      .eq('set_id', setId)
+      .order('order_index', { ascending:true });
+    if(qErr){ alert('Gagal ambil soal: ' + qErr.message); return; }
+    if(!qRows || qRows.length === 0){ alert('Set ini belum ada soalnya.'); return; }
+
+    attemptSet = setRow;
+    attemptQuestions = qRows;
+    attemptAnswers = {};
+    attemptIndex = 0;
+    attemptShowPinyin = false;
+    attemptShowTranslation = false;
+    $('togglePinyin').checked = false;
+    $('toggleTranslation').checked = false;
+
+    $('mockListCard').classList.add('hidden');
+    $('attemptCard').classList.remove('hidden');
+    $('attemptTitle').textContent = setRow.title;
+
+    renderAttemptQuestion();
+    startAttemptTimer(setRow.time_limit_seconds);
+  }
+
+  function startAttemptTimer(seconds){
+    attemptDeadline = Date.now() + seconds * 1000;
+    updateAttemptTimer();
+    stopAttemptTimer();
+    attemptTimerInterval = setInterval(updateAttemptTimer, 1000);
+  }
+
+  function stopAttemptTimer(){
+    if(attemptTimerInterval){ clearInterval(attemptTimerInterval); attemptTimerInterval = null; }
+  }
+
+  function updateAttemptTimer(){
+    const remainSec = Math.max(0, Math.round((attemptDeadline - Date.now()) / 1000));
+    const mm = String(Math.floor(remainSec / 60)).padStart(2,'0');
+    const ss = String(remainSec % 60).padStart(2,'0');
+    $('attemptTimer').textContent = `${mm}:${ss}`;
+    $('attemptTimer').classList.toggle('low', remainSec < 120);
+    if(remainSec <= 0){
+      stopAttemptTimer();
+      submitAttempt(true);
+    }
+  }
+
+  function isQuestionAnswered(q){
+    const a = attemptAnswers[q.id];
+    if(!a) return false;
+    if(q.question_type === 'ordering') return Array.isArray(a.order) && a.order.length === q.payload.segments.length;
+    return !!a.correct;
+  }
+
+  function renderAttemptQuestion(){
+    const q = attemptQuestions[attemptIndex];
+    const p = q.payload;
+    const answer = attemptAnswers[q.id];
+    let html = `<div class="qInstruction">${p.instruction || ''}</div>`;
+
+    if(q.question_type === 'reading_mc'){
+      html += `<div class="qPassage">${p.passage}</div>`;
+      if(attemptShowTranslation && p.passage_id) html += `<div class="qPassageTrans">${p.passage_id}</div>`;
+      html += `<div class="qStem">${p.question}</div>`;
+      if(attemptShowTranslation && p.question_id) html += `<div class="qStemTrans">${p.question_id}</div>`;
+      html += renderChoiceList(p.choices, answer);
+    } else if(q.question_type === 'fill_blank'){
+      html += `<div class="qStem">${p.stem}</div>`;
+      if(attemptShowTranslation && p.stem_id) html += `<div class="qStemTrans">${p.stem_id}</div>`;
+      html += renderChoiceList(p.choices, answer, true);
+    } else if(q.question_type === 'sentence_match'){
+      html += `<div class="qStem">${p.prompt}</div>`;
+      if(attemptShowTranslation && p.prompt_id) html += `<div class="qStemTrans">${p.prompt_id}</div>`;
+      html += renderChoiceList(p.choices, answer);
+    } else if(q.question_type === 'ordering'){
+      html += renderSegmentList(p.segments, answer);
+    }
+
+    $('attemptBody').innerHTML = html;
+    renderAttemptNav();
+    renderQuestionGrid();
+  }
+
+  function renderChoiceList(choices, answer, withPinyin){
+    const selectedKey = answer?.correct;
+    const items = choices.map(c => {
+      const active = c.key === selectedKey ? ' active' : '';
+      const pinyin = (withPinyin && attemptShowPinyin && c.pinyin) ? `<span class="choicePinyin">${c.pinyin}</span>` : '';
+      const trans = (attemptShowTranslation && c.id) ? `<span class="choiceTrans">${c.id}</span>` : '';
+      return `<div class="choiceItem${active}" data-key="${c.key}">
+        <span class="choiceKey">${c.key}</span>
+        <span class="choiceHanzi">${c.hanzi}</span>
+        ${pinyin}${trans}
+      </div>`;
+    }).join('');
+    return `<div class="choiceList">${items}</div>`;
+  }
+
+  function renderSegmentList(segments, answer){
+    const order = answer?.order || [];
+    const items = segments.map(s => {
+      const idx = order.indexOf(s.key);
+      const picked = idx >= 0 ? ' picked' : '';
+      const badge = idx >= 0 ? (idx + 1) : '';
+      const trans = (attemptShowTranslation && s.id) ? `<span class="segmentTrans">${s.id}</span>` : '';
+      return `<div class="segmentItem${picked}" data-key="${s.key}">
+        <span class="segmentBadge">${badge}</span>
+        <span class="segmentHanzi">${s.hanzi}</span>
+        ${trans}
+      </div>`;
+    }).join('');
+    return `<div class="segmentList">${items}</div>`;
+  }
+
+  function renderAttemptNav(){
+    $('attemptProgress').textContent = `Soal ${attemptIndex + 1} / ${attemptQuestions.length}`;
+    $('attemptPrevBtn').disabled = attemptIndex === 0;
+    $('attemptNextBtn').disabled = attemptIndex === attemptQuestions.length - 1;
+  }
+
+  function renderQuestionGrid(){
+    const wrap = $('questionGrid');
+    wrap.innerHTML = '';
+    attemptQuestions.forEach((q, i) => {
+      const btn = document.createElement('div');
+      btn.className = 'gridBtn' + (isQuestionAnswered(q) ? ' answered' : '') + (i === attemptIndex ? ' current' : '');
+      btn.textContent = i + 1;
+      btn.addEventListener('click', () => goToAttemptQuestion(i));
+      wrap.appendChild(btn);
+    });
+  }
+
+  function goToAttemptQuestion(idx){
+    if(idx < 0 || idx >= attemptQuestions.length) return;
+    attemptIndex = idx;
+    renderAttemptQuestion();
+  }
+
+  function gatherAttemptAnswers(){
+    const out = {};
+    attemptQuestions.forEach(q => {
+      if(isQuestionAnswered(q)) out[q.id] = attemptAnswers[q.id];
+    });
+    return out;
+  }
+
+  function submitAttempt(force){
+    const unanswered = attemptQuestions.filter(q => !isQuestionAnswered(q)).length;
+    if(!force && unanswered > 0){
+      const ok = confirm(`Masih ada ${unanswered} soal belum dijawab. Yakin mau submit?`);
+      if(!ok) return;
+    }
+    stopAttemptTimer();
+    const answers = gatherAttemptAnswers();
+    const timeTaken = attemptSet.time_limit_seconds - Math.max(0, Math.round((attemptDeadline - Date.now()) / 1000));
+
+    // TODO Task 4: ganti console.log ini dengan sb.rpc('submit_attempt', { p_set_id, p_answers, p_time_taken })
+    // lalu render halaman hasil dari return value RPC-nya.
+    console.log('[MockTest] submit_attempt (Task 4 belum wire ke RPC beneran):', {
+      p_set_id: attemptSet.set_id,
+      p_time_taken: timeTaken,
+      p_answers: answers
+    });
+
+    alert(`Submit (sementara, belum dinilai): ${Object.keys(answers).length} / ${attemptQuestions.length} soal terjawab. Detail jawaban ada di console (Task 4 bakal nyambungin ke skor beneran).`);
+    closeAttempt();
+  }
+
+  function closeAttempt(){
+    stopAttemptTimer();
+    $('attemptCard').classList.add('hidden');
+    $('mockListCard').classList.remove('hidden');
+    if(mockLevel) loadMockList(mockLevel);
+  }
+
+  function exitAttempt(){
+    const answered = attemptQuestions.filter(isQuestionAnswered).length;
+    if(answered > 0 && !confirm('Keluar sekarang? Progres jawaban bakal ilang (belum di-submit).')) return;
+    closeAttempt();
   }
 
   /* ---------- events ---------- */
@@ -935,6 +1194,33 @@
   $('mockList').addEventListener('click', e=>{
     const btn = e.target.closest('button[data-set]');
     if(btn) startAttempt(btn.dataset.set);
+  });
+  $('togglePinyin').addEventListener('change', e=>{ attemptShowPinyin = e.target.checked; renderAttemptQuestion(); });
+  $('toggleTranslation').addEventListener('change', e=>{ attemptShowTranslation = e.target.checked; renderAttemptQuestion(); });
+  $('attemptPrevBtn').addEventListener('click', ()=> goToAttemptQuestion(attemptIndex - 1));
+  $('attemptNextBtn').addEventListener('click', ()=> goToAttemptQuestion(attemptIndex + 1));
+  $('attemptSubmitBtn').addEventListener('click', ()=> submitAttempt(false));
+  $('attemptExitBtn').addEventListener('click', exitAttempt);
+  $('attemptBody').addEventListener('click', e=>{
+    const q = attemptQuestions[attemptIndex];
+    if(!q) return;
+    const choiceEl = e.target.closest('.choiceItem');
+    if(choiceEl){
+      attemptAnswers[q.id] = { correct: choiceEl.dataset.key };
+      renderAttemptQuestion();
+      return;
+    }
+    const segEl = e.target.closest('.segmentItem');
+    if(segEl){
+      const key = segEl.dataset.key;
+      const current = attemptAnswers[q.id]?.order ? [...attemptAnswers[q.id].order] : [];
+      const idx = current.indexOf(key);
+      if(idx >= 0) current.splice(idx, 1);
+      else current.push(key);
+      if(current.length === 0) delete attemptAnswers[q.id];
+      else attemptAnswers[q.id] = { order: current };
+      renderAttemptQuestion();
+    }
   });
 
   boot();

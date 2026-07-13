@@ -166,6 +166,8 @@
     .reviewBadge.wrong{background:rgba(224,104,95,.15); color:var(--danger)}
     .reviewBadge.neutral{background:rgba(139,150,176,.15); color:var(--muted)}
     /* mock test attempt — ordering 完成句子 reveal + char_input 看拼音写汉字 */
+    .qOrderingHint{font-size:14px; color:var(--text); line-height:1.5; margin-bottom:12px}
+    .orderingPreview{background:var(--panel); border:1px dashed var(--line); border-radius:10px; padding:12px 14px; font-size:17px; line-height:1.6; color:var(--gold-soft); font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif}
     .orderingReveal{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px; font-size:15px; line-height:1.75; font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif}
     .charInputPinyinHint{font-size:16px; color:var(--gold-soft); margin-bottom:12px}
     .charInputBox{width:100%; padding:12px 14px; background:var(--panel); color:var(--text); border:1px solid var(--line); border-radius:10px; font-size:18px; font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif; outline:none}
@@ -1219,10 +1221,20 @@
       if(attemptShowTranslation && p.prompt_id) html += `<div class="qStemTrans">${p.prompt_id}</div>`;
       html += renderChoiceList(p.choices, answer);
     } else if(q.question_type === 'ordering'){
+      // segments dengan `answer_sentence` = tipe susun-kalimat (完成句子, writing); tanpa itu = tipe
+      // urutkan-paragraf yang sudah ada sebelumnya (排列顺序, reading) -- beda instruksi & preview.
+      const isSentenceBuild = !!p.answer_sentence;
+      if(isSentenceBuild){
+        html += `<div class="qOrderingHint">Susun kata-kata berikut menjadi kalimat yang benar (ketuk sesuai urutan).</div>`;
+      }
       html += renderSegmentList(p.segments, answer);
       const order = answer?.order || [];
-      if(p.answer_sentence && order.length === p.segments.length){
-        html += `<div class="qEssayLabel" style="margin-top:14px">Kalimat lengkap</div><div class="orderingReveal">${p.answer_sentence}</div>`;
+      if(isSentenceBuild){
+        const preview = order.length ? buildOrderingPreview(p.segments, order) : '(belum ada kata dipilih)';
+        html += `<div class="qEssayLabel" style="margin-top:14px">Kalimat yang sedang kamu susun</div><div class="orderingPreview">${preview}</div>`;
+        if(order.length === p.segments.length){
+          html += `<div class="qEssayLabel" style="margin-top:14px">Kalimat lengkap</div><div class="orderingReveal">${p.answer_sentence}</div>`;
+        }
       }
     } else if(q.question_type === 'char_input'){
       html += renderCharInputQuestion(p, q, answer);
@@ -1265,6 +1277,14 @@
       </div>`;
     }).join('');
     return `<div class="segmentList">${items}</div>`;
+  }
+
+  function buildOrderingPreview(segments, order){
+    const segMap = new Map(segments.map(s => [s.key, s]));
+    return order.map(k => {
+      const s = segMap.get(k);
+      return s ? (s.hanzi || s.text) : '';
+    }).join('');
   }
 
   /* ---------- char_input (看拼音写汉字) ---------- */

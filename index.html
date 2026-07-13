@@ -164,6 +164,42 @@
     .reviewBadge{padding:2px 10px; border-radius:999px; font-size:11px; font-weight:700}
     .reviewBadge.correct{background:rgba(95,178,122,.15); color:var(--ok)}
     .reviewBadge.wrong{background:rgba(224,104,95,.15); color:var(--danger)}
+    .reviewBadge.neutral{background:rgba(139,150,176,.15); color:var(--muted)}
+    /* mock test attempt — ordering 完成句子 reveal + char_input 看拼音写汉字 */
+    .orderingReveal{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px; font-size:15px; line-height:1.75; font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif}
+    .charInputPinyinHint{font-size:16px; color:var(--gold-soft); margin-bottom:12px}
+    .charInputBox{width:100%; padding:12px 14px; background:var(--panel); color:var(--text); border:1px solid var(--line); border-radius:10px; font-size:18px; font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif; outline:none}
+    .charInputBox:focus{border-color:var(--gold)}
+    /* mock test attempt — essay (writing) */
+    .qEssayPrompt{font-size:16px; line-height:1.75; margin-bottom:6px; font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif; white-space:pre-line}
+    .qEssayPromptTrans{font-size:13px; color:var(--muted); margin-bottom:14px}
+    .qEssayLabel{font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; margin:0 0 6px}
+    .qEssayWord{display:inline-block; padding:6px 14px; margin-bottom:14px; background:rgba(216,162,74,.12); border:1px solid var(--gold); border-radius:8px; font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif; font-size:18px; font-weight:700; color:var(--gold-soft)}
+    .qEssayWordList{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px}
+    .qEssayWordChip{padding:5px 12px; background:var(--panel); border:1px solid var(--line); border-radius:999px; font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif; font-size:14px; color:var(--gold-soft)}
+    .qEssayArticle{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px; margin-bottom:14px; font-size:14px; line-height:1.85; font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif; white-space:pre-line; max-height:260px; overflow-y:auto}
+    .essayTextarea{width:100%; min-height:160px; padding:12px 14px; background:var(--panel); color:var(--text); border:1px solid var(--line); border-radius:10px; font-size:15px; line-height:1.7; font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif; resize:vertical; outline:none}
+    .essayTextarea:focus{border-color:var(--gold)}
+    .essayCharCount{font-size:12px; color:var(--muted); margin:6px 0 14px; text-align:right}
+    .essayCharCount.short{color:var(--danger)}
+    .essayCharCount.ok{color:var(--ok)}
+    .essayGradeBtn{margin-top:0}
+    .essayGradeBtn:disabled{opacity:.6; cursor:not-allowed}
+    .essayResult{margin-top:16px; background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px}
+    .essayResultLoading{text-align:center; color:var(--muted); font-size:13px; padding:14px 0}
+    .essayScoreRow{display:flex; align-items:baseline; gap:12px; margin-bottom:10px}
+    .essayScoreNum{font-size:34px; font-weight:700; color:var(--gold-soft)}
+    .essayBand{padding:3px 12px; border-radius:999px; font-size:12px; font-weight:700; background:rgba(95,178,122,.15); color:var(--ok)}
+    .essaySummary{font-size:13px; color:var(--text); margin-bottom:12px; line-height:1.6}
+    .essaySectionTitle{font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; margin:14px 0 8px}
+    .essayErrorItem{padding:8px 0; border-bottom:1px solid var(--line); font-size:13px}
+    .essayErrorItem:last-child{border-bottom:none}
+    .essayErrorLine{margin-bottom:2px}
+    .essayErrorOriginal{color:var(--danger); text-decoration:line-through}
+    .essayErrorCorrection{color:var(--ok); font-weight:600}
+    .essayErrorReason{color:var(--muted); font-size:12px}
+    .essayCorrected{font-size:14px; line-height:1.75; padding:12px; background:var(--panel-2); border-radius:8px; font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif; white-space:pre-line}
+    .essayListPlain{margin:0; padding-left:18px; font-size:13px; color:var(--text); line-height:1.7}
     .reviewPassage{font-size:14px; line-height:1.75; margin-bottom:6px; font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif; white-space:pre-line}
     .reviewPassageTrans{font-size:12px; color:var(--muted); margin-bottom:10px}
     .reviewStem{font-size:14px; margin-bottom:4px; font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif; white-space:pre-line}
@@ -294,6 +330,7 @@
     <p class="sub">Mock Test</p>
 
     <div class="levelPicker" id="mockLevelPicker"></div>
+    <div class="levelPicker sectionPicker" id="mockSectionPicker"></div>
     <div id="mockList"></div>
 
     <button id="mockListExitBtn" class="practiceExit">Kembali ke Dashboard</button>
@@ -369,6 +406,12 @@
   /* ---------- util tampilan ---------- */
   const $ = id => document.getElementById(id);
   const TRACK_LABEL = {hsk:'HSK Exam', business:'Bisnis', daily:'Percakapan Harian', travel:'Travel', academic:'Akademik'};
+
+  // dipakai buat teks yang bukan konten soal (mis. jawaban esai murid, hasil AI) —
+  // supaya nggak bisa inject HTML/script pas ditaruh balik ke innerHTML.
+  function escapeHtml(s){
+    return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
 
   // crypto.randomUUID() cuma ada di secure context (HTTPS/localhost) — fallback berjenjang
   // biar tetap jalan di http biasa / file:// (mis. testing lokal tanpa https).
@@ -975,17 +1018,42 @@
      MOCK TEST — LIST SET (Task 2)
      ========================================================== */
   const SECTION_LABEL = {reading:'Membaca', listening:'Mendengar', writing:'Menulis'};
+  const SECTION_TABS = [
+    { key:'all', label:'Semua' },
+    { key:'reading', label:'Membaca' },
+    { key:'listening', label:'Menyimak' },
+    { key:'writing', label:'Menulis' }
+  ];
   let mockLevel = null;
+  let mockSection = 'all';
 
   function openMockList(){
     $('dashCard').classList.add('hidden');
     $('mockListCard').classList.remove('hidden');
+    renderMockSectionPicker();
     renderMockLevelPicker();
   }
 
   function closeMockList(){
     $('mockListCard').classList.add('hidden');
     $('dashCard').classList.remove('hidden');
+  }
+
+  function renderMockSectionPicker(){
+    const wrap = $('mockSectionPicker');
+    wrap.innerHTML = '';
+    SECTION_TABS.forEach(t => {
+      const b = document.createElement('div');
+      b.className = 'levelBtn' + (t.key === mockSection ? ' active' : '');
+      b.textContent = t.label;
+      b.addEventListener('click', ()=>{
+        mockSection = t.key;
+        [...wrap.children].forEach(c=>c.classList.remove('active'));
+        b.classList.add('active');
+        if(mockLevel) loadMockList(mockLevel);
+      });
+      wrap.appendChild(b);
+    });
   }
 
   function renderMockLevelPicker(){
@@ -1016,14 +1084,17 @@
     const wrap = $('mockList');
     wrap.innerHTML = '<p class="emptyState">Memuat...</p>';
 
-    const { data: sets, error: setErr } = await sb
+    let query = sb
       .from('test_sets').select('set_id,hsk_level,section,title,time_limit_seconds,total_questions')
-      .eq('is_published', true).eq('hsk_level', level)
+      .eq('is_published', true).eq('hsk_level', level);
+    if(mockSection !== 'all') query = query.eq('section', mockSection);
+    const { data: sets, error: setErr } = await query
       .order('section', { ascending:true }).order('set_id', { ascending:true });
     if(setErr){ alert('Gagal ambil daftar mock test: ' + setErr.message); return; }
 
     if(!sets || sets.length === 0){
-      wrap.innerHTML = '<p class="emptyState">Belum ada mock test untuk HSK ' + level + '.</p>';
+      const sectionLabel = mockSection !== 'all' ? (SECTION_LABEL[mockSection] || mockSection) + ' ' : '';
+      wrap.innerHTML = '<p class="emptyState">Belum ada mock test ' + sectionLabel + 'untuk HSK ' + level + '.</p>';
       return;
     }
 
@@ -1122,6 +1193,8 @@
     const a = attemptAnswers[q.id];
     if(!a) return false;
     if(q.question_type === 'ordering') return Array.isArray(a.order) && a.order.length === q.payload.segments.length;
+    if(q.question_type === 'essay') return !!(a.essay_text && a.essay_text.trim().length > 0);
+    if(q.question_type === 'char_input') return !!(a.correct && a.correct.trim().length > 0);
     return !!a.correct;
   }
 
@@ -1147,6 +1220,14 @@
       html += renderChoiceList(p.choices, answer);
     } else if(q.question_type === 'ordering'){
       html += renderSegmentList(p.segments, answer);
+      const order = answer?.order || [];
+      if(p.answer_sentence && order.length === p.segments.length){
+        html += `<div class="qEssayLabel" style="margin-top:14px">Kalimat lengkap</div><div class="orderingReveal">${p.answer_sentence}</div>`;
+      }
+    } else if(q.question_type === 'char_input'){
+      html += renderCharInputQuestion(p, q, answer);
+    } else if(q.question_type === 'essay'){
+      html += renderEssayQuestion(p, q, answer);
     }
 
     $('attemptBody').innerHTML = html;
@@ -1179,11 +1260,127 @@
       const trans = (attemptShowTranslation && s.id) ? `<span class="segmentTrans">${s.id}</span>` : '';
       return `<div class="segmentItem${picked}" data-key="${s.key}">
         <span class="segmentBadge">${badge}</span>
-        <span class="segmentHanzi">${s.hanzi}</span>
+        <span class="segmentHanzi">${s.hanzi || s.text}</span>
         ${pinyin}${trans}
       </div>`;
     }).join('');
     return `<div class="segmentList">${items}</div>`;
+  }
+
+  /* ---------- char_input (看拼音写汉字) ---------- */
+  function renderCharInputQuestion(p, q, answer){
+    const value = answer?.correct || '';
+    let html = `<div class="qStem">${p.sentence}</div>`;
+    if(attemptShowTranslation && p.sentence_id) html += `<div class="qStemTrans">${p.sentence_id}</div>`;
+    html += `<div class="qEssayLabel">Pinyin petunjuk</div>
+      <div class="charInputPinyinHint">${p.pinyin || ''}</div>
+      <input class="charInputBox" type="text" data-qid="${q.id}" value="${escapeHtml(value)}" placeholder="Ketik hanzi di sini..." autocomplete="off" />`;
+    return html;
+  }
+
+  /* ---------- essay (writing) ---------- */
+  function essayCharCountEl(text, p){
+    const len = text.trim().length;
+    let label = `${len} karakter`;
+    let cls = '';
+    if(p.target_chars){
+      label += ` (target ${p.target_chars})`;
+      cls = len >= p.target_chars * 0.8 ? 'ok' : 'short';
+    } else if(p.min_chars){
+      label += ` (min ${p.min_chars})`;
+      cls = len >= p.min_chars ? 'ok' : 'short';
+    }
+    return { label, cls };
+  }
+
+  function renderEssayQuestion(p, q, answer){
+    const text = answer?.essay_text || '';
+    const { label, cls } = essayCharCountEl(text, p);
+    let html = `<div class="qEssayPrompt">${p.prompt || ''}</div>`;
+    if(attemptShowTranslation && p.prompt_id) html += `<div class="qEssayPromptTrans">${p.prompt_id}</div>`;
+
+    if(p.word){
+      html += `<div class="qEssayLabel">Kata yang harus dipakai</div><div class="qEssayWord">${p.word}</div>`;
+    }
+    if(Array.isArray(p.required_words) && p.required_words.length){
+      html += `<div class="qEssayLabel">Kata-kata yang harus dipakai</div>
+        <div class="qEssayWordList">${p.required_words.map(w => `<span class="qEssayWordChip">${w}</span>`).join('')}</div>`;
+    }
+    if(p.article){
+      html += `<div class="qEssayLabel">Artikel untuk diringkas</div><div class="qEssayArticle">${p.article}</div>`;
+    }
+
+    html += `<div class="qEssayLabel">Jawaban kamu</div>
+      <textarea class="essayTextarea" data-qid="${q.id}" placeholder="Tulis jawabanmu di sini...">${escapeHtml(text)}</textarea>
+      <div class="essayCharCount ${cls}" id="essayCharCount-${q.id}">${label}</div>
+      <button class="essayGradeBtn" data-qid="${q.id}" ${answer?.grading ? 'disabled' : ''}>${answer?.grading ? 'Menilai...' : 'Nilai / 提交'}</button>
+      <div class="essayResult${(!answer?.grading && !answer?.ai_error && !answer?.ai_result) ? ' hidden' : ''}" id="essayResult-${q.id}">${renderEssayResultHTML(answer)}</div>`;
+    return html;
+  }
+
+  function renderEssayResultHTML(answer){
+    if(answer?.grading) return '<div class="essayResultLoading">Sedang menilai jawaban kamu, tunggu beberapa detik...</div>';
+    if(answer?.ai_error) return `<div class="essayResultLoading" style="color:var(--danger)">Gagal menilai: ${escapeHtml(answer.ai_error)}</div>`;
+    if(answer?.ai_result) return buildEssayResultHTML(answer.ai_result);
+    return '';
+  }
+
+  function buildEssayResultHTML(g){
+    const errors = Array.isArray(g.errors) ? g.errors : [];
+    const strengths = Array.isArray(g.strengths) ? g.strengths : [];
+    const suggestions = Array.isArray(g.suggestions) ? g.suggestions : [];
+    let html = `<div class="essayScoreRow"><span class="essayScoreNum">${g.score ?? '—'}</span><span class="essayBand">${escapeHtml(g.band || '')}</span></div>`;
+    if(g.summary) html += `<div class="essaySummary">${escapeHtml(g.summary)}</div>`;
+    if(errors.length){
+      html += `<div class="essaySectionTitle">Kesalahan</div>`;
+      html += errors.map(e => `<div class="essayErrorItem">
+        <div class="essayErrorLine"><span class="essayErrorOriginal">${escapeHtml(e.original)}</span> → <span class="essayErrorCorrection">${escapeHtml(e.correction)}</span></div>
+        <div class="essayErrorReason">${escapeHtml(e.reason)}</div>
+      </div>`).join('');
+    }
+    if(g.corrected_text){
+      html += `<div class="essaySectionTitle">Versi Diperbaiki</div><div class="essayCorrected">${escapeHtml(g.corrected_text)}</div>`;
+    }
+    if(strengths.length){
+      html += `<div class="essaySectionTitle">Kelebihan</div><ul class="essayListPlain">${strengths.map(s => `<li>${escapeHtml(s)}</li>`).join('')}</ul>`;
+    }
+    if(suggestions.length){
+      html += `<div class="essaySectionTitle">Saran</div><ul class="essayListPlain">${suggestions.map(s => `<li>${escapeHtml(s)}</li>`).join('')}</ul>`;
+    }
+    return html;
+  }
+
+  async function gradeEssay(q){
+    const answer = attemptAnswers[q.id] || {};
+    const text = (answer.essay_text || '').trim();
+    if(!text){ alert('Tulis jawaban dulu sebelum dinilai.'); return; }
+
+    attemptAnswers[q.id] = { ...answer, grading: true, ai_error: null };
+    if(attemptQuestions[attemptIndex]?.id === q.id) renderAttemptQuestion();
+
+    const p = q.payload;
+    const body = {
+      hsk_level: attemptSet.hsk_level,
+      task_type: p.task_type,
+      prompt: p.prompt,
+      word: p.word,
+      required_words: p.required_words,
+      article: p.article,
+      min_chars: p.min_chars,
+      target_chars: p.target_chars,
+      student_text: text,
+      question_id: q.id,
+      set_id: attemptSet.set_id
+    };
+
+    const { data, error } = await sb.functions.invoke('grade-essay', { body });
+    const current = attemptAnswers[q.id] || {};
+    if(error || !data || data.error){
+      attemptAnswers[q.id] = { ...current, grading:false, ai_error: (data && data.error) || error?.message || 'Gagal menilai jawaban.' };
+    } else {
+      attemptAnswers[q.id] = { ...current, grading:false, ai_error:null, ai_result: data };
+    }
+    if(attemptQuestions[attemptIndex]?.id === q.id) renderAttemptQuestion();
   }
 
   function renderAttemptNav(){
@@ -1213,7 +1410,16 @@
   function gatherAttemptAnswers(){
     const out = {};
     attemptQuestions.forEach(q => {
-      if(isQuestionAnswered(q)) out[q.id] = attemptAnswers[q.id];
+      if(!isQuestionAnswered(q)) return;
+      // Buat esai cuma kirim teksnya — bukan state UI (grading/ai_result), itu udah
+      // kesimpen sendiri lewat essay_submissions pas panggil grade-essay.
+      if(q.question_type === 'essay'){
+        out[q.id] = { essay_text: attemptAnswers[q.id].essay_text };
+      } else if(q.question_type === 'char_input'){
+        out[q.id] = { correct: attemptAnswers[q.id].correct.trim() };
+      } else {
+        out[q.id] = attemptAnswers[q.id];
+      }
     });
     return out;
   }
@@ -1269,8 +1475,22 @@
     $('attemptCard').classList.add('hidden');
     $('resultCard').classList.remove('hidden');
     $('resultSetTitle').textContent = attemptSet.title;
-    $('resScore').textContent = `${result.score}/${result.total_points}`;
-    $('resCorrect').textContent = `${result.correct_count}/${result.total_questions}`;
+
+    // Set full-esai (mis. hsk*-writing-*) nggak punya skor objektif (nggak ada answer key
+    // buat key-matching) — skor yang ditampilkan adalah rata-rata skor AI dari soal yang sudah dinilai.
+    const isAllEssay = attemptQuestions.length > 0 && attemptQuestions.every(q => q.question_type === 'essay');
+    if(isAllEssay){
+      const graded = attemptQuestions.map(q => attemptAnswers[q.id]?.ai_result).filter(Boolean);
+      const avg = graded.length
+        ? Math.round(graded.reduce((sum, g) => sum + (Number(g.score) || 0), 0) / graded.length)
+        : null;
+      $('resScore').textContent = avg != null ? `${avg} (AI)` : 'N/A';
+      $('resCorrect').textContent = `${graded.length}/${attemptQuestions.length} dinilai`;
+    } else {
+      $('resScore').textContent = (result.score != null && result.total_points != null) ? `${result.score}/${result.total_points}` : 'N/A';
+      $('resCorrect').textContent = (result.correct_count != null && result.total_questions != null) ? `${result.correct_count}/${result.total_questions}` : 'N/A';
+    }
+
     $('resTime').textContent = formatDuration(timeTakenSec);
     renderReview(result.review || []);
   }
@@ -1298,6 +1518,12 @@
   // Review selalu nampilin pinyin & terjemahan (nggak ngikut toggle attemptShowPinyin/Translation),
   // karena murid udah selesai ngerjain -- beda dari attemptBody yang default nyembunyiin buat simulasi ujian.
   function buildReviewHTML(item, q){
+    if(q && q.question_type === 'essay'){
+      let html = `<div class="reviewHead"><span>Soal ${item.order_index}</span><span class="reviewBadge neutral">Dinilai AI</span></div>`;
+      html += buildReviewEssay(q.payload, item, attemptAnswers[q.id]);
+      return html;
+    }
+
     const badge = item.is_correct
       ? '<span class="reviewBadge correct">Benar</span>'
       : '<span class="reviewBadge wrong">Salah</span>';
@@ -1325,9 +1551,23 @@
       html += buildReviewChoices(p.choices, item.user_answer, item.correct_answer);
     } else if(q.question_type === 'ordering'){
       html += buildReviewOrdering(p.segments, item.user_answer, item.correct_answer);
+    } else if(q.question_type === 'char_input'){
+      html += buildReviewCharInput(p, item.user_answer, item.correct_answer);
     }
 
     html += `<div class="reviewExplain"><span class="reviewExplainLabel">Penjelasan</span>${item.explanation || '-'}</div>`;
+    return html;
+  }
+
+  function buildReviewCharInput(p, userAns, correctAns){
+    const userVal = userAns?.correct;
+    const correctVal = correctAns?.correct;
+    let html = `<div class="reviewStem">${p.sentence}</div>`;
+    if(p.sentence_id) html += `<div class="reviewStemTrans">${p.sentence_id}</div>`;
+    html += `<div class="reviewOrderRow"><span class="reviewOrderLabel">Jawaban kamu</span>${userVal ? escapeHtml(userVal) : '(belum dijawab)'}</div>`;
+    if(userVal !== correctVal){
+      html += `<div class="reviewOrderRow"><span class="reviewOrderLabel">Jawaban benar</span>${correctVal || '-'}</div>`;
+    }
     return html;
   }
 
@@ -1358,7 +1598,7 @@
       if(!s) return k;
       const pinyin = s.pinyin ? ` (${s.pinyin})` : '';
       const trans = s.id ? ` — ${s.id}` : '';
-      return `${s.hanzi}${pinyin}${trans}`;
+      return `${s.hanzi || s.text}${pinyin}${trans}`;
     }).join('  →  ');
 
     const userOrder = userAns?.order;
@@ -1368,6 +1608,23 @@
     let html = `<div class="reviewOrderRow"><span class="reviewOrderLabel">Jawaban kamu</span>${userOrder ? describe(userOrder) : '(belum dijawab)'}</div>`;
     if(!isMatch){
       html += `<div class="reviewOrderRow"><span class="reviewOrderLabel">Urutan benar</span>${describe(correctOrder)}</div>`;
+    }
+    return html;
+  }
+
+  // Penilaian esai dilakukan langsung pas ngerjain (tombol "Nilai / 提交"), bukan lewat submit_attempt.
+  // Jadi review-nya ambil dari attemptAnswers yang masih ada di memori sesi ini, bukan dari `item`.
+  function buildReviewEssay(p, item, savedAnswer){
+    let html = `<div class="reviewStem">${p.prompt || ''}</div>`;
+    if(p.prompt_id) html += `<div class="reviewStemTrans">${p.prompt_id}</div>`;
+
+    const text = savedAnswer?.essay_text || '';
+    html += `<div class="reviewExplain"><span class="reviewExplainLabel">Jawaban kamu</span>${text ? escapeHtml(text) : '(belum dijawab)'}</div>`;
+
+    if(savedAnswer?.ai_result){
+      html += `<div class="essayResult" style="margin-top:10px">${buildEssayResultHTML(savedAnswer.ai_result)}</div>`;
+    } else {
+      html += `<div class="reviewExplain"><span class="reviewExplainLabel">Penilaian AI</span>Belum dinilai saat pengerjaan.</div>`;
     }
     return html;
   }
@@ -1423,6 +1680,34 @@
       if(current.length === 0) delete attemptAnswers[q.id];
       else attemptAnswers[q.id] = { order: current };
       renderAttemptQuestion();
+      return;
+    }
+    const gradeBtn = e.target.closest('.essayGradeBtn');
+    if(gradeBtn){
+      gradeEssay(q);
+    }
+  });
+  $('attemptBody').addEventListener('input', e=>{
+    const ta = e.target.closest('.essayTextarea');
+    if(ta){
+      const q = attemptQuestions[attemptIndex];
+      if(!q || String(q.id) !== ta.dataset.qid) return;
+      const prev = attemptAnswers[q.id] || {};
+      attemptAnswers[q.id] = { ...prev, essay_text: ta.value };
+      const countEl = $('essayCharCount-' + q.id);
+      if(countEl){
+        const { label, cls } = essayCharCountEl(ta.value, q.payload);
+        countEl.textContent = label;
+        countEl.className = 'essayCharCount' + (cls ? ' ' + cls : '');
+      }
+      return;
+    }
+    const ci = e.target.closest('.charInputBox');
+    if(ci){
+      const q = attemptQuestions[attemptIndex];
+      if(!q || String(q.id) !== ci.dataset.qid) return;
+      attemptAnswers[q.id] = { correct: ci.value };
+      renderQuestionGrid();
     }
   });
 

@@ -131,6 +131,7 @@
     .attemptProgress{font-size:12px; color:var(--muted); margin-bottom:8px}
     .attemptBody{background:var(--panel-2); border:1px solid var(--line); border-radius:14px; padding:18px; min-height:160px}
     .qInstruction{font-size:11px; color:var(--muted); margin-bottom:10px; text-transform:uppercase; letter-spacing:.4px}
+    .sectionBreak{display:inline-block; padding:4px 12px; margin-bottom:14px; background:rgba(216,162,74,.15); border:1px solid var(--gold); border-radius:999px; font-size:12px; font-weight:700; color:var(--gold-soft); letter-spacing:.3px}
     .qPassage{font-size:15px; line-height:1.85; margin-bottom:14px; padding-bottom:14px; border-bottom:1px solid var(--line); font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif; white-space:pre-line}
     .qPassageTrans{font-size:13px; color:var(--muted); margin-top:8px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
     .qStem{font-size:16px; line-height:1.75; margin-bottom:6px; font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif; white-space:pre-line}
@@ -157,6 +158,8 @@
     .gridBtn{width:34px; height:34px; border-radius:8px; background:var(--panel-2); border:1px solid var(--line); color:var(--muted); font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; cursor:pointer}
     .gridBtn.answered{background:rgba(95,178,122,.15); border-color:var(--ok); color:var(--ok)}
     .gridBtn.current{border-color:var(--gold); color:var(--gold-soft)}
+    .attemptFilledCount{font-size:12px; color:var(--muted); text-align:center; margin-top:10px}
+    .attemptFilledCount.done{color:var(--ok); font-weight:700}
     /* mock test result / review */
     .result{max-width:560px}
     .reviewItem{background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:14px 16px; margin-bottom:12px}
@@ -359,6 +362,7 @@
     </div>
 
     <div class="questionGrid" id="questionGrid"></div>
+    <div class="attemptFilledCount" id="attemptFilledCount">Terisi 0/0</div>
 
     <button id="attemptSubmitBtn">Submit</button>
     <button id="attemptExitBtn" class="practiceExit">Keluar (batal)</button>
@@ -1020,6 +1024,7 @@
      MOCK TEST — LIST SET (Task 2)
      ========================================================== */
   const SECTION_LABEL = {reading:'Membaca', listening:'Mendengar', writing:'Menulis'};
+  const SECTION_ORDER = {listening:0, reading:1, writing:2};
   const SECTION_TABS = [
     { key:'all', label:'Semua' },
     { key:'reading', label:'Membaca' },
@@ -1028,6 +1033,20 @@
   ];
   let mockLevel = null;
   let mockSection = 'all';
+  let mockGroupedSets = new Map(); // baseCode -> array of test_sets rows, buat tombol "Mulai" di tab Semua
+
+  function sectionRank(section){
+    return SECTION_ORDER[section] ?? 99;
+  }
+
+  // Skema kode: judul = "H{level}XING{nnn} {SECTION}", kode dasar = token pertama.
+  // Judul lama/nggak sesuai skema nggak dipaksa gabung (biar nggak ke-grup asal) --
+  // dipakai apa adanya sebagai "kode"-nya sendiri.
+  function getBaseCode(title){
+    const t = (title || '').trim();
+    const first = t.split(/\s+/)[0] || t;
+    return /^H\d+XING\d+/i.test(first) ? first : t;
+  }
 
   function openMockList(){
     $('dashCard').classList.add('hidden');
@@ -1090,8 +1109,7 @@
       .from('test_sets').select('set_id,hsk_level,section,title,time_limit_seconds,total_questions')
       .eq('is_published', true).eq('hsk_level', level);
     if(mockSection !== 'all') query = query.eq('section', mockSection);
-    const { data: sets, error: setErr } = await query
-      .order('section', { ascending:true }).order('set_id', { ascending:true });
+    const { data: sets, error: setErr } = await query.order('title', { ascending:true });
     if(setErr){ alert('Gagal ambil daftar mock test: ' + setErr.message); return; }
 
     if(!sets || sets.length === 0){
@@ -1100,9 +1118,10 @@
       return;
     }
 
+    const setIds = sets.map(s => s.set_id);
     const { data: attempts, error: attErr } = await sb
       .from('test_attempts').select('set_id,score,total_points,correct_count,total_questions,created_at')
-      .eq('user_id', currentUser).eq('hsk_level', level)
+      .eq('user_id', currentUser).in('set_id', setIds)
       .order('created_at', { ascending:false });
     if(attErr){ alert('Gagal ambil riwayat attempt: ' + attErr.message); return; }
 
@@ -1110,6 +1129,14 @@
     (attempts||[]).forEach(a=>{ if(!lastAttempt.has(a.set_id)) lastAttempt.set(a.set_id, a); });
 
     wrap.innerHTML = '';
+    if(mockSection === 'all'){
+      renderMockGroupedList(wrap, sets, lastAttempt);
+    } else {
+      renderMockFlatList(wrap, sets, lastAttempt);
+    }
+  }
+
+  function renderMockFlatList(wrap, sets, lastAttempt){
     sets.forEach(s=>{
       const attempt = lastAttempt.get(s.set_id);
       const minutes = Math.round(s.time_limit_seconds / 60);
@@ -1120,6 +1147,47 @@
         <div class="mockSetMeta">HSK ${s.hsk_level} · ${SECTION_LABEL[s.section] || s.section} · ${s.total_questions} soal · ${minutes} menit</div>
         ${attempt ? `<div class="mockSetScore">Terakhir: ${attempt.score}/${attempt.total_points} · Benar ${attempt.correct_count}/${attempt.total_questions} · ${formatMockDate(attempt.created_at)}</div>` : ''}
         <button class="mockSetBtn" data-set="${s.set_id}">${attempt ? 'Ulangi' : 'Mulai'}</button>
+      `;
+      wrap.appendChild(card);
+    });
+  }
+
+  // Tab "Semua": satu kartu per kode dasar (mis. "H4XING001"), gabungan semua section
+  // yang berbagi kode itu. Urutan bagian pas dikerjain: listening -> reading -> writing.
+  function renderMockGroupedList(wrap, sets, lastAttempt){
+    mockGroupedSets = new Map();
+    sets.forEach(s=>{
+      const code = getBaseCode(s.title);
+      if(!mockGroupedSets.has(code)) mockGroupedSets.set(code, []);
+      mockGroupedSets.get(code).push(s);
+    });
+
+    const codes = [...mockGroupedSets.keys()].sort();
+    codes.forEach(code=>{
+      const groupSets = mockGroupedSets.get(code).slice().sort((a,b) => sectionRank(a.section) - sectionRank(b.section));
+      const totalQuestions = groupSets.reduce((sum,s) => sum + (s.total_questions||0), 0);
+      const totalMinutes = Math.round(groupSets.reduce((sum,s) => sum + (s.time_limit_seconds||0), 0) / 60);
+      const sectionLabels = groupSets.map(s => SECTION_LABEL[s.section] || s.section).join(' + ');
+
+      const attemptsForGroup = groupSets.map(s => lastAttempt.get(s.set_id));
+      const allAttempted = attemptsForGroup.every(Boolean);
+      let scoreLine = '';
+      if(allAttempted){
+        const score = attemptsForGroup.reduce((sum,a) => sum + (a.score||0), 0);
+        const totalPoints = attemptsForGroup.reduce((sum,a) => sum + (a.total_points||0), 0);
+        const correct = attemptsForGroup.reduce((sum,a) => sum + (a.correct_count||0), 0);
+        const totalQ = attemptsForGroup.reduce((sum,a) => sum + (a.total_questions||0), 0);
+        const latestDate = attemptsForGroup.reduce((latest,a) => a.created_at > latest ? a.created_at : latest, attemptsForGroup[0].created_at);
+        scoreLine = `<div class="mockSetScore">Terakhir: ${score}/${totalPoints} · Benar ${correct}/${totalQ} · ${formatMockDate(latestDate)}</div>`;
+      }
+
+      const card = document.createElement('div');
+      card.className = 'mockSetCard';
+      card.innerHTML = `
+        <div class="mockSetTitle">${code}</div>
+        <div class="mockSetMeta">HSK ${groupSets[0].hsk_level} · ${sectionLabels} · ${totalQuestions} soal · ${totalMinutes} menit</div>
+        ${scoreLine}
+        <button class="mockSetBtn" data-group="${code}">${allAttempted ? 'Ulangi' : 'Mulai'}</button>
       `;
       wrap.appendChild(card);
     });
@@ -1136,6 +1204,8 @@
   let attemptTimerInterval = null;
   let attemptShowPinyin = false;
   let attemptShowTranslation = false;
+  let attemptGroupSets = null;              // != null kalau ini exam gabungan (tab Semua)
+  let attemptSectionBreaks = new Map();      // index soal -> label section, buat pemisah antar bagian
 
   async function startAttempt(setId){
     const { data: setRow, error: setErr } = await sb
@@ -1151,6 +1221,8 @@
     if(qErr){ alert('Gagal ambil soal: ' + qErr.message); return; }
     if(!qRows || qRows.length === 0){ alert('Set ini belum ada soalnya.'); return; }
 
+    attemptGroupSets = null;
+    attemptSectionBreaks = new Map();
     attemptSet = setRow;
     attemptQuestions = qRows;
     attemptAnswers = {};
@@ -1166,6 +1238,70 @@
 
     renderAttemptQuestion();
     startAttemptTimer(setRow.time_limit_seconds);
+  }
+
+  // Tab "Semua": gabungkan semua set yang berbagi kode dasar jadi satu attempt berkelanjutan.
+  // Urutan section: listening -> reading -> writing (SECTION_ORDER), lalu urutan set, lalu order_index.
+  async function startCombinedAttempt(code, groupSetsRaw){
+    const groupSets = groupSetsRaw.slice().sort((a,b) => sectionRank(a.section) - sectionRank(b.section));
+    const setIds = groupSets.map(s => s.set_id);
+
+    // PENTING: kolom answer/explanation TIDAK di-select — nggak di-grant ke murid.
+    const { data: qRows, error: qErr } = await sb
+      .from('question_bank').select('id,question_type,order_index,payload,points,set_id')
+      .in('set_id', setIds);
+    if(qErr){ alert('Gagal ambil soal: ' + qErr.message); return; }
+    if(!qRows || qRows.length === 0){ alert('Set ini belum ada soalnya.'); return; }
+
+    const sectionMap = new Map(groupSets.map(s => [s.set_id, s.section]));
+    const setIndexMap = new Map(setIds.map((id, i) => [id, i]));
+    qRows.sort((a, b) => {
+      const ra = sectionRank(sectionMap.get(a.set_id));
+      const rb = sectionRank(sectionMap.get(b.set_id));
+      if(ra !== rb) return ra - rb;
+      const ia = setIndexMap.get(a.set_id) ?? 0;
+      const ib = setIndexMap.get(b.set_id) ?? 0;
+      if(ia !== ib) return ia - ib;
+      return a.order_index - b.order_index;
+    });
+
+    // Pemisah antar section cuma ditampilin kalau exam-nya beneran gabungan >1 section.
+    attemptSectionBreaks = new Map();
+    const distinctSections = new Set(groupSets.map(s => s.section));
+    if(distinctSections.size > 1){
+      let prevSection = null;
+      qRows.forEach((r, i) => {
+        const sec = sectionMap.get(r.set_id);
+        if(sec !== prevSection){
+          attemptSectionBreaks.set(i, SECTION_LABEL[sec] || sec);
+          prevSection = sec;
+        }
+      });
+    }
+
+    attemptGroupSets = groupSets;
+    attemptSet = {
+      set_id: code,
+      hsk_level: groupSets[0].hsk_level,
+      section: 'combined',
+      title: code,
+      time_limit_seconds: groupSets.reduce((sum, s) => sum + (s.time_limit_seconds || 0), 0),
+      total_questions: qRows.length
+    };
+    attemptQuestions = qRows;
+    attemptAnswers = {};
+    attemptIndex = 0;
+    attemptShowPinyin = false;
+    attemptShowTranslation = false;
+    $('togglePinyin').checked = false;
+    $('toggleTranslation').checked = false;
+
+    $('mockListCard').classList.add('hidden');
+    $('attemptCard').classList.remove('hidden');
+    $('attemptTitle').textContent = code;
+
+    renderAttemptQuestion();
+    startAttemptTimer(attemptSet.time_limit_seconds);
   }
 
   function startAttemptTimer(seconds){
@@ -1204,7 +1340,11 @@
     const q = attemptQuestions[attemptIndex];
     const p = q.payload;
     const answer = attemptAnswers[q.id];
-    let html = `<div class="qInstruction">${p.instruction || ''}</div>`;
+    let html = '';
+    if(attemptSectionBreaks.has(attemptIndex)){
+      html += `<div class="sectionBreak">${attemptSectionBreaks.get(attemptIndex)}</div>`;
+    }
+    html += `<div class="qInstruction">${p.instruction || ''}</div>`;
 
     if(q.question_type === 'reading_mc'){
       html += `<div class="qPassage">${p.passage}</div>`;
@@ -1412,13 +1552,20 @@
   function renderQuestionGrid(){
     const wrap = $('questionGrid');
     wrap.innerHTML = '';
+    let filled = 0;
     attemptQuestions.forEach((q, i) => {
+      const answered = isQuestionAnswered(q);
+      if(answered) filled++;
       const btn = document.createElement('div');
-      btn.className = 'gridBtn' + (isQuestionAnswered(q) ? ' answered' : '') + (i === attemptIndex ? ' current' : '');
+      btn.className = 'gridBtn' + (answered ? ' answered' : '') + (i === attemptIndex ? ' current' : '');
       btn.textContent = i + 1;
       btn.addEventListener('click', () => goToAttemptQuestion(i));
       wrap.appendChild(btn);
     });
+    const total = attemptQuestions.length;
+    const countEl = $('attemptFilledCount');
+    countEl.textContent = `Terisi ${filled}/${total}`;
+    countEl.classList.toggle('done', filled === total);
   }
 
   function goToAttemptQuestion(idx){
@@ -1454,6 +1601,47 @@
     $('attemptSubmitBtn').disabled = true;
     const answers = gatherAttemptAnswers();
     const timeTaken = attemptSet.time_limit_seconds - Math.max(0, Math.round((attemptDeadline - Date.now()) / 1000));
+
+    // Exam gabungan (tab Semua): submit_attempt tetap dipanggil per set_id asli (RPC-nya
+    // cuma tau satu set_id sekaligus), lalu hasilnya dijumlahin di sini jadi satu skor.
+    if(attemptGroupSets && attemptGroupSets.length > 0){
+      let totalScore = 0, totalPoints = 0, totalCorrect = 0, totalQuestions = 0;
+      const reviewMap = new Map();
+      for(const s of attemptGroupSets){
+        const { data, error } = await sb.rpc('submit_attempt', {
+          p_set_id: s.set_id,
+          p_answers: answers,
+          p_time_taken: timeTaken
+        });
+        if(error){
+          alert('Gagal submit (' + s.title + '): ' + error.message);
+          $('attemptSubmitBtn').disabled = false;
+          const remain = Math.max(0, Math.round((attemptDeadline - Date.now()) / 1000));
+          if(remain > 0) startAttemptTimer(remain);
+          return;
+        }
+        totalScore += data.score || 0;
+        totalPoints += data.total_points || 0;
+        totalCorrect += data.correct_count || 0;
+        totalQuestions += data.total_questions || 0;
+        (data.review || []).forEach(item => reviewMap.set(item.id, item));
+      }
+      // order_index dari tiap set mulai dari 1 lagi -- nomori ulang sesuai urutan gabungan asli
+      // (attemptQuestions) biar nggak dobel "Soal 1" antar section pas ditampilin di review.
+      const mergedReview = attemptQuestions.map((q, i) => ({
+        ...(reviewMap.get(q.id) || {}),
+        id: q.id,
+        order_index: i + 1
+      }));
+      showResult({
+        score: totalScore,
+        total_points: totalPoints,
+        correct_count: totalCorrect,
+        total_questions: totalQuestions,
+        review: mergedReview
+      }, timeTaken);
+      return;
+    }
 
     const { data, error } = await sb.rpc('submit_attempt', {
       p_set_id: attemptSet.set_id,
@@ -1671,8 +1859,13 @@
   $('mockTestBtn').addEventListener('click', openMockList);
   $('mockListExitBtn').addEventListener('click', closeMockList);
   $('mockList').addEventListener('click', e=>{
-    const btn = e.target.closest('button[data-set]');
-    if(btn) startAttempt(btn.dataset.set);
+    const setBtn = e.target.closest('button[data-set]');
+    if(setBtn){ startAttempt(setBtn.dataset.set); return; }
+    const groupBtn = e.target.closest('button[data-group]');
+    if(groupBtn){
+      const groupSets = mockGroupedSets.get(groupBtn.dataset.group);
+      if(groupSets) startCombinedAttempt(groupBtn.dataset.group, groupSets);
+    }
   });
   $('togglePinyin').addEventListener('change', e=>{ attemptShowPinyin = e.target.checked; renderAttemptQuestion(); });
   $('toggleTranslation').addEventListener('change', e=>{ attemptShowTranslation = e.target.checked; renderAttemptQuestion(); });
@@ -1720,6 +1913,7 @@
         countEl.textContent = label;
         countEl.className = 'essayCharCount' + (cls ? ' ' + cls : '');
       }
+      renderQuestionGrid();
       return;
     }
     const ci = e.target.closest('.charInputBox');

@@ -86,6 +86,13 @@
       transition:border-color .15s ease, box-shadow .15s ease;
     }
     .loginFormPanel input:focus{ border-color:var(--gold); box-shadow:0 0 0 4px rgba(242,176,30,.14); }
+    #password{ padding-right:44px; }
+    .passwordToggle{
+      position:absolute; right:14px; top:50%; transform:translateY(-50%);
+      width:auto; margin:0; padding:0; background:transparent; border:none;
+      cursor:pointer; opacity:.45; font-size:16px; color:inherit; line-height:1;
+    }
+    .passwordToggle:hover{ opacity:.8; }
 
     .loginRow{ display:flex; align-items:center; justify-content:space-between; margin:18px 0 4px; font-size:13px; }
     .loginFormPanel label.rememberMe{ display:flex; align-items:center; gap:6px; color:var(--muted); font-weight:600; cursor:pointer; margin:0; font-size:13px; }
@@ -486,6 +493,7 @@
         <div class="inputWrap">
           <span class="inputIcon">🔒</span>
           <input id="password" type="password" autocomplete="current-password" placeholder="" />
+          <button type="button" class="passwordToggle" id="passwordToggle" aria-label="Show password">👁️</button>
         </div>
 
         <div class="loginRow">
@@ -756,7 +764,15 @@
           hi:'Halo', readyToday:'Siap belajar hari ini?', dueToday:'Due Hari Ini', streakDaysLabel:'Streak (hari)',
           wordsMastered:'Kata Dikuasai', mockTestsDone:'Mock Test Selesai', continuePractice:'Lanjutkan Latihan',
           dailyGoal:'Target Harian', progressByLevel:'Progres per Level', quickActions:'Aksi Cepat',
-          recentHistory:'Riwayat Terakhir', seeAll:'Lihat semua', dictionary:'Kamus', report:'Raport' },
+          recentHistory:'Riwayat Terakhir', seeAll:'Lihat semua', dictionary:'Kamus', report:'Raport',
+          showPassword:'Tampilkan password', hidePassword:'Sembunyikan password',
+          errEmptyFields:'Isi email dan password dulu.', errWrongCredentials:'Email atau password salah.',
+          errProfileNotFound:'Profil tidak ditemukan. Hubungi admin.',
+          errSubscriptionEnded:'Langganan kamu sudah berakhir. Hubungi admin untuk perpanjang.',
+          errSubscriptionPastDue:'Masa langganan kamu sudah lewat. Hubungi admin untuk perpanjang.',
+          errSessionStartFailed:'Gagal memulai sesi. Coba lagi.',
+          errSessionTakenOver:'Sesi kamu diambil alih perangkat lain. Silakan login ulang.',
+          errLoggedInElsewhere:'Akun kamu login di perangkat lain. Kamu keluar otomatis.' },
     en: { beranda:'Home', latihan:'Practice & Test', materi:'Materials', progres:'Progress', riwayat:'History',
           streak:'STREAK', hari:'days', keluar:'Log out', mulai:'Start', ulangi:'Retry',
           soal:'questions', menit:'minutes', terakhir:'Last:', benar:'Correct', mockTest:'Mock Test',
@@ -766,7 +782,15 @@
           hi:'Hi', readyToday:'Ready to study today?', dueToday:'Due Today', streakDaysLabel:'Streak (days)',
           wordsMastered:'Words Mastered', mockTestsDone:'Mock Tests Done', continuePractice:'Continue Practice',
           dailyGoal:'Daily Goal', progressByLevel:'Progress by Level', quickActions:'Quick Actions',
-          recentHistory:'Recent History', seeAll:'See all', dictionary:'Dictionary', report:'Report' },
+          recentHistory:'Recent History', seeAll:'See all', dictionary:'Dictionary', report:'Report',
+          showPassword:'Show password', hidePassword:'Hide password',
+          errEmptyFields:'Please enter your email and password.', errWrongCredentials:'Incorrect email or password.',
+          errProfileNotFound:'Profile not found. Please contact admin.',
+          errSubscriptionEnded:'Your subscription has ended. Please contact admin to renew.',
+          errSubscriptionPastDue:'Your subscription period has passed. Please contact admin to renew.',
+          errSessionStartFailed:'Could not start your session. Please try again.',
+          errSessionTakenOver:'Your session was taken over on another device. Please sign in again.',
+          errLoggedInElsewhere:'Your account signed in on another device. You were signed out automatically.' },
     zh: { beranda:'首页', latihan:'练习与测试', materi:'学习资料', progres:'学习进度', riwayat:'历史记录',
           streak:'连续天数', hari:'天', keluar:'退出', mulai:'开始', ulangi:'重做',
           soal:'题', menit:'分钟', terakhir:'上次：', benar:'正确', mockTest:'模拟考试',
@@ -776,7 +800,15 @@
           hi:'你好', readyToday:'今天准备好了吗？', dueToday:'今日待复习', streakDaysLabel:'连续天数',
           wordsMastered:'已掌握词汇', mockTestsDone:'已完成模拟', continuePractice:'继续练习',
           dailyGoal:'每日目标', progressByLevel:'各级进度', quickActions:'快捷操作',
-          recentHistory:'最近记录', seeAll:'查看全部', dictionary:'词典', report:'成绩单' }
+          recentHistory:'最近记录', seeAll:'查看全部', dictionary:'词典', report:'成绩单',
+          showPassword:'显示密码', hidePassword:'隐藏密码',
+          errEmptyFields:'请输入邮箱和密码', errWrongCredentials:'邮箱或密码错误',
+          errProfileNotFound:'未找到账号资料，请联系管理员',
+          errSubscriptionEnded:'您的订阅已到期，请联系管理员续费',
+          errSubscriptionPastDue:'您的订阅期限已过，请联系管理员续费',
+          errSessionStartFailed:'无法启动会话，请重试',
+          errSessionTakenOver:'您的账号已在其他设备登录，请重新登录',
+          errLoggedInElsewhere:'您的账号已在其他设备登录，系统已自动将您登出' }
   };
   let currentLang = localStorage.getItem('xingLang') || 'en';
   if(!LANG[currentLang]) currentLang = 'en';
@@ -804,6 +836,7 @@
     $('forgotPasswordLink').textContent = t('forgotPassword');
     $('loginBtn').textContent = t('signIn');
     $('loginFoot').innerHTML = `${t('noAccount')} <b>${t('contactAdmin')}</b> ${t('toRegister')}`;
+    $('passwordToggle').setAttribute('aria-label', $('password').type === 'text' ? t('hidePassword') : t('showPassword'));
 
     $('dHello').textContent = t('hi');
     $('dGreet').textContent = t('readyToday');
@@ -912,11 +945,11 @@
   /* ---------- cek gerbang status langganan ---------- */
   function gateReason(profile){
     if(profile.role === 'admin') return null;            // admin selalu lolos
-    if(profile.status === 'expired') return 'Langganan kamu sudah berakhir. Hubungi admin untuk perpanjang.';
+    if(profile.status === 'expired') return t('errSubscriptionEnded');
     if(profile.subscription_end){
       const today = new Date(); today.setHours(0,0,0,0);
       const end = new Date(profile.subscription_end + 'T00:00:00');
-      if(end < today) return 'Masa langganan kamu sudah lewat. Hubungi admin untuk perpanjang.';
+      if(end < today) return t('errSubscriptionPastDue');
     }
     return null;
   }
@@ -953,7 +986,7 @@
         payload => {
           const mine = localStorage.getItem(SESSION_KEY);
           if(payload.new.active_session_id !== mine){
-            forceLogout('Akun kamu login di perangkat lain. Kamu keluar otomatis.');
+            forceLogout(t('errLoggedInElsewhere'));
           }
         })
       .subscribe();
@@ -974,7 +1007,7 @@
   async function loadProfile(userId){
     const { data:profile, error } = await sb
       .from('profiles').select('*').eq('id', userId).single();
-    if(error || !profile){ await forceLogout('Profil tidak ditemukan. Hubungi admin.'); return; }
+    if(error || !profile){ await forceLogout(t('errProfileNotFound')); return; }
 
     const blocked = gateReason(profile);
     if(blocked){ await forceLogout(blocked); return; }
@@ -995,24 +1028,24 @@
   async function doLogin(){
     const email = $('email').value.trim();
     const pass  = $('password').value;
-    if(!email || !pass){ showLogin('Isi email dan password dulu.', 'err'); return; }
+    if(!email || !pass){ showLogin(t('errEmptyFields'), 'err'); return; }
     $('loginBtn').disabled = true;
     showLogin(null);
 
     const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
-    if(error){ showLogin('Email atau password salah.', 'err'); return; }
+    if(error){ showLogin(t('errWrongCredentials'), 'err'); return; }
 
     const userId = data.user.id;
     // cek gerbang dulu sebelum klaim sesi
     const { data:profile } = await sb.from('profiles').select('*').eq('id', userId).single();
-    if(!profile){ await forceLogout('Profil tidak ditemukan. Hubungi admin.'); return; }
+    if(!profile){ await forceLogout(t('errProfileNotFound')); return; }
     const blocked = gateReason(profile);
     if(blocked){ await forceLogout(blocked); return; }
 
     // klaim sesi baru → ini yang nendang device lama
     const sid = genUUID();
     const { error:rpcErr } = await sb.rpc('claim_session', { p_session_id: sid, p_device_label: deviceLabel() });
-    if(rpcErr){ await forceLogout('Gagal memulai sesi. Coba lagi.'); return; }
+    if(rpcErr){ await forceLogout(t('errSessionStartFailed')); return; }
     localStorage.setItem(SESSION_KEY, sid);
 
     await loadProfile(userId);
@@ -1027,14 +1060,14 @@
     const storedSid = localStorage.getItem(SESSION_KEY);
 
     const { data:profile } = await sb.from('profiles').select('*').eq('id', userId).single();
-    if(!profile){ await forceLogout('Profil tidak ditemukan. Hubungi admin.'); return; }
+    if(!profile){ await forceLogout(t('errProfileNotFound')); return; }
 
     const blocked = gateReason(profile);
     if(blocked){ await forceLogout(blocked); return; }
 
     // kalau sesi di server beda dari punya device ini → device ini udah kalah
     if(!storedSid || profile.active_session_id !== storedSid){
-      await forceLogout('Sesi kamu diambil alih perangkat lain. Silakan login ulang.');
+      await forceLogout(t('errSessionTakenOver'));
       return;
     }
     await loadProfile(userId);
@@ -2768,6 +2801,14 @@
 
   document.querySelectorAll('.langBtn').forEach(b=>{
     b.addEventListener('click', ()=> setLang(b.dataset.lang));
+  });
+
+  $('passwordToggle').addEventListener('click', ()=>{
+    const pw = $('password');
+    const willShow = pw.type === 'password';
+    pw.type = willShow ? 'text' : 'password';
+    $('passwordToggle').textContent = willShow ? '🙈' : '👁️';
+    $('passwordToggle').setAttribute('aria-label', willShow ? t('hidePassword') : t('showPassword'));
   });
 
   applyStaticI18n();

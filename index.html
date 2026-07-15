@@ -348,9 +348,9 @@
     .continueMoonWrap{ position:absolute; left:300px; top:14px; width:52px; height:52px; pointer-events:none; }
     .continueMoonGlow{ position:absolute; inset:-18px; border-radius:50%; background:radial-gradient(circle,rgba(242,176,30,.4),transparent 68%); animation:moonGlow 6s ease-in-out infinite; }
     .continueStar{ position:absolute; border-radius:50%; background:#fff; animation:twinkle 3s ease-in-out infinite; pointer-events:none; }
-    .continueStar.gold{ background:#F7C64D; }
+    .continueStar.gold{ background:#F7C64D; animation:twinkle 3.8s ease-in-out infinite .5s; }
     .continueSparkle{ position:absolute; animation:twinkle 4.6s ease-in-out infinite .3s; pointer-events:none; }
-    .continueCardText{ position:relative; display:flex; flex-direction:column; gap:4px; min-width:0; }
+    .continueCardText{ position:relative; display:flex; flex-direction:column; min-width:0; }
     .continueCardLabel{ font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.16em; color:var(--gold); }
     .continueCardTitle{ margin-top:9px; font-family:var(--display-font); font-size:26px; font-weight:700; color:#fff; }
     .continueCardSubtitle{ margin-top:5px; font-size:13px; color:rgba(255,255,255,.65); }
@@ -782,7 +782,7 @@
         <button id="practiceBtn" class="continueCard" type="button">
           <div class="continueMoonWrap"><div class="continueMoonGlow"></div><svg width="52" height="52" viewBox="0 0 52 52"><defs><mask id="continueMoonMask"><rect width="52" height="52" fill="#000"/><circle cx="26" cy="26" r="18" fill="#fff"/><circle cx="34" cy="20" r="15" fill="#000"/></mask></defs><circle cx="26" cy="26" r="18" fill="#F2B01E" mask="url(#continueMoonMask)"/></svg></div>
           <span class="continueStar" style="top:30px; left:430px; width:4px; height:4px;"></span>
-          <span class="continueStar gold" style="top:70px; left:390px; width:3px; height:3px; animation-delay:.5s;"></span>
+          <span class="continueStar gold" style="top:70px; left:390px; width:3px; height:3px;"></span>
           <svg class="continueSparkle" style="top:40px; left:520px;" width="13" height="13" viewBox="0 0 24 24" fill="#F7C64D"><path d="M12 0c1 6 5 10 12 12-7 2-11 6-12 12-1-6-5-10-12-12 7-2 11-6 12-12z"/></svg>
           <div class="continueCardText">
             <span class="continueCardLabel" id="continueCardLabel">Lanjutkan Latihan</span>

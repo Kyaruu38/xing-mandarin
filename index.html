@@ -57,14 +57,10 @@
       font-size:620px; line-height:1; color:rgba(242,176,30,.06); pointer-events:none; user-select:none;
     }
     .loginBrandContent{ position:relative; max-width:480px; }
-    .loginBrandLogo{ width:170px; height:auto; display:block; margin-bottom:34px; filter:drop-shadow(0 10px 20px rgba(0,0,0,.25)); }
+    .loginBrandLogo{ width:180px; height:auto; display:block; margin-bottom:34px; filter:drop-shadow(0 10px 20px rgba(0,0,0,.25)); }
     .loginBrandKicker{ color:var(--gold); font-size:15px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; margin:0 0 14px; }
     .loginBrandTitle{ font-family:var(--hanzi-font); font-size:44px; font-weight:800; color:#fff; margin:0 0 18px; line-height:1.25; }
-    .loginBrandDesc{ color:#aab2d8; font-size:16.5px; line-height:1.65; margin:0 0 36px; }
-    .loginBrandStats{ display:flex; gap:36px; }
-    .loginStat{ display:flex; flex-direction:column; gap:4px; }
-    .loginStatNum{ font-size:26px; font-weight:800; color:#fff; }
-    .loginStatLabel{ font-size:13px; color:#8d96c4; }
+    .loginBrandDesc{ color:#aab2d8; font-size:16.5px; line-height:1.65; margin:0; }
 
     .loginFormPanel{ background:var(--bg); display:flex; align-items:center; justify-content:center; padding:40px 24px; }
     .loginFormBox{ width:100%; max-width:380px; }
@@ -447,15 +443,10 @@
       <div class="loginBrandGlow"></div>
       <div class="loginBrandOrnament">星</div>
       <div class="loginBrandContent">
-        <img class="loginBrandLogo" src="logo.png" alt="Xing Mandarin" />
+        <img class="loginBrandLogo" src="logo_light.png" alt="Xing Mandarin" />
         <p class="loginBrandKicker">Xing Mandarin</p>
         <h1 class="loginBrandTitle">学中文，走天下</h1>
-        <p class="loginBrandDesc">Simulasi ujian HSK 1–6 selengkap aslinya — audio penutur asli, soal bergambar, dan penilaian esai otomatis.</p>
-        <div class="loginBrandStats">
-          <div class="loginStat"><span class="loginStatNum">2.350</span><span class="loginStatLabel">soal listening</span></div>
-          <div class="loginStat"><span class="loginStatNum">6</span><span class="loginStatLabel">level HSK</span></div>
-          <div class="loginStat"><span class="loginStatNum">4.900+</span><span class="loginStatLabel">kosakata</span></div>
-        </div>
+        <p class="loginBrandDesc">HSK practice, the way the real exam feels. Listening, reading, writing. All in one place.</p>
       </div>
     </div>
 
@@ -549,7 +540,7 @@
         <button id="practiceBtn" class="continueCard" type="button">
           <div class="continueCardText">
             <span class="continueCardLabel">Lanjutkan Latihan</span>
-            <span class="continueCardTitle">Flashcard & SRS — HSK <span id="dContinueLevel">1</span></span>
+            <span class="continueCardTitle">Flashcard & SRS · HSK <span id="dContinueLevel">1</span></span>
           </div>
           <span class="continueCardArrow">→</span>
         </button>
@@ -2580,7 +2571,7 @@
       const s = segMap.get(k);
       if(!s) return k;
       const pinyin = s.pinyin ? ` (${s.pinyin})` : '';
-      const trans = s.id ? ` — ${s.id}` : '';
+      const trans = s.id ? ` · ${s.id}` : '';
       return `${s.hanzi || s.text}${pinyin}${trans}`;
     }).join('  →  ');
 

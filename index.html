@@ -66,7 +66,8 @@
     .loginBrandTitle{ font-family:var(--hanzi-font); font-size:44px; font-weight:800; color:#fff; margin:0 0 18px; line-height:1.25; }
     .loginBrandDesc{ color:#aab2d8; font-size:16.5px; line-height:1.65; margin:0; }
 
-    .loginFormPanel{ background:var(--bg); display:flex; align-items:center; justify-content:center; padding:40px 24px; }
+    .loginFormPanel{ position:relative; background:var(--bg); display:flex; align-items:center; justify-content:center; padding:40px 24px; }
+    .loginLangSwitch{ position:absolute; top:24px; right:28px; display:flex; gap:4px; z-index:2; }
     .loginFormBox{ width:100%; max-width:380px; }
     .loginMobileBrand{ display:none; align-items:center; gap:12px; margin-bottom:28px; }
     .loginMobileBrand img{ width:44px; height:44px; object-fit:contain; }
@@ -113,6 +114,7 @@
       .loginBrandPanel{ display:none; }
       .loginMobileBrand{ display:flex; }
       .loginFormPanel{ padding:32px 20px; }
+      .loginLangSwitch{ top:14px; right:14px; }
     }
 
     /* ============ app shell (sidebar + main) ============ */
@@ -153,7 +155,7 @@
     .sidebarUserMeta{ font-size:12px; color:var(--muted); margin-top:2px; margin-bottom:10px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .sidebarLangSwitch{ display:flex; gap:4px; margin-bottom:10px; }
     .langBtn{
-      flex:1 1 auto; padding:5px 0; text-align:center; background:var(--panel-2); border:1px solid var(--line);
+      flex:1 1 auto; padding:5px 9px; text-align:center; background:var(--panel-2); border:1px solid var(--line);
       border-radius:8px; color:var(--muted); font-weight:700; cursor:pointer; font-size:11px;
     }
     .langBtn.active{ background:linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#241a08; border-color:transparent; }
@@ -457,6 +459,11 @@
     </div>
 
     <div class="loginFormPanel">
+      <div class="loginLangSwitch" id="loginLangSwitch">
+        <button type="button" class="langBtn" data-lang="id">ID</button>
+        <button type="button" class="langBtn" data-lang="en">EN</button>
+        <button type="button" class="langBtn" data-lang="zh">中</button>
+      </div>
       <div class="loginFormBox">
         <div class="loginMobileBrand">
           <img src="logo.png" alt="Xing Mandarin" />
@@ -466,29 +473,29 @@
           </div>
         </div>
 
-        <h2 class="loginFormTitle">Selamat datang 👋</h2>
-        <p class="loginFormSub">Masuk untuk lanjut belajar.</p>
+        <h2 class="loginFormTitle"><span id="loginWelcome">Selamat datang</span> 👋</h2>
+        <p class="loginFormSub" id="loginSub">Masuk untuk lanjut belajar.</p>
 
-        <label for="email">Email</label>
+        <label for="email" id="labelEmail">Email</label>
         <div class="inputWrap">
           <span class="inputIcon">✉️</span>
           <input id="email" type="email" autocomplete="username" placeholder="kamu@email.com" />
         </div>
 
-        <label for="password">Password</label>
+        <label for="password" id="labelPassword">Password</label>
         <div class="inputWrap">
           <span class="inputIcon">🔒</span>
           <input id="password" type="password" autocomplete="current-password" placeholder="••••••••" />
         </div>
 
         <div class="loginRow">
-          <label class="rememberMe"><input type="checkbox" /> Ingat saya</label>
-          <a class="forgotLink" href="javascript:void(0)">Lupa password?</a>
+          <label class="rememberMe"><input type="checkbox" /> <span id="rememberMeText">Ingat saya</span></label>
+          <a class="forgotLink" href="javascript:void(0)" id="forgotPasswordLink">Lupa password?</a>
         </div>
 
         <button id="loginBtn">Masuk</button>
         <div id="loginMsg" class="msg"></div>
-        <p class="foot">Belum punya akun? <b>Hubungi admin</b> untuk daftar.</p>
+        <p class="foot" id="loginFoot">Belum punya akun? <b>Hubungi admin</b> untuk daftar.</p>
       </div>
     </div>
   </div>
@@ -532,41 +539,41 @@
       <!-- ============ DASHBOARD / BERANDA ============ -->
       <div id="dashCard" class="pageCard dash hidden">
         <div class="pageHeader">
-          <p class="hello">Halo, <b id="dName">—</b> 👋</p>
+          <p class="hello"><span id="dHello">Halo</span>, <b id="dName">—</b> 👋</p>
           <p class="sub" id="dGreet">Siap belajar hari ini?</p>
         </div>
 
         <div class="statGrid">
-          <div class="statCard"><span class="statCardNum" id="dashDue">—</span><span class="statCardLabel">Due Hari Ini</span></div>
-          <div class="statCard"><span class="statCardNum" id="dashStreak">—</span><span class="statCardLabel">Streak (hari)</span></div>
-          <div class="statCard"><span class="statCardNum" id="dashMastered">—</span><span class="statCardLabel">Kata Dikuasai</span></div>
-          <div class="statCard"><span class="statCardNum" id="dashMockDone">—</span><span class="statCardLabel">Mock Test Selesai</span></div>
+          <div class="statCard"><span class="statCardNum" id="dashDue">—</span><span class="statCardLabel" id="statLabelDue">Due Hari Ini</span></div>
+          <div class="statCard"><span class="statCardNum" id="dashStreak">—</span><span class="statCardLabel" id="statLabelStreak">Streak (hari)</span></div>
+          <div class="statCard"><span class="statCardNum" id="dashMastered">—</span><span class="statCardLabel" id="statLabelMastered">Kata Dikuasai</span></div>
+          <div class="statCard"><span class="statCardNum" id="dashMockDone">—</span><span class="statCardLabel" id="statLabelMockDone">Mock Test Selesai</span></div>
         </div>
 
         <button id="practiceBtn" class="continueCard" type="button">
           <div class="continueCardText">
-            <span class="continueCardLabel">Lanjutkan Latihan</span>
+            <span class="continueCardLabel" id="continueCardLabel">Lanjutkan Latihan</span>
             <span class="continueCardTitle">Flashcard & SRS · HSK <span id="dContinueLevel">1</span></span>
           </div>
           <span class="continueCardArrow">→</span>
         </button>
 
         <div class="dailyGoalCard">
-          <div class="dailyGoalHead"><span>Target Harian</span><span id="dashDailyLabel">0 / 20 kata direview hari ini</span></div>
+          <div class="dailyGoalHead"><span id="dailyGoalLabel">Target Harian</span><span id="dashDailyLabel">0 / 20 kata direview hari ini</span></div>
           <div class="dailyGoalTrack"><div class="dailyGoalFill" id="dashDailyFill"></div></div>
         </div>
 
-        <p class="sectionTitle">Progres per Level</p>
+        <p class="sectionTitle" id="sectionTitleProgress">Progres per Level</p>
         <div class="hskGrid" id="hskGrid"></div>
 
-        <p class="sectionTitle">Aksi Cepat</p>
+        <p class="sectionTitle" id="sectionTitleQuickActions">Aksi Cepat</p>
         <div class="quickGrid">
-          <button id="mockTestBtn" class="quickTile" type="button"><span class="quickTileIcon">📝</span><span>Mock Test</span></button>
-          <button id="browseBtn" class="quickTile" type="button"><span class="quickTileIcon">📚</span><span>Kamus</span></button>
-          <button id="raportBtn" class="quickTile" type="button"><span class="quickTileIcon">📈</span><span>Raport</span></button>
+          <button id="mockTestBtn" class="quickTile" type="button"><span class="quickTileIcon">📝</span><span id="quickTileMockTestLabel">Mock Test</span></button>
+          <button id="browseBtn" class="quickTile" type="button"><span class="quickTileIcon">📚</span><span id="quickTileDictLabel">Kamus</span></button>
+          <button id="raportBtn" class="quickTile" type="button"><span class="quickTileIcon">📈</span><span id="quickTileReportLabel">Raport</span></button>
         </div>
 
-        <div class="dashRecentHead"><p class="sectionTitle" style="margin-bottom:0">Riwayat Terakhir</p><span class="linkBtn" id="dashSeeAllHistory">Lihat semua →</span></div>
+        <div class="dashRecentHead"><p class="sectionTitle" id="sectionTitleRecentHistory" style="margin-bottom:0">Riwayat Terakhir</p><span class="linkBtn" id="dashSeeAllHistory">Lihat semua →</span></div>
         <div id="dashRecentHistory"></div>
 
         <p class="sectionTitle">Akun</p>
@@ -737,23 +744,44 @@
   const $ = id => document.getElementById(id);
   const TRACK_LABEL = {hsk:'HSK Exam', business:'Bisnis', daily:'Percakapan Harian', travel:'Travel', academic:'Akademik'};
 
-  // i18n untuk UI chrome (sidebar, tombol, label kartu) — TIDAK dipakai buat konten
-  // soal (hanzi/opsi/explanation), itu selalu tampil apa adanya dari DB.
+  // i18n untuk UI chrome (sidebar, login, dashboard, tombol, label kartu) — TIDAK
+  // dipakai buat konten soal (hanzi/opsi/explanation), itu selalu tampil apa adanya dari DB.
   const LANG = {
     id: { beranda:'Beranda', latihan:'Latihan & Tes', materi:'Materi', progres:'Progres', riwayat:'Riwayat',
           streak:'STREAK', hari:'hari', keluar:'Keluar', mulai:'Mulai', ulangi:'Ulangi',
-          soal:'soal', menit:'menit', terakhir:'Terakhir:', benar:'Benar', mockTest:'Mock Test' },
+          soal:'soal', menit:'menit', terakhir:'Terakhir:', benar:'Benar', mockTest:'Mock Test',
+          welcomeBack:'Selamat datang', loginSub:'Masuk untuk lanjut belajar.', emailLabel:'Email', passwordLabel:'Password',
+          rememberMe:'Ingat saya', forgotPassword:'Lupa password?', signIn:'Masuk',
+          noAccount:'Belum punya akun?', contactAdmin:'Hubungi admin', toRegister:'untuk daftar.',
+          hi:'Halo', readyToday:'Siap belajar hari ini?', dueToday:'Due Hari Ini', streakDaysLabel:'Streak (hari)',
+          wordsMastered:'Kata Dikuasai', mockTestsDone:'Mock Test Selesai', continuePractice:'Lanjutkan Latihan',
+          dailyGoal:'Target Harian', progressByLevel:'Progres per Level', quickActions:'Aksi Cepat',
+          recentHistory:'Riwayat Terakhir', seeAll:'Lihat semua', dictionary:'Kamus', report:'Raport' },
     en: { beranda:'Home', latihan:'Practice & Test', materi:'Materials', progres:'Progress', riwayat:'History',
           streak:'STREAK', hari:'days', keluar:'Log out', mulai:'Start', ulangi:'Retry',
-          soal:'questions', menit:'minutes', terakhir:'Last:', benar:'Correct', mockTest:'Mock Test' },
+          soal:'questions', menit:'minutes', terakhir:'Last:', benar:'Correct', mockTest:'Mock Test',
+          welcomeBack:'Welcome back', loginSub:'Sign in to continue learning.', emailLabel:'Email', passwordLabel:'Password',
+          rememberMe:'Remember me', forgotPassword:'Forgot password?', signIn:'Sign in',
+          noAccount:'No account yet?', contactAdmin:'Contact admin', toRegister:'to register.',
+          hi:'Hi', readyToday:'Ready to study today?', dueToday:'Due Today', streakDaysLabel:'Streak (days)',
+          wordsMastered:'Words Mastered', mockTestsDone:'Mock Tests Done', continuePractice:'Continue Practice',
+          dailyGoal:'Daily Goal', progressByLevel:'Progress by Level', quickActions:'Quick Actions',
+          recentHistory:'Recent History', seeAll:'See all', dictionary:'Dictionary', report:'Report' },
     zh: { beranda:'首页', latihan:'练习与测试', materi:'学习资料', progres:'学习进度', riwayat:'历史记录',
           streak:'连续天数', hari:'天', keluar:'退出', mulai:'开始', ulangi:'重做',
-          soal:'题', menit:'分钟', terakhir:'上次：', benar:'正确', mockTest:'模拟考试' }
+          soal:'题', menit:'分钟', terakhir:'上次：', benar:'正确', mockTest:'模拟考试',
+          welcomeBack:'欢迎回来', loginSub:'登录以继续学习', emailLabel:'邮箱', passwordLabel:'密码',
+          rememberMe:'记住我', forgotPassword:'忘记密码？', signIn:'登录',
+          noAccount:'还没有账号？', contactAdmin:'联系管理员', toRegister:'注册',
+          hi:'你好', readyToday:'今天准备好了吗？', dueToday:'今日待复习', streakDaysLabel:'连续天数',
+          wordsMastered:'已掌握词汇', mockTestsDone:'已完成模拟', continuePractice:'继续练习',
+          dailyGoal:'每日目标', progressByLevel:'各级进度', quickActions:'快捷操作',
+          recentHistory:'最近记录', seeAll:'查看全部', dictionary:'词典', report:'成绩单' }
   };
-  let currentLang = localStorage.getItem('xingLang') || 'id';
-  if(!LANG[currentLang]) currentLang = 'id';
+  let currentLang = localStorage.getItem('xingLang') || 'en';
+  if(!LANG[currentLang]) currentLang = 'en';
   function t(key){
-    return LANG[currentLang][key] ?? LANG.id[key] ?? key;
+    return LANG[currentLang][key] ?? LANG.en[key] ?? key;
   }
   let currentPageRenderer = null; // dipanggil ulang pas ganti bahasa, biar UI ke-refresh tanpa reload
 
@@ -767,6 +795,32 @@
     $('sideStreakUnit').textContent = t('hari');
     $('logoutBtn').textContent = t('keluar');
     if($('mockListHeader')) $('mockListHeader').textContent = t('mockTest');
+
+    $('loginWelcome').textContent = t('welcomeBack');
+    $('loginSub').textContent = t('loginSub');
+    $('labelEmail').textContent = t('emailLabel');
+    $('labelPassword').textContent = t('passwordLabel');
+    $('rememberMeText').textContent = t('rememberMe');
+    $('forgotPasswordLink').textContent = t('forgotPassword');
+    $('loginBtn').textContent = t('signIn');
+    $('loginFoot').innerHTML = `${t('noAccount')} <b>${t('contactAdmin')}</b> ${t('toRegister')}`;
+
+    $('dHello').textContent = t('hi');
+    $('dGreet').textContent = t('readyToday');
+    $('statLabelDue').textContent = t('dueToday');
+    $('statLabelStreak').textContent = t('streakDaysLabel');
+    $('statLabelMastered').textContent = t('wordsMastered');
+    $('statLabelMockDone').textContent = t('mockTestsDone');
+    $('continueCardLabel').textContent = t('continuePractice');
+    $('dailyGoalLabel').textContent = t('dailyGoal');
+    $('sectionTitleProgress').textContent = t('progressByLevel');
+    $('sectionTitleQuickActions').textContent = t('quickActions');
+    $('quickTileMockTestLabel').textContent = t('mockTest');
+    $('quickTileDictLabel').textContent = t('dictionary');
+    $('quickTileReportLabel').textContent = t('report');
+    $('sectionTitleRecentHistory').textContent = t('recentHistory');
+    $('dashSeeAllHistory').textContent = t('seeAll') + ' →';
+
     document.body.classList.toggle('lang-zh', currentLang === 'zh');
     document.querySelectorAll('.langBtn').forEach(b=>{
       b.classList.toggle('active', b.dataset.lang === currentLang);
@@ -2716,6 +2770,7 @@
     b.addEventListener('click', ()=> setLang(b.dataset.lang));
   });
 
+  applyStaticI18n();
   boot();
   </script>
 </body>

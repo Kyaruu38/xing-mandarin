@@ -124,6 +124,24 @@
       .loginLangSwitch{ top:14px; right:14px; }
     }
 
+    /* ============ onboarding modal ============ */
+    .modalOverlay{
+      position:fixed; inset:0; background:rgba(28,42,94,.55);
+      display:flex; align-items:center; justify-content:center; z-index:1000; padding:20px;
+    }
+    .modalCard{
+      background:var(--panel); border-radius:22px; padding:36px; width:100%; max-width:400px;
+      box-shadow:var(--shadow-lg); text-align:left;
+    }
+    .modalTitle{ font-size:22px; font-weight:800; color:var(--text); margin:0 0 8px; }
+    .modalSub{ font-size:14px; color:var(--muted); margin:0 0 22px; }
+    .modalInput{
+      width:100%; padding:14px 16px; background:var(--panel-2); color:var(--text);
+      border:1.5px solid var(--line); border-radius:13px; font-size:15px; outline:none; font-family:inherit;
+      transition:border-color .15s ease, box-shadow .15s ease; margin-bottom:0;
+    }
+    .modalInput:focus{ border-color:var(--gold); box-shadow:0 0 0 4px rgba(242,176,30,.14); }
+
     /* ============ app shell (sidebar + main) ============ */
     #appShell{ display:flex; min-height:100vh; align-items:stretch; }
     #appShell.hidden{ display:none !important; }
@@ -170,11 +188,11 @@
 
     .pageCard{
       background:var(--panel); border:1px solid var(--line); border-radius:var(--radius-lg);
-      padding:32px; box-shadow:var(--shadow-md); max-width:720px;
+      padding:32px; box-shadow:var(--shadow-md); max-width:720px; margin:0 auto;
     }
 
     /* dashboard */
-    .dash{ max-width:900px }
+    .dash{ max-width:1200px }
     .dash .hello{font-size:24px; margin:2px 0 2px}
     .dash .hello b{color:var(--navy)}
     .pageHeader{ margin-bottom:6px }
@@ -210,7 +228,7 @@
     .dailyGoalTrack{ height:8px; background:var(--line); border-radius:99px; overflow:hidden; }
     .dailyGoalFill{ height:100%; width:0%; background:linear-gradient(90deg,var(--gold-soft),var(--gold)); border-radius:99px; transition:width .3s ease; }
 
-    .hskGrid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(96px,1fr)); gap:12px; margin-top:4px; }
+    .hskGrid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(96px,1fr)); gap:12px; margin-top:4px; }
     .hskCard{ background:var(--panel-2); border:1px solid var(--line); border-radius:16px; padding:14px 8px; text-align:center; cursor:pointer; transition:transform .15s ease, box-shadow .15s ease; }
     .hskCard:hover{ transform:translateY(-2px); box-shadow:var(--shadow-sm); border-color:var(--gold); }
     .hskRing{ width:60px; height:60px; border-radius:50%; margin:0 auto 8px; background:conic-gradient(var(--gold) calc(var(--pct)*1%), var(--line) 0); display:flex; align-items:center; justify-content:center; }
@@ -233,7 +251,7 @@
     .linkBtn:hover{ text-decoration:underline; }
 
     /* practice / flashcard */
-    .practice{max-width:480px}
+    .practice{max-width:640px}
     .levelPicker{display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 20px}
     .levelBtn{
       flex:1 1 auto; min-width:50px; padding:10px 0; text-align:center;
@@ -241,20 +259,23 @@
       color:var(--text); font-weight:700; cursor:pointer; font-size:14px;
     }
     .levelBtn.active{background:linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#241a08; border-color:transparent}
+    #sessionView{ display:flex; flex-direction:column; justify-content:center; min-height:70vh; }
+    .sessionProgressTrack{ height:4px; background:var(--line); border-radius:99px; overflow:hidden; margin-bottom:20px; }
+    .sessionProgressFill{ height:100%; width:0%; background:linear-gradient(90deg,var(--gold-soft),var(--gold)); border-radius:99px; transition:width .3s ease; }
     .cardArea{
       background:var(--panel-2); border:1px solid var(--line); border-radius:18px;
-      padding:36px 20px; text-align:center; min-height:180px;
+      max-width:560px; width:100%; margin:0 auto; padding:40px; text-align:center; min-height:260px;
       display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
     }
     .hanzi-big{
-      font-size:52px; font-weight:700; letter-spacing:1px;
+      font-size:72px; font-weight:700; letter-spacing:1px;
       font-family:var(--hanzi-font);
     }
-    .pinyin-line{font-size:18px; color:var(--gold)}
-    .meaning-line{font-size:15px; color:var(--text); margin-top:4px}
-    .revealBtn{margin-top:18px}
-    .gradeRow{display:flex; gap:8px; margin-top:16px}
-    .gradeBtn{flex:1; margin-top:0; padding:11px 0; font-size:13px; border-radius:9px}
+    .pinyin-line{font-size:20px; color:var(--gold)}
+    .meaning-line{font-size:16px; color:var(--text); margin-top:4px}
+    .revealBtn{margin-top:24px; padding:16px}
+    .gradeRow{display:flex; gap:10px; margin-top:20px}
+    .gradeBtn{flex:1; margin-top:0; padding:14px 0; font-size:14px; border-radius:10px}
     .gradeBtn.again{background:linear-gradient(180deg,#f0a49c,var(--danger)); color:#3a0f0c}
     .gradeBtn.hard{background:linear-gradient(180deg,var(--gold-soft),#d99614); color:#241a08}
     .gradeBtn.good{background:linear-gradient(180deg,#8fd1a6,var(--ok)); color:#0d2414}
@@ -292,8 +313,9 @@
     .browseMeaning{flex:1; color:var(--text)}
     .browseCount{font-size:11px; color:var(--muted); text-align:center; margin:10px 0 0}
     /* mock test list */
-    .mocklist{max-width:640px}
-    .mockSetCard{background:var(--panel-2); border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin-bottom:10px}
+    .mocklist{max-width:1200px}
+    #mockList{ display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:16px; }
+    .mockSetCard{background:var(--panel-2); border:1px solid var(--line); border-radius:16px; padding:16px 18px}
     .mockSetTitle{font-weight:700; font-size:14px; margin-bottom:4px}
     .mockSetMeta{font-size:12px; color:var(--muted); margin-bottom:8px}
     .mockSetScore{font-size:12px; color:var(--gold); margin-bottom:10px; font-weight:600}
@@ -594,13 +616,14 @@
       <!-- ============ PRACTICE (FLASHCARD + SRS) ============ -->
       <div id="practiceCard" class="pageCard practice hidden">
         <div id="levelPickerView">
-          <p class="sub">Pilih level HSK buat latihan</p>
+          <p class="sub" id="practiceLevelPrompt">Pilih level HSK buat latihan</p>
           <div class="levelPicker" id="levelPicker"></div>
           <button id="practiceExitBtn1" class="practiceExit">Kembali</button>
         </div>
 
         <div id="sessionView" class="hidden">
           <div class="sessionMeta"><span id="sessionProgress">0 / 0</span><span id="sessionLevelLabel">—</span></div>
+          <div class="sessionProgressTrack"><div class="sessionProgressFill" id="sessionProgressFill"></div></div>
           <div class="cardArea">
             <div class="hanzi-big" id="cardHanzi">—</div>
             <div class="pinyin-line hidden" id="cardPinyin"></div>
@@ -608,10 +631,10 @@
           </div>
           <button id="revealBtn" class="revealBtn">Lihat Jawaban</button>
           <div class="gradeRow hidden" id="gradeRow">
-            <button class="gradeBtn again" data-grade="again">Lupa</button>
-            <button class="gradeBtn hard" data-grade="hard">Susah</button>
-            <button class="gradeBtn good" data-grade="good">Oke</button>
-            <button class="gradeBtn easy" data-grade="easy">Gampang</button>
+            <button class="gradeBtn again" data-grade="again" id="gradeBtnAgain">Lupa</button>
+            <button class="gradeBtn hard" data-grade="hard" id="gradeBtnHard">Susah</button>
+            <button class="gradeBtn good" data-grade="good" id="gradeBtnGood">Oke</button>
+            <button class="gradeBtn easy" data-grade="easy" id="gradeBtnEasy">Gampang</button>
           </div>
           <button id="exampleBtn" class="exampleBtn hidden">Contoh Kalimat</button>
           <button id="practiceExitBtn2" class="practiceExit">Selesai / Kembali</button>
@@ -720,6 +743,16 @@
     </main>
   </div>
 
+  <!-- ============ ONBOARDING MODAL (nama user) ============ -->
+  <div id="onboardingModal" class="modalOverlay hidden">
+    <div class="modalCard">
+      <h2 class="modalTitle" id="onboardingTitle">What should we call you?</h2>
+      <p class="modalSub" id="onboardingSub">This is how we will greet you.</p>
+      <input id="onboardingNameInput" class="modalInput" type="text" maxlength="40" placeholder="" autocomplete="off" />
+      <button id="onboardingContinueBtn" disabled>Continue</button>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
   /* ==========================================================
@@ -772,7 +805,14 @@
           errSubscriptionPastDue:'Masa langganan kamu sudah lewat. Hubungi admin untuk perpanjang.',
           errSessionStartFailed:'Gagal memulai sesi. Coba lagi.',
           errSessionTakenOver:'Sesi kamu diambil alih perangkat lain. Silakan login ulang.',
-          errLoggedInElsewhere:'Akun kamu login di perangkat lain. Kamu keluar otomatis.' },
+          errLoggedInElsewhere:'Akun kamu login di perangkat lain. Kamu keluar otomatis.',
+          dailyGoalProgress:'{count} / {total} kata direview hari ini', wordsUnit:'kata', scoreLabel:'Skor',
+          practiceLevelPrompt:'Pilih level HSK buat latihan', back:'Kembali', showAnswer:'Lihat Jawaban',
+          gradeAgain:'Lupa', gradeHard:'Susah', gradeGood:'Oke', gradeEasy:'Gampang',
+          exampleSentence:'Contoh Kalimat', doneBack:'Selesai / Kembali',
+          emptyNoDue:'Belum ada kartu due-review, dan semua kata populer di HSK {level} udah pernah kamu lihat. Coba lagi nanti atau pilih level lain.',
+          sessionComplete:'Sesi selesai! {correct} / {total} kartu terjawab benar.',
+          onboardingTitle:'Siapa nama kamu?', onboardingSub:'Ini nama yang akan kami pakai.', onboardingContinue:'Lanjut' },
     en: { beranda:'Home', latihan:'Practice & Test', materi:'Materials', progres:'Progress', riwayat:'History',
           streak:'STREAK', hari:'days', keluar:'Log out', mulai:'Start', ulangi:'Retry',
           soal:'questions', menit:'minutes', terakhir:'Last:', benar:'Correct', mockTest:'Mock Test',
@@ -790,7 +830,14 @@
           errSubscriptionPastDue:'Your subscription period has passed. Please contact admin to renew.',
           errSessionStartFailed:'Could not start your session. Please try again.',
           errSessionTakenOver:'Your session was taken over on another device. Please sign in again.',
-          errLoggedInElsewhere:'Your account signed in on another device. You were signed out automatically.' },
+          errLoggedInElsewhere:'Your account signed in on another device. You were signed out automatically.',
+          dailyGoalProgress:'{count} / {total} words reviewed today', wordsUnit:'words', scoreLabel:'Score',
+          practiceLevelPrompt:'Choose an HSK level to practice', back:'Back', showAnswer:'Show Answer',
+          gradeAgain:'Forgot', gradeHard:'Hard', gradeGood:'Good', gradeEasy:'Easy',
+          exampleSentence:'Example Sentence', doneBack:'Done / Back',
+          emptyNoDue:'No cards due for review, and you have already seen all the popular words for HSK {level}. Try again later or pick another level.',
+          sessionComplete:'Session complete! {correct} / {total} cards answered correctly.',
+          onboardingTitle:'What should we call you?', onboardingSub:'This is how we will greet you.', onboardingContinue:'Continue' },
     zh: { beranda:'首页', latihan:'练习与测试', materi:'学习资料', progres:'学习进度', riwayat:'历史记录',
           streak:'连续天数', hari:'天', keluar:'退出', mulai:'开始', ulangi:'重做',
           soal:'题', menit:'分钟', terakhir:'上次：', benar:'正确', mockTest:'模拟考试',
@@ -808,7 +855,14 @@
           errSubscriptionPastDue:'您的订阅期限已过，请联系管理员续费',
           errSessionStartFailed:'无法启动会话，请重试',
           errSessionTakenOver:'您的账号已在其他设备登录，请重新登录',
-          errLoggedInElsewhere:'您的账号已在其他设备登录，系统已自动将您登出' }
+          errLoggedInElsewhere:'您的账号已在其他设备登录，系统已自动将您登出',
+          dailyGoalProgress:'今日已复习 {count} / {total} 词', wordsUnit:'词', scoreLabel:'得分',
+          practiceLevelPrompt:'选择HSK等级开始练习', back:'返回', showAnswer:'显示答案',
+          gradeAgain:'忘记', gradeHard:'困难', gradeGood:'良好', gradeEasy:'简单',
+          exampleSentence:'例句', doneBack:'完成 / 返回',
+          emptyNoDue:'暂无待复习卡片，HSK {level} 常用词你都学过了。请稍后再试或选择其他等级',
+          sessionComplete:'本次学习完成！{correct} / {total} 张卡片回答正确',
+          onboardingTitle:'怎么称呼你？', onboardingSub:'我们将这样称呼你', onboardingContinue:'继续' }
   };
   let currentLang = localStorage.getItem('xingLang') || 'en';
   if(!LANG[currentLang]) currentLang = 'en';
@@ -853,6 +907,20 @@
     $('quickTileReportLabel').textContent = t('report');
     $('sectionTitleRecentHistory').textContent = t('recentHistory');
     $('dashSeeAllHistory').textContent = t('seeAll') + ' →';
+
+    $('practiceLevelPrompt').textContent = t('practiceLevelPrompt');
+    $('practiceExitBtn1').textContent = t('back');
+    $('revealBtn').textContent = t('showAnswer');
+    $('gradeBtnAgain').textContent = t('gradeAgain');
+    $('gradeBtnHard').textContent = t('gradeHard');
+    $('gradeBtnGood').textContent = t('gradeGood');
+    $('gradeBtnEasy').textContent = t('gradeEasy');
+    $('exampleBtn').textContent = t('exampleSentence');
+    $('practiceExitBtn2').textContent = t('doneBack');
+
+    $('onboardingTitle').textContent = t('onboardingTitle');
+    $('onboardingSub').textContent = t('onboardingSub');
+    $('onboardingContinueBtn').textContent = t('onboardingContinue');
 
     document.body.classList.toggle('lang-zh', currentLang === 'zh');
     document.querySelectorAll('.langBtn').forEach(b=>{
@@ -924,6 +992,7 @@
   function showLogin(msg, type){
     document.body.classList.remove('app-active');
     $('appShell').classList.add('hidden');
+    $('onboardingModal').classList.add('hidden');
     $('loginCard').classList.remove('hidden');
     const m = $('loginMsg');
     if(msg){ m.textContent = msg; m.className = 'msg ' + (type||'err'); }
@@ -1012,8 +1081,12 @@
     const blocked = gateReason(profile);
     if(blocked){ await forceLogout(blocked); return; }
 
-    renderDash(profile);
     currentUser = userId; currentProfile = profile;
+    renderDash(profile);
+
+    const nameNeeded = !profile.display_name || !profile.display_name.trim() || profile.display_name === 'Murid';
+    if(nameNeeded) showOnboarding();
+
     watchSession(userId);
 
     // heartbeat: perbarui last_seen tiap 2 menit
@@ -1022,6 +1095,29 @@
       const sid = localStorage.getItem(SESSION_KEY);
       if(sid) sb.rpc('claim_session', { p_session_id: sid, p_device_label: deviceLabel() });
     }, 120000);
+  }
+
+  /* ---------- onboarding: minta nama murid pas display_name masih kosong/default ---------- */
+  function showOnboarding(){
+    $('onboardingNameInput').value = '';
+    $('onboardingContinueBtn').disabled = true;
+    $('onboardingModal').classList.remove('hidden');
+    $('onboardingNameInput').focus();
+  }
+
+  async function submitOnboardingName(){
+    const name = $('onboardingNameInput').value.trim();
+    if(!name) return;
+    $('onboardingContinueBtn').disabled = true;
+    const { error } = await sb.from('profiles').update({ display_name: name }).eq('id', currentUser);
+    if(error){
+      $('onboardingContinueBtn').disabled = false;
+      alert('Gagal menyimpan nama: ' + error.message);
+      return;
+    }
+    currentProfile.display_name = name;
+    $('onboardingModal').classList.add('hidden');
+    renderDash(currentProfile);
   }
 
   /* ---------- alur LOGIN ---------- */
@@ -1170,7 +1266,7 @@
       $('levelPickerView').classList.add('hidden');
       $('sessionView').classList.add('hidden');
       $('emptyView').classList.remove('hidden');
-      $('emptyMsg').textContent = 'Belum ada kartu due-review, dan semua kata populer di HSK ' + level + ' udah pernah kamu lihat. Coba lagi nanti atau pilih level lain.';
+      $('emptyMsg').textContent = t('emptyNoDue').replace('{level}', level);
       return;
     }
 
@@ -1185,6 +1281,7 @@
     revealed = false;
     const card = sessionQueue[sessionIndex];
     $('sessionProgress').textContent = (sessionIndex+1) + ' / ' + sessionQueue.length;
+    $('sessionProgressFill').style.width = (((sessionIndex+1) / sessionQueue.length) * 100) + '%';
     $('cardHanzi').textContent = card.hanzi;
     $('cardPinyin').textContent = card.pinyin;
     $('cardMeaning').textContent = card.meaning_id || card.meaning_en;
@@ -1230,7 +1327,7 @@
     if(sessionIndex >= sessionQueue.length){
       $('sessionView').classList.add('hidden');
       $('emptyView').classList.remove('hidden');
-      $('emptyMsg').textContent = 'Sesi selesai! ' + sessionStats.correct + ' / ' + sessionStats.total + ' kartu terjawab benar.';
+      $('emptyMsg').textContent = t('sessionComplete').replace('{correct}', sessionStats.correct).replace('{total}', sessionStats.total);
       return;
     }
     renderCard();
@@ -1420,7 +1517,7 @@
       row.className = 'historyItem';
       row.innerHTML = `
         <div class="historyTitle">${titleMap.get(h.set_id) || h.set_id}</div>
-        <div class="historyMeta">HSK ${h.hsk_level} · ${SECTION_LABEL[h.section] || h.section} · Skor ${pct}% · ${t('benar')} ${h.correct_count}/${h.total_questions} · ${formatMockDate(h.created_at)}</div>
+        <div class="historyMeta">HSK ${h.hsk_level} · ${SECTION_LABEL[h.section] || h.section} · ${t('scoreLabel')} ${pct}% · ${t('benar')} ${h.correct_count}/${h.total_questions} · ${formatMockDate(h.created_at)}</div>
       `;
       wrap.appendChild(row);
     });
@@ -1471,7 +1568,7 @@
     const todayCount = mastery.filter(m => m.last_reviewed && m.last_reviewed.slice(0,10) === todayStr()).length;
     const dailyPct = Math.min(100, Math.round((todayCount / DAILY_GOAL) * 100));
     $('dashDailyFill').style.width = dailyPct + '%';
-    $('dashDailyLabel').textContent = `${todayCount} / ${DAILY_GOAL} kata direview hari ini`;
+    $('dashDailyLabel').textContent = t('dailyGoalProgress').replace('{count}', todayCount).replace('{total}', DAILY_GOAL);
 
     renderHskGrid(levelTotals, seenPerLevel);
 
@@ -1497,7 +1594,7 @@
         const pct = h.total_points ? Math.round((h.score / h.total_points) * 100) : 0;
         return `<div class="historyItem">
           <div class="historyTitle">${titleMap.get(h.set_id) || h.set_id}</div>
-          <div class="historyMeta">HSK ${h.hsk_level} · ${SECTION_LABEL[h.section] || h.section} · Skor ${pct}% · ${formatMockDate(h.created_at)}</div>
+          <div class="historyMeta">HSK ${h.hsk_level} · ${SECTION_LABEL[h.section] || h.section} · ${t('scoreLabel')} ${pct}% · ${formatMockDate(h.created_at)}</div>
         </div>`;
       }).join('');
     }
@@ -1515,7 +1612,7 @@
       card.innerHTML = `
         <div class="hskRing" style="--pct:${pct}"><span>${pct}%</span></div>
         <div class="hskCardLabel">HSK ${lv}</div>
-        <div class="hskCardSub">${seen}/${total} kata</div>
+        <div class="hskCardSub">${seen}/${total} ${t('wordsUnit')}</div>
       `;
       card.addEventListener('click', ()=>{
         setActiveNav('latihan');
@@ -1711,6 +1808,11 @@
     return d.toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' });
   }
 
+  // sort "1, 2, ... 10" bukan "1, 10, 2, ..." (default string sort lexicographic)
+  function naturalCompare(a, b){
+    return String(a).localeCompare(String(b), undefined, { numeric:true, sensitivity:'base' });
+  }
+
   async function loadMockList(level){
     mockLevel = level;
     const wrap = $('mockList');
@@ -1722,6 +1824,7 @@
     if(mockSection !== 'all') query = query.eq('section', mockSection);
     const { data: sets, error: setErr } = await query.order('title', { ascending:true });
     if(setErr){ alert('Gagal ambil daftar mock test: ' + setErr.message); return; }
+    if(sets) sets.sort((a,b) => naturalCompare(a.title, b.title));
 
     if(!sets || sets.length === 0){
       const sectionLabel = mockSection !== 'all' ? (SECTION_LABEL[mockSection] || mockSection) + ' ' : '';
@@ -1773,7 +1876,7 @@
       mockGroupedSets.get(code).push(s);
     });
 
-    const codes = [...mockGroupedSets.keys()].sort();
+    const codes = [...mockGroupedSets.keys()].sort(naturalCompare);
     codes.forEach(code=>{
       const groupSets = mockGroupedSets.get(code).slice().sort((a,b) => sectionRank(a.section) - sectionRank(b.section));
       const totalQuestions = groupSets.reduce((sum,s) => sum + (s.total_questions||0), 0);
@@ -2810,6 +2913,14 @@
     $('passwordToggle').textContent = willShow ? '🙈' : '👁️';
     $('passwordToggle').setAttribute('aria-label', willShow ? t('hidePassword') : t('showPassword'));
   });
+
+  $('onboardingNameInput').addEventListener('input', ()=>{
+    $('onboardingContinueBtn').disabled = !$('onboardingNameInput').value.trim();
+  });
+  $('onboardingNameInput').addEventListener('keydown', e=>{
+    if(e.key === 'Enter' && !$('onboardingContinueBtn').disabled) submitOnboardingName();
+  });
+  $('onboardingContinueBtn').addEventListener('click', submitOnboardingName);
 
   applyStaticI18n();
   boot();

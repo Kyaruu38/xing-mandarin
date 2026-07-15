@@ -519,7 +519,7 @@
         </div>
 
         <div class="loginRow">
-          <label class="rememberMe"><input type="checkbox" /> <span id="rememberMeText">Ingat saya</span></label>
+          <label class="rememberMe"><input type="checkbox" id="rememberMeCheckbox" /> <span id="rememberMeText">Ingat saya</span></label>
           <a class="forgotLink" href="javascript:void(0)" id="forgotPasswordLink">Lupa password?</a>
         </div>
 
@@ -648,20 +648,20 @@
 
       <!-- ============ RAPORT / PROGRES ============ -->
       <div id="raportCard" class="pageCard raport hidden">
-        <p class="sub">Raport Belajar</p>
+        <p class="sub" id="raportHeader">Raport Belajar</p>
 
         <div class="statRow">
-          <div class="statBox"><span class="statNum" id="rDue">—</span><span class="statLabel">Due Hari Ini</span></div>
-          <div class="statBox"><span class="statNum" id="rStreak">—</span><span class="statLabel">Streak (hari)</span></div>
+          <div class="statBox"><span class="statNum" id="rDue">—</span><span class="statLabel" id="raportLabelDue">Due Hari Ini</span></div>
+          <div class="statBox"><span class="statNum" id="rStreak">—</span><span class="statLabel" id="raportLabelStreak">Streak (hari)</span></div>
         </div>
 
-        <p class="sectionTitle">Progres per Level</p>
+        <p class="sectionTitle" id="raportLabelProgress">Progres per Level</p>
         <div id="rLevels"></div>
 
-        <p class="sectionTitle">Kata Terlemah</p>
+        <p class="sectionTitle" id="raportLabelWeak">Kata Terlemah</p>
         <div id="rWeak"></div>
 
-        <p class="sectionTitle">Riwayat Mock Test</p>
+        <p class="sectionTitle" id="raportLabelHistory">Riwayat Mock Test</p>
         <div id="rMockHistory"></div>
 
         <button id="raportExitBtn" class="practiceExit">Kembali ke Dashboard</button>
@@ -669,7 +669,7 @@
 
       <!-- ============ BROWSE / MATERI (KAMUS) ============ -->
       <div id="browseCard" class="pageCard browse hidden">
-        <p class="sub">Kamus Kosakata</p>
+        <p class="sub" id="browseHeader">Kamus Kosakata</p>
 
         <div class="levelPicker" id="browseLevelPicker"></div>
         <input id="browseSearch" class="browseSearchInput" type="text" placeholder="Cari hanzi, pinyin, atau arti..." />
@@ -699,8 +699,8 @@
         </div>
 
         <div class="attemptToggles">
-          <label><input type="checkbox" id="togglePinyin" /> Pinyin</label>
-          <label><input type="checkbox" id="toggleTranslation" /> Terjemahan</label>
+          <label><input type="checkbox" id="togglePinyin" /> <span id="toggleLabelPinyin">Pinyin</span></label>
+          <label><input type="checkbox" id="toggleTranslation" /> <span id="toggleLabelTranslation">Terjemahan</span></label>
         </div>
 
         <div class="attemptProgress" id="attemptProgress">Soal 1 / 1</div>
@@ -723,12 +723,12 @@
         <p class="sub" id="resultSetTitle">Hasil Mock Test</p>
 
         <div class="statRow">
-          <div class="statBox"><span class="statNum" id="resScore">—</span><span class="statLabel">Skor</span></div>
-          <div class="statBox"><span class="statNum" id="resCorrect">—</span><span class="statLabel">Benar</span></div>
-          <div class="statBox"><span class="statNum" id="resTime">—</span><span class="statLabel">Waktu</span></div>
+          <div class="statBox"><span class="statNum" id="resScore">—</span><span class="statLabel" id="resLabelScore">Skor</span></div>
+          <div class="statBox"><span class="statNum" id="resCorrect">—</span><span class="statLabel" id="resLabelCorrect">Benar</span></div>
+          <div class="statBox"><span class="statNum" id="resTime">—</span><span class="statLabel" id="resLabelTime">Waktu</span></div>
         </div>
 
-        <p class="sectionTitle">Review Jawaban</p>
+        <p class="sectionTitle" id="resultReviewHeader">Review Jawaban</p>
         <div id="resultReview"></div>
 
         <button id="resultCloseBtn" class="practiceExit">Kembali ke Daftar Mock Test</button>
@@ -736,7 +736,7 @@
 
       <!-- ============ RIWAYAT ============ -->
       <div id="riwayatCard" class="pageCard hidden">
-        <p class="sub">Riwayat Mock Test</p>
+        <p class="sub" id="riwayatHeader">Riwayat Mock Test</p>
         <div id="riwayatList"></div>
       </div>
 
@@ -761,7 +761,37 @@
   const SUPABASE_URL  = 'https://xzgvhzmmqbijpbrhagjf.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6Z3Zoem1tcWJpanBicmhhZ2pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0OTA4NjMsImV4cCI6MjA5OTA2Njg2M30.9OtBJIBDDUhhSsvtz9Pql12hWToGzmULOGh7Tj-vzNs';
 
-  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+  // "Ingat saya": nentuin auth token Supabase disimpen di localStorage (persist lintas
+  // sesi browser) atau sessionStorage (ilang pas tab ditutup). rememberMePref di-set dari
+  // checkbox tepat sebelum login; pas boot() nemu sesi lama, getItem nebak balik dari mana
+  // sesi itu asalnya biar auto-refresh token berikutnya tetap konsisten sama pilihan awal.
+  let rememberMePref = false;
+  const authStorage = {
+    getItem: (key) => {
+      const sessionVal = sessionStorage.getItem(key);
+      if(sessionVal !== null){ rememberMePref = false; return sessionVal; }
+      const localVal = localStorage.getItem(key);
+      if(localVal !== null){ rememberMePref = true; return localVal; }
+      return null;
+    },
+    setItem: (key, value) => {
+      if(rememberMePref){
+        localStorage.setItem(key, value);
+        sessionStorage.removeItem(key);
+      } else {
+        sessionStorage.setItem(key, value);
+        localStorage.removeItem(key);
+      }
+    },
+    removeItem: (key) => {
+      localStorage.removeItem(key);
+      sessionStorage.removeItem(key);
+    }
+  };
+
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+    auth: { storage: authStorage, persistSession: true, autoRefreshToken: true }
+  });
 
   const attemptAudio = new Audio();
   const resultAudio  = new Audio();
@@ -812,7 +842,15 @@
           exampleSentence:'Contoh Kalimat', doneBack:'Selesai / Kembali',
           emptyNoDue:'Belum ada kartu due-review, dan semua kata populer di HSK {level} udah pernah kamu lihat. Coba lagi nanti atau pilih level lain.',
           sessionComplete:'Sesi selesai! {correct} / {total} kartu terjawab benar.',
-          onboardingTitle:'Siapa nama kamu?', onboardingSub:'Ini nama yang akan kami pakai.', onboardingContinue:'Lanjut' },
+          onboardingTitle:'Siapa nama kamu?', onboardingSub:'Ini nama yang akan kami pakai.', onboardingContinue:'Lanjut',
+          backToDashboard:'Kembali ke Dashboard', weakestWords:'Kata Terlemah', mockTestHistory:'Riwayat Mock Test',
+          raportHeader:'Raport Belajar', vocabDictionary:'Kamus Kosakata',
+          searchPlaceholder:'Cari hanzi, pinyin, atau arti...', loadMore:'Muat Lebih Banyak',
+          pinyinLabel:'Pinyin', translationLabel:'Terjemahan',
+          questionProgress:'Soal {current} / {total}', prevBtn:'‹ Sebelumnya', nextBtn:'Berikutnya ›',
+          filledCount:'Terisi {filled}/{total}', submitBtn:'Submit', exitCancel:'Keluar (batal)',
+          exitAttemptConfirm:'Keluar sekarang? Progres jawaban bakal ilang (belum di-submit).',
+          timeLabel:'Waktu', answerReview:'Review Jawaban', backToMockList:'Kembali ke Daftar Mock Test' },
     en: { beranda:'Home', latihan:'Practice & Test', materi:'Materials', progres:'Progress', riwayat:'History',
           streak:'STREAK', hari:'days', keluar:'Log out', mulai:'Start', ulangi:'Retry',
           soal:'questions', menit:'minutes', terakhir:'Last:', benar:'Correct', mockTest:'Mock Test',
@@ -837,7 +875,15 @@
           exampleSentence:'Example Sentence', doneBack:'Done / Back',
           emptyNoDue:'No cards due for review, and you have already seen all the popular words for HSK {level}. Try again later or pick another level.',
           sessionComplete:'Session complete! {correct} / {total} cards answered correctly.',
-          onboardingTitle:'What should we call you?', onboardingSub:'This is how we will greet you.', onboardingContinue:'Continue' },
+          onboardingTitle:'What should we call you?', onboardingSub:'This is how we will greet you.', onboardingContinue:'Continue',
+          backToDashboard:'Back to Dashboard', weakestWords:'Weakest Words', mockTestHistory:'Mock Test History',
+          raportHeader:'Learning Report', vocabDictionary:'Vocabulary Dictionary',
+          searchPlaceholder:'Search hanzi, pinyin, or meaning...', loadMore:'Load More',
+          pinyinLabel:'Pinyin', translationLabel:'Translation',
+          questionProgress:'Question {current} / {total}', prevBtn:'‹ Previous', nextBtn:'Next ›',
+          filledCount:'Filled {filled}/{total}', submitBtn:'Submit', exitCancel:'Exit (cancel)',
+          exitAttemptConfirm:'Exit now? Your unsubmitted answers will be lost.',
+          timeLabel:'Time', answerReview:'Answer Review', backToMockList:'Back to Mock Test List' },
     zh: { beranda:'首页', latihan:'练习与测试', materi:'学习资料', progres:'学习进度', riwayat:'历史记录',
           streak:'连续天数', hari:'天', keluar:'退出', mulai:'开始', ulangi:'重做',
           soal:'题', menit:'分钟', terakhir:'上次：', benar:'正确', mockTest:'模拟考试',
@@ -862,7 +908,15 @@
           exampleSentence:'例句', doneBack:'完成 / 返回',
           emptyNoDue:'暂无待复习卡片，HSK {level} 常用词你都学过了。请稍后再试或选择其他等级',
           sessionComplete:'本次学习完成！{correct} / {total} 张卡片回答正确',
-          onboardingTitle:'怎么称呼你？', onboardingSub:'我们将这样称呼你', onboardingContinue:'继续' }
+          onboardingTitle:'怎么称呼你？', onboardingSub:'我们将这样称呼你', onboardingContinue:'继续',
+          backToDashboard:'返回主页', weakestWords:'最薄弱词汇', mockTestHistory:'模拟考试记录',
+          raportHeader:'学习报告', vocabDictionary:'词汇词典',
+          searchPlaceholder:'搜索汉字、拼音或释义...', loadMore:'加载更多',
+          pinyinLabel:'拼音', translationLabel:'翻译',
+          questionProgress:'第 {current} / {total} 题', prevBtn:'‹ 上一题', nextBtn:'下一题 ›',
+          filledCount:'已填 {filled}/{total}', submitBtn:'提交', exitCancel:'退出（取消）',
+          exitAttemptConfirm:'现在退出？未提交的答案将会丢失',
+          timeLabel:'用时', answerReview:'答案回顾', backToMockList:'返回模拟考试列表' }
   };
   let currentLang = localStorage.getItem('xingLang') || 'en';
   if(!LANG[currentLang]) currentLang = 'en';
@@ -917,10 +971,41 @@
     $('gradeBtnEasy').textContent = t('gradeEasy');
     $('exampleBtn').textContent = t('exampleSentence');
     $('practiceExitBtn2').textContent = t('doneBack');
+    $('practiceExitBtn3').textContent = t('backToDashboard');
 
     $('onboardingTitle').textContent = t('onboardingTitle');
     $('onboardingSub').textContent = t('onboardingSub');
     $('onboardingContinueBtn').textContent = t('onboardingContinue');
+
+    $('raportHeader').textContent = t('raportHeader');
+    $('raportLabelDue').textContent = t('dueToday');
+    $('raportLabelStreak').textContent = t('streakDaysLabel');
+    $('raportLabelProgress').textContent = t('progressByLevel');
+    $('raportLabelWeak').textContent = t('weakestWords');
+    $('raportLabelHistory').textContent = t('mockTestHistory');
+    $('raportExitBtn').textContent = t('backToDashboard');
+
+    $('browseHeader').textContent = t('vocabDictionary');
+    $('browseSearch').placeholder = t('searchPlaceholder');
+    $('browseMoreBtn').textContent = t('loadMore');
+    $('browseExitBtn').textContent = t('backToDashboard');
+
+    $('mockListExitBtn').textContent = t('backToDashboard');
+
+    $('toggleLabelPinyin').textContent = t('pinyinLabel');
+    $('toggleLabelTranslation').textContent = t('translationLabel');
+    $('attemptPrevBtn').textContent = t('prevBtn');
+    $('attemptNextBtn').textContent = t('nextBtn');
+    $('attemptSubmitBtn').textContent = t('submitBtn');
+    $('attemptExitBtn').textContent = t('exitCancel');
+
+    $('resLabelScore').textContent = t('scoreLabel');
+    $('resLabelCorrect').textContent = t('benar');
+    $('resLabelTime').textContent = t('timeLabel');
+    $('resultReviewHeader').textContent = t('answerReview');
+    $('resultCloseBtn').textContent = t('backToMockList');
+
+    $('riwayatHeader').textContent = t('mockTestHistory');
 
     document.body.classList.toggle('lang-zh', currentLang === 'zh');
     document.querySelectorAll('.langBtn').forEach(b=>{
@@ -1128,6 +1213,7 @@
     $('loginBtn').disabled = true;
     showLogin(null);
 
+    rememberMePref = $('rememberMeCheckbox').checked;
     const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
     if(error){ showLogin(t('errWrongCredentials'), 'err'); return; }
 
@@ -2492,7 +2578,7 @@
   }
 
   function renderAttemptNav(){
-    $('attemptProgress').textContent = `Soal ${attemptIndex + 1} / ${attemptQuestions.length}`;
+    $('attemptProgress').textContent = t('questionProgress').replace('{current}', attemptIndex + 1).replace('{total}', attemptQuestions.length);
     $('attemptPrevBtn').disabled = attemptIndex === 0;
     $('attemptNextBtn').disabled = attemptIndex === attemptQuestions.length - 1;
   }
@@ -2512,7 +2598,7 @@
     });
     const total = attemptQuestions.length;
     const countEl = $('attemptFilledCount');
-    countEl.textContent = `Terisi ${filled}/${total}`;
+    countEl.textContent = t('filledCount').replace('{filled}', filled).replace('{total}', total);
     countEl.classList.toggle('done', filled === total);
   }
 
@@ -2619,7 +2705,7 @@
 
   function exitAttempt(){
     const answered = attemptQuestions.filter(isQuestionAnswered).length;
-    if(answered > 0 && !confirm('Keluar sekarang? Progres jawaban bakal ilang (belum di-submit).')) return;
+    if(answered > 0 && !confirm(t('exitAttemptConfirm'))) return;
     closeAttempt();
   }
 

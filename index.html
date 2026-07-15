@@ -6,11 +6,26 @@
   <title>Xing Mandarin</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Baloo+2:wght@700&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700&display=swap" rel="stylesheet">
   <style>
+    /* Token <-> design_handoff_xing_mandarin README mapping, for future handoffs:
+       --bg      = design --bg        (page background)
+       --bg2     = design --bg2       (gradient highlight, paired with --bg in linear/radial gradients)
+       --panel   = design --surface   (cards, inputs, raised surfaces)
+       --panel-2 = design --surface2  (sidebar + recessed/secondary surfaces)
+       --track   = design --track     (progress bar empty fill, question-nav empty tile)
+       --line    = hairline borders (design doesn't have a separate token for this; kept as our own)
+       --text    = design --ink       (primary text color)
+       --text-rgb = design --ink-rgb  (r,g,b triplet of --text, for rgba() borders/shadows/tints)
+       --muted-rgb = r,g,b triplet of --muted, same purpose as --text-rgb but for muted-color tints
+       --muted   = derived in design via rgba(ink-rgb, opacity); kept here as a flat token instead
+       --gold/--gold-soft/--danger/--ok/--navy = accent colors, fixed across both themes
+       NOTE: design's dark --ink-rgb (214,225,250) was a typo -- didn't match design's own dark --ink
+       hex (#EAF0FF = 234,240,255). Corrected here to match --text exactly, per "--text-rgb = --text
+       in rgb form". If --text ever changes, update --text-rgb (and --muted/--muted-rgb) to match. */
     :root{
-      --bg:#F7F1DE; --panel:#FFFFFF; --panel-2:#F5EFDD;
-      --line:#EEE7D4; --text:#1C2A5E; --muted:#6B7192;
+      --bg:#F7F1DE; --bg2:#FBF6E8; --panel:#FFFFFF; --panel-2:#FCF8EC;
+      --track:#EADFC4; --line:#EEE7D4; --text:#1C2A5E; --text-rgb:28,42,94; --muted:#6B7192; --muted-rgb:107,113,146;
       --gold:#F2B01E; --gold-soft:#F7C657; --danger:#D64545; --ok:#2F9E5B;
       --navy:#1C2A5E;
       --shadow-sm:0 2px 8px rgba(28,42,94,.06);
@@ -18,10 +33,12 @@
       --shadow-lg:0 16px 40px rgba(28,42,94,.14);
       --radius-lg:22px; --radius-md:16px; --radius-sm:10px;
       --hanzi-font:'Noto Sans SC',"Microsoft YaHei","PingFang SC",-apple-system,sans-serif;
+      --display-font:'Baloo 2',cursive;
+      --hanzi-serif-font:'Noto Serif SC',serif;
     }
     [data-theme="dark"]{
-      --bg:#0F1730; --panel:#1A2547; --panel-2:#141D3D;
-      --line:#2A3763; --text:#F7F1DE; --muted:#8D96C4;
+      --bg:#0F1A3D; --bg2:#16224C; --panel:#1C2B58; --panel-2:#141F45;
+      --track:rgba(255,255,255,.12); --line:#2A3763; --text:#EAF0FF; --text-rgb:234,240,255; --muted:#8D96C4; --muted-rgb:141,150,196;
       --shadow-sm:0 2px 8px rgba(0,0,0,.24);
       --shadow-md:0 8px 24px rgba(0,0,0,.32);
       --shadow-lg:0 16px 40px rgba(0,0,0,.42);
@@ -379,7 +396,7 @@
     .reviewBadge{padding:2px 10px; border-radius:999px; font-size:11px; font-weight:700}
     .reviewBadge.correct{background:rgba(47,158,91,.12); color:var(--ok)}
     .reviewBadge.wrong{background:rgba(214,69,69,.12); color:var(--danger)}
-    .reviewBadge.neutral{background:rgba(107,113,146,.12); color:var(--muted)}
+    .reviewBadge.neutral{background:rgba(var(--muted-rgb),.12); color:var(--muted)}
     /* mock test attempt — ordering 完成句子 reveal + char_input 看拼音写汉字 */
     .qOrderingHint{font-size:14px; color:var(--text); line-height:1.5; margin-bottom:12px}
     .orderingPreview{background:var(--panel); border:1px dashed var(--line); border-radius:10px; padding:12px 14px; font-size:17px; line-height:1.6; color:var(--text); font-family:var(--hanzi-font)}

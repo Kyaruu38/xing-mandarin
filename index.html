@@ -4,58 +4,161 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Xing Mandarin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg:#0d1220; --panel:#141b2e; --panel-2:#1b2337;
-      --line:#26304a; --text:#e8ecf6; --muted:#8b96b0;
-      --gold:#d8a24a; --gold-soft:#e8c07f; --danger:#e0685f; --ok:#5fb27a;
+      --bg:#F7F1DE; --panel:#FFFFFF; --panel-2:#F5EFDD;
+      --line:#EEE7D4; --text:#1C2A5E; --muted:#6B7192;
+      --gold:#F2B01E; --gold-soft:#F7C657; --danger:#D64545; --ok:#2F9E5B;
+      --navy:#1C2A5E;
+      --shadow-sm:0 2px 8px rgba(28,42,94,.06);
+      --shadow-md:0 8px 24px rgba(28,42,94,.08);
+      --shadow-lg:0 16px 40px rgba(28,42,94,.14);
+      --radius-lg:22px; --radius-md:16px; --radius-sm:10px;
+      --hanzi-font:'Noto Sans SC',"Microsoft YaHei","PingFang SC",-apple-system,sans-serif;
     }
     *{box-sizing:border-box}
     body{
-      margin:0; min-height:100vh; background:
-        radial-gradient(1200px 500px at 50% -10%, #1a2440 0%, transparent 60%), var(--bg);
-      color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+      margin:0; min-height:100vh; background:var(--bg);
+      color:var(--text); font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
       display:flex; align-items:center; justify-content:center; padding:20px;
     }
+    body.app-active{ display:block; padding:0; }
     .hidden{display:none !important}
     .card{
       width:100%; max-width:400px; background:var(--panel);
       border:1px solid var(--line); border-radius:18px; padding:32px;
-      box-shadow:0 20px 60px rgba(0,0,0,.45);
+      box-shadow:var(--shadow-lg);
     }
     .brand{display:flex; align-items:center; gap:10px; margin-bottom:6px}
     .star{color:var(--gold); font-size:26px; line-height:1}
     .brand h1{font-size:20px; margin:0; letter-spacing:.3px}
-    .brand .cn{color:var(--gold-soft); font-weight:600}
+    .brand .cn{color:var(--gold); font-weight:700}
     .sub{color:var(--muted); font-size:13px; margin:0 0 26px}
     label{display:block; font-size:12px; color:var(--muted); margin:14px 0 6px}
     input{
       width:100%; padding:12px 14px; background:var(--panel-2); color:var(--text);
       border:1px solid var(--line); border-radius:10px; font-size:15px; outline:none;
+      font-family:inherit;
     }
     input:focus{border-color:var(--gold)}
     button{
       width:100%; margin-top:22px; padding:13px; border:none; border-radius:10px;
       background:linear-gradient(180deg,var(--gold-soft),var(--gold));
       color:#241a08; font-weight:700; font-size:15px; cursor:pointer;
+      font-family:inherit;
     }
     button:disabled{opacity:.6; cursor:not-allowed}
     .msg{margin-top:16px; font-size:13px; padding:10px 12px; border-radius:9px; display:none}
-    .msg.err{display:block; background:rgba(224,104,95,.12); color:var(--danger); border:1px solid rgba(224,104,95,.3)}
-    .msg.ok{display:block; background:rgba(95,178,122,.12); color:var(--ok); border:1px solid rgba(95,178,122,.3)}
+    .msg.err{display:block; background:rgba(214,69,69,.08); color:var(--danger); border:1px solid rgba(214,69,69,.25)}
+    .msg.ok{display:block; background:rgba(47,158,91,.08); color:var(--ok); border:1px solid rgba(47,158,91,.25)}
+
+    /* ============ app shell (sidebar + main) ============ */
+    #appShell{ display:flex; min-height:100vh; align-items:stretch; }
+    #appShell.hidden{ display:none !important; }
+    .sidebar{
+      width:256px; flex-shrink:0; background:var(--panel);
+      border-right:1px solid var(--line); padding:20px 16px;
+      display:flex; flex-direction:column; gap:20px;
+      position:sticky; top:0; height:100vh; overflow-y:auto;
+    }
+    .sidebarLogo{
+      background:var(--bg); border-radius:var(--radius-md); padding:14px;
+      display:flex; align-items:center; justify-content:center; min-height:56px;
+    }
+    .sidebarLogo img{ max-width:100%; max-height:44px; display:block; }
+    .sidebarLogoFallback{ display:flex; align-items:center; gap:8px; font-weight:800; color:var(--text); font-size:16px; }
+    .sidebarLogoFallback .star{ color:var(--gold); font-size:20px; }
+    .sidebarLogoFallback b{ color:var(--gold); }
+    .sidebarNav{ display:flex; flex-direction:column; gap:4px; }
+    .navItem{
+      display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:12px;
+      color:var(--muted); font-weight:600; font-size:14px; cursor:pointer;
+      transition:background .15s ease, color .15s ease;
+    }
+    .navItem .navIcon{ font-size:16px; line-height:1; width:18px; text-align:center; flex-shrink:0; }
+    .navItem:hover{ background:var(--panel-2); color:var(--text); }
+    .navItem.active{ background:rgba(242,176,30,.16); color:var(--text); }
+    .sidebarStreak{
+      margin-top:auto; background:var(--panel-2); border:1px solid var(--line); border-radius:var(--radius-md);
+      padding:14px; display:flex; flex-direction:column; align-items:center; gap:2px;
+    }
+    .sidebarStreakLabel{ font-size:11px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.3px; }
+    .sidebarStreakNum{ font-size:26px; font-weight:800; color:var(--gold); }
+    .sidebarStreakUnit{ font-size:11px; color:var(--muted); }
+    .sidebarUser{ border-top:1px solid var(--line); padding-top:14px; }
+    .sidebarUserName{ font-weight:700; font-size:14px; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .sidebarUserMeta{ font-size:12px; color:var(--muted); margin-top:2px; margin-bottom:10px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .mainContent{ flex:1; min-width:0; padding:32px 40px; }
+
+    .pageCard{
+      background:var(--panel); border:1px solid var(--line); border-radius:var(--radius-lg);
+      padding:32px; box-shadow:var(--shadow-md); max-width:720px;
+    }
+
     /* dashboard */
-    .dash .hello{font-size:22px; margin:2px 0 2px}
-    .dash .hello b{color:var(--gold-soft)}
+    .dash{ max-width:900px }
+    .dash .hello{font-size:24px; margin:2px 0 2px}
+    .dash .hello b{color:var(--navy)}
+    .pageHeader{ margin-bottom:6px }
     .rowline{display:flex; justify-content:space-between; padding:14px 0; border-bottom:1px solid var(--line); font-size:14px}
     .rowline:last-child{border-bottom:none}
     .rowline .k{color:var(--muted)}
     .rowline .v{font-weight:600}
     .pill{padding:3px 10px; border-radius:999px; font-size:12px; font-weight:700}
-    .pill.on{background:rgba(95,178,122,.15); color:var(--ok)}
-    .logout{margin-top:24px; background:transparent; border:1px solid var(--line); color:var(--muted); font-weight:600}
+    .pill.on{background:rgba(47,158,91,.12); color:var(--ok)}
+    .logout{margin-top:0; background:transparent; border:1px solid var(--line); color:var(--muted); font-weight:600}
     .foot{margin-top:22px; text-align:center; color:var(--muted); font-size:11px}
+
+    .statGrid{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin:18px 0 20px; }
+    .statCard{ background:var(--panel-2); border:1px solid var(--line); border-radius:16px; padding:16px; text-align:center; }
+    .statCardNum{ display:block; font-size:24px; font-weight:800; color:var(--navy); }
+    .statCardLabel{ display:block; font-size:11px; color:var(--muted); margin-top:4px; font-weight:600; }
+
+    .continueCard{
+      width:100%; margin-top:4px; padding:22px 24px; border:none; border-radius:20px;
+      background:linear-gradient(135deg,var(--navy),#2a3a75); color:#fff;
+      display:flex; align-items:center; justify-content:space-between; gap:16px;
+      cursor:pointer; text-align:left; box-shadow:var(--shadow-md);
+      transition:transform .15s ease, box-shadow .15s ease;
+    }
+    .continueCard:hover{ transform:translateY(-2px); box-shadow:var(--shadow-lg); }
+    .continueCardText{ display:flex; flex-direction:column; gap:4px; }
+    .continueCardLabel{ font-size:12px; opacity:.75; text-transform:uppercase; letter-spacing:.4px; font-weight:700; }
+    .continueCardTitle{ font-size:17px; font-weight:700; }
+    .continueCardArrow{ font-size:22px; color:var(--gold); flex-shrink:0; }
+
+    .dailyGoalCard{ margin-top:20px; background:var(--panel-2); border:1px solid var(--line); border-radius:16px; padding:16px 18px; }
+    .dailyGoalHead{ display:flex; justify-content:space-between; font-size:12px; color:var(--muted); font-weight:600; margin-bottom:10px; }
+    .dailyGoalTrack{ height:8px; background:var(--line); border-radius:99px; overflow:hidden; }
+    .dailyGoalFill{ height:100%; width:0%; background:linear-gradient(90deg,var(--gold-soft),var(--gold)); border-radius:99px; transition:width .3s ease; }
+
+    .hskGrid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(96px,1fr)); gap:12px; margin-top:4px; }
+    .hskCard{ background:var(--panel-2); border:1px solid var(--line); border-radius:16px; padding:14px 8px; text-align:center; cursor:pointer; transition:transform .15s ease, box-shadow .15s ease; }
+    .hskCard:hover{ transform:translateY(-2px); box-shadow:var(--shadow-sm); border-color:var(--gold); }
+    .hskRing{ width:60px; height:60px; border-radius:50%; margin:0 auto 8px; background:conic-gradient(var(--gold) calc(var(--pct)*1%), var(--line) 0); display:flex; align-items:center; justify-content:center; }
+    .hskRing span{ width:44px; height:44px; border-radius:50%; background:var(--panel-2); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; color:var(--navy); }
+    .hskCardLabel{ font-size:13px; font-weight:700; color:var(--text); }
+    .hskCardSub{ font-size:11px; color:var(--muted); margin-top:2px; }
+
+    .quickGrid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:4px; }
+    .quickTile{
+      padding:16px 8px; background:var(--panel-2); border:1px solid var(--line); border-radius:16px;
+      color:var(--text); font-weight:700; font-size:13px; cursor:pointer;
+      display:flex; flex-direction:column; align-items:center; gap:8px;
+      margin-top:0; width:100%;
+    }
+    .quickTile:hover{ border-color:var(--gold); }
+    .quickTileIcon{ font-size:22px; }
+
+    .dashRecentHead{ display:flex; align-items:center; justify-content:space-between; margin-top:20px; }
+    .linkBtn{ font-size:12px; color:var(--gold); font-weight:700; cursor:pointer; }
+    .linkBtn:hover{ text-decoration:underline; }
+
     /* practice / flashcard */
-    .practice{max-width:460px}
+    .practice{max-width:480px}
     .levelPicker{display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 20px}
     .levelBtn{
       flex:1 1 auto; min-width:50px; padding:10px 0; text-align:center;
@@ -64,21 +167,21 @@
     }
     .levelBtn.active{background:linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#241a08; border-color:transparent}
     .cardArea{
-      background:var(--panel-2); border:1px solid var(--line); border-radius:14px;
+      background:var(--panel-2); border:1px solid var(--line); border-radius:18px;
       padding:36px 20px; text-align:center; min-height:180px;
       display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
     }
     .hanzi-big{
       font-size:52px; font-weight:700; letter-spacing:1px;
-      font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif;
+      font-family:var(--hanzi-font);
     }
-    .pinyin-line{font-size:18px; color:var(--gold-soft)}
+    .pinyin-line{font-size:18px; color:var(--gold)}
     .meaning-line{font-size:15px; color:var(--text); margin-top:4px}
     .revealBtn{margin-top:18px}
     .gradeRow{display:flex; gap:8px; margin-top:16px}
     .gradeBtn{flex:1; margin-top:0; padding:11px 0; font-size:13px; border-radius:9px}
-    .gradeBtn.again{background:linear-gradient(180deg,#e88b83,var(--danger)); color:#3a0f0c}
-    .gradeBtn.hard{background:linear-gradient(180deg,#e0c07f,#c99a3f); color:#241a08}
+    .gradeBtn.again{background:linear-gradient(180deg,#f0a49c,var(--danger)); color:#3a0f0c}
+    .gradeBtn.hard{background:linear-gradient(180deg,var(--gold-soft),#d99614); color:#241a08}
     .gradeBtn.good{background:linear-gradient(180deg,#8fd1a6,var(--ok)); color:#0d2414}
     .gradeBtn.easy{background:linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#241a08}
     .exampleBtn{margin-top:10px; background:transparent; border:1px solid var(--line); color:var(--muted); font-weight:600; font-size:13px}
@@ -86,104 +189,104 @@
     .practiceExit{margin-top:20px; background:transparent; border:1px solid var(--line); color:var(--muted); font-weight:600}
     .emptyState{text-align:center; color:var(--muted); font-size:14px; padding:30px 10px}
     /* raport */
-    .raport{max-width:480px}
+    .raport{max-width:640px}
     .statRow{display:flex; gap:10px; margin:14px 0 20px}
-    .statBox{flex:1; background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:16px 10px; text-align:center}
-    .statNum{display:block; font-size:26px; font-weight:700; color:var(--gold-soft)}
+    .statBox{flex:1; background:var(--panel-2); border:1px solid var(--line); border-radius:16px; padding:16px 10px; text-align:center}
+    .statNum{display:block; font-size:26px; font-weight:700; color:var(--navy)}
     .statLabel{display:block; font-size:11px; color:var(--muted); margin-top:4px}
     .sectionTitle{font-size:13px; color:var(--muted); margin:20px 0 10px; font-weight:700; letter-spacing:.3px}
     .levelRow{display:flex; align-items:center; gap:10px; padding:8px 0; font-size:12px}
     .levelName{width:52px; flex-shrink:0; font-weight:700}
-    .levelBar{flex:1; height:8px; background:var(--panel-2); border-radius:99px; overflow:hidden}
+    .levelBar{flex:1; height:8px; background:var(--line); border-radius:99px; overflow:hidden}
     .levelBarFill{height:100%; background:linear-gradient(90deg,var(--gold-soft),var(--gold))}
     .levelNums{width:130px; flex-shrink:0; color:var(--muted); text-align:right; font-size:11px}
     .weakItem{display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--line); font-size:13px}
     .weakItem:last-child{border-bottom:none}
-    .weakHanzi{font-size:20px; font-weight:700; width:40px; flex-shrink:0; font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif}
-    .weakPinyin{width:70px; flex-shrink:0; color:var(--gold-soft)}
+    .weakHanzi{font-size:20px; font-weight:700; width:40px; flex-shrink:0; font-family:var(--hanzi-font)}
+    .weakPinyin{width:70px; flex-shrink:0; color:var(--gold)}
     .weakMeaning{flex:1; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
     .weakMastery{color:var(--muted); font-size:11px; flex-shrink:0}
     /* browse / kamus */
-    .browse{max-width:480px}
+    .browse{max-width:640px}
     .browseSearchInput{margin:14px 0 4px}
     .browseList{max-height:360px; overflow-y:auto; margin-top:10px}
     .browseItem{display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--line); font-size:13px}
     .browseItem:last-child{border-bottom:none}
-    .browseHanzi{font-size:20px; font-weight:700; width:44px; flex-shrink:0; font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif}
-    .browsePinyin{width:76px; flex-shrink:0; color:var(--gold-soft)}
+    .browseHanzi{font-size:20px; font-weight:700; width:44px; flex-shrink:0; font-family:var(--hanzi-font)}
+    .browsePinyin{width:76px; flex-shrink:0; color:var(--gold)}
     .browseMeaning{flex:1; color:var(--text)}
     .browseCount{font-size:11px; color:var(--muted); text-align:center; margin:10px 0 0}
     /* mock test list */
-    .mocklist{max-width:480px}
-    .mockSetCard{background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:14px 16px; margin-bottom:10px}
+    .mocklist{max-width:640px}
+    .mockSetCard{background:var(--panel-2); border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin-bottom:10px}
     .mockSetTitle{font-weight:700; font-size:14px; margin-bottom:4px}
     .mockSetMeta{font-size:12px; color:var(--muted); margin-bottom:8px}
-    .mockSetScore{font-size:12px; color:var(--gold-soft); margin-bottom:10px}
+    .mockSetScore{font-size:12px; color:var(--gold); margin-bottom:10px; font-weight:600}
     .mockSetBtn{margin-top:0}
     /* mock test attempt */
-    .attempt{max-width:540px}
+    .attempt{max-width:680px}
     .attemptHeader{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px}
     .attemptTitle{font-weight:700; font-size:14px}
-    .attemptTimer{font-weight:700; font-size:17px; font-variant-numeric:tabular-nums; color:var(--gold-soft)}
+    .attemptTimer{font-weight:700; font-size:17px; font-variant-numeric:tabular-nums; color:var(--navy)}
     .attemptTimer.low{color:var(--danger)}
     .attemptToggles{display:flex; gap:16px; margin-bottom:12px; font-size:12px; color:var(--muted)}
     .attemptToggles label{display:flex; align-items:center; gap:6px; cursor:pointer}
     .attemptProgress{font-size:12px; color:var(--muted); margin-bottom:8px}
-    .attemptBody{background:var(--panel-2); border:1px solid var(--line); border-radius:14px; padding:18px; min-height:160px}
+    .attemptBody{background:var(--panel-2); border:1px solid var(--line); border-radius:18px; padding:18px; min-height:160px}
     .qInstruction{font-size:11px; color:var(--muted); margin-bottom:10px; text-transform:uppercase; letter-spacing:.4px}
-    .sectionBreak{display:inline-block; padding:4px 12px; margin-bottom:14px; background:rgba(216,162,74,.15); border:1px solid var(--gold); border-radius:999px; font-size:12px; font-weight:700; color:var(--gold-soft); letter-spacing:.3px}
-    .qPassage{font-size:15px; line-height:1.85; margin-bottom:14px; padding-bottom:14px; border-bottom:1px solid var(--line); font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif; white-space:pre-line}
-    .qPassageTrans{font-size:13px; color:var(--muted); margin-top:8px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
-    .qStem{font-size:16px; line-height:1.75; margin-bottom:6px; font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif; white-space:pre-line}
+    .sectionBreak{display:inline-block; padding:4px 12px; margin-bottom:14px; background:rgba(242,176,30,.16); border:1px solid var(--gold); border-radius:999px; font-size:12px; font-weight:700; color:var(--navy); letter-spacing:.3px}
+    .qPassage{font-size:15px; line-height:1.85; margin-bottom:14px; padding-bottom:14px; border-bottom:1px solid var(--line); font-family:var(--hanzi-font); white-space:pre-line}
+    .qPassageTrans{font-size:13px; color:var(--muted); margin-top:8px; font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+    .qStem{font-size:16px; line-height:1.75; margin-bottom:6px; font-family:var(--hanzi-font); white-space:pre-line}
     .qStemTrans{font-size:13px; color:var(--muted); margin-bottom:14px}
     .choiceList{display:flex; flex-direction:column; gap:8px; margin-top:10px}
-    .choiceItem{display:flex; align-items:baseline; flex-wrap:wrap; gap:8px; padding:12px 14px; background:var(--panel); border:1px solid var(--line); border-radius:10px; cursor:pointer; font-size:14px}
-    .choiceItem.active{border-color:var(--gold); background:rgba(216,162,74,.12)}
-    .choiceKey{font-weight:700; color:var(--gold-soft); flex-shrink:0}
-    .choiceHanzi{font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif; font-size:16px}
-    .choicePinyin{color:var(--gold-soft); font-size:12px}
+    .choiceItem{display:flex; align-items:baseline; flex-wrap:wrap; gap:8px; padding:12px 14px; background:var(--panel); border:1px solid var(--line); border-radius:12px; cursor:pointer; font-size:14px}
+    .choiceItem.active{border-color:var(--gold); background:rgba(242,176,30,.10)}
+    .choiceKey{font-weight:700; color:var(--gold); flex-shrink:0}
+    .choiceHanzi{font-family:var(--hanzi-font); font-size:16px}
+    .choicePinyin{color:var(--gold); font-size:12px}
     .choiceTrans{color:var(--muted); font-size:12px}
     .segmentList{display:flex; flex-direction:column; gap:8px; margin-top:10px}
-    .segmentItem{display:flex; align-items:center; gap:10px; padding:12px 14px; background:var(--panel); border:1px solid var(--line); border-radius:10px; cursor:pointer}
-    .segmentItem.picked{border-color:var(--gold); background:rgba(216,162,74,.12)}
+    .segmentItem{display:flex; align-items:center; gap:10px; padding:12px 14px; background:var(--panel); border:1px solid var(--line); border-radius:12px; cursor:pointer}
+    .segmentItem.picked{border-color:var(--gold); background:rgba(242,176,30,.10)}
     .segmentBadge{width:24px; height:24px; border-radius:50%; background:var(--panel-2); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; color:var(--muted)}
     .segmentItem.picked .segmentBadge{background:linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#241a08; border-color:transparent}
-    .segmentHanzi{font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif; font-size:15px}
-    .segmentPinyin{color:var(--gold-soft); font-size:12px}
+    .segmentHanzi{font-family:var(--hanzi-font); font-size:15px}
+    .segmentPinyin{color:var(--gold); font-size:12px}
     .segmentTrans{color:var(--muted); font-size:12px; margin-left:auto; text-align:right}
     .attemptNav{display:flex; gap:8px; margin-top:16px}
     .navBtn{margin-top:0; flex:1; background:var(--panel-2); border:1px solid var(--line); color:var(--text); font-weight:600}
     .navBtn:disabled{opacity:.4; cursor:not-allowed}
     .questionGrid{display:flex; flex-wrap:wrap; gap:6px; margin-top:16px}
     .gridBtn{width:34px; height:34px; border-radius:8px; background:var(--panel-2); border:1px solid var(--line); color:var(--muted); font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; cursor:pointer}
-    .gridBtn.answered{background:rgba(95,178,122,.15); border-color:var(--ok); color:var(--ok)}
-    .gridBtn.current{border-color:var(--gold); color:var(--gold-soft)}
+    .gridBtn.answered{background:rgba(47,158,91,.12); border-color:var(--ok); color:var(--ok)}
+    .gridBtn.current{border-color:var(--gold); color:var(--navy)}
     .attemptFilledCount{font-size:12px; color:var(--muted); text-align:center; margin-top:10px}
     .attemptFilledCount.done{color:var(--ok); font-weight:700}
     /* mock test result / review */
-    .result{max-width:560px}
-    .reviewItem{background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:14px 16px; margin-bottom:12px}
+    .result{max-width:720px}
+    .reviewItem{background:var(--panel-2); border:1px solid var(--line); border-radius:16px; padding:14px 16px; margin-bottom:12px}
     .reviewHead{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:12px; color:var(--muted)}
     .reviewBadge{padding:2px 10px; border-radius:999px; font-size:11px; font-weight:700}
-    .reviewBadge.correct{background:rgba(95,178,122,.15); color:var(--ok)}
-    .reviewBadge.wrong{background:rgba(224,104,95,.15); color:var(--danger)}
-    .reviewBadge.neutral{background:rgba(139,150,176,.15); color:var(--muted)}
+    .reviewBadge.correct{background:rgba(47,158,91,.12); color:var(--ok)}
+    .reviewBadge.wrong{background:rgba(214,69,69,.12); color:var(--danger)}
+    .reviewBadge.neutral{background:rgba(107,113,146,.12); color:var(--muted)}
     /* mock test attempt — ordering 完成句子 reveal + char_input 看拼音写汉字 */
     .qOrderingHint{font-size:14px; color:var(--text); line-height:1.5; margin-bottom:12px}
-    .orderingPreview{background:var(--panel); border:1px dashed var(--line); border-radius:10px; padding:12px 14px; font-size:17px; line-height:1.6; color:var(--gold-soft); font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif}
-    .orderingReveal{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px; font-size:15px; line-height:1.75; font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif}
-    .charInputPinyinHint{font-size:16px; color:var(--gold-soft); margin-bottom:12px}
-    .charInputBox{width:100%; padding:12px 14px; background:var(--panel); color:var(--text); border:1px solid var(--line); border-radius:10px; font-size:18px; font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif; outline:none}
+    .orderingPreview{background:var(--panel); border:1px dashed var(--line); border-radius:10px; padding:12px 14px; font-size:17px; line-height:1.6; color:var(--navy); font-family:var(--hanzi-font)}
+    .orderingReveal{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px; font-size:15px; line-height:1.75; font-family:var(--hanzi-font)}
+    .charInputPinyinHint{font-size:16px; color:var(--navy); margin-bottom:12px}
+    .charInputBox{width:100%; padding:12px 14px; background:var(--panel); color:var(--text); border:1px solid var(--line); border-radius:10px; font-size:18px; font-family:var(--hanzi-font); outline:none}
     .charInputBox:focus{border-color:var(--gold)}
     /* mock test attempt — essay (writing) */
-    .qEssayPrompt{font-size:16px; line-height:1.75; margin-bottom:6px; font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif; white-space:pre-line}
+    .qEssayPrompt{font-size:16px; line-height:1.75; margin-bottom:6px; font-family:var(--hanzi-font); white-space:pre-line}
     .qEssayPromptTrans{font-size:13px; color:var(--muted); margin-bottom:14px}
     .qEssayLabel{font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; margin:0 0 6px}
-    .qEssayWord{display:inline-block; padding:6px 14px; margin-bottom:14px; background:rgba(216,162,74,.12); border:1px solid var(--gold); border-radius:8px; font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif; font-size:18px; font-weight:700; color:var(--gold-soft)}
+    .qEssayWord{display:inline-block; padding:6px 14px; margin-bottom:14px; background:rgba(242,176,30,.10); border:1px solid var(--gold); border-radius:8px; font-family:var(--hanzi-font); font-size:18px; font-weight:700; color:var(--navy)}
     .qEssayWordList{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px}
-    .qEssayWordChip{padding:5px 12px; background:var(--panel); border:1px solid var(--line); border-radius:999px; font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif; font-size:14px; color:var(--gold-soft)}
-    .qEssayArticle{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px; margin-bottom:14px; font-size:14px; line-height:1.85; font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif; white-space:pre-line; max-height:260px; overflow-y:auto}
-    .essayTextarea{width:100%; min-height:160px; padding:12px 14px; background:var(--panel); color:var(--text); border:1px solid var(--line); border-radius:10px; font-size:15px; line-height:1.7; font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif; resize:vertical; outline:none}
+    .qEssayWordChip{padding:5px 12px; background:var(--panel); border:1px solid var(--line); border-radius:999px; font-family:var(--hanzi-font); font-size:14px; color:var(--navy)}
+    .qEssayArticle{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px; margin-bottom:14px; font-size:14px; line-height:1.85; font-family:var(--hanzi-font); white-space:pre-line; max-height:260px; overflow-y:auto}
+    .essayTextarea{width:100%; min-height:160px; padding:12px 14px; background:var(--panel); color:var(--text); border:1px solid var(--line); border-radius:10px; font-size:15px; line-height:1.7; font-family:var(--hanzi-font); resize:vertical; outline:none}
     .essayTextarea:focus{border-color:var(--gold)}
     .essayCharCount{font-size:12px; color:var(--muted); margin:6px 0 14px; text-align:right}
     .essayCharCount.short{color:var(--danger)}
@@ -193,8 +296,8 @@
     .essayResult{margin-top:16px; background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px}
     .essayResultLoading{text-align:center; color:var(--muted); font-size:13px; padding:14px 0}
     .essayScoreRow{display:flex; align-items:baseline; gap:12px; margin-bottom:10px}
-    .essayScoreNum{font-size:34px; font-weight:700; color:var(--gold-soft)}
-    .essayBand{padding:3px 12px; border-radius:999px; font-size:12px; font-weight:700; background:rgba(95,178,122,.15); color:var(--ok)}
+    .essayScoreNum{font-size:34px; font-weight:700; color:var(--navy)}
+    .essayBand{padding:3px 12px; border-radius:999px; font-size:12px; font-weight:700; background:rgba(47,158,91,.12); color:var(--ok)}
     .essaySummary{font-size:13px; color:var(--text); margin-bottom:12px; line-height:1.6}
     .essaySectionTitle{font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; margin:14px 0 8px}
     .essayErrorItem{padding:8px 0; border-bottom:1px solid var(--line); font-size:13px}
@@ -203,18 +306,18 @@
     .essayErrorOriginal{color:var(--danger); text-decoration:line-through}
     .essayErrorCorrection{color:var(--ok); font-weight:600}
     .essayErrorReason{color:var(--muted); font-size:12px}
-    .essayCorrected{font-size:14px; line-height:1.75; padding:12px; background:var(--panel-2); border-radius:8px; font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif; white-space:pre-line}
+    .essayCorrected{font-size:14px; line-height:1.75; padding:12px; background:var(--panel-2); border-radius:8px; font-family:var(--hanzi-font); white-space:pre-line}
     .essayListPlain{margin:0; padding-left:18px; font-size:13px; color:var(--text); line-height:1.7}
-    .reviewPassage{font-size:14px; line-height:1.75; margin-bottom:6px; font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif; white-space:pre-line}
+    .reviewPassage{font-size:14px; line-height:1.75; margin-bottom:6px; font-family:var(--hanzi-font); white-space:pre-line}
     .reviewPassageTrans{font-size:12px; color:var(--muted); margin-bottom:10px}
-    .reviewStem{font-size:14px; margin-bottom:4px; font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",-apple-system,sans-serif; white-space:pre-line}
+    .reviewStem{font-size:14px; margin-bottom:4px; font-family:var(--hanzi-font); white-space:pre-line}
     .reviewStemTrans{font-size:12px; color:var(--muted); margin-bottom:10px}
     .reviewChoiceList{display:flex; flex-direction:column; gap:6px; margin-top:6px}
     .reviewChoice{display:flex; flex-wrap:wrap; align-items:baseline; gap:8px; padding:8px 10px; border-radius:8px; font-size:13px; border:1px solid var(--line); background:var(--panel)}
-    .reviewChoice.isCorrect{background:rgba(95,178,122,.12); border-color:var(--ok)}
-    .reviewChoice.isWrongPick{background:rgba(224,104,95,.12); border-color:var(--danger)}
-    .reviewChoiceKey{font-weight:700; color:var(--gold-soft)}
-    .reviewChoicePinyin{color:var(--gold-soft); font-size:11px}
+    .reviewChoice.isCorrect{background:rgba(47,158,91,.10); border-color:var(--ok)}
+    .reviewChoice.isWrongPick{background:rgba(214,69,69,.10); border-color:var(--danger)}
+    .reviewChoiceKey{font-weight:700; color:var(--navy)}
+    .reviewChoicePinyin{color:var(--gold); font-size:11px}
     .reviewChoiceTrans{color:var(--muted); font-size:11px}
     .reviewMark{color:var(--muted); font-size:11px; margin-left:auto}
     .reviewOrderRow{font-size:13px; margin-bottom:6px; line-height:1.6}
@@ -226,6 +329,47 @@
     .historyItem:last-child{border-bottom:none}
     .historyTitle{font-weight:700; margin-bottom:2px}
     .historyMeta{color:var(--muted); font-size:12px}
+
+    /* listening: audio player */
+    .audioPlayer{
+      display:flex; align-items:center; gap:12px; background:var(--panel-2);
+      border:1px solid var(--line); border-radius:16px; padding:12px 16px; margin-bottom:10px;
+    }
+    .audioPlayBtn{
+      width:40px; height:40px; flex-shrink:0; border-radius:50%; border:none;
+      background:linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#241a08;
+      font-size:15px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+      margin-top:0; padding:0;
+    }
+    .audioProgressTrack{ flex:1; height:6px; background:var(--line); border-radius:99px; cursor:pointer; overflow:hidden; }
+    .audioProgressFill{ height:100%; width:0%; background:linear-gradient(90deg,var(--gold-soft),var(--gold)); border-radius:99px; }
+    .audioTime{ font-size:11px; color:var(--muted); font-variant-numeric:tabular-nums; flex-shrink:0; min-width:78px; text-align:right; }
+
+    /* listening: true/false */
+    .tfRow{ display:flex; gap:10px; margin-top:14px; }
+    .tfBtn{
+      flex:1; padding:14px 0; border-radius:12px; border:1px solid var(--line);
+      background:var(--panel); color:var(--text); font-weight:700; font-size:14px; cursor:pointer; margin-top:0;
+    }
+    .tfBtn.active{ border-color:var(--gold); background:rgba(242,176,30,.14); color:var(--navy); }
+
+    /* listening: image */
+    .listeningImageWrap{ margin:12px 0; border-radius:14px; overflow:hidden; border:1px solid var(--line); max-width:320px; }
+    .listeningImage{ display:block; width:100%; height:auto; }
+    .imageChoiceList{ flex-direction:row !important; flex-wrap:wrap; }
+    .imageChoiceItem{ flex-direction:column; align-items:center; gap:8px; flex:1 1 30%; min-width:110px; }
+    .imageChoiceImg{ width:100%; max-width:140px; border-radius:10px; display:block; }
+    .imageReviewChoice{ flex-direction:column; align-items:center; gap:6px; flex:1 1 30%; min-width:110px; }
+
+    @media (max-width: 760px){
+      .sidebar{ width:76px; padding:16px 8px; }
+      .navItem span:not(.navIcon){ display:none; }
+      .navItem{ justify-content:center; }
+      .sidebarUserName, .sidebarUserMeta, .sidebarStreakLabel, .sidebarStreakUnit{ display:none; }
+      .sidebarLogo{ padding:8px; }
+      .mainContent{ padding:20px 14px; }
+      .statGrid{ grid-template-columns:repeat(2,1fr); }
+    }
   </style>
 </head>
 <body>
@@ -243,146 +387,210 @@
     <p class="foot">Belum punya akun? Hubungi admin untuk daftar.</p>
   </div>
 
-  <!-- ============ DASHBOARD ============ -->
-  <div id="dashCard" class="card dash hidden">
-    <div class="brand"><span class="star">✦</span><h1>Xing Mandarin <span class="cn">星</span></h1></div>
-    <p class="hello">Halo, <b id="dName">—</b> 👋</p>
-    <p class="sub" id="dGreet">Siap belajar hari ini?</p>
-    <div class="rowline"><span class="k">Track</span><span class="v" id="dTrack">—</span></div>
-    <div class="rowline"><span class="k">Target Level</span><span class="v" id="dLevel">—</span></div>
-    <div class="rowline"><span class="k">Status</span><span class="pill on" id="dStatus">—</span></div>
-    <div class="rowline"><span class="k">Langganan s/d</span><span class="v" id="dSub">—</span></div>
-    <button id="practiceBtn">Mulai Latihan</button>
-    <button id="mockTestBtn">Mock Test</button>
-    <button id="raportBtn">Raport</button>
-    <button id="browseBtn">Kamus</button>
-    <button class="logout" id="logoutBtn">Keluar</button>
-  </div>
-
-  <!-- ============ PRACTICE (FLASHCARD + SRS) ============ -->
-  <div id="practiceCard" class="card practice hidden">
-    <div class="brand"><span class="star">✦</span><h1>Xing Mandarin <span class="cn">星</span></h1></div>
-
-    <div id="levelPickerView">
-      <p class="sub">Pilih level HSK buat latihan</p>
-      <div class="levelPicker" id="levelPicker"></div>
-      <button id="practiceExitBtn1" class="practiceExit">Kembali</button>
-    </div>
-
-    <div id="sessionView" class="hidden">
-      <div class="sessionMeta"><span id="sessionProgress">0 / 0</span><span id="sessionLevelLabel">—</span></div>
-      <div class="cardArea">
-        <div class="hanzi-big" id="cardHanzi">—</div>
-        <div class="pinyin-line hidden" id="cardPinyin"></div>
-        <div class="meaning-line hidden" id="cardMeaning"></div>
+  <!-- ============ APP SHELL ============ -->
+  <div id="appShell" class="hidden">
+    <aside class="sidebar">
+      <div class="sidebarLogo">
+        <img src="logo.png" alt="Xing Mandarin" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+        <div class="sidebarLogoFallback" style="display:none">
+          <span class="star">✦</span><span>Xing <b>星</b></span>
+        </div>
       </div>
-      <button id="revealBtn" class="revealBtn">Lihat Jawaban</button>
-      <div class="gradeRow hidden" id="gradeRow">
-        <button class="gradeBtn again" data-grade="again">Lupa</button>
-        <button class="gradeBtn hard" data-grade="hard">Susah</button>
-        <button class="gradeBtn good" data-grade="good">Oke</button>
-        <button class="gradeBtn easy" data-grade="easy">Gampang</button>
+      <nav class="sidebarNav">
+        <div class="navItem active" id="navBeranda" data-page="beranda"><span class="navIcon">🏠</span><span>Beranda</span></div>
+        <div class="navItem" id="navLatihan" data-page="latihan"><span class="navIcon">📝</span><span>Latihan & Tes</span></div>
+        <div class="navItem" id="navMateri" data-page="materi"><span class="navIcon">📚</span><span>Materi</span></div>
+        <div class="navItem" id="navProgres" data-page="progres"><span class="navIcon">📈</span><span>Progres</span></div>
+        <div class="navItem" id="navRiwayat" data-page="riwayat"><span class="navIcon">🕒</span><span>Riwayat</span></div>
+      </nav>
+      <div class="sidebarStreak">
+        <span class="sidebarStreakLabel">Streak</span>
+        <span class="sidebarStreakNum" id="sideStreak">—</span>
+        <span class="sidebarStreakUnit">hari</span>
       </div>
-      <button id="exampleBtn" class="exampleBtn hidden">Contoh Kalimat</button>
-      <button id="practiceExitBtn2" class="practiceExit">Selesai / Kembali</button>
-    </div>
+      <div class="sidebarUser">
+        <div class="sidebarUserName" id="sideUserName">—</div>
+        <div class="sidebarUserMeta" id="sideUserMeta">—</div>
+        <button class="logout" id="logoutBtn">Keluar</button>
+      </div>
+    </aside>
 
-    <div id="emptyView" class="hidden">
-      <p class="emptyState" id="emptyMsg">—</p>
-      <button id="practiceExitBtn3" class="practiceExit">Kembali ke Dashboard</button>
-    </div>
-  </div>
+    <main class="mainContent">
 
-  <!-- ============ RAPORT ============ -->
-  <div id="raportCard" class="card raport hidden">
-    <div class="brand"><span class="star">✦</span><h1>Xing Mandarin <span class="cn">星</span></h1></div>
-    <p class="sub">Raport Belajar</p>
+      <!-- ============ DASHBOARD / BERANDA ============ -->
+      <div id="dashCard" class="pageCard dash hidden">
+        <div class="pageHeader">
+          <p class="hello">Halo, <b id="dName">—</b> 👋</p>
+          <p class="sub" id="dGreet">Siap belajar hari ini?</p>
+        </div>
 
-    <div class="statRow">
-      <div class="statBox"><span class="statNum" id="rDue">—</span><span class="statLabel">Due Hari Ini</span></div>
-      <div class="statBox"><span class="statNum" id="rStreak">—</span><span class="statLabel">Streak (hari)</span></div>
-    </div>
+        <div class="statGrid">
+          <div class="statCard"><span class="statCardNum" id="dashDue">—</span><span class="statCardLabel">Due Hari Ini</span></div>
+          <div class="statCard"><span class="statCardNum" id="dashStreak">—</span><span class="statCardLabel">Streak (hari)</span></div>
+          <div class="statCard"><span class="statCardNum" id="dashMastered">—</span><span class="statCardLabel">Kata Dikuasai</span></div>
+          <div class="statCard"><span class="statCardNum" id="dashMockDone">—</span><span class="statCardLabel">Mock Test Selesai</span></div>
+        </div>
 
-    <p class="sectionTitle">Progres per Level</p>
-    <div id="rLevels"></div>
+        <button id="practiceBtn" class="continueCard" type="button">
+          <div class="continueCardText">
+            <span class="continueCardLabel">Lanjutkan Latihan</span>
+            <span class="continueCardTitle">Flashcard & SRS — HSK <span id="dContinueLevel">1</span></span>
+          </div>
+          <span class="continueCardArrow">→</span>
+        </button>
 
-    <p class="sectionTitle">Kata Terlemah</p>
-    <div id="rWeak"></div>
+        <div class="dailyGoalCard">
+          <div class="dailyGoalHead"><span>Target Harian</span><span id="dashDailyLabel">0 / 20 kata direview hari ini</span></div>
+          <div class="dailyGoalTrack"><div class="dailyGoalFill" id="dashDailyFill"></div></div>
+        </div>
 
-    <p class="sectionTitle">Riwayat Mock Test</p>
-    <div id="rMockHistory"></div>
+        <p class="sectionTitle">Progres per Level</p>
+        <div class="hskGrid" id="hskGrid"></div>
 
-    <button id="raportExitBtn" class="practiceExit">Kembali ke Dashboard</button>
-  </div>
+        <p class="sectionTitle">Aksi Cepat</p>
+        <div class="quickGrid">
+          <button id="mockTestBtn" class="quickTile" type="button"><span class="quickTileIcon">📝</span><span>Mock Test</span></button>
+          <button id="browseBtn" class="quickTile" type="button"><span class="quickTileIcon">📚</span><span>Kamus</span></button>
+          <button id="raportBtn" class="quickTile" type="button"><span class="quickTileIcon">📈</span><span>Raport</span></button>
+        </div>
 
-  <!-- ============ BROWSE / KAMUS ============ -->
-  <div id="browseCard" class="card browse hidden">
-    <div class="brand"><span class="star">✦</span><h1>Xing Mandarin <span class="cn">星</span></h1></div>
-    <p class="sub">Kamus Kosakata</p>
+        <div class="dashRecentHead"><p class="sectionTitle" style="margin-bottom:0">Riwayat Terakhir</p><span class="linkBtn" id="dashSeeAllHistory">Lihat semua →</span></div>
+        <div id="dashRecentHistory"></div>
 
-    <div class="levelPicker" id="browseLevelPicker"></div>
-    <input id="browseSearch" class="browseSearchInput" type="text" placeholder="Cari hanzi, pinyin, atau arti..." />
+        <p class="sectionTitle">Akun</p>
+        <div class="rowline"><span class="k">Track</span><span class="v" id="dTrack">—</span></div>
+        <div class="rowline"><span class="k">Target Level</span><span class="v" id="dLevel">—</span></div>
+        <div class="rowline"><span class="k">Status</span><span class="pill on" id="dStatus">—</span></div>
+        <div class="rowline"><span class="k">Langganan s/d</span><span class="v" id="dSub">—</span></div>
+      </div>
 
-    <div class="browseList" id="browseList"></div>
-    <p class="browseCount" id="browseCount"></p>
-    <button id="browseMoreBtn" class="practiceExit hidden">Muat Lebih Banyak</button>
-    <button id="browseExitBtn" class="practiceExit">Kembali ke Dashboard</button>
-  </div>
+      <!-- ============ PRACTICE (FLASHCARD + SRS) ============ -->
+      <div id="practiceCard" class="pageCard practice hidden">
+        <div id="levelPickerView">
+          <p class="sub">Pilih level HSK buat latihan</p>
+          <div class="levelPicker" id="levelPicker"></div>
+          <button id="practiceExitBtn1" class="practiceExit">Kembali</button>
+        </div>
 
-  <!-- ============ MOCK TEST — LIST SET ============ -->
-  <div id="mockListCard" class="card mocklist hidden">
-    <div class="brand"><span class="star">✦</span><h1>Xing Mandarin <span class="cn">星</span></h1></div>
-    <p class="sub">Mock Test</p>
+        <div id="sessionView" class="hidden">
+          <div class="sessionMeta"><span id="sessionProgress">0 / 0</span><span id="sessionLevelLabel">—</span></div>
+          <div class="cardArea">
+            <div class="hanzi-big" id="cardHanzi">—</div>
+            <div class="pinyin-line hidden" id="cardPinyin"></div>
+            <div class="meaning-line hidden" id="cardMeaning"></div>
+          </div>
+          <button id="revealBtn" class="revealBtn">Lihat Jawaban</button>
+          <div class="gradeRow hidden" id="gradeRow">
+            <button class="gradeBtn again" data-grade="again">Lupa</button>
+            <button class="gradeBtn hard" data-grade="hard">Susah</button>
+            <button class="gradeBtn good" data-grade="good">Oke</button>
+            <button class="gradeBtn easy" data-grade="easy">Gampang</button>
+          </div>
+          <button id="exampleBtn" class="exampleBtn hidden">Contoh Kalimat</button>
+          <button id="practiceExitBtn2" class="practiceExit">Selesai / Kembali</button>
+        </div>
 
-    <div class="levelPicker" id="mockLevelPicker"></div>
-    <div class="levelPicker sectionPicker" id="mockSectionPicker"></div>
-    <div id="mockList"></div>
+        <div id="emptyView" class="hidden">
+          <p class="emptyState" id="emptyMsg">—</p>
+          <button id="practiceExitBtn3" class="practiceExit">Kembali ke Dashboard</button>
+        </div>
+      </div>
 
-    <button id="mockListExitBtn" class="practiceExit">Kembali ke Dashboard</button>
-  </div>
+      <!-- ============ RAPORT / PROGRES ============ -->
+      <div id="raportCard" class="pageCard raport hidden">
+        <p class="sub">Raport Belajar</p>
 
-  <!-- ============ MOCK TEST — NGERJAIN SOAL ============ -->
-  <div id="attemptCard" class="card attempt hidden">
-    <div class="attemptHeader">
-      <div class="attemptTitle" id="attemptTitle">—</div>
-      <div class="attemptTimer" id="attemptTimer">00:00</div>
-    </div>
+        <div class="statRow">
+          <div class="statBox"><span class="statNum" id="rDue">—</span><span class="statLabel">Due Hari Ini</span></div>
+          <div class="statBox"><span class="statNum" id="rStreak">—</span><span class="statLabel">Streak (hari)</span></div>
+        </div>
 
-    <div class="attemptToggles">
-      <label><input type="checkbox" id="togglePinyin" /> Pinyin</label>
-      <label><input type="checkbox" id="toggleTranslation" /> Terjemahan</label>
-    </div>
+        <p class="sectionTitle">Progres per Level</p>
+        <div id="rLevels"></div>
 
-    <div class="attemptProgress" id="attemptProgress">Soal 1 / 1</div>
-    <div class="attemptBody" id="attemptBody"></div>
+        <p class="sectionTitle">Kata Terlemah</p>
+        <div id="rWeak"></div>
 
-    <div class="attemptNav">
-      <button id="attemptPrevBtn" class="navBtn">‹ Sebelumnya</button>
-      <button id="attemptNextBtn" class="navBtn">Berikutnya ›</button>
-    </div>
+        <p class="sectionTitle">Riwayat Mock Test</p>
+        <div id="rMockHistory"></div>
 
-    <div class="questionGrid" id="questionGrid"></div>
-    <div class="attemptFilledCount" id="attemptFilledCount">Terisi 0/0</div>
+        <button id="raportExitBtn" class="practiceExit">Kembali ke Dashboard</button>
+      </div>
 
-    <button id="attemptSubmitBtn">Submit</button>
-    <button id="attemptExitBtn" class="practiceExit">Keluar (batal)</button>
-  </div>
+      <!-- ============ BROWSE / MATERI (KAMUS) ============ -->
+      <div id="browseCard" class="pageCard browse hidden">
+        <p class="sub">Kamus Kosakata</p>
 
-  <!-- ============ MOCK TEST — HASIL & REVIEW ============ -->
-  <div id="resultCard" class="card result hidden">
-    <div class="brand"><span class="star">✦</span><h1>Xing Mandarin <span class="cn">星</span></h1></div>
-    <p class="sub" id="resultSetTitle">Hasil Mock Test</p>
+        <div class="levelPicker" id="browseLevelPicker"></div>
+        <input id="browseSearch" class="browseSearchInput" type="text" placeholder="Cari hanzi, pinyin, atau arti..." />
 
-    <div class="statRow">
-      <div class="statBox"><span class="statNum" id="resScore">—</span><span class="statLabel">Skor</span></div>
-      <div class="statBox"><span class="statNum" id="resCorrect">—</span><span class="statLabel">Benar</span></div>
-      <div class="statBox"><span class="statNum" id="resTime">—</span><span class="statLabel">Waktu</span></div>
-    </div>
+        <div class="browseList" id="browseList"></div>
+        <p class="browseCount" id="browseCount"></p>
+        <button id="browseMoreBtn" class="practiceExit hidden">Muat Lebih Banyak</button>
+        <button id="browseExitBtn" class="practiceExit">Kembali ke Dashboard</button>
+      </div>
 
-    <p class="sectionTitle">Review Jawaban</p>
-    <div id="resultReview"></div>
+      <!-- ============ MOCK TEST — LIST SET (LATIHAN & TES) ============ -->
+      <div id="mockListCard" class="pageCard mocklist hidden">
+        <p class="sub">Mock Test</p>
 
-    <button id="resultCloseBtn" class="practiceExit">Kembali ke Daftar Mock Test</button>
+        <div class="levelPicker" id="mockLevelPicker"></div>
+        <div class="levelPicker sectionPicker" id="mockSectionPicker"></div>
+        <div id="mockList"></div>
+
+        <button id="mockListExitBtn" class="practiceExit">Kembali ke Dashboard</button>
+      </div>
+
+      <!-- ============ MOCK TEST — NGERJAIN SOAL ============ -->
+      <div id="attemptCard" class="pageCard attempt hidden">
+        <div class="attemptHeader">
+          <div class="attemptTitle" id="attemptTitle">—</div>
+          <div class="attemptTimer" id="attemptTimer">00:00</div>
+        </div>
+
+        <div class="attemptToggles">
+          <label><input type="checkbox" id="togglePinyin" /> Pinyin</label>
+          <label><input type="checkbox" id="toggleTranslation" /> Terjemahan</label>
+        </div>
+
+        <div class="attemptProgress" id="attemptProgress">Soal 1 / 1</div>
+        <div class="attemptBody" id="attemptBody"></div>
+
+        <div class="attemptNav">
+          <button id="attemptPrevBtn" class="navBtn">‹ Sebelumnya</button>
+          <button id="attemptNextBtn" class="navBtn">Berikutnya ›</button>
+        </div>
+
+        <div class="questionGrid" id="questionGrid"></div>
+        <div class="attemptFilledCount" id="attemptFilledCount">Terisi 0/0</div>
+
+        <button id="attemptSubmitBtn">Submit</button>
+        <button id="attemptExitBtn" class="practiceExit">Keluar (batal)</button>
+      </div>
+
+      <!-- ============ MOCK TEST — HASIL & REVIEW ============ -->
+      <div id="resultCard" class="pageCard result hidden">
+        <p class="sub" id="resultSetTitle">Hasil Mock Test</p>
+
+        <div class="statRow">
+          <div class="statBox"><span class="statNum" id="resScore">—</span><span class="statLabel">Skor</span></div>
+          <div class="statBox"><span class="statNum" id="resCorrect">—</span><span class="statLabel">Benar</span></div>
+          <div class="statBox"><span class="statNum" id="resTime">—</span><span class="statLabel">Waktu</span></div>
+        </div>
+
+        <p class="sectionTitle">Review Jawaban</p>
+        <div id="resultReview"></div>
+
+        <button id="resultCloseBtn" class="practiceExit">Kembali ke Daftar Mock Test</button>
+      </div>
+
+      <!-- ============ RIWAYAT ============ -->
+      <div id="riwayatCard" class="pageCard hidden">
+        <p class="sub">Riwayat Mock Test</p>
+        <div id="riwayatList"></div>
+      </div>
+
+    </main>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -394,6 +602,9 @@
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6Z3Zoem1tcWJpanBicmhhZ2pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0OTA4NjMsImV4cCI6MjA5OTA2Njg2M30.9OtBJIBDDUhhSsvtz9Pql12hWToGzmULOGh7Tj-vzNs';
 
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  const attemptAudio = new Audio();
+  const resultAudio  = new Audio();
 
   const SESSION_KEY = 'xm_session_id';   // simpen id sesi lokal (buat cocokin device)
   let watchChannel = null;
@@ -408,6 +619,7 @@
   const DUE_LIMIT = 20;
   const NEW_CANDIDATE_LIMIT = 200;
   const NEW_LIMIT = 10;
+  const DAILY_GOAL = 20;
 
   /* ---------- util tampilan ---------- */
   const $ = id => document.getElementById(id);
@@ -438,14 +650,32 @@
     });
   }
 
+  /* ---------- navigasi appShell (Task: reskin) ---------- */
+  function hideAllPages(){
+    ['dashCard','practiceCard','raportCard','browseCard','mockListCard','attemptCard','resultCard','riwayatCard']
+      .forEach(id => $(id).classList.add('hidden'));
+  }
+
+  function setActiveNav(key){
+    document.querySelectorAll('.navItem').forEach(el=>{
+      el.classList.toggle('active', el.dataset.page === key);
+    });
+  }
+
+  function navTo(fn){
+    hideAllPages();
+    fn();
+  }
+
+  function goBerandaContent(){
+    setActiveNav('beranda');
+    $('dashCard').classList.remove('hidden');
+    loadBerandaExtras();
+  }
+
   function showLogin(msg, type){
-    $('dashCard').classList.add('hidden');
-    $('practiceCard').classList.add('hidden');
-    $('raportCard').classList.add('hidden');
-    $('browseCard').classList.add('hidden');
-    $('mockListCard').classList.add('hidden');
-    $('attemptCard').classList.add('hidden');
-    $('resultCard').classList.add('hidden');
+    document.body.classList.remove('app-active');
+    $('appShell').classList.add('hidden');
     $('loginCard').classList.remove('hidden');
     const m = $('loginMsg');
     if(msg){ m.textContent = msg; m.className = 'msg ' + (type||'err'); }
@@ -478,13 +708,23 @@
 
   /* ---------- render dashboard ---------- */
   function renderDash(profile){
+    document.body.classList.add('app-active');
+    $('appShell').classList.remove('hidden');
     $('loginCard').classList.add('hidden');
+    hideAllPages();
     $('dashCard').classList.remove('hidden');
+    setActiveNav('beranda');
+
     $('dName').textContent   = profile.display_name || 'Murid';
     $('dTrack').textContent  = TRACK_LABEL[profile.active_track] || 'Belum diset';
     $('dLevel').textContent  = profile.target_level ? ('HSK ' + profile.target_level) : '—';
     $('dStatus').textContent = profile.role==='admin' ? 'Admin' : 'Aktif';
     $('dSub').textContent    = profile.subscription_end || '—';
+    $('dContinueLevel').textContent = profile.target_level || 1;
+    $('sideUserName').textContent = profile.display_name || 'Murid';
+    $('sideUserMeta').textContent = (TRACK_LABEL[profile.active_track] || 'Belum diset') + ' · HSK ' + (profile.target_level || '-');
+
+    loadBerandaExtras();
   }
 
   /* ---------- dengerin perebutan sesi (realtime) ---------- */
@@ -589,6 +829,7 @@
   function todayStr(){ return new Date().toISOString().slice(0,10); }
 
   function openPractice(){
+    setActiveNav('latihan');
     $('dashCard').classList.add('hidden');
     $('practiceCard').classList.remove('hidden');
     $('levelPickerView').classList.remove('hidden');
@@ -598,8 +839,10 @@
   }
 
   function backToDash(){
+    setActiveNav('beranda');
     $('practiceCard').classList.add('hidden');
     $('dashCard').classList.remove('hidden');
+    loadBerandaExtras();
   }
 
   function renderLevelPicker(){
@@ -624,6 +867,7 @@
   // lihat catatan Task 2 — optimize belakangan kalau ada user yang mentok).
   async function startSession(level){
     practiceLevel = level;
+    $('practiceCard').classList.remove('hidden');
 
     const { data: seenRows, error: seenErr } = await sb
       .from('user_mastery').select('item_key')
@@ -797,6 +1041,7 @@
   const WEAK_LIMIT = 10;
 
   async function openRaport(){
+    setActiveNav('progres');
     $('dashCard').classList.add('hidden');
     $('raportCard').classList.remove('hidden');
     $('rDue').textContent = '…';
@@ -808,6 +1053,7 @@
   }
 
   function closeRaport(){
+    setActiveNav('beranda');
     $('raportCard').classList.add('hidden');
     $('dashCard').classList.remove('hidden');
   }
@@ -898,8 +1144,9 @@
     return streak;
   }
 
-  async function loadMockHistory(){
-    const wrap = $('rMockHistory');
+  async function loadMockHistory(targetId){
+    targetId = targetId || 'rMockHistory';
+    const wrap = $(targetId);
     wrap.innerHTML = '<p class="emptyState">Memuat...</p>';
 
     const { data: history, error } = await sb
@@ -930,7 +1177,117 @@
   }
 
   /* ==========================================================
-     BROWSE / KAMUS (Task 4)
+     BERANDA — stat cards, target harian, grid HSK, riwayat singkat
+     (Task: reskin. Metrik yang dipilih & DAILY_GOAL=20 adalah asumsi
+     produk, belum ada spek resmi — cek ulang pas review.)
+     ========================================================== */
+  async function loadBerandaExtras(){
+    $('dashDue').textContent = '…';
+    $('dashStreak').textContent = '…';
+    $('dashMastered').textContent = '…';
+    $('dashMockDone').textContent = '…';
+    $('hskGrid').innerHTML = '';
+    $('dashRecentHistory').innerHTML = '<p class="emptyState">Memuat...</p>';
+
+    const { data: vocabAll, error: vErr } = await sb.from('vocab').select('hanzi,hsk_level');
+    if(vErr){ console.error('Gagal ambil vocab buat dashboard:', vErr.message); return; }
+    const levelOf = new Map(vocabAll.map(v=>[v.hanzi, v.hsk_level]));
+    const levelTotals = {1:0,2:0,3:0,4:0,5:0,6:0};
+    vocabAll.forEach(v=>{ levelTotals[v.hsk_level] = (levelTotals[v.hsk_level]||0) + 1; });
+
+    const { data: mastery, error: mErr } = await sb
+      .from('user_mastery').select('item_key,mastery_level,srs_due,last_reviewed')
+      .eq('user_id', currentUser).eq('item_type', 'word');
+    if(mErr){ console.error('Gagal ambil mastery buat dashboard:', mErr.message); return; }
+
+    const dueCount = mastery.filter(m => m.srs_due && m.srs_due <= todayStr()).length;
+    $('dashDue').textContent = dueCount;
+
+    const dateSet = new Set(mastery.filter(m=>m.last_reviewed).map(m=>m.last_reviewed.slice(0,10)));
+    const streak = computeStreak(dateSet);
+    $('dashStreak').textContent = streak;
+    $('sideStreak').textContent = streak;
+
+    const seenPerLevel = {1:0,2:0,3:0,4:0,5:0,6:0};
+    let totalMastered = 0;
+    mastery.forEach(m=>{
+      const lv = levelOf.get(m.item_key);
+      if(!lv) return;
+      seenPerLevel[lv] += 1;
+      if(m.mastery_level >= MASTERED_THRESHOLD) totalMastered += 1;
+    });
+    $('dashMastered').textContent = totalMastered;
+
+    const todayCount = mastery.filter(m => m.last_reviewed && m.last_reviewed.slice(0,10) === todayStr()).length;
+    const dailyPct = Math.min(100, Math.round((todayCount / DAILY_GOAL) * 100));
+    $('dashDailyFill').style.width = dailyPct + '%';
+    $('dashDailyLabel').textContent = `${todayCount} / ${DAILY_GOAL} kata direview hari ini`;
+
+    renderHskGrid(levelTotals, seenPerLevel);
+
+    const { data: history, error: hErr } = await sb
+      .from('test_attempts').select('set_id,hsk_level,section,score,total_points,correct_count,total_questions,created_at')
+      .eq('user_id', currentUser)
+      .order('created_at', { ascending:false })
+      .limit(3);
+    if(hErr){ $('dashMockDone').textContent = '—'; $('dashRecentHistory').innerHTML = '<p class="emptyState">Gagal ambil riwayat.</p>'; return; }
+
+    const { count: mockCount } = await sb
+      .from('test_attempts').select('set_id', { count:'exact', head:true })
+      .eq('user_id', currentUser);
+    $('dashMockDone').textContent = mockCount ?? 0;
+
+    if(!history || history.length === 0){
+      $('dashRecentHistory').innerHTML = '<p class="emptyState">Belum ada mock test yang dikerjakan.</p>';
+    } else {
+      const setIds = [...new Set(history.map(h => h.set_id))];
+      const { data: setsInfo } = await sb.from('test_sets').select('set_id,title').in('set_id', setIds);
+      const titleMap = new Map((setsInfo || []).map(s => [s.set_id, s.title]));
+      $('dashRecentHistory').innerHTML = history.map(h=>{
+        const pct = h.total_points ? Math.round((h.score / h.total_points) * 100) : 0;
+        return `<div class="historyItem">
+          <div class="historyTitle">${titleMap.get(h.set_id) || h.set_id}</div>
+          <div class="historyMeta">HSK ${h.hsk_level} · ${SECTION_LABEL[h.section] || h.section} · Skor ${pct}% · ${formatMockDate(h.created_at)}</div>
+        </div>`;
+      }).join('');
+    }
+  }
+
+  function renderHskGrid(levelTotals, seenPerLevel){
+    const wrap = $('hskGrid');
+    wrap.innerHTML = '';
+    for(let lv=1; lv<=6; lv++){
+      const total = levelTotals[lv] || 0;
+      const seen = seenPerLevel[lv] || 0;
+      const pct = total ? Math.round((seen/total)*100) : 0;
+      const card = document.createElement('div');
+      card.className = 'hskCard';
+      card.innerHTML = `
+        <div class="hskRing" style="--pct:${pct}"><span>${pct}%</span></div>
+        <div class="hskCardLabel">HSK ${lv}</div>
+        <div class="hskCardSub">${seen}/${total} kata</div>
+      `;
+      card.addEventListener('click', ()=>{
+        setActiveNav('latihan');
+        hideAllPages();
+        $('practiceCard').classList.remove('hidden');
+        $('levelPickerView').classList.add('hidden');
+        $('sessionView').classList.add('hidden');
+        $('emptyView').classList.add('hidden');
+        startSession(lv);
+      });
+      wrap.appendChild(card);
+    }
+  }
+
+  async function openRiwayat(){
+    setActiveNav('riwayat');
+    $('riwayatCard').classList.remove('hidden');
+    await loadMockHistory('riwayatList');
+  }
+
+  /* ==========================================================
+     BROWSE / MATERI — KAMUS (Task 4)
      ========================================================== */
   let browseLevel = null;
   let browseCache = [];
@@ -944,6 +1301,7 @@
   }
 
   function openBrowse(){
+    setActiveNav('materi');
     $('dashCard').classList.add('hidden');
     $('browseCard').classList.remove('hidden');
     $('browseSearch').value = '';
@@ -951,6 +1309,7 @@
   }
 
   function closeBrowse(){
+    setActiveNav('beranda');
     $('browseCard').classList.add('hidden');
     $('dashCard').classList.remove('hidden');
   }
@@ -1049,6 +1408,7 @@
   }
 
   function openMockList(){
+    setActiveNav('latihan');
     $('dashCard').classList.add('hidden');
     $('mockListCard').classList.remove('hidden');
     renderMockSectionPicker();
@@ -1056,6 +1416,7 @@
   }
 
   function closeMockList(){
+    setActiveNav('beranda');
     $('mockListCard').classList.add('hidden');
     $('dashCard').classList.remove('hidden');
   }
@@ -1194,6 +1555,228 @@
   }
 
   /* ==========================================================
+     LISTENING — audio player + tipe soal listening_tf/listening_mc/image_tf/image_mc
+     (payload.audio_url dari bucket listening-audio, payload.image_url /
+     payload.image_options dari bucket listening-images, dua-duanya public)
+     ========================================================== */
+  function listeningAudioUrl(path){
+    return sb.storage.from('listening-audio').getPublicUrl(path).data.publicUrl;
+  }
+  function listeningImageUrl(path){
+    return sb.storage.from('listening-images').getPublicUrl(path).data.publicUrl;
+  }
+
+  function formatAudioTime(sec){
+    if(!isFinite(sec)) return '0:00';
+    const m = Math.floor(sec/60);
+    const s = Math.floor(sec%60).toString().padStart(2,'0');
+    return `${m}:${s}`;
+  }
+
+  function renderAudioPlayer(path){
+    const url = listeningAudioUrl(path);
+    return `<div class="audioPlayer" data-src="${url}">
+      <button type="button" class="audioPlayBtn" aria-label="Putar audio">▶</button>
+      <div class="audioProgressTrack"><div class="audioProgressFill"></div></div>
+      <span class="audioTime"></span>
+    </div>`;
+  }
+
+  // dipanggil dari delegated click handler attemptBody/resultReview; return true kalau
+  // klik-nya kena elemen audio player (biar caller tau harus berhenti nyari handler lain).
+  function handleAudioPlayerClick(e, audioEl){
+    const playBtn = e.target.closest('.audioPlayBtn');
+    if(playBtn){
+      const player = playBtn.closest('.audioPlayer');
+      const src = player.dataset.src;
+      if(audioEl.dataset.currentSrc !== src){
+        audioEl.src = src;
+        audioEl.dataset.currentSrc = src;
+      }
+      if(audioEl.paused) audioEl.play(); else audioEl.pause();
+      return true;
+    }
+    const track = e.target.closest('.audioProgressTrack');
+    if(track){
+      const player = track.closest('.audioPlayer');
+      if(player.dataset.src === audioEl.dataset.currentSrc && isFinite(audioEl.duration) && audioEl.duration > 0){
+        const rect = track.getBoundingClientRect();
+        const frac = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+        audioEl.currentTime = frac * audioEl.duration;
+      }
+      return true;
+    }
+    return false;
+  }
+
+  function syncAudioPlayers(container, audioEl){
+    container.querySelectorAll('.audioPlayer').forEach(p=>{
+      const active = p.dataset.src === audioEl.dataset.currentSrc;
+      const btn = p.querySelector('.audioPlayBtn');
+      const fill = p.querySelector('.audioProgressFill');
+      const time = p.querySelector('.audioTime');
+      if(!btn) return;
+      btn.textContent = (active && !audioEl.paused) ? '⏸' : '▶';
+      if(active && isFinite(audioEl.duration) && audioEl.duration > 0){
+        fill.style.width = ((audioEl.currentTime / audioEl.duration) * 100) + '%';
+        time.textContent = formatAudioTime(audioEl.currentTime) + ' / ' + formatAudioTime(audioEl.duration);
+      } else {
+        fill.style.width = '0%';
+        time.textContent = '';
+      }
+    });
+  }
+
+  ['play','pause','timeupdate','ended','loadedmetadata'].forEach(ev=>{
+    attemptAudio.addEventListener(ev, ()=> syncAudioPlayers($('attemptBody'), attemptAudio));
+    resultAudio.addEventListener(ev, ()=> syncAudioPlayers($('resultReview'), resultAudio));
+  });
+
+  // NOTE (buat direview): key TF dikonfirmasi boolean asli ({correct:true}/{correct:false}),
+  // sesuai kolom `answer` yang udah ada buat listening_tf/image_tf. Key MC (listening_mc/
+  // image_mc) diasumsikan huruf "A"/"B"/"C" konsisten sama choices di reading_mc/fill_blank/
+  // sentence_match ({"correct":"A"}) — belum diverifikasi langsung ke DB, cek pas review.
+  function renderTFButtons(answer){
+    const val = answer?.correct;
+    const trueActive = val === true ? ' active' : '';
+    const falseActive = val === false ? ' active' : '';
+    return `<div class="tfRow">
+      <button type="button" class="tfBtn${trueActive}" data-value="true">Benar</button>
+      <button type="button" class="tfBtn${falseActive}" data-value="false">Salah</button>
+    </div>`;
+  }
+
+  function renderListeningTF(p, answer){
+    let html = renderAudioPlayer(p.audio_url);
+    if(p.statement){
+      html += `<div class="qStem" style="margin-top:14px">${p.statement}</div>`;
+      if(attemptShowTranslation && p.statement_id) html += `<div class="qStemTrans">${p.statement_id}</div>`;
+    }
+    html += renderTFButtons(answer);
+    return html;
+  }
+
+  function renderImageTF(p, answer){
+    let html = renderAudioPlayer(p.audio_url);
+    html += `<div class="listeningImageWrap"><img class="listeningImage" src="${listeningImageUrl(p.image_url)}" alt="" /></div>`;
+    if(p.statement){
+      html += `<div class="qStem">${p.statement}</div>`;
+      if(attemptShowTranslation && p.statement_id) html += `<div class="qStemTrans">${p.statement_id}</div>`;
+    }
+    html += renderTFButtons(answer);
+    return html;
+  }
+
+  function renderListeningOptions(options, answer){
+    const selectedKey = answer?.correct;
+    const items = Object.entries(options||{}).map(([key,text])=>{
+      const active = key === selectedKey ? ' active' : '';
+      return `<div class="choiceItem${active}" data-key="${key}">
+        <span class="choiceKey">${key}</span>
+        <span class="choiceHanzi">${text ?? ''}</span>
+      </div>`;
+    }).join('');
+    return `<div class="choiceList">${items}</div>`;
+  }
+
+  function renderListeningMC(p, answer){
+    let html = renderAudioPlayer(p.audio_url);
+    if(!p.hide_question && p.question){
+      html += `<div class="qStem" style="margin-top:14px">${p.question}</div>`;
+      if(attemptShowTranslation && p.question_id) html += `<div class="qStemTrans">${p.question_id}</div>`;
+    }
+    html += renderListeningOptions(p.options, answer);
+    return html;
+  }
+
+  function renderImageOptions(options, answer){
+    const selectedKey = answer?.correct;
+    const items = Object.entries(options||{}).map(([key,path])=>{
+      const active = key === selectedKey ? ' active' : '';
+      return `<div class="choiceItem imageChoiceItem${active}" data-key="${key}">
+        <span class="choiceKey">${key}</span>
+        <img class="imageChoiceImg" src="${listeningImageUrl(path)}" alt="Pilihan ${key}" />
+      </div>`;
+    }).join('');
+    return `<div class="choiceList imageChoiceList">${items}</div>`;
+  }
+
+  function renderImageMC(p, answer){
+    let html = renderAudioPlayer(p.audio_url);
+    if(!p.hide_question && p.question){
+      html += `<div class="qStem" style="margin-top:14px">${p.question}</div>`;
+    }
+    html += renderImageOptions(p.image_options, answer);
+    return html;
+  }
+
+  function buildReviewTF(p, userAns, correctAns, isImage){
+    let html = renderAudioPlayer(p.audio_url);
+    if(isImage && p.image_url){
+      html += `<div class="listeningImageWrap"><img class="listeningImage" src="${listeningImageUrl(p.image_url)}" alt="" /></div>`;
+    }
+    if(p.statement){
+      html += `<div class="reviewStem">${p.statement}</div>`;
+      if(p.statement_id) html += `<div class="reviewStemTrans">${p.statement_id}</div>`;
+    }
+    const userVal = typeof userAns?.correct === 'boolean' ? (userAns.correct ? 'Benar' : 'Salah') : '(belum dijawab)';
+    const correctVal = typeof correctAns?.correct === 'boolean' ? (correctAns.correct ? 'Benar' : 'Salah') : '-';
+    html += `<div class="reviewOrderRow"><span class="reviewOrderLabel">Jawaban kamu</span>${userVal}</div>`;
+    if(userAns?.correct !== correctAns?.correct){
+      html += `<div class="reviewOrderRow"><span class="reviewOrderLabel">Jawaban benar</span>${correctVal}</div>`;
+    }
+    return html;
+  }
+
+  function buildReviewOptionChoices(options, userAns, correctAns){
+    const userKey = userAns?.correct;
+    const correctKey = correctAns?.correct;
+    const items = Object.entries(options||{}).map(([key,text])=>{
+      let cls = '';
+      if(key === correctKey) cls += ' isCorrect';
+      if(key === userKey && userKey !== correctKey) cls += ' isWrongPick';
+      const mark = key === userKey ? 'jawaban kamu' : (key === correctKey ? 'jawaban benar' : '');
+      return `<div class="reviewChoice${cls}">
+        <span class="reviewChoiceKey">${key}</span>
+        <span class="choiceHanzi">${text ?? ''}</span>
+        <span class="reviewMark">${mark}</span>
+      </div>`;
+    }).join('');
+    return `<div class="reviewChoiceList">${items}</div>`;
+  }
+
+  function buildReviewImageChoices(options, userAns, correctAns){
+    const userKey = userAns?.correct;
+    const correctKey = correctAns?.correct;
+    const items = Object.entries(options||{}).map(([key,path])=>{
+      let cls = '';
+      if(key === correctKey) cls += ' isCorrect';
+      if(key === userKey && userKey !== correctKey) cls += ' isWrongPick';
+      const mark = key === userKey ? 'jawaban kamu' : (key === correctKey ? 'jawaban benar' : '');
+      return `<div class="reviewChoice imageReviewChoice${cls}">
+        <span class="reviewChoiceKey">${key}</span>
+        <img class="imageChoiceImg" src="${listeningImageUrl(path)}" alt="Pilihan ${key}" />
+        <span class="reviewMark">${mark}</span>
+      </div>`;
+    }).join('');
+    return `<div class="reviewChoiceList imageChoiceList">${items}</div>`;
+  }
+
+  function buildReviewListeningMC(p, userAns, correctAns){
+    let html = renderAudioPlayer(p.audio_url);
+    if(!p.hide_question && p.question) html += `<div class="reviewStem">${p.question}</div>`;
+    html += buildReviewOptionChoices(p.options, userAns, correctAns);
+    return html;
+  }
+
+  function buildReviewImageMC(p, userAns, correctAns){
+    let html = renderAudioPlayer(p.audio_url);
+    if(!p.hide_question && p.question) html += `<div class="reviewStem">${p.question}</div>`;
+    html += buildReviewImageChoices(p.image_options, userAns, correctAns);
+    return html;
+  }
+
+  /* ==========================================================
      MOCK TEST — NGERJAIN SOAL (Task 3)
      ========================================================== */
   let attemptSet = null;
@@ -1232,7 +1815,7 @@
     $('togglePinyin').checked = false;
     $('toggleTranslation').checked = false;
 
-    $('mockListCard').classList.add('hidden');
+    hideAllPages();
     $('attemptCard').classList.remove('hidden');
     $('attemptTitle').textContent = setRow.title;
 
@@ -1296,7 +1879,7 @@
     $('togglePinyin').checked = false;
     $('toggleTranslation').checked = false;
 
-    $('mockListCard').classList.add('hidden');
+    hideAllPages();
     $('attemptCard').classList.remove('hidden');
     $('attemptTitle').textContent = code;
 
@@ -1333,10 +1916,14 @@
     if(q.question_type === 'ordering') return Array.isArray(a.order) && a.order.length === q.payload.segments.length;
     if(q.question_type === 'essay') return !!(a.essay_text && a.essay_text.trim().length > 0);
     if(q.question_type === 'char_input') return !!(a.correct && a.correct.trim().length > 0);
+    if(q.question_type === 'listening_tf' || q.question_type === 'image_tf') return typeof a.correct === 'boolean';
     return !!a.correct;
   }
 
   function renderAttemptQuestion(){
+    attemptAudio.pause();
+    delete attemptAudio.dataset.currentSrc;
+
     const q = attemptQuestions[attemptIndex];
     const p = q.payload;
     const answer = attemptAnswers[q.id];
@@ -1380,6 +1967,14 @@
       html += renderCharInputQuestion(p, q, answer);
     } else if(q.question_type === 'essay'){
       html += renderEssayQuestion(p, q, answer);
+    } else if(q.question_type === 'listening_tf'){
+      html += renderListeningTF(p, answer);
+    } else if(q.question_type === 'listening_mc'){
+      html += renderListeningMC(p, answer);
+    } else if(q.question_type === 'image_tf'){
+      html += renderImageTF(p, answer);
+    } else if(q.question_type === 'image_mc'){
+      html += renderImageMC(p, answer);
     }
 
     $('attemptBody').innerHTML = html;
@@ -1662,6 +2257,8 @@
 
   function closeAttempt(){
     stopAttemptTimer();
+    attemptAudio.pause();
+    setActiveNav('latihan');
     $('attemptCard').classList.add('hidden');
     $('mockListCard').classList.remove('hidden');
     if(mockLevel) loadMockList(mockLevel);
@@ -1680,7 +2277,7 @@
   }
 
   function showResult(result, timeTakenSec){
-    $('attemptCard').classList.add('hidden');
+    hideAllPages();
     $('resultCard').classList.remove('hidden');
     $('resultSetTitle').textContent = attemptSet.title;
 
@@ -1704,12 +2301,16 @@
   }
 
   function closeResult(){
+    setActiveNav('latihan');
     $('resultCard').classList.add('hidden');
     $('mockListCard').classList.remove('hidden');
     if(mockLevel) loadMockList(mockLevel);
   }
 
   function renderReview(reviewArr){
+    resultAudio.pause();
+    delete resultAudio.dataset.currentSrc;
+
     const qMap = new Map(attemptQuestions.map(q => [q.id, q]));
     const wrap = $('resultReview');
     wrap.innerHTML = '';
@@ -1761,6 +2362,14 @@
       html += buildReviewOrdering(p.segments, item.user_answer, item.correct_answer);
     } else if(q.question_type === 'char_input'){
       html += buildReviewCharInput(p, item.user_answer, item.correct_answer);
+    } else if(q.question_type === 'listening_tf'){
+      html += buildReviewTF(p, item.user_answer, item.correct_answer, false);
+    } else if(q.question_type === 'image_tf'){
+      html += buildReviewTF(p, item.user_answer, item.correct_answer, true);
+    } else if(q.question_type === 'listening_mc'){
+      html += buildReviewListeningMC(p, item.user_answer, item.correct_answer);
+    } else if(q.question_type === 'image_mc'){
+      html += buildReviewImageMC(p, item.user_answer, item.correct_answer);
     }
 
     html += `<div class="reviewExplain"><span class="reviewExplainLabel">Penjelasan</span>${item.explanation || '-'}</div>`;
@@ -1877,6 +2486,13 @@
   $('attemptBody').addEventListener('click', e=>{
     const q = attemptQuestions[attemptIndex];
     if(!q) return;
+    if(handleAudioPlayerClick(e, attemptAudio)) return;
+    const tfEl = e.target.closest('.tfBtn');
+    if(tfEl){
+      attemptAnswers[q.id] = { correct: tfEl.dataset.value === 'true' };
+      renderAttemptQuestion();
+      return;
+    }
     const choiceEl = e.target.closest('.choiceItem');
     if(choiceEl){
       attemptAnswers[q.id] = { correct: choiceEl.dataset.key };
@@ -1924,6 +2540,14 @@
       renderQuestionGrid();
     }
   });
+  $('resultReview').addEventListener('click', e=>{ handleAudioPlayerClick(e, resultAudio); });
+
+  $('navBeranda').addEventListener('click', ()=> navTo(goBerandaContent));
+  $('navLatihan').addEventListener('click', ()=> navTo(openMockList));
+  $('navMateri').addEventListener('click', ()=> navTo(openBrowse));
+  $('navProgres').addEventListener('click', ()=> navTo(openRaport));
+  $('navRiwayat').addEventListener('click', ()=> navTo(openRiwayat));
+  $('dashSeeAllHistory').addEventListener('click', ()=> navTo(openRiwayat));
 
   boot();
   </script>

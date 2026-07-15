@@ -20,8 +20,9 @@
       --hanzi-font:'Noto Sans SC',"Microsoft YaHei","PingFang SC",-apple-system,sans-serif;
     }
     *{box-sizing:border-box}
+    html{ overflow-x:hidden; }
     body{
-      margin:0; min-height:100vh; background:var(--bg);
+      margin:0; min-height:100vh; background:var(--bg); overflow-x:hidden;
       color:var(--text); font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
     }
     body.lang-zh .sidebar, body.lang-zh .pageHeader, body.lang-zh .sub, body.lang-zh .mockSetCard{ font-family:var(--hanzi-font); }
@@ -124,23 +125,6 @@
       .loginLangSwitch{ top:14px; right:14px; }
     }
 
-    /* ============ onboarding modal ============ */
-    .modalOverlay{
-      position:fixed; inset:0; background:rgba(28,42,94,.55);
-      display:flex; align-items:center; justify-content:center; z-index:1000; padding:20px;
-    }
-    .modalCard{
-      background:var(--panel); border-radius:22px; padding:36px; width:100%; max-width:400px;
-      box-shadow:var(--shadow-lg); text-align:left;
-    }
-    .modalTitle{ font-size:22px; font-weight:800; color:var(--text); margin:0 0 8px; }
-    .modalSub{ font-size:14px; color:var(--muted); margin:0 0 22px; }
-    .modalInput{
-      width:100%; padding:14px 16px; background:var(--panel-2); color:var(--text);
-      border:1.5px solid var(--line); border-radius:13px; font-size:15px; outline:none; font-family:inherit;
-      transition:border-color .15s ease, box-shadow .15s ease; margin-bottom:0;
-    }
-    .modalInput:focus{ border-color:var(--gold); box-shadow:0 0 0 4px rgba(242,176,30,.14); }
 
     /* ============ app shell (sidebar + main) ============ */
     #appShell{ display:flex; min-height:100vh; align-items:stretch; }
@@ -184,7 +168,7 @@
       border-radius:8px; color:var(--muted); font-weight:700; cursor:pointer; font-size:11px;
     }
     .langBtn.active{ background:linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#241a08; border-color:transparent; }
-    .mainContent{ flex:1; min-width:0; padding:32px 40px; }
+    .mainContent{ flex:1; min-width:0; padding:32px 40px; overflow-x:hidden; }
 
     .pageCard{
       background:var(--panel); border:1px solid var(--line); border-radius:var(--radius-lg);
@@ -195,7 +179,14 @@
     .dash{ max-width:1200px }
     .dash .hello{font-size:24px; margin:2px 0 2px}
     .dash .hello b{color:var(--navy)}
-    .pageHeader{ margin-bottom:6px }
+    .pageHeader{ margin-bottom:6px; display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+    .pageHeaderText{ min-width:0; }
+    .packageBadge{
+      flex-shrink:0; margin-top:4px; padding:5px 12px; border-radius:100px;
+      font-size:12px; font-weight:700; white-space:nowrap;
+      background:var(--gold-soft); color:var(--navy);
+    }
+    .packageBadge.vip{ background:linear-gradient(135deg,var(--navy),#2a3a75); color:var(--gold); }
     .rowline{display:flex; justify-content:space-between; padding:14px 0; border-bottom:1px solid var(--line); font-size:14px}
     .rowline:last-child{border-bottom:none}
     .rowline .k{color:var(--muted)}
@@ -205,7 +196,7 @@
     .logout{margin-top:0; background:transparent; border:1px solid var(--line); color:var(--muted); font-weight:600}
     .foot{margin-top:22px; text-align:center; color:var(--muted); font-size:11px}
 
-    .statGrid{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin:18px 0 20px; }
+    .statGrid{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin:18px 0 20px; }
     .statCard{ background:var(--panel-2); border:1px solid var(--line); border-radius:16px; padding:16px; text-align:center; }
     .statCardNum{ display:block; font-size:24px; font-weight:800; color:var(--navy); }
     .statCardLabel{ display:block; font-size:11px; color:var(--muted); margin-top:4px; font-weight:600; }
@@ -224,7 +215,8 @@
     .continueCardArrow{ font-size:22px; color:var(--gold); flex-shrink:0; }
 
     .dailyGoalCard{ margin-top:20px; background:var(--panel-2); border:1px solid var(--line); border-radius:16px; padding:16px 18px; }
-    .dailyGoalHead{ display:flex; justify-content:space-between; font-size:12px; color:var(--muted); font-weight:600; margin-bottom:10px; }
+    .dailyGoalHead{ display:flex; justify-content:space-between; gap:8px; font-size:12px; color:var(--muted); font-weight:600; margin-bottom:10px; }
+    .dailyGoalHead > span{ min-width:0; }
     .dailyGoalTrack{ height:8px; background:var(--line); border-radius:99px; overflow:hidden; }
     .dailyGoalFill{ height:100%; width:0%; background:linear-gradient(90deg,var(--gold-soft),var(--gold)); border-radius:99px; transition:width .3s ease; }
 
@@ -236,7 +228,7 @@
     .hskCardLabel{ font-size:13px; font-weight:700; color:var(--text); }
     .hskCardSub{ font-size:11px; color:var(--muted); margin-top:2px; }
 
-    .quickGrid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:4px; }
+    .quickGrid{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:4px; }
     .quickTile{
       padding:16px 8px; background:var(--panel-2); border:1px solid var(--line); border-radius:16px;
       color:var(--text); font-weight:700; font-size:13px; cursor:pointer;
@@ -336,6 +328,7 @@
     .qPassageTrans{font-size:13px; color:var(--muted); margin-top:8px; font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
     .qStem{font-size:16px; line-height:1.75; margin-bottom:6px; font-family:var(--hanzi-font); white-space:pre-line}
     .qStemTrans{font-size:13px; color:var(--muted); margin-bottom:14px}
+    ruby rt{ font-size:0.55em; color:var(--gold); font-weight:600; user-select:none; }
     .choiceList{display:flex; flex-direction:column; gap:8px; margin-top:10px}
     .choiceItem{display:flex; align-items:baseline; flex-wrap:wrap; gap:8px; padding:12px 14px; background:var(--panel); border:1px solid var(--line); border-radius:12px; cursor:pointer; font-size:14px}
     .choiceItem.active{border-color:var(--gold); background:rgba(242,176,30,.10)}
@@ -349,7 +342,6 @@
     .segmentBadge{width:24px; height:24px; border-radius:50%; background:var(--panel-2); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; color:var(--muted)}
     .segmentItem.picked .segmentBadge{background:linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#241a08; border-color:transparent}
     .segmentHanzi{font-family:var(--hanzi-font); font-size:15px}
-    .segmentPinyin{color:var(--gold); font-size:12px}
     .segmentTrans{color:var(--muted); font-size:12px; margin-left:auto; text-align:right}
     .attemptNav{display:flex; gap:8px; margin-top:16px}
     .navBtn{margin-top:0; flex:1; background:var(--panel-2); border:1px solid var(--line); color:var(--text); font-weight:600}
@@ -569,8 +561,12 @@
       <!-- ============ DASHBOARD / BERANDA ============ -->
       <div id="dashCard" class="pageCard dash hidden">
         <div class="pageHeader">
-          <p class="hello"><span id="dHello">Halo</span>, <b id="dName">—</b> 👋</p>
-          <p class="sub" id="dGreet">Siap belajar hari ini?</p>
+          <div class="pageHeaderText">
+            <p class="hello" id="dGreetingNamed"><span id="dHello">Halo</span>, <b id="dName">—</b> 👋</p>
+            <p class="hello hidden" id="dGreetingFallback"><span id="dHelloThere">Hai</span> 👋</p>
+            <p class="sub" id="dGreet">Siap belajar hari ini?</p>
+          </div>
+          <span class="packageBadge" id="packageBadge">HSK 1&ndash;4</span>
         </div>
 
         <div class="statGrid">
@@ -743,17 +739,8 @@
     </main>
   </div>
 
-  <!-- ============ ONBOARDING MODAL (nama user) ============ -->
-  <div id="onboardingModal" class="modalOverlay hidden">
-    <div class="modalCard">
-      <h2 class="modalTitle" id="onboardingTitle">What should we call you?</h2>
-      <p class="modalSub" id="onboardingSub">This is how we will greet you.</p>
-      <input id="onboardingNameInput" class="modalInput" type="text" maxlength="40" placeholder="" autocomplete="off" />
-      <button id="onboardingContinueBtn" disabled>Continue</button>
-    </div>
-  </div>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.28.1/dist/index.js"></script>
   <script>
   /* ==========================================================
      KONFIG — dua nilai ini aman ditaruh di client (public-safe)
@@ -800,6 +787,34 @@
   let watchChannel = null;
   let heartbeat = null;
   let currentUser = null, currentProfile = null;
+
+  // Pembatasan akses berdasarkan paket murid (profiles.package). Level yang nggak
+  // masuk paket disembunyikan sepenuhnya (bukan dikunci) dari tab HSK, dashboard,
+  // dan flashcard. Paket tanpa level (business/convo) belum ada konten levelnya.
+  const PACKAGE_LEVELS = {
+    hsk_1_4: [1,2,3,4],
+    hsk_5:   [5],
+    hsk_6:   [6],
+    business: [],
+    convo:    [],
+    vip:      [1,2,3,4,5,6]
+  };
+  let userPackageLevels = PACKAGE_LEVELS.hsk_1_4;
+
+  function isLevelAllowed(lv){
+    return userPackageLevels.includes(lv);
+  }
+
+  // Label badge paket di dashboard -- TETAP, nggak ikut language switcher.
+  const PACKAGE_BADGE_LABEL = {
+    hsk_1_4: 'HSK 1–4',
+    hsk_5: 'HSK 5',
+    hsk_6: 'HSK 6',
+    business: 'Business',
+    convo: 'Conversation',
+    vip: 'VIP'
+  };
+
   let practiceLevel = null;
   let sessionQueue = [];
   let sessionIndex = 0;
@@ -824,7 +839,7 @@
           welcomeBack:'Selamat datang', loginSub:'Masuk untuk lanjut belajar.', emailLabel:'Email', passwordLabel:'Password',
           rememberMe:'Ingat saya', forgotPassword:'Lupa password?', signIn:'Masuk',
           noAccount:'Belum punya akun?', contactAdmin:'Hubungi admin', toRegister:'untuk daftar.',
-          hi:'Halo', readyToday:'Siap belajar hari ini?', dueToday:'Due Hari Ini', streakDaysLabel:'Streak (hari)',
+          hi:'Halo', hiThere:'Hai', readyToday:'Siap belajar hari ini?', dueToday:'Due Hari Ini', streakDaysLabel:'Streak (hari)',
           wordsMastered:'Kata Dikuasai', mockTestsDone:'Mock Test Selesai', continuePractice:'Lanjutkan Latihan',
           dailyGoal:'Target Harian', progressByLevel:'Progres per Level', quickActions:'Aksi Cepat',
           recentHistory:'Riwayat Terakhir', seeAll:'Lihat semua', dictionary:'Kamus', report:'Raport',
@@ -842,8 +857,8 @@
           exampleSentence:'Contoh Kalimat', doneBack:'Selesai / Kembali',
           emptyNoDue:'Belum ada kartu due-review, dan semua kata populer di HSK {level} udah pernah kamu lihat. Coba lagi nanti atau pilih level lain.',
           sessionComplete:'Sesi selesai! {correct} / {total} kartu terjawab benar.',
-          onboardingTitle:'Siapa nama kamu?', onboardingSub:'Ini nama yang akan kami pakai.', onboardingContinue:'Lanjut',
           backToDashboard:'Kembali ke Dashboard', weakestWords:'Kata Terlemah', mockTestHistory:'Riwayat Mock Test',
+          comingSoon:'Konten segera hadir',
           raportHeader:'Raport Belajar', vocabDictionary:'Kamus Kosakata',
           searchPlaceholder:'Cari hanzi, pinyin, atau arti...', loadMore:'Muat Lebih Banyak',
           pinyinLabel:'Pinyin', translationLabel:'Terjemahan',
@@ -857,7 +872,7 @@
           welcomeBack:'Welcome back', loginSub:'Sign in to continue learning.', emailLabel:'Email', passwordLabel:'Password',
           rememberMe:'Remember me', forgotPassword:'Forgot password?', signIn:'Sign in',
           noAccount:'No account yet?', contactAdmin:'Contact admin', toRegister:'to register.',
-          hi:'Hi', readyToday:'Ready to study today?', dueToday:'Due Today', streakDaysLabel:'Streak (days)',
+          hi:'Hi', hiThere:'Hi there', readyToday:'Ready to study today?', dueToday:'Due Today', streakDaysLabel:'Streak (days)',
           wordsMastered:'Words Mastered', mockTestsDone:'Mock Tests Done', continuePractice:'Continue Practice',
           dailyGoal:'Daily Goal', progressByLevel:'Progress by Level', quickActions:'Quick Actions',
           recentHistory:'Recent History', seeAll:'See all', dictionary:'Dictionary', report:'Report',
@@ -875,8 +890,8 @@
           exampleSentence:'Example Sentence', doneBack:'Done / Back',
           emptyNoDue:'No cards due for review, and you have already seen all the popular words for HSK {level}. Try again later or pick another level.',
           sessionComplete:'Session complete! {correct} / {total} cards answered correctly.',
-          onboardingTitle:'What should we call you?', onboardingSub:'This is how we will greet you.', onboardingContinue:'Continue',
           backToDashboard:'Back to Dashboard', weakestWords:'Weakest Words', mockTestHistory:'Mock Test History',
+          comingSoon:'Content coming soon',
           raportHeader:'Learning Report', vocabDictionary:'Vocabulary Dictionary',
           searchPlaceholder:'Search hanzi, pinyin, or meaning...', loadMore:'Load More',
           pinyinLabel:'Pinyin', translationLabel:'Translation',
@@ -890,7 +905,7 @@
           welcomeBack:'欢迎回来', loginSub:'登录以继续学习', emailLabel:'邮箱', passwordLabel:'密码',
           rememberMe:'记住我', forgotPassword:'忘记密码？', signIn:'登录',
           noAccount:'还没有账号？', contactAdmin:'联系管理员', toRegister:'注册',
-          hi:'你好', readyToday:'今天准备好了吗？', dueToday:'今日待复习', streakDaysLabel:'连续天数',
+          hi:'你好', hiThere:'你好', readyToday:'今天准备好了吗？', dueToday:'今日待复习', streakDaysLabel:'连续天数',
           wordsMastered:'已掌握词汇', mockTestsDone:'已完成模拟', continuePractice:'继续练习',
           dailyGoal:'每日目标', progressByLevel:'各级进度', quickActions:'快捷操作',
           recentHistory:'最近记录', seeAll:'查看全部', dictionary:'词典', report:'成绩单',
@@ -908,8 +923,8 @@
           exampleSentence:'例句', doneBack:'完成 / 返回',
           emptyNoDue:'暂无待复习卡片，HSK {level} 常用词你都学过了。请稍后再试或选择其他等级',
           sessionComplete:'本次学习完成！{correct} / {total} 张卡片回答正确',
-          onboardingTitle:'怎么称呼你？', onboardingSub:'我们将这样称呼你', onboardingContinue:'继续',
           backToDashboard:'返回主页', weakestWords:'最薄弱词汇', mockTestHistory:'模拟考试记录',
+          comingSoon:'内容即将上线',
           raportHeader:'学习报告', vocabDictionary:'词汇词典',
           searchPlaceholder:'搜索汉字、拼音或释义...', loadMore:'加载更多',
           pinyinLabel:'拼音', translationLabel:'翻译',
@@ -947,6 +962,7 @@
     $('passwordToggle').setAttribute('aria-label', $('password').type === 'text' ? t('hidePassword') : t('showPassword'));
 
     $('dHello').textContent = t('hi');
+    $('dHelloThere').textContent = t('hiThere');
     $('dGreet').textContent = t('readyToday');
     $('statLabelDue').textContent = t('dueToday');
     $('statLabelStreak').textContent = t('streakDaysLabel');
@@ -972,10 +988,6 @@
     $('exampleBtn').textContent = t('exampleSentence');
     $('practiceExitBtn2').textContent = t('doneBack');
     $('practiceExitBtn3').textContent = t('backToDashboard');
-
-    $('onboardingTitle').textContent = t('onboardingTitle');
-    $('onboardingSub').textContent = t('onboardingSub');
-    $('onboardingContinueBtn').textContent = t('onboardingContinue');
 
     $('raportHeader').textContent = t('raportHeader');
     $('raportLabelDue').textContent = t('dueToday');
@@ -1031,6 +1043,42 @@
     return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
 
+  const HANZI_RANGE = /[一-鿿]/;
+
+  // Toggle Pinyin: passage/question/stem/statement/prompt nggak punya field pinyin di DB
+  // (nambahin ke ribuan soal manual terlalu rawan salah) -- jadi digenerate client-side pakai
+  // pinyin-pro. Library-nya udah context-aware buat 多音字 (mis. 银行 -> háng, bukan xíng) lewat
+  // segmentasi kata built-in, cukup panggil type:'array' biar hasilnya align 1:1 sama karakter.
+  function hanziPinyinHtml(text){
+    if(!text) return '';
+    if(!attemptShowPinyin || typeof pinyinPro === 'undefined'){
+      return escapeHtml(text);
+    }
+    const chars = [...text];
+    let pinyinArr;
+    try {
+      pinyinArr = pinyinPro.pinyin(text, { type:'array', toneType:'symbol' });
+    } catch(e){
+      return escapeHtml(text);
+    }
+    return chars.map((ch, i) => {
+      if(HANZI_RANGE.test(ch)){
+        const py = pinyinArr[i] || '';
+        return `<ruby>${escapeHtml(ch)}<rt>${escapeHtml(py)}</rt></ruby>`;
+      }
+      return escapeHtml(ch);
+    }).join('');
+  }
+
+  // Choices/segments DB kadang udah punya field pinyin sendiri (lebih akurat, ditulis manual) --
+  // pakai itu duluan kalau ada, baru generate pakai pinyin-pro sebagai fallback.
+  function pinyinStringFallback(text, dbPinyin){
+    if(dbPinyin) return dbPinyin;
+    if(!text || typeof pinyinPro === 'undefined') return '';
+    try { return pinyinPro.pinyin(text, { toneType:'symbol' }); }
+    catch(e){ return ''; }
+  }
+
   // crypto.randomUUID() cuma ada di secure context (HTTPS/localhost) — fallback berjenjang
   // biar tetap jalan di http biasa / file:// (mis. testing lokal tanpa https).
   function genUUID(){
@@ -1077,7 +1125,6 @@
   function showLogin(msg, type){
     document.body.classList.remove('app-active');
     $('appShell').classList.add('hidden');
-    $('onboardingModal').classList.add('hidden');
     $('loginCard').classList.remove('hidden');
     const m = $('loginMsg');
     if(msg){ m.textContent = msg; m.className = 'msg ' + (type||'err'); }
@@ -1119,7 +1166,16 @@
     currentPageRenderer = goBerandaContent;
     applyStaticI18n();
 
-    $('dName').textContent   = profile.display_name || 'Murid';
+    userPackageLevels = PACKAGE_LEVELS[profile.package] || PACKAGE_LEVELS.hsk_1_4;
+
+    const pkg = PACKAGE_BADGE_LABEL[profile.package] ? profile.package : 'hsk_1_4';
+    $('packageBadge').textContent = PACKAGE_BADGE_LABEL[pkg];
+    $('packageBadge').classList.toggle('vip', pkg === 'vip');
+
+    const hasName = profile.display_name && profile.display_name.trim();
+    $('dGreetingNamed').classList.toggle('hidden', !hasName);
+    $('dGreetingFallback').classList.toggle('hidden', !!hasName);
+    if(hasName) $('dName').textContent = profile.display_name;
     $('dTrack').textContent  = TRACK_LABEL[profile.active_track] || 'Belum diset';
     $('dLevel').textContent  = profile.target_level ? ('HSK ' + profile.target_level) : '—';
     $('dStatus').textContent = profile.role==='admin' ? 'Admin' : 'Aktif';
@@ -1168,10 +1224,6 @@
 
     currentUser = userId; currentProfile = profile;
     renderDash(profile);
-
-    const nameNeeded = !profile.display_name || !profile.display_name.trim() || profile.display_name === 'Murid';
-    if(nameNeeded) showOnboarding();
-
     watchSession(userId);
 
     // heartbeat: perbarui last_seen tiap 2 menit
@@ -1180,29 +1232,6 @@
       const sid = localStorage.getItem(SESSION_KEY);
       if(sid) sb.rpc('claim_session', { p_session_id: sid, p_device_label: deviceLabel() });
     }, 120000);
-  }
-
-  /* ---------- onboarding: minta nama murid pas display_name masih kosong/default ---------- */
-  function showOnboarding(){
-    $('onboardingNameInput').value = '';
-    $('onboardingContinueBtn').disabled = true;
-    $('onboardingModal').classList.remove('hidden');
-    $('onboardingNameInput').focus();
-  }
-
-  async function submitOnboardingName(){
-    const name = $('onboardingNameInput').value.trim();
-    if(!name) return;
-    $('onboardingContinueBtn').disabled = true;
-    const { error } = await sb.from('profiles').update({ display_name: name }).eq('id', currentUser);
-    if(error){
-      $('onboardingContinueBtn').disabled = false;
-      alert('Gagal menyimpan nama: ' + error.message);
-      return;
-    }
-    currentProfile.display_name = name;
-    $('onboardingModal').classList.add('hidden');
-    renderDash(currentProfile);
   }
 
   /* ---------- alur LOGIN ---------- */
@@ -1278,10 +1307,15 @@
   }
 
   function renderLevelPicker(){
-    const defaultLevel = currentProfile?.target_level || 1;
     const wrap = $('levelPicker');
     wrap.innerHTML = '';
-    for(let lv=1; lv<=6; lv++){
+    if(userPackageLevels.length === 0){
+      wrap.innerHTML = `<p class="emptyState">${t('comingSoon')}</p>`;
+      return;
+    }
+    const defaultLevel = (currentProfile?.target_level && isLevelAllowed(currentProfile.target_level))
+      ? currentProfile.target_level : userPackageLevels[0];
+    userPackageLevels.forEach(lv=>{
       const b = document.createElement('div');
       b.className = 'levelBtn' + (lv===defaultLevel ? ' active' : '');
       b.textContent = 'HSK ' + lv;
@@ -1291,7 +1325,7 @@
         startSession(lv);
       });
       wrap.appendChild(b);
-    }
+    });
   }
 
   // Due-review ditarik LINTAS SEMUA LEVEL (time-critical, bukan level-critical).
@@ -1520,17 +1554,21 @@
 
     const levelsWrap = $('rLevels');
     levelsWrap.innerHTML = '';
-    for(let lv=1; lv<=6; lv++){
-      const total = levelTotals[lv] || 0;
-      const seen = seenPerLevel[lv] || 0;
-      const mastered = masteredPerLevel[lv] || 0;
-      const pct = total ? Math.round((seen/total)*100) : 0;
-      const row = document.createElement('div');
-      row.className = 'levelRow';
-      row.innerHTML = `<span class="levelName">HSK ${lv}</span>
-        <div class="levelBar"><div class="levelBarFill" style="width:${pct}%"></div></div>
-        <span class="levelNums">${seen} dilihat · ${mastered} dikuasai / ${total}</span>`;
-      levelsWrap.appendChild(row);
+    if(userPackageLevels.length === 0){
+      levelsWrap.innerHTML = `<p class="emptyState">${t('comingSoon')}</p>`;
+    } else {
+      userPackageLevels.forEach(lv=>{
+        const total = levelTotals[lv] || 0;
+        const seen = seenPerLevel[lv] || 0;
+        const mastered = masteredPerLevel[lv] || 0;
+        const pct = total ? Math.round((seen/total)*100) : 0;
+        const row = document.createElement('div');
+        row.className = 'levelRow';
+        row.innerHTML = `<span class="levelName">HSK ${lv}</span>
+          <div class="levelBar"><div class="levelBarFill" style="width:${pct}%"></div></div>
+          <span class="levelNums">${seen} dilihat · ${mastered} dikuasai / ${total}</span>`;
+        levelsWrap.appendChild(row);
+      });
     }
 
     const weakSorted = mastery
@@ -1689,7 +1727,11 @@
   function renderHskGrid(levelTotals, seenPerLevel){
     const wrap = $('hskGrid');
     wrap.innerHTML = '';
-    for(let lv=1; lv<=6; lv++){
+    if(userPackageLevels.length === 0){
+      wrap.innerHTML = `<p class="emptyState">${t('comingSoon')}</p>`;
+      return;
+    }
+    userPackageLevels.forEach(lv=>{
       const total = levelTotals[lv] || 0;
       const seen = seenPerLevel[lv] || 0;
       const pct = total ? Math.round((seen/total)*100) : 0;
@@ -1710,7 +1752,7 @@
         startSession(lv);
       });
       wrap.appendChild(card);
-    }
+    });
   }
 
   async function openRiwayat(){
@@ -1872,10 +1914,16 @@
   }
 
   function renderMockLevelPicker(){
-    const defaultLevel = currentProfile?.target_level || 1;
     const wrap = $('mockLevelPicker');
     wrap.innerHTML = '';
-    for(let lv=1; lv<=6; lv++){
+    if(userPackageLevels.length === 0){
+      $('mockSectionPicker').innerHTML = '';
+      $('mockList').innerHTML = `<p class="emptyState">${t('comingSoon')}</p>`;
+      return;
+    }
+    const defaultLevel = (currentProfile?.target_level && isLevelAllowed(currentProfile.target_level))
+      ? currentProfile.target_level : userPackageLevels[0];
+    userPackageLevels.forEach(lv=>{
       const b = document.createElement('div');
       b.className = 'levelBtn' + (lv===defaultLevel ? ' active' : '');
       b.textContent = 'HSK ' + lv;
@@ -1885,7 +1933,7 @@
         loadMockList(lv);
       });
       wrap.appendChild(b);
-    }
+    });
     loadMockList(defaultLevel);
   }
 
@@ -1906,7 +1954,7 @@
 
     let query = sb
       .from('test_sets').select('set_id,hsk_level,section,title,time_limit_seconds,total_questions')
-      .eq('is_published', true).eq('hsk_level', level);
+      .eq('is_published', true).eq('hsk_level', level).in('hsk_level', userPackageLevels);
     if(mockSection !== 'all') query = query.eq('section', mockSection);
     const { data: sets, error: setErr } = await query.order('title', { ascending:true });
     if(setErr){ alert('Gagal ambil daftar mock test: ' + setErr.message); return; }
@@ -2088,7 +2136,7 @@
   function renderListeningTF(p, answer){
     let html = renderAudioPlayer(p.audio_url);
     if(p.statement){
-      html += `<div class="qStem" style="margin-top:14px">${p.statement}</div>`;
+      html += `<div class="qStem" style="margin-top:14px">${hanziPinyinHtml(p.statement)}</div>`;
       if(attemptShowTranslation && p.statement_id) html += `<div class="qStemTrans">${p.statement_id}</div>`;
     }
     html += renderTFButtons(answer);
@@ -2099,7 +2147,7 @@
     let html = renderAudioPlayer(p.audio_url);
     html += `<div class="listeningImageWrap"><img class="listeningImage" src="${listeningImageUrl(p.image_url)}" alt="" /></div>`;
     if(p.statement){
-      html += `<div class="qStem">${p.statement}</div>`;
+      html += `<div class="qStem">${hanziPinyinHtml(p.statement)}</div>`;
       if(attemptShowTranslation && p.statement_id) html += `<div class="qStemTrans">${p.statement_id}</div>`;
     }
     html += renderTFButtons(answer);
@@ -2110,9 +2158,12 @@
     const selectedKey = answer?.correct;
     const items = Object.entries(options||{}).map(([key,text])=>{
       const active = key === selectedKey ? ' active' : '';
+      const pinyinText = attemptShowPinyin ? pinyinStringFallback(text) : '';
+      const pinyin = pinyinText ? `<span class="choicePinyin">${escapeHtml(pinyinText)}</span>` : '';
       return `<div class="choiceItem${active}" data-key="${key}">
         <span class="choiceKey">${key}</span>
         <span class="choiceHanzi">${text ?? ''}</span>
+        ${pinyin}
       </div>`;
     }).join('');
     return `<div class="choiceList">${items}</div>`;
@@ -2121,7 +2172,7 @@
   function renderListeningMC(p, answer){
     let html = renderAudioPlayer(p.audio_url);
     if(!p.hide_question && p.question){
-      html += `<div class="qStem" style="margin-top:14px">${p.question}</div>`;
+      html += `<div class="qStem" style="margin-top:14px">${hanziPinyinHtml(p.question)}</div>`;
       if(attemptShowTranslation && p.question_id) html += `<div class="qStemTrans">${p.question_id}</div>`;
     }
     html += renderListeningOptions(p.options, answer);
@@ -2143,7 +2194,7 @@
   function renderImageMC(p, answer){
     let html = renderAudioPlayer(p.audio_url);
     if(!p.hide_question && p.question){
-      html += `<div class="qStem" style="margin-top:14px">${p.question}</div>`;
+      html += `<div class="qStem" style="margin-top:14px">${hanziPinyinHtml(p.question)}</div>`;
     }
     html += renderImageOptions(p.image_options, answer);
     return html;
@@ -2373,17 +2424,17 @@
     html += `<div class="qInstruction">${p.instruction || ''}</div>`;
 
     if(q.question_type === 'reading_mc'){
-      html += `<div class="qPassage">${p.passage}</div>`;
+      html += `<div class="qPassage">${hanziPinyinHtml(p.passage)}</div>`;
       if(attemptShowTranslation && p.passage_id) html += `<div class="qPassageTrans">${p.passage_id}</div>`;
-      html += `<div class="qStem">${p.question}</div>`;
+      html += `<div class="qStem">${hanziPinyinHtml(p.question)}</div>`;
       if(attemptShowTranslation && p.question_id) html += `<div class="qStemTrans">${p.question_id}</div>`;
       html += renderChoiceList(p.choices, answer);
     } else if(q.question_type === 'fill_blank'){
-      html += `<div class="qStem">${p.stem}</div>`;
+      html += `<div class="qStem">${hanziPinyinHtml(p.stem)}</div>`;
       if(attemptShowTranslation && p.stem_id) html += `<div class="qStemTrans">${p.stem_id}</div>`;
       html += renderChoiceList(p.choices, answer, true);
     } else if(q.question_type === 'sentence_match'){
-      html += `<div class="qStem">${p.prompt}</div>`;
+      html += `<div class="qStem">${hanziPinyinHtml(p.prompt)}</div>`;
       if(attemptShowTranslation && p.prompt_id) html += `<div class="qStemTrans">${p.prompt_id}</div>`;
       html += renderChoiceList(p.choices, answer);
     } else if(q.question_type === 'ordering'){
@@ -2425,7 +2476,8 @@
     const selectedKey = answer?.correct;
     const items = choices.map(c => {
       const active = c.key === selectedKey ? ' active' : '';
-      const pinyin = (withPinyin && attemptShowPinyin && c.pinyin) ? `<span class="choicePinyin">${c.pinyin}</span>` : '';
+      const pinyinText = (withPinyin && attemptShowPinyin) ? pinyinStringFallback(c.hanzi, c.pinyin) : '';
+      const pinyin = pinyinText ? `<span class="choicePinyin">${escapeHtml(pinyinText)}</span>` : '';
       const trans = (attemptShowTranslation && c.id) ? `<span class="choiceTrans">${c.id}</span>` : '';
       return `<div class="choiceItem${active}" data-key="${c.key}">
         <span class="choiceKey">${c.key}</span>
@@ -2442,12 +2494,11 @@
       const idx = order.indexOf(s.key);
       const picked = idx >= 0 ? ' picked' : '';
       const badge = idx >= 0 ? (idx + 1) : '';
-      const pinyin = (attemptShowPinyin && s.pinyin) ? `<span class="segmentPinyin">${s.pinyin}</span>` : '';
       const trans = (attemptShowTranslation && s.id) ? `<span class="segmentTrans">${s.id}</span>` : '';
       return `<div class="segmentItem${picked}" data-key="${s.key}">
         <span class="segmentBadge">${badge}</span>
-        <span class="segmentHanzi">${s.hanzi || s.text}</span>
-        ${pinyin}${trans}
+        <span class="segmentHanzi">${hanziPinyinHtml(s.hanzi || s.text)}</span>
+        ${trans}
       </div>`;
     }).join('');
     return `<div class="segmentList">${items}</div>`;
@@ -2464,7 +2515,7 @@
   /* ---------- char_input (看拼音写汉字) ---------- */
   function renderCharInputQuestion(p, q, answer){
     const value = answer?.correct || '';
-    let html = `<div class="qStem">${p.sentence}</div>`;
+    let html = `<div class="qStem">${hanziPinyinHtml(p.sentence)}</div>`;
     if(attemptShowTranslation && p.sentence_id) html += `<div class="qStemTrans">${p.sentence_id}</div>`;
     html += `<div class="qEssayLabel">Pinyin petunjuk</div>
       <div class="charInputPinyinHint">${p.pinyin || ''}</div>
@@ -2490,7 +2541,7 @@
   function renderEssayQuestion(p, q, answer){
     const text = answer?.essay_text || '';
     const { label, cls } = essayCharCountEl(text, p);
-    let html = `<div class="qEssayPrompt">${p.prompt || ''}</div>`;
+    let html = `<div class="qEssayPrompt">${hanziPinyinHtml(p.prompt || '')}</div>`;
     if(attemptShowTranslation && p.prompt_id) html += `<div class="qEssayPromptTrans">${p.prompt_id}</div>`;
 
     if(p.word){
@@ -2999,14 +3050,6 @@
     $('passwordToggle').textContent = willShow ? '🙈' : '👁️';
     $('passwordToggle').setAttribute('aria-label', willShow ? t('hidePassword') : t('showPassword'));
   });
-
-  $('onboardingNameInput').addEventListener('input', ()=>{
-    $('onboardingContinueBtn').disabled = !$('onboardingNameInput').value.trim();
-  });
-  $('onboardingNameInput').addEventListener('keydown', e=>{
-    if(e.key === 'Enter' && !$('onboardingContinueBtn').disabled) submitOnboardingName();
-  });
-  $('onboardingContinueBtn').addEventListener('click', submitOnboardingName);
 
   applyStaticI18n();
   boot();

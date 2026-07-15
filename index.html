@@ -23,20 +23,9 @@
     body{
       margin:0; min-height:100vh; background:var(--bg);
       color:var(--text); font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-      display:flex; align-items:center; justify-content:center; padding:20px;
     }
-    body.app-active{ display:block; padding:0; }
+    body.lang-zh .sidebar, body.lang-zh .pageHeader, body.lang-zh .sub, body.lang-zh .mockSetCard{ font-family:var(--hanzi-font); }
     .hidden{display:none !important}
-    .card{
-      width:100%; max-width:400px; background:var(--panel);
-      border:1px solid var(--line); border-radius:18px; padding:32px;
-      box-shadow:var(--shadow-lg);
-    }
-    .brand{display:flex; align-items:center; gap:10px; margin-bottom:6px}
-    .star{color:var(--gold); font-size:26px; line-height:1}
-    .brand h1{font-size:20px; margin:0; letter-spacing:.3px}
-    .brand .cn{color:var(--gold); font-weight:700}
-    .sub{color:var(--muted); font-size:13px; margin:0 0 26px}
     label{display:block; font-size:12px; color:var(--muted); margin:14px 0 6px}
     input{
       width:100%; padding:12px 14px; background:var(--panel-2); color:var(--text);
@@ -51,9 +40,80 @@
       font-family:inherit;
     }
     button:disabled{opacity:.6; cursor:not-allowed}
+
+    /* ============ login (split-screen) ============ */
+    .loginScreen{ display:grid; grid-template-columns:1.05fr 1fr; min-height:100vh; }
+
+    .loginBrandPanel{
+      position:relative; overflow:hidden; background:var(--navy);
+      display:flex; align-items:center; padding:64px 60px;
+    }
+    .loginBrandGlow{
+      position:absolute; top:-160px; left:-160px; width:520px; height:520px; border-radius:50%;
+      background:radial-gradient(circle, rgba(242,176,30,.18), transparent 70%); pointer-events:none;
+    }
+    .loginBrandOrnament{
+      position:absolute; right:-120px; bottom:-160px; font-family:var(--hanzi-font);
+      font-size:620px; line-height:1; color:rgba(242,176,30,.06); pointer-events:none; user-select:none;
+    }
+    .loginBrandContent{ position:relative; max-width:480px; }
+    .loginBrandLogo{ width:170px; height:auto; display:block; margin-bottom:34px; filter:drop-shadow(0 10px 20px rgba(0,0,0,.25)); }
+    .loginBrandKicker{ color:var(--gold); font-size:15px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; margin:0 0 14px; }
+    .loginBrandTitle{ font-family:var(--hanzi-font); font-size:44px; font-weight:800; color:#fff; margin:0 0 18px; line-height:1.25; }
+    .loginBrandDesc{ color:#aab2d8; font-size:16.5px; line-height:1.65; margin:0 0 36px; }
+    .loginBrandStats{ display:flex; gap:36px; }
+    .loginStat{ display:flex; flex-direction:column; gap:4px; }
+    .loginStatNum{ font-size:26px; font-weight:800; color:#fff; }
+    .loginStatLabel{ font-size:13px; color:#8d96c4; }
+
+    .loginFormPanel{ background:var(--bg); display:flex; align-items:center; justify-content:center; padding:40px 24px; }
+    .loginFormBox{ width:100%; max-width:380px; }
+    .loginMobileBrand{ display:none; align-items:center; gap:12px; margin-bottom:28px; }
+    .loginMobileBrand img{ width:44px; height:44px; object-fit:contain; }
+    .loginMobileBrandTitle{ font-weight:800; font-size:16px; color:var(--text); }
+    .loginMobileBrandTagline{ font-size:11px; color:var(--muted); font-family:var(--hanzi-font); }
+
+    .loginFormTitle{ font-size:30px; font-weight:800; margin:0 0 6px; color:var(--text); }
+    .loginFormSub{ color:var(--muted); font-size:14px; margin:0 0 26px; }
+
+    .loginFormPanel label{ display:block; font-size:13.5px; font-weight:700; color:var(--text); margin:16px 0 6px; }
+    .inputWrap{ position:relative; }
+    .inputIcon{ position:absolute; left:16px; top:50%; transform:translateY(-50%); font-size:15px; opacity:.55; pointer-events:none; }
+    .loginFormPanel input{
+      width:100%; padding:14px 16px 14px 44px; background:var(--panel); color:var(--text);
+      border:1.5px solid var(--line); border-radius:13px; font-size:15px; outline:none; font-family:inherit;
+      transition:border-color .15s ease, box-shadow .15s ease;
+    }
+    .loginFormPanel input:focus{ border-color:var(--gold); box-shadow:0 0 0 4px rgba(242,176,30,.14); }
+
+    .loginRow{ display:flex; align-items:center; justify-content:space-between; margin:18px 0 4px; font-size:13px; }
+    .loginFormPanel label.rememberMe{ display:flex; align-items:center; gap:6px; color:var(--muted); font-weight:600; cursor:pointer; margin:0; font-size:13px; }
+    .rememberMe input[type=checkbox]{ width:auto; padding:0; border:1px solid var(--line); border-radius:4px; background:var(--panel); box-shadow:none; }
+    .forgotLink{ color:var(--gold); font-weight:700; text-decoration:none; }
+    .forgotLink:hover{ text-decoration:underline; }
+
+    #loginBtn{
+      width:100%; margin-top:22px; padding:15px; border:none; border-radius:13px;
+      background:var(--gold); color:#141F47; font-weight:700; font-size:15px; cursor:pointer;
+      font-family:inherit; box-shadow:0 6px 18px -6px rgba(242,176,30,.55);
+      transition:transform .15s ease, background .15s ease;
+    }
+    #loginBtn:hover{ transform:translateY(-1px); background:#e5a30f; }
+    #loginBtn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
+
     .msg{margin-top:16px; font-size:13px; padding:10px 12px; border-radius:9px; display:none}
-    .msg.err{display:block; background:rgba(214,69,69,.08); color:var(--danger); border:1px solid rgba(214,69,69,.25)}
+    .msg.err{display:flex; align-items:flex-start; gap:8px; background:#FDEDEE; color:#A03A44; border:1px solid #F6CFD2;}
+    .msg.err::before{ content:'⚠️'; flex-shrink:0; }
     .msg.ok{display:block; background:rgba(47,158,91,.08); color:var(--ok); border:1px solid rgba(47,158,91,.25)}
+    .foot{margin-top:22px; text-align:center; color:var(--muted); font-size:13px}
+    .foot b{ color:var(--navy); }
+
+    @media (max-width: 880px){
+      .loginScreen{ grid-template-columns:1fr; }
+      .loginBrandPanel{ display:none; }
+      .loginMobileBrand{ display:flex; }
+      .loginFormPanel{ padding:32px 20px; }
+    }
 
     /* ============ app shell (sidebar + main) ============ */
     #appShell{ display:flex; min-height:100vh; align-items:stretch; }
@@ -65,13 +125,13 @@
       position:sticky; top:0; height:100vh; overflow-y:auto;
     }
     .sidebarLogo{
-      background:var(--bg); border-radius:var(--radius-md); padding:14px;
-      display:flex; align-items:center; justify-content:center; min-height:56px;
+      background:var(--bg); border-radius:18px; padding:14px;
+      display:flex; align-items:center; gap:11px; min-height:56px;
     }
-    .sidebarLogo img{ max-width:100%; max-height:44px; display:block; }
-    .sidebarLogoFallback{ display:flex; align-items:center; gap:8px; font-weight:800; color:var(--text); font-size:16px; }
-    .sidebarLogoFallback .star{ color:var(--gold); font-size:20px; }
-    .sidebarLogoFallback b{ color:var(--gold); }
+    .sidebarLogo img{ height:52px; width:auto; object-fit:contain; display:block; flex-shrink:0; }
+    .sidebarLogoText{ display:flex; flex-direction:column; gap:1px; min-width:0; }
+    .sidebarLogoTitle{ font-weight:800; font-size:17px; color:var(--text); line-height:1.15; white-space:nowrap; }
+    .sidebarLogoTagline{ font-size:10px; color:var(--muted); font-family:var(--hanzi-font); line-height:1.2; white-space:nowrap; }
     .sidebarNav{ display:flex; flex-direction:column; gap:4px; }
     .navItem{
       display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:12px;
@@ -91,6 +151,12 @@
     .sidebarUser{ border-top:1px solid var(--line); padding-top:14px; }
     .sidebarUserName{ font-weight:700; font-size:14px; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .sidebarUserMeta{ font-size:12px; color:var(--muted); margin-top:2px; margin-bottom:10px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .sidebarLangSwitch{ display:flex; gap:4px; margin-bottom:10px; }
+    .langBtn{
+      flex:1 1 auto; padding:5px 0; text-align:center; background:var(--panel-2); border:1px solid var(--line);
+      border-radius:8px; color:var(--muted); font-weight:700; cursor:pointer; font-size:11px;
+    }
+    .langBtn.active{ background:linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#241a08; border-color:transparent; }
     .mainContent{ flex:1; min-width:0; padding:32px 40px; }
 
     .pageCard{
@@ -366,7 +432,8 @@
       .navItem span:not(.navIcon){ display:none; }
       .navItem{ justify-content:center; }
       .sidebarUserName, .sidebarUserMeta, .sidebarStreakLabel, .sidebarStreakUnit{ display:none; }
-      .sidebarLogo{ padding:8px; }
+      .sidebarLogo{ padding:8px; justify-content:center; }
+      .sidebarLogoText{ display:none; }
       .mainContent{ padding:20px 14px; }
       .statGrid{ grid-template-columns:repeat(2,1fr); }
     }
@@ -375,42 +442,90 @@
 <body>
 
   <!-- ============ LOGIN ============ -->
-  <div id="loginCard" class="card">
-    <div class="brand"><span class="star">✦</span><h1>Xing Mandarin <span class="cn">星</span></h1></div>
-    <p class="sub">Masuk ke akun belajar kamu</p>
-    <label>Email</label>
-    <input id="email" type="email" autocomplete="username" placeholder="kamu@email.com" />
-    <label>Password</label>
-    <input id="password" type="password" autocomplete="current-password" placeholder="••••••••" />
-    <button id="loginBtn">Masuk</button>
-    <div id="loginMsg" class="msg"></div>
-    <p class="foot">Belum punya akun? Hubungi admin untuk daftar.</p>
+  <div id="loginCard" class="loginScreen">
+    <div class="loginBrandPanel">
+      <div class="loginBrandGlow"></div>
+      <div class="loginBrandOrnament">星</div>
+      <div class="loginBrandContent">
+        <img class="loginBrandLogo" src="logo.png" alt="Xing Mandarin" />
+        <p class="loginBrandKicker">Xing Mandarin</p>
+        <h1 class="loginBrandTitle">学中文，走天下</h1>
+        <p class="loginBrandDesc">Simulasi ujian HSK 1–6 selengkap aslinya — audio penutur asli, soal bergambar, dan penilaian esai otomatis.</p>
+        <div class="loginBrandStats">
+          <div class="loginStat"><span class="loginStatNum">2.350</span><span class="loginStatLabel">soal listening</span></div>
+          <div class="loginStat"><span class="loginStatNum">6</span><span class="loginStatLabel">level HSK</span></div>
+          <div class="loginStat"><span class="loginStatNum">4.900+</span><span class="loginStatLabel">kosakata</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="loginFormPanel">
+      <div class="loginFormBox">
+        <div class="loginMobileBrand">
+          <img src="logo.png" alt="Xing Mandarin" />
+          <div>
+            <div class="loginMobileBrandTitle">Xing Mandarin</div>
+            <div class="loginMobileBrandTagline">学中文 · 走天下</div>
+          </div>
+        </div>
+
+        <h2 class="loginFormTitle">Selamat datang 👋</h2>
+        <p class="loginFormSub">Masuk untuk lanjut belajar.</p>
+
+        <label for="email">Email</label>
+        <div class="inputWrap">
+          <span class="inputIcon">✉️</span>
+          <input id="email" type="email" autocomplete="username" placeholder="kamu@email.com" />
+        </div>
+
+        <label for="password">Password</label>
+        <div class="inputWrap">
+          <span class="inputIcon">🔒</span>
+          <input id="password" type="password" autocomplete="current-password" placeholder="••••••••" />
+        </div>
+
+        <div class="loginRow">
+          <label class="rememberMe"><input type="checkbox" /> Ingat saya</label>
+          <a class="forgotLink" href="javascript:void(0)">Lupa password?</a>
+        </div>
+
+        <button id="loginBtn">Masuk</button>
+        <div id="loginMsg" class="msg"></div>
+        <p class="foot">Belum punya akun? <b>Hubungi admin</b> untuk daftar.</p>
+      </div>
+    </div>
   </div>
 
   <!-- ============ APP SHELL ============ -->
   <div id="appShell" class="hidden">
     <aside class="sidebar">
       <div class="sidebarLogo">
-        <img src="logo.png" alt="Xing Mandarin" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-        <div class="sidebarLogoFallback" style="display:none">
-          <span class="star">✦</span><span>Xing <b>星</b></span>
+        <img src="logo.png" alt="Xing Mandarin" />
+        <div class="sidebarLogoText">
+          <span class="sidebarLogoTitle">Xing Mandarin</span>
+          <span class="sidebarLogoTagline">学中文 · 走天下</span>
         </div>
       </div>
       <nav class="sidebarNav">
-        <div class="navItem active" id="navBeranda" data-page="beranda"><span class="navIcon">🏠</span><span>Beranda</span></div>
-        <div class="navItem" id="navLatihan" data-page="latihan"><span class="navIcon">📝</span><span>Latihan & Tes</span></div>
-        <div class="navItem" id="navMateri" data-page="materi"><span class="navIcon">📚</span><span>Materi</span></div>
-        <div class="navItem" id="navProgres" data-page="progres"><span class="navIcon">📈</span><span>Progres</span></div>
-        <div class="navItem" id="navRiwayat" data-page="riwayat"><span class="navIcon">🕒</span><span>Riwayat</span></div>
+        <div class="navItem active" id="navBeranda" data-page="beranda"><span class="navIcon">🏠</span><span id="navLabelBeranda">Beranda</span></div>
+        <div class="navItem" id="navLatihan" data-page="latihan"><span class="navIcon">📝</span><span id="navLabelLatihan">Latihan & Tes</span></div>
+        <div class="navItem" id="navMateri" data-page="materi"><span class="navIcon">📚</span><span id="navLabelMateri">Materi</span></div>
+        <div class="navItem" id="navProgres" data-page="progres"><span class="navIcon">📈</span><span id="navLabelProgres">Progres</span></div>
+        <div class="navItem" id="navRiwayat" data-page="riwayat"><span class="navIcon">🕒</span><span id="navLabelRiwayat">Riwayat</span></div>
       </nav>
       <div class="sidebarStreak">
-        <span class="sidebarStreakLabel">Streak</span>
+        <span class="sidebarStreakLabel" id="sideStreakLabel">Streak</span>
         <span class="sidebarStreakNum" id="sideStreak">—</span>
-        <span class="sidebarStreakUnit">hari</span>
+        <span class="sidebarStreakUnit" id="sideStreakUnit">hari</span>
       </div>
       <div class="sidebarUser">
         <div class="sidebarUserName" id="sideUserName">—</div>
         <div class="sidebarUserMeta" id="sideUserMeta">—</div>
+        <div class="sidebarLangSwitch" id="langSwitch">
+          <button type="button" class="langBtn" data-lang="id">ID</button>
+          <button type="button" class="langBtn" data-lang="en">EN</button>
+          <button type="button" class="langBtn" data-lang="zh">中</button>
+        </div>
         <button class="logout" id="logoutBtn">Keluar</button>
       </div>
     </aside>
@@ -532,7 +647,7 @@
 
       <!-- ============ MOCK TEST — LIST SET (LATIHAN & TES) ============ -->
       <div id="mockListCard" class="pageCard mocklist hidden">
-        <p class="sub">Mock Test</p>
+        <p class="sub" id="mockListHeader">Mock Test</p>
 
         <div class="levelPicker" id="mockLevelPicker"></div>
         <div class="levelPicker sectionPicker" id="mockSectionPicker"></div>
@@ -625,6 +740,54 @@
   const $ = id => document.getElementById(id);
   const TRACK_LABEL = {hsk:'HSK Exam', business:'Bisnis', daily:'Percakapan Harian', travel:'Travel', academic:'Akademik'};
 
+  // i18n untuk UI chrome (sidebar, tombol, label kartu) — TIDAK dipakai buat konten
+  // soal (hanzi/opsi/explanation), itu selalu tampil apa adanya dari DB.
+  const LANG = {
+    id: { beranda:'Beranda', latihan:'Latihan & Tes', materi:'Materi', progres:'Progres', riwayat:'Riwayat',
+          streak:'STREAK', hari:'hari', keluar:'Keluar', mulai:'Mulai', ulangi:'Ulangi',
+          soal:'soal', menit:'menit', terakhir:'Terakhir:', benar:'Benar', mockTest:'Mock Test' },
+    en: { beranda:'Home', latihan:'Practice & Test', materi:'Materials', progres:'Progress', riwayat:'History',
+          streak:'STREAK', hari:'days', keluar:'Log out', mulai:'Start', ulangi:'Retry',
+          soal:'questions', menit:'minutes', terakhir:'Last:', benar:'Correct', mockTest:'Mock Test' },
+    zh: { beranda:'首页', latihan:'练习与测试', materi:'学习资料', progres:'学习进度', riwayat:'历史记录',
+          streak:'连续天数', hari:'天', keluar:'退出', mulai:'开始', ulangi:'重做',
+          soal:'题', menit:'分钟', terakhir:'上次：', benar:'正确', mockTest:'模拟考试' }
+  };
+  let currentLang = localStorage.getItem('xingLang') || 'id';
+  if(!LANG[currentLang]) currentLang = 'id';
+  function t(key){
+    return LANG[currentLang][key] ?? LANG.id[key] ?? key;
+  }
+  let currentPageRenderer = null; // dipanggil ulang pas ganti bahasa, biar UI ke-refresh tanpa reload
+
+  function applyStaticI18n(){
+    $('navLabelBeranda').textContent = t('beranda');
+    $('navLabelLatihan').textContent = t('latihan');
+    $('navLabelMateri').textContent = t('materi');
+    $('navLabelProgres').textContent = t('progres');
+    $('navLabelRiwayat').textContent = t('riwayat');
+    $('sideStreakLabel').textContent = t('streak');
+    $('sideStreakUnit').textContent = t('hari');
+    $('logoutBtn').textContent = t('keluar');
+    if($('mockListHeader')) $('mockListHeader').textContent = t('mockTest');
+    document.body.classList.toggle('lang-zh', currentLang === 'zh');
+    document.querySelectorAll('.langBtn').forEach(b=>{
+      b.classList.toggle('active', b.dataset.lang === currentLang);
+    });
+  }
+
+  function setLang(lang){
+    if(!LANG[lang] || lang === currentLang){ applyStaticI18n(); return; }
+    currentLang = lang;
+    localStorage.setItem('xingLang', lang);
+    applyStaticI18n();
+    // jangan re-render (navigasi ulang) kalau lagi di tengah attempt/result — bisa
+    // ilangin progres jawaban murid yang belum di-submit.
+    const attemptVisible = !$('attemptCard').classList.contains('hidden');
+    const resultVisible = !$('resultCard').classList.contains('hidden');
+    if(currentPageRenderer && !attemptVisible && !resultVisible) currentPageRenderer();
+  }
+
   // dipakai buat teks yang bukan konten soal (mis. jawaban esai murid, hasil AI) —
   // supaya nggak bisa inject HTML/script pas ditaruh balik ke innerHTML.
   function escapeHtml(s){
@@ -664,6 +827,7 @@
 
   function navTo(fn){
     hideAllPages();
+    currentPageRenderer = fn;
     fn();
   }
 
@@ -714,6 +878,8 @@
     hideAllPages();
     $('dashCard').classList.remove('hidden');
     setActiveNav('beranda');
+    currentPageRenderer = goBerandaContent;
+    applyStaticI18n();
 
     $('dName').textContent   = profile.display_name || 'Murid';
     $('dTrack').textContent  = TRACK_LABEL[profile.active_track] || 'Belum diset';
@@ -1170,7 +1336,7 @@
       row.className = 'historyItem';
       row.innerHTML = `
         <div class="historyTitle">${titleMap.get(h.set_id) || h.set_id}</div>
-        <div class="historyMeta">HSK ${h.hsk_level} · ${SECTION_LABEL[h.section] || h.section} · Skor ${pct}% · Benar ${h.correct_count}/${h.total_questions} · ${formatMockDate(h.created_at)}</div>
+        <div class="historyMeta">HSK ${h.hsk_level} · ${SECTION_LABEL[h.section] || h.section} · Skor ${pct}% · ${t('benar')} ${h.correct_count}/${h.total_questions} · ${formatMockDate(h.created_at)}</div>
       `;
       wrap.appendChild(row);
     });
@@ -1382,13 +1548,13 @@
   /* ==========================================================
      MOCK TEST — LIST SET (Task 2)
      ========================================================== */
-  const SECTION_LABEL = {reading:'Membaca', listening:'Mendengar', writing:'Menulis'};
+  const SECTION_LABEL = {reading:'Reading', listening:'Listening', writing:'Writing'};
   const SECTION_ORDER = {listening:0, reading:1, writing:2};
   const SECTION_TABS = [
-    { key:'all', label:'Semua' },
-    { key:'reading', label:'Membaca' },
-    { key:'listening', label:'Menyimak' },
-    { key:'writing', label:'Menulis' }
+    { key:'all', label:'Set Test' },
+    { key:'reading', label:'Reading' },
+    { key:'listening', label:'Listening' },
+    { key:'writing', label:'Writing' }
   ];
   let mockLevel = null;
   let mockSection = 'all';
@@ -1505,9 +1671,9 @@
       card.className = 'mockSetCard';
       card.innerHTML = `
         <div class="mockSetTitle">${s.title}</div>
-        <div class="mockSetMeta">HSK ${s.hsk_level} · ${SECTION_LABEL[s.section] || s.section} · ${s.total_questions} soal · ${minutes} menit</div>
-        ${attempt ? `<div class="mockSetScore">Terakhir: ${attempt.score}/${attempt.total_points} · Benar ${attempt.correct_count}/${attempt.total_questions} · ${formatMockDate(attempt.created_at)}</div>` : ''}
-        <button class="mockSetBtn" data-set="${s.set_id}">${attempt ? 'Ulangi' : 'Mulai'}</button>
+        <div class="mockSetMeta">HSK ${s.hsk_level} · ${SECTION_LABEL[s.section] || s.section} · ${s.total_questions} ${t('soal')} · ${minutes} ${t('menit')}</div>
+        ${attempt ? `<div class="mockSetScore">${t('terakhir')} ${attempt.score}/${attempt.total_points} · ${t('benar')} ${attempt.correct_count}/${attempt.total_questions} · ${formatMockDate(attempt.created_at)}</div>` : ''}
+        <button class="mockSetBtn" data-set="${s.set_id}">${attempt ? t('ulangi') : t('mulai')}</button>
       `;
       wrap.appendChild(card);
     });
@@ -1539,16 +1705,16 @@
         const correct = attemptsForGroup.reduce((sum,a) => sum + (a.correct_count||0), 0);
         const totalQ = attemptsForGroup.reduce((sum,a) => sum + (a.total_questions||0), 0);
         const latestDate = attemptsForGroup.reduce((latest,a) => a.created_at > latest ? a.created_at : latest, attemptsForGroup[0].created_at);
-        scoreLine = `<div class="mockSetScore">Terakhir: ${score}/${totalPoints} · Benar ${correct}/${totalQ} · ${formatMockDate(latestDate)}</div>`;
+        scoreLine = `<div class="mockSetScore">${t('terakhir')} ${score}/${totalPoints} · ${t('benar')} ${correct}/${totalQ} · ${formatMockDate(latestDate)}</div>`;
       }
 
       const card = document.createElement('div');
       card.className = 'mockSetCard';
       card.innerHTML = `
         <div class="mockSetTitle">${code}</div>
-        <div class="mockSetMeta">HSK ${groupSets[0].hsk_level} · ${sectionLabels} · ${totalQuestions} soal · ${totalMinutes} menit</div>
+        <div class="mockSetMeta">HSK ${groupSets[0].hsk_level} · ${sectionLabels} · ${totalQuestions} ${t('soal')} · ${totalMinutes} ${t('menit')}</div>
         ${scoreLine}
-        <button class="mockSetBtn" data-group="${code}">${allAttempted ? 'Ulangi' : 'Mulai'}</button>
+        <button class="mockSetBtn" data-group="${code}">${allAttempted ? t('ulangi') : t('mulai')}</button>
       `;
       wrap.appendChild(card);
     });
@@ -2465,7 +2631,7 @@
   $('browseExitBtn').addEventListener('click', closeBrowse);
   $('browseSearch').addEventListener('input', applyBrowseFilter);
   $('browseMoreBtn').addEventListener('click', renderBrowseChunk);
-  $('mockTestBtn').addEventListener('click', openMockList);
+  $('mockTestBtn').addEventListener('click', ()=> navTo(openMockList));
   $('mockListExitBtn').addEventListener('click', closeMockList);
   $('mockList').addEventListener('click', e=>{
     const setBtn = e.target.closest('button[data-set]');
@@ -2548,6 +2714,10 @@
   $('navProgres').addEventListener('click', ()=> navTo(openRaport));
   $('navRiwayat').addEventListener('click', ()=> navTo(openRiwayat));
   $('dashSeeAllHistory').addEventListener('click', ()=> navTo(openRiwayat));
+
+  document.querySelectorAll('.langBtn').forEach(b=>{
+    b.addEventListener('click', ()=> setLang(b.dataset.lang));
+  });
 
   boot();
   </script>

@@ -726,10 +726,18 @@
     /* .dc.html's "Answered" swatch/cell is a literal #1C2A5E, unconditional across both themes
        (same pattern as .navBtn.navNext) -- not the --ink/--text token. Base rule above uses
        var(--text) instead, which happens to equal #1C2A5E in light (coincidence, not a match),
-       but flips to near-white in dark. Override here restores the source's literal value in
-       dark only; light is untouched since var(--text) already computes to the same hex. */
-    [data-theme="dark"] .gridBtn.answered{background:#1C2A5E}
-    [data-theme="dark"] .legendSwatch.answered{background:#1C2A5E}
+       but flips to near-white in dark. Light is untouched since var(--text) already computes
+       to the same hex there.
+       DELIBERATE DEVIATION from comp in dark, decided by user 2026-07-16: a literal #1C2A5E
+       port was tried first and confirmed broken -- #1C2A5E vs dark --panel (#1C2B58) differ by
+       only 6 RGB points (verified via getComputedStyle, both computed to rgb(28,4x,8x)), and the
+       base rule's color:var(--panel) text also collapsed to the same dark color, making both the
+       cell and its number functionally invisible. The design PNG (11-mocktest-attempt-dark.png)
+       shows the same flaw -- its own "answered" cells are visually indistinguishable from empty
+       ones. Replaced with #2b3c78 (the login/dashboard brand-panel navy, already an approved
+       palette color from the comp, not invented) + explicit white text, for actual legibility. */
+    [data-theme="dark"] .gridBtn.answered{background:#2b3c78; color:#fff}
+    [data-theme="dark"] .legendSwatch.answered{background:#2b3c78}
     .attemptSubmitBtn{width:100%; margin-top:22px; height:54px; padding:0; border:none; border-radius:16px; background:linear-gradient(180deg,#F8C13A,#F2B01E); color:#1c2a5e; font-size:16px; font-weight:800; cursor:pointer; box-shadow:0 14px 28px -12px rgba(242,176,30,.85); transition:transform .15s ease}
     .attemptSubmitBtn:hover{transform:translateY(-2px)}
     .attemptSubmitBtn:disabled{opacity:.6; cursor:not-allowed; transform:none}

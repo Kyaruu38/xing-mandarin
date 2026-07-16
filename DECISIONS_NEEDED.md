@@ -757,16 +757,36 @@ sweep into a **port**, same rule as light mode: `.dc.html` is source of truth, P
 only. Full comparison table (screen | design dark | app dark | verdict) worked through in-session;
 summary of what came out of it:
 
-**Fixed** — `.gridBtn.answered`/`.legendSwatch.answered` (`index.html:714,722`): `.dc.html`'s
-"Answered" navigator swatch (baris 348) is a **literal, unconditional `#1C2A5E`** — same across
-both themes, same pattern as `.navBtn.navNext`. App had `background:var(--text)` instead, which
-**happens to equal `#1C2A5E` in light mode** (coincidence — `--text` and the literal value are
-numerically identical there) but flips to near-white (`#EAF0FF`) in dark, since `--text` is a
-theme-adaptive token and the source's value isn't. This is *why the bug survived 6 prior
-restyle sessions* — every light-mode screenshot review looked correct, because the wrong-token
-and the right-literal computed to the same pixel. Only surfaced once the dark comp gave a second
-data point to diff against. Fixed via a `[data-theme="dark"]` override only (see CSS comment
-next to it) — light mode's rule (`var(--text)`) is untouched since it already renders identically.
+**Fixed, in 2 rounds** — `.gridBtn.answered`/`.legendSwatch.answered` (`index.html:714,722`).
+`.dc.html`'s "Answered" navigator swatch (baris 348) is a **literal, unconditional `#1C2A5E`** —
+same across both themes, same pattern as `.navBtn.navNext`. App had `background:var(--text)`
+instead, which **happens to equal `#1C2A5E` in light mode** (coincidence — `--text` and the
+literal value are numerically identical there) but flips to near-white (`#EAF0FF`) in dark,
+since `--text` is a theme-adaptive token and the source's value isn't. This is *why the bug
+survived 6 prior restyle sessions* — every light-mode screenshot review looked correct, because
+the wrong-token and the right-literal computed to the same pixel. Only surfaced once the dark
+comp gave a second data point to diff against.
+
+**Round 1** ported the literal `#1C2A5E` verbatim, `[data-theme="dark"]`-scoped only. Verified
+live via a synthetic attempt fixture (`getComputedStyle`) and it was **broken**: `#1C2A5E`
+(28,42,94) vs dark `--panel` (28,43,88) — a 6-point RGB delta, functionally identical, cell
+invisible against the card. Worse, the base rule's `color:var(--panel)` (same coincidental-match
+bug, mirrored — correct in light where `--panel` is white, but `--panel` is also dark in dark
+mode) made the number text collapse to the exact same color as the card background too.
+Cross-checked `11-mocktest-attempt-dark.png` itself at this point — **the design comp has the
+same flaw**: its own "answered" cells (should be 1-4, 6-8, 10-12 per "Filled 12/95") render
+visually indistinguishable from "empty" cells in that screenshot. Grepped for the mirrored
+pattern (`color:var(--panel)` used as foreground on a fixed-dark background) — only this 1
+instance exists, contained.
+
+**Round 2 — DELIBERATE DEVIATION from comp, decided by user, 2026-07-16**: since the literal
+port is confirmed broken (both by direct pixel measurement and by the comp's own screenshot
+showing the same collapse), replaced with `background:#2b3c78` (the login/dashboard brand-panel
+navy — already an approved palette color from the comp, not invented) + explicit `color:#fff`.
+Re-verified via `getComputedStyle` (`cell1_bg: rgb(43,60,120)`, `cell1_color: rgb(255,255,255)`,
+distinct from `card_bg: rgb(28,43,88)`) and screenshot showing all 4 navigator states (answered/
+current/flagged/empty) simultaneously legible. **Light mode untouched in both rounds** — its
+rule (`var(--text)`/`var(--panel)`) already renders correctly and was never touched.
 
 **Confirmed correct by design, no change** — `.navBtn.navNext` (`#1C2A5E` navy-on-near-navy-panel
 in dark): matches `.dc.html` baris 340 literally, unconditional across themes. Looked like a

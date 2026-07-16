@@ -1,4 +1,105 @@
-# Handoff — session 4 (continuation after /clear)
+# Handoff — session 5 (dark mode sweep, continuation after /clear)
+
+Scope this session: **dark mode**, the last item in the fixed restyle sequence. Mid-session,
+user supplied 6 dark-mode design PNGs (`screens/08-13-*-dark.png` + `README-DARK.md`) that
+weren't available before — this turned the session from a contrast-judgment sweep into a
+**port** (same rule as every light-mode session: `.dc.html` wins, PNG is cross-check only).
+`.dc.html` already had a `[data-theme="dark"]` token block (baris 17) nobody had diffed against
+before.
+
+## Dark mode port: DONE, APPROVED, COMMITTED — `f29a55c` + `32fb4dd` (2 rounds, same fix)
+
+**Method**: grepped the whole file for `var(--text)`/`var(--muted)` used as `background` (not
+`color`) before touching anything, per explicit instruction — found exactly 2 instances
+(`.gridBtn.answered`, `.legendSwatch.answered`, both index.html:714/722), nothing else. 4 other
+places use low-alpha `rgba(var(--text-rgb),X)` as background — confirmed correct token behavior
+(translucent tint, not an opaque swap), left alone.
+
+**The bug and why it survived 6 sessions**: `.dc.html`'s "Answered" navigator swatch (baris 348)
+is a literal, unconditional `#1C2A5E` — same in both themes, same pattern as `.navBtn.navNext`
+(which the app already matched correctly). App had `background:var(--text)` instead, which
+happens to equal `#1C2A5E` in light mode (pure coincidence — the token and the literal value
+compute to the same hex there) but flips to near-white in dark, since `--text` is theme-adaptive
+and the source's literal isn't. Every prior light-mode screenshot review looked correct because
+of that coincidence; only the dark comp gave a second data point to expose it.
+
+**Round 1** ported the literal `#1C2A5E` verbatim (`f29a55c`), `[data-theme="dark"]`-scoped only.
+Verified live via a synthetic attempt fixture pushed through the console (bypassing Supabase
+auth entirely, same test-fixture precedent as prior sessions' flashcard/dashboard checks) and
+`getComputedStyle` — **confirmed broken**: `#1C2A5E` (28,42,94) vs dark `--panel` (28,43,88), a
+6-point RGB delta, cell functionally invisible against the card. The base rule's
+`color:var(--panel)` compounded it (same coincidental-match bug, mirrored: correct in light
+since `--panel` is white there, but `--panel` is dark in dark mode too, so the answered-cell
+number collapsed to the exact same color as the card background). Cross-checked
+`11-mocktest-attempt-dark.png` itself at this point — **the design comp has the same flaw**,
+its own "answered" cells read as indistinguishable from "empty" ones in that screenshot.
+
+**Round 2 — deliberate deviation from comp, decided by user** (`32fb4dd`): replaced the literal
+`#1C2A5E` with `#2b3c78` (the login/dashboard brand-panel navy — an already-approved palette
+color from the comp, not invented) + explicit `color:#fff`. Re-verified via `getComputedStyle`
+(cell background `rgb(43,60,120)`, text `rgb(255,255,255)`, distinct from card `rgb(28,43,88)`)
+and a screenshot showing all 4 navigator states (answered/current/flagged/empty) simultaneously
+legible. **Light mode untouched in both rounds.** Full writeup: DECISIONS_NEEDED #29.
+
+**Everything else checked against the comp came back already correct** (no code changes needed):
+- `.navBtn.navNext` (`#1C2A5E`, navy-on-near-navy in dark) — confirmed matches `.dc.html` baris
+  340 literally, deliberate design, not a bug (was flagged as a risk before the dark comp
+  existed; comp settled it).
+- `.qListeningBadge`, `.sectionBreak` colors, dashboard stat cards/quick actions/history cards,
+  flashcard card shell/deckChip/gradeBtn/pinyin, result hero ring/badge/section-breakdown colors
+  — all literal hex or token-based, all matched `.dc.html` exactly already.
+- `.practiceExit` (Retake/Back to home, DECISIONS_NEEDED #24) — comp's own dark treatment is
+  100% `var(--surface)`/`var(--ink)`/`rgba(ink-rgb,X)`, no separate dark override in source. No
+  new information from the dark comp — **#24 is not reopened**, stays exactly as it was.
+- Photo/image box (`.listeningImageWrap`/`.imageChoiceImg`, hardcoded white) — confirmed
+  `.dc.html`'s `isTest` block has zero image element in either theme (source only ever
+  demonstrates `listening_tf`). Stays deferred, not guessed at.
+- `13-materials-dark.png` — confirmed **not used** for Kamus's dark pass (that PNG is the unbuilt
+  hub product, #21/#22, a different IA). Kamus dark has no comp of its own.
+
+**Logged, not fixed, out of scope** (DECISIONS_NEEDED #29 has full detail on both):
+- `.resultBadge.pending`/`.sectionCard.pending .sectionCardBar` (the essay-pending state from
+  #17) — unverified visually this session, no live essay-graded combined attempt to screenshot
+  against, not faked with dummy data. Expected fine on the token math (low-alpha rgba over dark
+  panel) but nobody has actually looked at it lit up.
+- `.gridBtn.flagged`/`.legendSwatch.flagged` alpha values (`rgba(...,.18/.55)` app vs
+  `.dc.html`'s `rgba(...,.3/.6)`) — pre-existing drift from the light-mode port (`8ec14ae`), same
+  in both themes, not a dark-specific bug, not touched this round.
+
+## Screenshot verification — 5 restyled screens + Kamus manual sweep
+
+All 6 checked live via a local static server (`python -m http.server`, serving `index.html`
+directly — Supabase auth isn't reachable in this environment) + synthetic fixtures pushed
+through the console to bypass auth entirely (`sessionQueue`, `attemptQuestions`/`attemptAnswers`,
+a fixture `result` object for `showResult()`), same technique as prior sessions' flashcard/
+dashboard checks — not fabricated product data, test fixtures to exercise the real render
+functions. All matched their respective dark PNGs / token expectations:
+
+- **Login**: brand panel, moon/stars, word-of-day chip, form inputs, theme toggle — matches
+  `08-login-dark.png`. Streak-waiting promo chip correctly absent (already-dropped decision).
+- **Dashboard**: stat cards, continue-practice hero, daily goal, quick actions, sidebar — matches
+  `09-dashboard-dark.png`. Empty-state dashes are correct (no session data in this fixture),
+  same as the already-established light-mode empty-state precedent.
+- **Flashcard**: card shell (navy in dark, confirmed via `var(--panel)`), badge, deckChips,
+  Show answer / Done-Back buttons — matches `10-flashcard-dark.png`.
+- **Mock attempt**: chrome + listening_tf question, navigator (post-fix, all 4 states legible) —
+  matches `11-mocktest-attempt-dark.png` modulo the deliberate Answered-cell deviation above.
+- **Mock result**: ring/badge/section-breakdown/exit buttons — matches
+  `12-mocktest-result-dark.png`.
+- **Kamus**: no comp (per #21/#22, this is the dictionary not the hub) — manual contrast check
+  only. Wrapper/list/level-picker/search bar all legible against the dark panel via the existing
+  `var(--panel)`/`var(--panel-2)` pairing. No issues found.
+
+## Restyle sequence: COMPLETE
+
+Login → Dashboard → Flashcard → Mock attempt chrome+listening_tf → Mock result → Materials/Kamus
+chrome → #12 (answer-choice buttons) → dark mode. All 8 stages done, approved, committed.
+**Materials hub build is next**, gated on the 3 prerequisites in DECISIONS_NEEDED #22 (still
+unanswered) — do not start it without the user answering those first.
+
+---
+
+
 
 Scope this session: **#12 only** (`.choiceItem`/`.segmentItem` div→button, 4 call sites).
 Plan was pre-approved from last session's writeup (see DECISIONS_NEEDED #12). Executed, verified

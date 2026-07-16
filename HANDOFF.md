@@ -1,3 +1,61 @@
+# Handoff — session 4 (continuation after /clear)
+
+Scope this session: **#12 only** (`.choiceItem`/`.segmentItem` div→button, 4 call sites).
+Plan was pre-approved from last session's writeup (see DECISIONS_NEEDED #12). Executed, verified
+in-browser by user, committed. Stopping here as instructed.
+
+## Answer-choice `<div>`s → real `<button>`s (#12): DONE, APPROVED, COMMITTED — `cd8d8ca`
+
+Converted the 4 template-string call sites (`renderChoiceList`, `renderListeningOptions`,
+`renderImageOptions`, `renderSegmentList`) from `<div class="choiceItem/segmentItem">` to
+`<button type="button" class="...">`, same recipe as every prior div-to-button conversion in
+this sequence (`8ec14ae`): delegated click handler (`index.html:4002-4029`) already used
+`closest()`/`dataset`, tag-agnostic, zero logic changes needed.
+
+**`button{}` leak (index.html:67-72) blocked explicitly** on `.choiceItem`/`.segmentItem`:
+`width:auto`, `margin-top:0`, `color:var(--text)`, `font-weight:400`, `text-align:left`,
+`line-height:normal` (restated, not a new value — nothing set it before). `background` was
+already explicitly `var(--panel)` on both classes pre-conversion, so that part of the leak
+(gold gradient) was already blocked without needing a new rule — confirmed, not assumed, by
+reading the existing CSS before touching it. **Padding was deliberately left untouched** on
+both classes — both already had identical pre-existing `padding:12px 14px`, restated as-is,
+not unified or invented.
+
+**`.imageChoiceItem` checked for conflict before touching `.choiceItem`**: it only sets
+`flex-direction`/`align-items`/`gap`/`flex`/`min-width`, no `width` of its own — sizing is
+governed by `flex-basis` (via the `flex` shorthand), which wins over `.choiceItem`'s new
+`width:auto` for a flex item. No conflict, no extra CSS needed there.
+
+**Verified in-browser by user** against `H4XING001` (combined "Semua" attempt): soal #1
+(`listening_tf`) and soal #11 (`listening_mc`, via `renderListeningOptions` — turned out to
+have real local-equivalent data after all, correcting last session's "no local data" note for
+that renderer). Options render white background, navy text, left-aligned, zero regression.
+`renderImageOptions`/`renderSegmentList` weren't separately re-verified this exact session
+(no image_mc question surfaced in the tested attempt) but share the identical reset recipe.
+
+**Correction**: `H4XING001` is confirmed **95 questions**, not 90 — the `7/45=16, 0/40=0,
+0/5=0 → 16/300` verification numbers from #9 (recorded in the previous session's writeup below)
+came from a **different** set, not this one. See DECISIONS_NEEDED's new correction note.
+
+**2 pre-existing findings surfaced during verification, logged not fixed** (DECISIONS_NEEDED
+#27/#28, full detail there):
+- **#27**: `H4XING001` soal #1 shows two stacked "Listening" badges — traced via `git log -S`
+  to two unrelated components (`.sectionBreak`, older, from `ec87492`'s combined-exam grouping
+  work; `.qListeningBadge`, newer, from `37952ef`'s design-comp port) that only visually
+  collide on a combined attempt's very first question. Not a regression, not fixed.
+- **#28**: `.qListeningBadge` only renders on `listening_tf` (source's only comp'd type),
+  not on `listening_mc`/`image_mc`/`image_tf` — was always this narrow by design-comp scope,
+  now visibly inconsistent since #12 made those other types easier to actually reach/compare
+  side-by-side. Not fixed, user to decide per-type vs per-section scope.
+
+## Remaining session order: ~~result~~ → ~~materials~~ → ~~#12~~ → **dark mode** → materials hub
+
+**Only dark mode left in the restyle sequence.** Materials hub build (new screen, comp's
+6-card hub) stays gated behind dark mode + the 3 unanswered prerequisites (see previous
+session's Materials section below) — do not start it next.
+
+---
+
 # Handoff — session 3 (continuation after /clear)
 
 Scope is capped and paced explicitly (~1-2 screens per session, then `/clear`, verify-before-commit every time). This session's mandate was the mock test RESULT screen ONLY, not paired with #12 or dark mode. Landed, verified against real submitted attempts, approved before commit. Stopping here as instructed.
@@ -318,7 +376,6 @@ this session:
   `question_bank.question_type` for that set directly (Supabase dashboard/SQL editor) before
   #17 can be tested against it.
 
-Budget note for next session: **#12** (`.choiceItem`/`.segmentItem` → real `<button>`, see
-DECISIONS_NEEDED #12), solo scope, same pacing as every session in this sequence. Materials hub
-does NOT come next — it's gated behind #12, dark mode, and 3 unanswered prerequisites (see top
-of this section).
+Budget note (superseded — see session 4 above): #12 is now DONE (`cd8d8ca`). Only dark mode is
+left in the restyle sequence. Materials hub still does NOT come next — gated behind dark mode
+and 3 unanswered prerequisites (see top of this section).

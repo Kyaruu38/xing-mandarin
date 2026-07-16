@@ -1,6 +1,57 @@
-# Handoff — session 2 (continuation after /clear)
+# Handoff — session 3 (continuation after /clear)
 
-Scope is capped and paced explicitly (~1-2 screens per session, then `/clear`, verify-before-commit every time). This session ran long — flashcard drift fix, mock test attempt chrome, question card + `listening_tf`, and a 7-renderer audit all landed, verified/approved before each commit. Stopping here as instructed.
+Scope is capped and paced explicitly (~1-2 screens per session, then `/clear`, verify-before-commit every time). This session's mandate was the mock test RESULT screen ONLY, not paired with #12 or dark mode. Landed, verified against real submitted attempts, approved before commit. Stopping here as instructed.
+
+## Mock test RESULT screen: DONE (single-section + combined-HSK1-4-objective paths), CODE COMPLETE/UNVERIFIED on 2 branches (see below)
+
+Source: `05-mocktest-result.png`, `.dc.html`'s `isMock` block (lines 232-262). Full drift table
+and DECISIONS_NEEDED entries (#14-#21) are in that file — summary here.
+
+**What got verified against a real submitted attempt** (user ran an actual combined "Semua"
+HSK4 attempt, checked the math by hand): `7/45=16`, `0/40=0`, `0/5=0` → total `16/300`, ring
+`5/100`, accuracy `7/90=8%` — all confirmed correct by manual calculation. #9's formula
+(`round(correct/total*100)` per section, summed, max derived from section count not a hardcoded
+level table) is working with zero fabricated numbers. Percentile (#14) and the "next focus
+area" sentence (#15) were confirmed absent, as intended. Review/Retake/Back-to-home buttons all
+confirmed working.
+
+**Ring color overrides source**: `--ok`/`--danger` (app's existing pass/fail convention, used
+in 6+ other places) used instead of source's literal `#34A98A`, since that hex is only a
+2-location isolated example (both from the same commit) — same reasoning as decision #13,
+applied in the other direction this time. Confirmed correct by the user.
+
+**Reverted before commit**: an invented hero headline ("Mock test complete!", shown for every
+badge state) was added, then caught in review and removed — source's actual headline needs a
+user-name field the app has nowhere, and is pass-state-specific copy with no signal for the
+other 3 states. See DECISIONS_NEEDED #21. Badge + subline carry the real info; no headline
+element ships.
+
+**Known, accepted, ported-as-is**: the sparkle dot (`.mockResultSparkle`) is hardcoded green
+`#34A98A` regardless of ring state (matches source's own hardcoded/static treatment, same
+precedent as the flashcard sparkle in `e40aaf1`) — looks slightly off against a red/fail ring,
+not fixed, not blocking. Section Breakdown's `auto-fit` grid wrapping 2+1 instead of 3-across
+is the literal same CSS rule as source (`repeat(auto-fit,minmax(240px,1fr))`) — a viewport-width
+consequence, not a divergent port.
+
+### CODE COMPLETE, UNVERIFIED — do not read the code above as "done" for these
+
+- **HSK 1-2 branch** (`max=200`, pass line `120`, real PASSED/FAILED badge, `level <= 4`
+  logic): no HSK 1-2 mock content exists yet to submit an attempt against. Code path has never
+  executed against real data. **Blocked on content, not code** (DECISIONS_NEEDED #20) — retest
+  the instant HSK 1-2 sets exist, don't assume it's fine because the logic reads correctly.
+- **Pending state (#17, writing/essay section in combined mode)**: never triggered by the one
+  real attempt tested — that attempt's writing section turned out to be objectively-gradable
+  (not essay), confirmed by the app's own scoring behavior (`0/5 correct` rendered via the
+  normal path, not the pending path). The `isEssay` detection code
+  (`setQuestions.every(q => q.question_type === 'essay')`) has **zero real-data confirmation**.
+  Needs an attempt against a genuinely essay-based writing section (HSK 5/6, per earlier
+  session's finding that those levels' writing is a single 100-point essay task) to verify the
+  pending card/hero state actually renders — not just that the code compiles.
+- **Combined "Semua" mode generally**: only tested once, on one HSK4 attempt. HSK1-2 combined
+  (2-section, no writing) and any essay-triggered combined attempt are both unverified live
+  paths, not just the specific branches above.
+
+Commit: index.html + DECISIONS_NEEDED.md + HANDOFF.md, this session.
 
 ## 7-renderer audit: DONE, 0 renderers ported — `14ac666` (**this was the correct outcome, not a shortfall**)
 
@@ -129,18 +180,27 @@ All confirmed via `git log` — nothing left uncommitted in `index.html`.
 - Flashcard example sentence — no schema field, not built.
 - Deck chip Learning/Review split threshold (`LEARNING_REPS_THRESHOLD = 2`) is our own convention, not from source — flag if a different threshold is wanted.
 
-## Remaining session order: result → materials → #12 → dark mode (fixed order, don't reshuffle)
+## Remaining session order: ~~result~~ → materials → #12 → dark mode (fixed order, don't reshuffle)
 
-**#12 (`.choiceItem`/`.segmentItem` → real `<button>`) must land BEFORE the dark mode sweep, not after.** That conversion adds new `button{}`-leak CSS resets (`margin-top`, `padding`, `width`, `background`) on classes the dark-mode pass would otherwise need to re-check. Doing dark mode first means redoing it once #12 lands. Dark mode is last on purpose — only make that sweep once all markup for a screen is final.
+Result screen is DONE (this session, see top section — with the 2 CODE COMPLETE/UNVERIFIED
+branches noted there, not blockers). **#12 (`.choiceItem`/`.segmentItem` → real `<button>`) must
+land BEFORE the dark mode sweep, not after.** That conversion adds new `button{}`-leak CSS resets
+(`margin-top`, `padding`, `width`, `background`) on classes the dark-mode pass would otherwise
+need to re-check. Doing dark mode first means redoing it once #12 lands. Dark mode is last on
+purpose — only make that sweep once all markup for a screen is final.
 
-## Next session: mock test RESULT screen ONLY — do not pair with #12 or #9
+## Next session: MATERIALS ONLY — do not pair with anything
 
-Source comp: `05-mocktest-result.png`, `.dc.html`'s `isMock` block (lines 232-262 — NOT `isTest`, which is the attempt screen already ported). Percentage ring, scaled score text (e.g. "245/300"), per-section breakdown each /100, PASSED/FAILED badge.
+Source comp: `06-materials.png`. Solo scope, same as every session in this sequence — don't fold
+in #12 or dark mode.
 
-**#9 status**: formula RESOLVED (`correct/total*100` per section) and passing line RESOLVED (option b — HSK 1-4 get a real PASSED/FAILED badge at 180/120; HSK 5-6 show 180 as a labeled *target* with distinct wording/color, e.g. "Target tercapai"/"Belum sampai target" — **never literally "PASSED"/"FAILED" for HSK 5-6**, since no official pass line has existed for those levels since Feb 2013).
-
-**Still blocking, and NOT fixable by this port — this is a schema gap, not a missing formula**: a combined score like "245/300" cannot be built because **no combined/full-mock row is ever persisted**. The "Semua" (all-sections) attempt calls `submit_attempt` 3 times — once per underlying single-section set — and 3 independent section-level rows land in `test_attempts` with no group id linking them back together. There is no query that reconstructs "245/300" from what's stored today. **If the port needs that number, skip it and point back to #9 — do not invent a formula, do not invent a default, do not work around the missing group id.** Port the presentation layer (ring, layout, badge treatment, section breakdown shell) using whatever real numbers already exist per-section (`correct_count`/`total_questions`, per-section RPC results) and flag the gap explicitly.
-
-**Do not fold in #12 or dark mode** into this session — see the fixed ordering above. Result screen only.
+**Relevant open item from this session**: DECISIONS_NEEDED #19 found that `closeBrowse()` (the
+exit function for the Materials/`browseCard` screen) hides only `browseCard` and shows
+`dashCard`, without a `hideAllPages()` safety net — same shape as the `#resultCard` leak this
+session caught and fixed in `navTo(goBerandaContent)`. Currently unreachable as a live bug
+(traced every entry point), but if this session's port adds any *new* way to leave `browseCard`
+(a new button, a filter-chip that also exits, etc.), re-verify that assumption before assuming
+`hideAllPages()` isn't needed — don't just carry the "it's fine, I checked once" conclusion
+forward without re-checking against the new code.
 
 Budget this screen alone.

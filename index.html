@@ -214,6 +214,7 @@
       .statCard, .dashMascot, .pageCard.dash{ animation:none !important; opacity:1 !important; }
       .continueMoonGlow, .continueStar, .continueSparkle, .dailyGoalFill{ animation:none !important; }
       .hskRingProgress{ animation:none !important; }
+      .mockResultSparkle, .resultRingProgress, .sectionCardBarFill{ animation:none !important; }
     }
     #appShell{ display:flex; min-height:100vh; align-items:stretch; }
     #appShell.hidden{ display:none !important; }
@@ -508,6 +509,57 @@
     .statBox{flex:1; background:var(--panel-2); border:1px solid var(--line); border-radius:16px; padding:16px 10px; text-align:center}
     .statNum{display:block; font-size:26px; font-weight:700; color:var(--text)}
     .statLabel{display:block; font-size:11px; color:var(--muted); margin-top:4px}
+    /* mock test result — hero (combined "Semua" attempts only, see showResult()) + section breakdown + actions.
+       Ported from .dc.html's isMock block; --surface/--ink-rgb mapped to --panel/--text-rgb per the token table above. */
+    .mockResultHero{ margin-top:20px; position:relative; overflow:hidden; background:var(--panel); border:1px solid rgba(52,169,138,.2); border-radius:26px; padding:30px; display:flex; align-items:center; gap:30px; flex-wrap:wrap; box-shadow:0 22px 46px -24px rgba(52,169,138,.5); }
+    .mockResultSparkle{ position:absolute; top:24px; left:150px; width:5px; height:5px; border-radius:50%; background:#34A98A; animation:twinkle 3s ease-in-out infinite; opacity:.5; }
+    .resultRingWrap{ position:relative; width:150px; height:150px; flex:none; }
+    .resultRingWrap svg{ transform:rotate(-90deg); }
+    .resultRingTrack{ stroke:rgba(var(--text-rgb),.1); }
+    .resultRingProgress{ animation:ringFill 1.4s .3s ease-out both; }
+    .resultRingProgress.pass{ stroke:var(--ok); }
+    .resultRingProgress.fail{ stroke:var(--danger); }
+    .resultRingProgress.target{ stroke:var(--gold); }
+    .resultRingProgress.pending{ stroke:rgba(var(--text-rgb),.25); }
+    .resultRingLabel{ position:absolute; inset:0; display:grid; place-content:center; text-align:center; }
+    .resultRingNum{ display:block; font-family:var(--display-font); font-size:42px; font-weight:800; line-height:1; color:var(--text); }
+    .resultRingSuffix{ display:block; font-size:11px; font-weight:700; color:rgba(var(--text-rgb),.5); }
+    .resultHeroInfo{ flex:1; min-width:220px; }
+    .resultBadge{ display:inline-flex; align-items:center; gap:7px; font-size:12px; font-weight:800; padding:6px 14px; border-radius:99px; color:#fff; }
+    .resultBadge.pass{ background:var(--ok); box-shadow:0 8px 16px -6px rgba(47,158,91,.7); }
+    .resultBadge.fail{ background:var(--danger); box-shadow:0 8px 16px -6px rgba(214,69,69,.7); }
+    .resultBadge.target{ background:var(--gold); color:#241a08; box-shadow:0 8px 16px -6px rgba(242,176,30,.7); }
+    .resultBadge.pending{ background:rgba(var(--text-rgb),.12); color:var(--muted); }
+    .resultSubline{ margin-top:12px; font-size:14px; color:rgba(var(--text-rgb),.6); max-width:420px; }
+    .resultHeroStats{ margin-top:16px; display:flex; gap:20px; flex-wrap:wrap; }
+    .resultHeroStatNum{ display:block; font-size:19px; font-weight:800; color:var(--text); }
+    .resultHeroStatLabel{ display:block; font-size:11.5px; color:rgba(var(--text-rgb),.55); font-weight:600; }
+
+    .sectionBreakdownGrid{ margin-top:12px; display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; }
+    .sectionCard{ background:var(--panel); border-radius:20px; padding:22px; box-shadow:0 8px 18px -10px rgba(var(--text-rgb),.16); }
+    .sectionCardHead{ display:flex; justify-content:space-between; align-items:center; }
+    .sectionCardName{ display:flex; align-items:center; gap:9px; font-weight:800; font-size:15px; color:var(--text); }
+    .sectionCardIcon{ width:34px; height:34px; border-radius:10px; display:grid; place-items:center; flex:none; }
+    .sectionCardIcon.listening{ background:rgba(91,147,214,.14); color:#5B93D6; }
+    .sectionCardIcon.reading{ background:rgba(52,169,138,.14); color:#34A98A; }
+    .sectionCardIcon.writing{ background:rgba(242,176,30,.16); color:#C7900F; }
+    .sectionCardScore{ font-size:18px; font-weight:800; color:var(--text); }
+    .sectionCardBar{ margin-top:14px; height:10px; border-radius:99px; background:var(--track); overflow:hidden; }
+    .sectionCardBarFill{ height:100%; border-radius:99px; animation:growW 1.1s .2s ease-out both; }
+    .sectionCardBarFill.listening{ background:#5B93D6; }
+    .sectionCardBarFill.reading{ background:#34A98A; }
+    .sectionCardBarFill.writing{ background:#F2B01E; }
+    .sectionCardMeta{ margin-top:8px; font-size:12px; color:rgba(var(--text-rgb),.5); }
+    .sectionCard.pending .sectionCardScore{ color:var(--muted); font-size:13px; font-weight:700; }
+    .sectionCard.pending .sectionCardBar{ background:rgba(var(--text-rgb),.08); }
+
+    /* button{} leak: every property the global rule sets (width/margin-top/padding/background/color) reset explicitly, same recipe as .attemptSubmitBtn */
+    .resultActions{ margin-top:22px; display:flex; gap:12px; flex-wrap:wrap; }
+    .resultBtn{ flex:1; min-width:160px; width:auto; height:52px; margin-top:0; padding:0; border-radius:15px; font-size:15px; font-weight:800; font-family:inherit; cursor:pointer; transition:transform .15s ease; }
+    .resultBtn:hover{ transform:translateY(-2px); }
+    .resultBtn.primary{ border:none; background:linear-gradient(180deg,#F8C13A,#F2B01E); color:#1c2a5e; box-shadow:0 14px 26px -12px rgba(242,176,30,.85); }
+    .resultBtn.secondary{ border:1.5px solid rgba(var(--text-rgb),.15); background:var(--panel); color:var(--text); }
+    .resultBtn.ghost{ border:1.5px solid rgba(var(--text-rgb),.15); background:transparent; color:rgba(var(--text-rgb),.7); }
     .sectionTitle{font-size:13px; color:var(--muted); margin:20px 0 10px; font-weight:700; letter-spacing:.3px}
     /* dashboard-home only: source uses a bold display-font heading here, other screens (raport, account, result review) keep the small muted label untouched */
     .dash .sectionTitle{ margin:28px 0 0; font-family:var(--display-font); font-size:18px; font-weight:700; letter-spacing:normal; color:var(--text); }
@@ -1094,10 +1146,52 @@
       <div id="resultCard" class="pageCard result hidden">
         <p class="sub" id="resultSetTitle">Hasil Mock Test</p>
 
-        <div class="statRow">
+        <!-- Combined ("Semua") attempts only -- see showResult(). No design comp exists for
+             single-section results, so single-section keeps the plain statRow below instead
+             of this hero + breakdown (DECISIONS_NEEDED #16). -->
+        <div class="mockResultHero hidden" id="resultHero">
+          <span class="mockResultSparkle"></span>
+          <div class="resultRingWrap">
+            <svg width="150" height="150" viewBox="0 0 150 150">
+              <circle cx="75" cy="75" r="64" fill="none" class="resultRingTrack" stroke-width="14"/>
+              <circle cx="75" cy="75" r="64" fill="none" stroke-width="14" stroke-linecap="round" class="resultRingProgress" id="resultRingCircle"/>
+            </svg>
+            <div class="resultRingLabel">
+              <span class="resultRingNum" id="resultRingNum">—</span>
+              <span class="resultRingSuffix" id="resultRingSuffix">/ 100</span>
+            </div>
+          </div>
+          <div class="resultHeroInfo">
+            <span class="resultBadge" id="resultBadge"></span>
+            <!-- No headline here (DECISIONS_NEEDED #21) -- source's "Great work, Kyaru! 🎉" needs a
+                 name field the app has nowhere else, and a tone that only fits the pass state. A
+                 generic always-on headline was tried and reverted as invented copy; badge + subline
+                 already carry the real information. -->
+            <div class="resultSubline" id="resultSubline"></div>
+            <div class="resultHeroStats">
+              <div class="resultHeroStat"><span class="resultHeroStatNum" id="resHeroTime">—</span><span class="resultHeroStatLabel" id="resHeroTimeLabel">Waktu</span></div>
+              <div class="resultHeroStat"><span class="resultHeroStatNum" id="resHeroAccuracy">—</span><span class="resultHeroStatLabel" id="resHeroAccuracyLabel">Akurasi</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hidden" id="sectionBreakdownBlock">
+          <p class="sectionTitle" id="sectionBreakdownTitle">Section Breakdown</p>
+          <div class="sectionBreakdownGrid" id="sectionBreakdownGrid"></div>
+        </div>
+
+        <!-- Single-section attempts: unchanged layout, resScore now shows the #9-resolved
+             percentage instead of raw score/total_points. -->
+        <div class="statRow" id="resultStatRow">
           <div class="statBox"><span class="statNum" id="resScore">—</span><span class="statLabel" id="resLabelScore">Skor</span></div>
           <div class="statBox"><span class="statNum" id="resCorrect">—</span><span class="statLabel" id="resLabelCorrect">Benar</span></div>
           <div class="statBox"><span class="statNum" id="resTime">—</span><span class="statLabel" id="resLabelTime">Waktu</span></div>
+        </div>
+
+        <div class="resultActions">
+          <button type="button" id="resultReviewBtn" class="resultBtn primary"></button>
+          <button type="button" id="resultRetakeBtn" class="resultBtn secondary"></button>
+          <button type="button" id="resultHomeBtn" class="resultBtn ghost"></button>
         </div>
 
         <p class="sectionTitle" id="resultReviewHeader">Review Jawaban</p>
@@ -1255,6 +1349,18 @@
           filledCount:'Terisi {filled}/{total}', submitBtn:'Submit', exitCancel:'Keluar (batal)',
           exitAttemptConfirm:'Keluar sekarang? Progres jawaban bakal ilang (belum di-submit).',
           timeLabel:'Waktu', answerReview:'Review Jawaban', backToMockList:'Kembali ke Daftar Mock Test',
+          accuracyLabel:'Akurasi',
+          resultSublinePass:'Kamu skor {score}/{max} — di atas garis lulus HSK {level} ({line}).',
+          resultSublineFail:'Kamu skor {score}/{max} — di bawah garis lulus HSK {level} ({line}).',
+          resultSublineTargetMet:'Kamu skor {score}/{max} — di atas target latihan HSK {level} ({line}).',
+          resultSublineTargetMissed:'Kamu skor {score}/{max} — di bawah target latihan HSK {level} ({line}).',
+          resultSublinePending:'Skor listening & reading: {score}/{max}. Skor menulis dinilai terpisah, belum bisa digabung ke total.',
+          badgePassed:'LULUS', badgeFailed:'TIDAK LULUS',
+          badgeTargetMet:'Target tercapai', badgeTargetMissed:'Belum sampai target',
+          badgePending:'Menunggu nilai menulis',
+          sectionBreakdownLabel:'Rincian per Bagian', correctCountOf:'{correct} / {total} benar',
+          pendingWritingNote:'Dinilai terpisah oleh AI — lihat catatan',
+          reviewAnswersBtn:'Review jawaban', retakeTestBtn:'Ulangi tes', backToHomeBtn:'Kembali ke beranda',
           themeToDark:'Ganti ke mode gelap', themeToLight:'Ganti ke mode terang',
           loading:'Memuat...', notFound:'tidak ditemukan',
           errFetchProgress:'Gagal ambil data progres.', errFetchDueCards:'Gagal ambil kartu review.',
@@ -1325,6 +1431,18 @@
           filledCount:'Filled {filled}/{total}', submitBtn:'Submit', exitCancel:'Exit (cancel)',
           exitAttemptConfirm:'Exit now? Your unsubmitted answers will be lost.',
           timeLabel:'Time', answerReview:'Answer Review', backToMockList:'Back to Mock Test List',
+          accuracyLabel:'Accuracy',
+          resultSublinePass:'You scored {score}/{max} — above the HSK {level} passing line ({line}).',
+          resultSublineFail:'You scored {score}/{max} — below the HSK {level} passing line ({line}).',
+          resultSublineTargetMet:'You scored {score}/{max} — above the HSK {level} practice target ({line}).',
+          resultSublineTargetMissed:'You scored {score}/{max} — below the HSK {level} practice target ({line}).',
+          resultSublinePending:'Listening & reading score: {score}/{max}. Writing is graded separately and can’t be combined into the total yet.',
+          badgePassed:'PASSED', badgeFailed:'FAILED',
+          badgeTargetMet:'Target reached', badgeTargetMissed:'Target not reached',
+          badgePending:'Awaiting writing score',
+          sectionBreakdownLabel:'Section Breakdown', correctCountOf:'{correct} / {total} correct',
+          pendingWritingNote:'Graded separately by AI — see note',
+          reviewAnswersBtn:'Review answers', retakeTestBtn:'Retake test', backToHomeBtn:'Back to home',
           themeToDark:'Switch to dark mode', themeToLight:'Switch to light mode',
           loading:'Loading...', notFound:'not found',
           errFetchProgress:'Could not load your progress.', errFetchDueCards:'Could not load review cards.',
@@ -1395,6 +1513,18 @@
           filledCount:'已填 {filled}/{total}', submitBtn:'提交', exitCancel:'退出（取消）',
           exitAttemptConfirm:'现在退出？未提交的答案将会丢失',
           timeLabel:'用时', answerReview:'答案回顾', backToMockList:'返回模拟考试列表',
+          accuracyLabel:'正确率',
+          resultSublinePass:'你得了 {score}/{max} 分 — 高于 HSK {level} 及格线（{line}）。',
+          resultSublineFail:'你得了 {score}/{max} 分 — 低于 HSK {level} 及格线（{line}）。',
+          resultSublineTargetMet:'你得了 {score}/{max} 分 — 高于 HSK {level} 的练习目标（{line}）。',
+          resultSublineTargetMissed:'你得了 {score}/{max} 分 — 低于 HSK {level} 的练习目标（{line}）。',
+          resultSublinePending:'听力与阅读得分：{score}/{max}。写作由AI单独评分，暂时无法合并到总分。',
+          badgePassed:'通过', badgeFailed:'未通过',
+          badgeTargetMet:'达到目标', badgeTargetMissed:'未达到目标',
+          badgePending:'等待写作评分',
+          sectionBreakdownLabel:'各部分详情', correctCountOf:'{correct} / {total} 题正确',
+          pendingWritingNote:'由AI单独评分——见说明',
+          reviewAnswersBtn:'查看答案', retakeTestBtn:'重新测试', backToHomeBtn:'返回首页',
           themeToDark:'切换到深色模式', themeToLight:'切换到浅色模式',
           loading:'加载中...', notFound:'未找到',
           errFetchProgress:'无法加载学习进度', errFetchDueCards:'无法加载复习卡片',
@@ -1551,6 +1681,12 @@
     $('resLabelTime').textContent = t('timeLabel');
     $('resultReviewHeader').textContent = t('answerReview');
     $('resultCloseBtn').textContent = t('backToMockList');
+    $('resHeroTimeLabel').textContent = t('timeLabel');
+    $('resHeroAccuracyLabel').textContent = t('accuracyLabel');
+    $('sectionBreakdownTitle').textContent = t('sectionBreakdownLabel');
+    $('resultReviewBtn').textContent = t('reviewAnswersBtn');
+    $('resultRetakeBtn').textContent = t('retakeTestBtn');
+    $('resultHomeBtn').textContent = t('backToHomeBtn');
 
     $('riwayatHeader').textContent = t('mockTestHistory');
 
@@ -2520,6 +2656,11 @@
     listening: '<path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/>'
   };
   const SECTION_ORDER = {listening:0, reading:1, writing:2};
+  // DECISIONS_NEEDED #9 (resolved 2026-07-16): section score = round(correct/total*100), display-math
+  // only, computed from RPC results already in memory -- never persisted, never touches the RPC/schema.
+  // Combined-attempt max is derived from how many real sections exist (2*100 or 3*100), not a hardcoded
+  // level lookup, so it can't drift from what the set actually contains.
+  const HSK_PASS_LINE = (max) => max === 200 ? 120 : 180; // HSK1-2 line / HSK3-4 line
   const SECTION_TABS = [
     { key:'all', label:'Set Test' },
     { key:'reading', label:'Reading' },
@@ -3371,6 +3512,8 @@
     if(attemptGroupSets && attemptGroupSets.length > 0){
       let totalScore = 0, totalPoints = 0, totalCorrect = 0, totalQuestions = 0;
       const reviewMap = new Map();
+      const sectionResults = []; // per-section breakdown, DECISIONS_NEEDED #9 -- built here (in-memory only)
+                                  // since RPC returns one section's result at a time, never persisted combined.
       for(const s of attemptGroupSets){
         const { data, error } = await sb.rpc('submit_attempt', {
           p_set_id: s.set_id,
@@ -3389,6 +3532,26 @@
         totalCorrect += data.correct_count || 0;
         totalQuestions += data.total_questions || 0;
         (data.review || []).forEach(item => reviewMap.set(item.id, item));
+
+        // submit_attempt excludes essay rows from correct_count/total_questions (DECISIONS_NEEDED #9
+        // prereq 3) -- a writing set made of essay questions can't get a section score from the RPC.
+        // Averaging per-question AI scores is the one approach already shipped (isAllEssay below), reused
+        // here rather than deciding a new one; "average vs sum-then-rescale" for essay is still open,
+        // so this section is flagged pending, not silently scored (see DECISIONS_NEEDED #9 note below).
+        const setQuestions = attemptQuestions.filter(q => q.set_id === s.set_id);
+        const isEssaySection = setQuestions.length > 0 && setQuestions.every(q => q.question_type === 'essay');
+        if(isEssaySection){
+          const graded = setQuestions.map(q => attemptAnswers[q.id]?.ai_result).filter(Boolean);
+          sectionResults.push({
+            section: s.section, isEssay: true,
+            essayGraded: graded.length, essayTotal: setQuestions.length
+          });
+        } else {
+          sectionResults.push({
+            section: s.section, isEssay: false,
+            correct_count: data.correct_count || 0, total_questions: data.total_questions || 0
+          });
+        }
       }
       // order_index dari tiap set mulai dari 1 lagi -- nomori ulang sesuai urutan gabungan asli
       // (attemptQuestions) biar nggak dobel "Soal 1" antar section pas ditampilin di review.
@@ -3402,6 +3565,7 @@
         total_points: totalPoints,
         correct_count: totalCorrect,
         total_questions: totalQuestions,
+        sections: sectionResults,
         review: mergedReview
       }, timeTaken);
       return;
@@ -3445,10 +3609,19 @@
     return `${mm}:${ss}`;
   }
 
+  // Design's hero stat shows "1h 42m" -- only used there; resTime (single-section statRow, pre-existing) keeps mm:ss.
+  function formatDurationLong(totalSec){
+    const h = Math.floor(totalSec / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    return h > 0 ? `${h}h ${m}m` : `${m}m ${totalSec % 60}s`;
+  }
+
   function showResult(result, timeTakenSec){
     hideAllPages();
     $('resultCard').classList.remove('hidden');
     $('resultSetTitle').textContent = attemptSet.title;
+
+    const isCombined = !!(attemptGroupSets && attemptGroupSets.length > 0);
 
     // Set full-esai (mis. hsk*-writing-*) nggak punya skor objektif (nggak ada answer key
     // buat key-matching) — skor yang ditampilkan adalah rata-rata skor AI dari soal yang sudah dinilai.
@@ -3461,12 +3634,121 @@
       $('resScore').textContent = avg != null ? `${avg} (AI)` : 'N/A';
       $('resCorrect').textContent = `${graded.length}/${attemptQuestions.length} dinilai`;
     } else {
-      $('resScore').textContent = (result.score != null && result.total_points != null) ? `${result.score}/${result.total_points}` : 'N/A';
+      // DECISIONS_NEEDED #9: display value switched from raw score/total_points to the resolved
+      // correct/total*100 formula -- numerically identical today (every question row has points=1
+      // flat, per #9 prereq 4), forward-compatible once real per-level point weighting lands.
+      const pct = (result.correct_count != null && result.total_questions > 0)
+        ? Math.round(result.correct_count / result.total_questions * 100) : null;
+      $('resScore').textContent = pct != null ? `${pct}/100` : 'N/A';
       $('resCorrect').textContent = (result.correct_count != null && result.total_questions != null) ? `${result.correct_count}/${result.total_questions}` : 'N/A';
     }
-
     $('resTime').textContent = formatDuration(timeTakenSec);
+
+    // Hero + Section Breakdown: combined ("Semua") attempts only -- design has no comp for
+    // single-section results (DECISIONS_NEEDED #16), so single-section keeps the statRow above as-is.
+    $('resultHero').classList.toggle('hidden', !isCombined);
+    $('sectionBreakdownBlock').classList.toggle('hidden', !isCombined);
+    $('resultStatRow').classList.toggle('hidden', isCombined);
+    if(isCombined) renderResultHero(result, timeTakenSec);
+
     renderReview(result.review || []);
+  }
+
+  // Combined-attempt hero: ring + badge + headline, built entirely from the sectionResults
+  // already computed in submitAttempt(). Writing/essay sections can't be scored yet (DECISIONS_NEEDED
+  // #9 prereq 3, averaging-vs-rescale still open) -- when one is present the hero shows a distinct
+  // "pending" state instead of a partial total that could be mistaken for the real one.
+  function renderResultHero(result, timeTakenSec){
+    const sections = result.sections || [];
+    const objectiveSections = sections.filter(s => !s.isEssay);
+    const hasPending = sections.some(s => s.isEssay);
+    const objectiveScore = objectiveSections.reduce((sum, s) => sum + sectionScorePct(s), 0);
+    const level = attemptSet.hsk_level;
+
+    let badgeClass, badgeText, sublineKey, score, max, lineVal = null;
+    if(hasPending){
+      score = objectiveScore; max = objectiveSections.length * 100;
+      badgeClass = 'pending'; badgeText = t('badgePending'); sublineKey = 'resultSublinePending';
+    } else {
+      score = objectiveScore; max = sections.length * 100;
+      lineVal = HSK_PASS_LINE(max);
+      if(level <= 4){
+        const passed = score >= lineVal;
+        badgeClass = passed ? 'pass' : 'fail';
+        badgeText = passed ? t('badgePassed') : t('badgeFailed');
+        sublineKey = passed ? 'resultSublinePass' : 'resultSublineFail';
+      } else {
+        // HSK5-6: no official pass line since Feb 2013 -- never render PASSED/FAILED for these levels.
+        const met = score >= lineVal;
+        badgeClass = 'target';
+        badgeText = met ? t('badgeTargetMet') : t('badgeTargetMissed');
+        sublineKey = met ? 'resultSublineTargetMet' : 'resultSublineTargetMissed';
+      }
+    }
+
+    $('resultBadge').className = `resultBadge ${badgeClass}`;
+    $('resultBadge').textContent = badgeText;
+
+    let subline = t(sublineKey).replace('{score}', score).replace('{max}', max);
+    if(lineVal != null) subline = subline.replace('{level}', level).replace('{line}', lineVal);
+    $('resultSubline').textContent = subline;
+
+    const ringPct = max > 0 ? Math.round(score / max * 100) : 0;
+    $('resultRingNum').textContent = ringPct;
+    const circ = 402;
+    const off = circ - (circ * ringPct / 100);
+    const ring = $('resultRingCircle');
+    ring.setAttribute('class', `resultRingProgress ${badgeClass}`);
+    ring.setAttribute('stroke-dasharray', circ);
+    ring.style.setProperty('--circ', circ);
+    ring.style.setProperty('--off', off);
+
+    $('resHeroTime').textContent = formatDurationLong(timeTakenSec);
+    // Accuracy uses the same correct_count/total_questions the RPC already returns (essay rows
+    // excluded there too, DECISIONS_NEEDED #9 prereq 3) -- real, not re-derived from the pending guard above.
+    const accPct = (result.total_questions > 0) ? Math.round(result.correct_count / result.total_questions * 100) : null;
+    $('resHeroAccuracy').textContent = accPct != null ? `${accPct}%` : 'N/A';
+
+    renderSectionBreakdown(sections);
+  }
+
+  function renderSectionBreakdown(sections){
+    const wrap = $('sectionBreakdownGrid');
+    wrap.innerHTML = sections.map(s => {
+      const sec = s.section in SECTION_ICON ? s.section : 'reading';
+      const icon = `<span class="sectionCardIcon ${sec}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${SECTION_ICON[sec]}</svg></span>`;
+      if(s.isEssay){
+        return `<div class="sectionCard pending">
+          <div class="sectionCardHead">
+            <span class="sectionCardName">${icon}${SECTION_LABEL[sec] || sec}</span>
+            <span class="sectionCardScore">${t('badgePending')}</span>
+          </div>
+          <div class="sectionCardBar"></div>
+          <div class="sectionCardMeta">${t('pendingWritingNote')} (${s.essayGraded}/${s.essayTotal})</div>
+        </div>`;
+      }
+      const pct = sectionScorePct(s);
+      return `<div class="sectionCard">
+        <div class="sectionCardHead">
+          <span class="sectionCardName">${icon}${SECTION_LABEL[sec] || sec}</span>
+          <span class="sectionCardScore">${pct}</span>
+        </div>
+        <div class="sectionCardBar"><div class="sectionCardBarFill ${sec}" style="width:${pct}%"></div></div>
+        <div class="sectionCardMeta">${t('correctCountOf').replace('{correct}', s.correct_count).replace('{total}', s.total_questions)}</div>
+      </div>`;
+    }).join('');
+  }
+
+  function sectionScorePct(s){
+    return s.total_questions > 0 ? Math.round(s.correct_count / s.total_questions * 100) : 0;
+  }
+
+  function retakeAttempt(){
+    if(attemptGroupSets && attemptGroupSets.length > 0){
+      startCombinedAttempt(attemptSet.set_id, attemptGroupSets);
+    } else if(attemptSet && attemptSet.set_id){
+      startAttempt(attemptSet.set_id);
+    }
   }
 
   function closeResult(){
@@ -3654,6 +3936,9 @@
   $('attemptSubmitBtn').addEventListener('click', ()=> submitAttempt(false));
   $('attemptExitBtn').addEventListener('click', exitAttempt);
   $('resultCloseBtn').addEventListener('click', closeResult);
+  $('resultReviewBtn').addEventListener('click', ()=> $('resultReviewHeader').scrollIntoView({behavior:'smooth', block:'start'}));
+  $('resultRetakeBtn').addEventListener('click', retakeAttempt);
+  $('resultHomeBtn').addEventListener('click', ()=> navTo(goBerandaContent));
   $('attemptBody').addEventListener('click', e=>{
     const q = attemptQuestions[attemptIndex];
     if(!q) return;

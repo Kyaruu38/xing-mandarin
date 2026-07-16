@@ -332,4 +332,158 @@ counting caught it before it happened. **No code change made or needed.**
 
 ---
 
+## 14. Mock result "Top 18% Percentile" — dead data, not ported, same class as #6/#8
+
+`05-mocktest-result.png`'s stat row shows "1h 42m Time taken | 81% Accuracy | Top 18%
+Percentile". Percentile needs a cohort (comparing this score against other users') — the
+platform's user base is a handful of people right now, no source of that data exists and
+won't for a while. **Not ported.** Time taken and Accuracy were ported (both are real,
+derivable from data already in memory at result time).
+
+Options for user to decide, not to be implemented without sign-off:
+- **(a)** Leave it out permanently (current state) until real user volume exists
+- **(b)** Build it once enough users exist to make a cohort meaningful
+- **(c)** Something else (e.g. compare against the user's own past attempts of the same set)
+
+## 15. "Writing is your next focus area" sentence — SKIPPED, needs weakest-section logic
+
+Design's hero subline: "You scored 245/300 — above the HSK 4 passing line. **Writing is your
+next focus area.**" The second sentence implies picking the user's weakest section
+automatically. Not built — open questions with no signal from source (static prototype,
+no logic behind the one hardcoded example):
+- Single-section attempts have nothing to compare against.
+- Tie-breaking when two sections score equally.
+- Threshold — does it always name the lowest section even at 95%, or only below some cutoff?
+
+**Not ported.** Hero subline currently ends at the score/pass-line sentence.
+
+Options for user to decide, not to be implemented without sign-off:
+- **(a)** Always name the lowest-scoring section (no threshold)
+- **(b)** Only show it below some score threshold (needs a number)
+- **(c)** Drop the feature entirely, keep the subline as just the score sentence (current state)
+
+## 16. Single-section result screen — no design comp, kept on the old layout
+
+`05-mocktest-result.png` (`isMock` block) only ever shows the **combined** "Semua" attempt
+(3-section breakdown, single ring/badge for the whole exam). A single-section attempt (e.g.
+`H4XING001 LISTENING`, 45 questions) has no equivalent comp — there's nothing in source to
+port a ring/badge/breakdown treatment *from* for that mode.
+
+**Implemented**: `showResult()` now branches on `attemptGroupSets` (existing flag, already
+used by `submitAttempt()` to distinguish combined vs single). Combined attempts get the new
+hero card (ring, badge, Section Breakdown grid). Single-section attempts keep the original
+`.statRow`/`.statBox` layout untouched, with one real fix: `resScore` now shows the
+#9-resolved `correct/total*100` percentage instead of raw `score/total_points` (numerically
+identical today since every question row has `points=1` flat — see #9 prereq 4 — but this is
+the number the resolved formula actually specifies, and it's forward-compatible once real
+per-level point weighting exists).
+
+Options for user to decide, not to be implemented without sign-off:
+- **(a)** Leave single-section on the plain statRow permanently (current state) — it's not
+  broken, just visually plainer than the combined hero
+- **(b)** Design a single-section-specific hero/ring treatment later (would need its own
+  design decision, no comp to port from)
+- **(c)** Something else
+
+## 17. Combined attempts with an essay-graded writing section — hero total shows "pending", not a number
+
+Surfaced while wiring #9's resolved formula into the result screen. `submit_attempt`
+excludes essay-type questions from `correct_count`/`total_points` (#9 prereq 3) — so for a
+combined "Semua" attempt where the writing section is essay-based (true for every HSK3+ writing
+set in this data model, per prereq 3's own finding), the RPC literally cannot report that
+section's score. This isn't a hypothetical edge case — it's the **normal case** for any real
+HSK3+ full-mock attempt.
+
+**What was built**: `submitAttempt()`'s combined branch now also captures each section's raw
+RPC result *before* summing (`sectionResults`, in-memory only, no schema/RPC change). A
+section made entirely of essay questions is flagged `isEssay:true` — its Section Breakdown
+card shows a "Menunggu nilai menulis" / "Awaiting writing score" state (with a "{graded}/{total}
+graded" note, reusing the exact same per-question `ai_result.score` data the pre-existing
+`isAllEssay` branch already reads) **instead of a computed number**. The hero ring/badge/score
+also switch to a distinct "pending" state (muted ring, neutral badge) showing only the
+listening+reading subtotal, explicitly labeled as partial in the subline — never a "245/300"-
+looking number that could pass for the real total.
+
+**Deliberately not decided here**: *how* to fold a writing section's average AI score into
+the /300 total (average vs. sum-then-rescale) is exactly the still-open question from #9
+prereq 3 ("Biarin apa adanya" instruction for `isAllEssay`). Reusing that averaging math for a
+*new* per-section combined-mode number would mean silently deciding that open question, not
+just leaving existing code alone — so it was skipped instead, consistent with the standing
+no-guessing rule. **This ties directly back to #9 prereq 3** — resolving that unblocks this
+too, same decision, two call sites.
+
+For HSK 1-2 (no writing section exists at all) this never triggers — hero total renders fully,
+same as any other combined attempt.
+
+---
+
+## 18. "Reading" color differs between two live screens — now real, not hypothetical
+
+Confirmed in the app (not just in source) after building Section Breakdown: **Recent History**
+renders reading = gold (`.historyCardIcon.reading`, ported literally from the Recent History
+block per decision #2). **Section Breakdown** renders reading = green `#34A98A` (ported
+literally from the `isMock` block, same session). Same word, two different colors, two
+different screens a user can see in the same session.
+
+This is the same design inconsistency #2 already found between these two blocks in source
+(source itself never reconciled them — two independently-hardcoded prototype blocks) — #2
+resolved to port each verbatim rather than invent a shared mapping, and that's what happened
+here too. Confirmed correct call, not a bug to silently fix.
+
+Options for user to decide, not to be implemented without sign-off:
+- **(a)** Leave both as-is, source is inconsistent and each screen matches its own source block
+- **(b)** Change Section Breakdown's reading color to gold, matching Recent History
+- **(c)** Change Recent History's reading color to green, matching Section Breakdown
+
+## 19. `backToDash()` / `closeRaport()` / `closeBrowse()` / `closeMockList()` — same shape as the `#resultCard` leak, currently unreachable
+
+Checked whether the bug caught in `navTo(goBerandaContent)` (hiding only one card by name
+instead of `hideAllPages()`) exists anywhere else. It does — as a **pattern**, not a one-off:
+
+| Function | Hides | Shows | Called from |
+|---|---|---|---|
+| `backToDash()` | `practiceCard` only | `dashCard` | `practiceExitBtn1/2/3` (inside `practiceCard`) |
+| `closeRaport()` | `raportCard` only | `dashCard` | `raportExitBtn` (inside `raportCard`) |
+| `closeBrowse()` | `browseCard` only | `dashCard` | `browseExitBtn` (inside `browseCard`) |
+| `closeMockList()` | `mockListCard` only | `dashCard` | `mockListExitBtn` (inside `mockListCard`) |
+
+**Traced every entry point**: all 4 trigger buttons live *inside* the card each function hides
+— none of them are reachable while `#resultCard` (or any other card) is showing, since you'd
+have to already be looking at `practiceCard`/`raportCard`/`browseCard`/`mockListCard` to click
+them. The only cross-card jump is the sidebar, and all 5 sidebar items already go through
+`navTo(fn)` → `hideAllPages()` first (confirmed by reading every `navItem` listener). **So
+`#resultCard` cannot currently get stuck visible through any of these 4 — the bug shape exists
+but has no live path to trigger it today.**
+
+Flagging because **`closeBrowse()` is directly in scope for next session (Materials,
+`06-materials.png`)** — if that session's port adds any new way to leave `browseCard` (a new
+button, a filter-chip interaction that also exits, etc.), re-check this exact assumption before
+assuming `hideAllPages()` isn't needed there. Not fixed here — no live bug to fix, and this
+result-screen session shouldn't touch 4 functions outside its scope.
+
+## 20. HSK 1-2 scoring branch (max 200, pass line 120) — CODE COMPLETE, UNVERIFIED
+
+See HANDOFF.md — no HSK 1-2 mock content exists yet to submit an attempt against, so this
+branch (`HSK_PASS_LINE(200) === 120`, `level <= 4` badge logic) has never executed against
+real data. Blocked on content, not code. Re-test once HSK 1-2 sets exist.
+
+## 21. Result hero headline — reverted, no design-safe copy exists yet
+
+First pass added a generic headline ("Mock test complete!") shown for every badge state.
+Caught in review: source's actual headline is "Great work, Kyaru! 🎉" — celebratory copy
+paired with a user name the app has no field for anywhere else (dashboard greeting doesn't
+personalize with a real name either), and a tone that only fits the pass state — source never
+shows what a fail/target/pending headline should say. Generalizing it to one flat sentence for
+all 4 states was inventing copy source doesn't specify, same class of issue as #15. **Reverted
+before commit** — badge + subline already state the real result; no headline is shown.
+
+Options for user to decide, not to be implemented without sign-off:
+- **(a)** Add a real user-name field somewhere and port source's exact copy for the pass state
+  only, something neutral for the other 3
+- **(b)** Write copy for all 4 states without a name (e.g. "Nice work!" / "Keep practicing!" /
+  "Almost there!" / "Writing still pending")
+- **(c)** Leave it out permanently, badge + subline are enough (current state)
+
+---
+
 Nothing else pending a decision right now.

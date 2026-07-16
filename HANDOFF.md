@@ -1,0 +1,67 @@
+# Handoff — session 2 (continuation after /clear)
+
+Scope for this session was capped at 4 items by explicit instruction (context-budget pacing: ~2 screens per session, then `/clear`). All 4 done, verified in-browser with screenshots, committed. Stopping here as instructed.
+
+## Commits this session
+
+- **`78b9787`** — Port progress rings, quick action icons, and Recent History cards (Chunk C + Recent History)
+- **`883a252`** — Port Flashcard & SRS session view to design handoff comp
+
+Both confirmed via `git log` — nothing left uncommitted in `index.html`.
+
+## Screenshot verification
+
+- **Dashboard** (fresh tab, real/no-session state — genuine empty placeholders, not fabricated): greeting, stat cards, continue-practice card, daily goal, Progress by Level (empty since no session ever populated it — correct), Quick Actions (real icons: coral checkmark/green book/blue bar-chart), Recent History (empty, correct). Matches `01-dashboard.png` layout and colors everywhere real data exists to show.
+- **Flashcard**: real Supabase auth isn't available in this environment, so this was verified with a synthetic single-card session pushed via console (`sessionQueue = [{hanzi:'图书馆', pinyin:'túshūguǎn', ...}]` then calling the real `renderCard()`/`revealCard()` functions directly — not fabricated product data, just a test fixture to exercise the real rendering code path, same method used for the Chunk C ring/history verification last session). Both not-flipped and flipped states screenshotted and match `03-flashcard.png` closely — chips, progress bar, badge, serif hanzi, pinyin, meaning+pos, grade-row colors and computed interval subtext all render correctly.
+
+## Drift table — Flashcard & SRS (`.dc.html` lines 185-229 vs `index.html`)
+
+| Element | Source (`.dc.html`) | Was (`index.html`) | Now | Verdict |
+|---|---|---|---|---|
+| Deck header | title + "Deck · HSK N Vocabulary" + New/Learning/Review chips, lines 187-189 | No deck header existed at all — just a bare `.sessionMeta` row showing "0/0" and "HSK N" | Added `.deckHeader` with title, subtitle, and 3 color-coded chips | **Ported.** Chip counts are real (computed from the actual session's due/new split), not copied from source's demo numbers (5/3/12). |
+| New/Learning/Review split | static demo numbers, no logic behind them (prototype) | N/A (didn't exist) | New = never-seen count (real). Review vs Learning = split by `srs_reps` count on the due card (`LEARNING_REPS_THRESHOLD = 2`, our own convention) | **Not a source rule to violate** — source has zero logic here, so this is a reasonable real-data interpretation, not a guess overriding something source specified. Documented inline in code. |
+| Progress bar | `height:10px`, gold→green fill, "Card N / Total" label beside it, line 191 | `height:4px`, gold-soft→gold fill, label above the bar, no "Card" word | Track height 10px, fill `linear-gradient(90deg,var(--gold),#34A98A)`, moved label beside the bar with "Card" prefix | **Fixed to match.** |
+| Card area shell | `border-radius:28px`, `box-shadow:0 30px 60px -28px rgba(ink-rgb,.4)`, no padding on the shell itself (inner content carries its own padding), line 193 | `border-radius:18px`, flat `1px solid` border, flex-centered with a fixed `gap:10px` between hanzi/pinyin/meaning regardless of state | Shell now radius 28px, matching shadow, `overflow:hidden`, no padding; inner `.cardContent` carries state-specific padding instead of a fixed gap | **Fixed.** The old fixed-gap approach is the same class of bug flagged on the dashboard's continue-card text block last session (parent spacing stacking with children's own margins) — avoided here by not using gap at all, matching source's block-flow-with-margins approach. |
+| HSK+word badge (top-left of card) | coral pill `HSK 4 · 图书`, line 194 | Did not exist | Added `.cardBadge`, showing `HSK {level} · {hanzi}` | **Ported, with one simplification**: source's badge text is a *different, shorter* string ("图书") than the card's main word ("图书馆") — likely a demo-content quirk, not a real second field. Used the same hanzi for both badge and main display since there's no separate "short form" data field to pull from. |
+| Audio icon (top-right of card) | circular button with a speaker/volume SVG, line 195 | Did not exist | Added `.cardAudioBtn` with the literal speaker icon from source, positioned/styled to match | **Visual port only — not wired.** No audio data source exists for individual vocab words in the current schema. Clicking it does nothing right now. Backlog item, not fabricated. |
+| Decorative sparkle on card | small twinkling star SVG, line 196 | Did not exist | Not added | **Skipped**, purely decorative and non-essential; can revisit if wanted, low priority. |
+| Hanzi typography (not flipped) | `font-family:'Noto Serif SC',serif`, `font-size:80px`, `font-weight:700`, line 199 | `font-family:var(--hanzi-font)` (= Noto **Sans** SC, the sans-serif token used everywhere else in the app), `font-size:72px` | `font-family:'Noto Serif SC',serif` (font already loaded via the existing Google Fonts `<link>`, just never applied here), `font-size:80px` | **Fixed — this was a real, pre-existing drift** (wrong font family entirely, not just a size mismatch), independent of anything from Chunk A/C. |
+| Hanzi typography (flipped) | `font-weight:600`, `font-size:46px`, line 205 | Same element/size as not-flipped state (no distinct flipped styling) | `.cardContent.flipped .hanzi-big` overrides to 46px/600 | **Fixed.** |
+| Flip hint text | "Tap "Show answer" when you're ready", muted, line 200 | Did not exist | Added `.cardFlipHint`, shown only in not-flipped state | **Ported.** |
+| Pinyin (flipped) | `font-size:22px`, `font-weight:800`, `color:#C7900F`, line 206 | `font-size:20px`, `color:var(--gold)` (different hex — gold token is `#F2B01E`, source uses the darker `#C7900F` amber here) | `22px`/`800`/`#C7900F` | **Fixed.** |
+| Meaning + part-of-speech (flipped) | "library · noun", pos in a dimmer tone, line 207 | Just the meaning, no part-of-speech shown at all | Added `pos` to the vocab select queries (real DB column, already existed in schema) and render "meaning · pos" | **Ported — legitimate data-wiring, not fabrication** (`pos` already exists on `vocab`, just wasn't being selected/shown). |
+| Example sentence block | hanzi+pinyin+translation example, divider above it, lines 208-212 | Did not exist | **Not added** | **Deliberately skipped.** `vocab` has no example-sentence column in this schema — there is no real content to show. Fabricating one would violate the no-fake-data rule. Flagged as backlog needing a new data source before it can be built. |
+| Show-answer button | full-width, height 56, radius 16, gradient `#F8C13A→#F2B01E`, color `#1c2a5e`, shadow, hover lift, line 219 | Inherited the shared global `button{}` style (gold gradient but different stops/radius/height/weight/color), no shadow, no hover lift | Explicit overrides added to match source exactly | **Fixed.** |
+| Grade row layout | CSS grid, 4 equal columns, gap 12px, line 222 | Flex row with `gap:10px` (visually similar but not identical) | Changed to `grid-template-columns:repeat(4,1fr)`, `gap:12px` | **Fixed (minor).** |
+| Grade button colors | flat tinted pills: again=coral, hard=gold, good=green, easy=blue (rgba tints + solid text colors), lines 223-226 | Bold two-stop gradient buttons (danger-red/gold/ok-green/gold-again) — a completely different, higher-contrast visual language | Rewritten to the flat tinted pill style from source, colors matching exactly | **Fixed — this was the single biggest visual drift in this screen.** The old buttons looked like a different design system entirely. |
+| Grade button subtext (interval preview) | small text under each label ("< 1 min", "6 min", "1 day", "4 days" — specific to source's one demo card's SRS state) | Did not exist — buttons had only a single label, no subtext at all | Added `.gradeBtnSub`, populated by calling the existing `sm2Update()` function speculatively (preview only, not committed) for each of the 4 grades against the real current card | **Ported the *feature*, not source's literal demo text.** The actual displayed intervals will differ from source's exact wording since they reflect this app's real SM-2 implementation (which has no sub-day intervals — "Again" always shows "N day(s)", never "< 1 min"). Changing the algorithm itself to produce sub-day intervals would be a functional change to core SRS logic, out of scope for a visual port — flagged, not silently changed. |
+| Level-picker view, empty-state view | not shown in `03-flashcard.png` at all (comp only shows the active session) | Existing, functional, unstyled-by-this-effort | **Untouched** | Correctly out of scope — no design comp exists for these, same reasoning as leaving Raport/mock-result-review alone. |
+
+## DECISIONS_NEEDED — both items closed, see that file for the full writeup
+
+1. HSK ring 0% rule — confirmed correct (percentage-based, not level-6-specific).
+2. Recent History icon/color — writing/reading restored to their literal Recent-History-block values after an earlier over-correction; listening = `#5B93D6`/`#4A7CBE` per explicit decision, documented inline in the CSS.
+
+## Backlog items surfaced (not blockers, just noted)
+
+- Flashcard audio icon — visual only, not wired, no data source yet.
+- Flashcard example sentence — no schema field, not built.
+- Deck chip Learning/Review split threshold (`LEARNING_REPS_THRESHOLD = 2`) is our own convention, not from source — flag if a different threshold is wanted.
+
+## Next session: Mock test attempt ONLY — do not pair with anything else
+
+This is the screen you flagged as highest-risk (audio player, question navigator, listening badge, multiple question-type renderers) and the one most likely to exhaust a context budget on its own.
+
+**Located in `.dc.html`: `isTest` block, lines 302-358** (NOT `isMock`, which is lines 232-262 and is actually the *result* screen — confusingly named, easy to grab the wrong block). Cross-check against `04-mocktest-attempt.png`.
+
+What's in that block, so next session doesn't have to re-derive it:
+- **Header row** (lines 305-310): set icon (coral checkmark/rect, same icon already used for Mock Test everywhere else in this app) + set title/subtitle, and a timer pill (clock icon + monospace `94:58` countdown, gold-tinted).
+- **Toolbar row** (lines 313-320): Pinyin/Translation toggle chips (checkmark shown when active), "Question 13 / 95" label, then a progress bar (`height:8px`, gold→green gradient — a third, slightly different progress-bar treatment vs. the ones already ported on dashboard/flashcard).
+- **Question card** (lines 322-336): only ONE worked example in source — a **listening, true/false** question. Shows: section badge (blue "Listening" pill with speaker icon — same icon now already ported for Recent History), an audio player (play circle button, progress track, `0:12 / 0:38` time label), Chinese sentence prompt (Noto Sans SC, not serif — different from the flashcard's serif hanzi), optional pinyin/translation lines below it (toggled by the toolbar chips), then Benar/Salah (True/False) answer buttons.
+- **Nav buttons** (lines 338-341): Previous (outlined, muted) / Next (solid navy `#1C2A5E`, high contrast — a new accent color not used elsewhere yet).
+- **Question navigator** (lines 343-352): "Question navigator" label + "Filled 12/95" counter, then a grid of numbered cells (`sc-for` over `qNav`, ~30 shown as placeholder count but real count would be 95), plus a legend (Answered=navy, Current=gold, Flagged=coral outline, Empty=track-gray).
+- **Submit button** (line 354): full-width gold gradient, same treatment as the flashcard's Show-answer button (reuse that styling).
+
+**Why this is the risky one**: source only demonstrates ONE of what the app calls "8 question types" (true/false + listening). The existing app already has CSS for several other question renderers (`.qPassage`, `.choiceHanzi`, `.segmentHanzi`, `.orderingPreview`/`.orderingReveal`, `.charInputBox`, `.qEssayPrompt`/`.qEssayWord`/`.qEssayArticle` — at minimum reading passages, multiple choice, sentence ordering, character input, and essay). None of those have a source example to port from directly — the plan should be: port the shared chrome (card shell, header, toolbar, progress, nav buttons, question navigator, legend) faithfully from the one example given, then bring each existing question-renderer's *inner* content styling in line with that shared card shell's conventions (same badge style, same fonts/sizes/spacing patterns used elsewhere) rather than inventing new designs for types with zero source reference. Expect this to need its own DECISIONS_NEEDED entries for any question type where "how should this specifically look" isn't inferable from the one given example.
+
+Budget this screen alone. Don't start anything else after it in the same session.

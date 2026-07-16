@@ -74,6 +74,36 @@ number at the goal (show "20 / 20"), or keep the honest overshoot with some "exc
 (e.g. "40/20 ✓")? This is a product/copy decision, not a restyle — **do not implement either
 option without explicit sign-off.** Backlog.
 
+## 6. Flashcard speaker button — dead/unwired — OPEN, product decision
+
+`.cardAudioBtn` was ported as a visual-only element in `883a252` — "not wired, clicking does
+nothing," no audio data source exists for individual vocab words in the current schema. A
+button that looks live but does nothing is worse than no button. Options for user to decide:
+- **(a)** Hide the button until a real audio source exists
+- **(b)** Leave it as a visible placeholder (current state)
+
+Noted: user has an existing `edge-tts` pipeline for the listening section that might be
+reusable here — but that's a separate project/scope, not something to pull in as part of a
+visual-drift fix. **Do not implement either option — decision pending.**
+
+## 7. Flashcard badge redundant with main hanzi — OPEN, product decision
+
+Badge currently renders `HSK {level} · {hanzi}` using the *same* hanzi as the card's main
+word — e.g. "HSK 6 · 哦" over hanzi "哦". Identical string shown twice, zero added information.
+
+In source, badge ("HSK 4 · 图书") and main hanzi ("图书馆") are *different* — 图书 (book) vs
+图书馆 (library). That means source's badge is very likely showing a **topic/category**, not
+the word itself, since it's clearly not just a truncation. `883a252`'s port ("no second field
+to pull from data → filled with the same hanzi") was an **assumption that should have been
+skipped per the standing no-guessing rule**, not silently substituted — flagged here as the
+correction. Low-stakes but makes the badge currently useless.
+
+Options for user to decide, not to be implemented without sign-off:
+- **(a)** Drop the word portion, badge shows just "HSK {level}"
+- **(b)** Use the `pos` (part-of-speech) column, already selected as of `883a252`
+- **(c)** Use a radical field (would need to check if one exists in the `vocab` schema)
+- **(d)** Leave the redundant duplicate as-is
+
 ---
 
 Nothing else pending a decision right now.

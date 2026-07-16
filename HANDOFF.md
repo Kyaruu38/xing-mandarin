@@ -1,6 +1,17 @@
 # Handoff — session 2 (continuation after /clear)
 
-Scope is capped and paced explicitly (~1-2 screens per session, then `/clear`, verify-before-commit every time). This session ran long — flashcard drift fix, mock test attempt chrome, and question card + `listening_tf` all landed, verified in-browser and approved before each commit. Stopping here as instructed.
+Scope is capped and paced explicitly (~1-2 screens per session, then `/clear`, verify-before-commit every time). This session ran long — flashcard drift fix, mock test attempt chrome, question card + `listening_tf`, and a 7-renderer audit all landed, verified/approved before each commit. Stopping here as instructed.
+
+## 7-renderer audit: DONE, 0 renderers ported — `14ac666` (**this was the correct outcome, not a shortfall**)
+
+Audited `reading_mc`, `error_sentence`, `fill_blank`, `sentence_match`, `ordering`, `char_input`, `essay` — none have a source comp (source only ever demonstrated `listening_tf`). **Zero code changes to `index.html` this session.** That's the expected, correct result of an audit-only pass against renderers with no comp to port from — do not read "0 ported" as unfinished work next time this comes up.
+
+Findings:
+- **`char_input`/`essay` already correct**: real `<input type="text">`, real `<textarea>`, and `essayGradeBtn` already has its own `margin-top:0` (no `button{}` leak) — this code was written with real interaction in mind from the start, same pattern noted for `audioPlayBtn`/`tfBtn` in `37952ef`.
+- **Side-effect check on `image_tf`** (top priority this session, since it inherited half a restyle from `37952ef`): investigated whether `.listeningImageWrap` sitting between the newly-shadow-styled `.audioPlayer`/`.tfBtn` was a "half-ported" seam. Counted occurrences instead of eyeballing it — the shadow-elevated style only exists in 2 places (both literal copies of the same source paragraph, same commit), while the bordered-flat style `.listeningImageWrap` already uses exists in 20+ pre-existing locations across the file. **Conclusion: `.listeningImageWrap` was never broken.** See DECISIONS_NEEDED #13 (now resolved) for the design rule this settled.
+- **#12 (new, high priority)**: `.choiceItem`/`.segmentItem` — used by 6 of the 7 audited renderers — are non-semantic `<div>`s, same bug class as the toggleChip/gridBtn regressions from `8ec14ae`, but pre-existing and much wider (touches 4 render functions at once). This means **most of a 100-question mock test currently can't be answered by keyboard**. Elevated to the same priority tier as #9 (scoring) — both make the platform not launch-ready. Traced every click handler involved; it's mechanical (delegated click handler already works identically on `<button>` via `closest()`/`dataset`, no drag/hover/dblclick logic anywhere) — not fixed this session, footprint is too big for an audit pass, but logged with that risk assessment so it doesn't need re-deriving.
+
+**Method note for next time a "no comp" audit comes up**: when asked to judge whether something looks "off"/"timpang" against existing style, count real occurrences of each competing pattern before concluding — a pattern that appears in 2 places from the same source commit is not equivalent to one with 20+ independently-established locations, even if both look plausible by eye.
 
 ## Flashcard + fix drift: DONE — `e40aaf1`
 
@@ -73,6 +84,9 @@ You (Claude) port + syntax-check + report. The user screenshots in a live logged
 - **`e40aaf1`** — Fix flashcard session chrome (`:has()` → `.sessionActive` class toggle) and sidebar lang switch button margin-top leak
 - **`8ec14ae`** — Port mock test attempt chrome (header/toolbar/nav/navigator/submit), fixing two div-vs-semantic-element accessibility regressions and a second confirmed `button{}` leak
 - **`37952ef`** — Port question card + listening_tf renderer (the only question type with a source comp)
+- **`ae41660`** / **`38d78a8`** — Docs: post-`37952ef` checks, title/subtitle redundancy correction (#11)
+- **`25ddc86`** — Resolve HSK scoring formula (#9), log full-mock data gap and HSK 3.0 risk (#10)
+- **`14ac666`** — 7-renderer audit: 0 renderers ported (correct outcome, no comp exists), #13 resolved, #12 elevated to high priority — `index.html` untouched this commit, docs only
 
 All confirmed via `git log` — nothing left uncommitted in `index.html`.
 
@@ -115,14 +129,12 @@ All confirmed via `git log` — nothing left uncommitted in `index.html`.
 - Flashcard example sentence — no schema field, not built.
 - Deck chip Learning/Review split threshold (`LEARNING_REPS_THRESHOLD = 2`) is our own convention, not from source — flag if a different threshold is wanted.
 
-## Next session: audit the 7 non-listening_tf question renderers — fresh context, judgment-heavy
+## Next session: mock test RESULT screen ONLY — do not pair with #12 or #9
 
-Mock test attempt is now fully ported for the one question type source shows (chrome in `8ec14ae`, question card + `listening_tf` in `37952ef`). What's left: `reading_mc`, `error_sentence`, `fill_blank`, `sentence_match`, `ordering`, `char_input`, `essay` (and `listening_mc`/`image_tf`/`image_mc`, which partially inherited the shared audio/TF component restyle already — see below). None of these have a source comp. Source only ever demonstrated `listening_tf`.
+Source comp: `05-mocktest-result.png`, `.dc.html`'s `isMock` block (lines 232-262 — NOT `isTest`, which is the attempt screen already ported). Percentage ring, scaled score text (e.g. "245/300"), per-section breakdown each /100, PASSED/FAILED badge.
 
-**This is explicitly an audit-first session, not a port session.** Per the standing rule (established this session, see the "BOLEH/GA BOLEH" test the user set): shared chrome/tokens/literal-property values can be ported to these renderers, but LAYOUT/STRUCTURE decisions with zero source reference (e.g. how `ordering`'s drag tiles are arranged, what `char_input`'s box looks like) must be skipped and logged to `DECISIONS_NEEDED.md`, not invented. Expect the output of this session to be mostly a table + several new DECISIONS_NEEDED entries, with only the clearly-literal/token-level fixes actually applied.
+**Hard constraint carried over from #9 (still unresolved)**: the real HSK 200/300-point scale, per-section formula, and passing-line treatment for HSK 5-6 are NOT decided yet — formula itself was resolved by the user (`correct/total*100` per section, see DECISIONS_NEEDED #9), but the passing-line question for HSK 5-6 (no official pass score since 2013) is still open, and no combined/full-mock score is currently persisted anywhere (`test_attempts` only stores 3 independent section-level rows for a combined attempt, no group id). **If porting this screen needs a number that doesn't exist yet — a properly-scaled combined score, a badge that depends on the unresolved passing-line decision — skip it and point back to #9. Do not invent a formula or a passing-line default to unblock the visual port.** Port the presentation layer (ring, layout, badge treatment, section breakdown shell) using whatever real numbers already exist (raw `correct_count`/`total_questions`, per-section RPC results) and flag the gaps explicitly rather than filling them with a guess.
 
-**Already partially affected as a side effect of `37952ef`** (not a full port, just inherited restyling since these share `.audioPlayer`/`.tfRow`/`.tfBtn` with `listening_tf`): `image_tf` (audio player + TF buttons), `listening_mc`/`image_mc` (audio player only, still use the untouched `.choiceList`/`.choiceItem` for their own options). Worth a quick look first to see what they already inherited before auditing what's still missing.
+**Do not fold in #12** (the `.choiceItem`/`.segmentItem` keyboard-accessibility fix) even though it's now high priority — it's a separate, mechanical, cross-renderer change with its own footprint, not part of a visual port. Its own session.
 
-**Also flagged, not yet acted on**: `.attemptTitle` displaying `test_sets.title` in all-caps with the section name appended ("H4XING001 LISTENING") is very likely raw data in that table, not a CSS bug — verify against the actual DB value if picked up.
-
-Budget this as its own session. Don't pair with anything else.
+Budget this screen alone.

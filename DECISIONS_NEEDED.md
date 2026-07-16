@@ -673,4 +673,78 @@ editor: `select question_type from question_bank where set_id = (select set_id f
 where title ilike '%H6XING001%' and section = 'writing')` or equivalent) before treating this as
 a real #17 test candidate. Reporting only, nothing implemented or assumed.
 
+---
+
+## 27. Double "Listening" badge on `H4XING001` soal #1 — traced, not fixed
+
+User-reported from live verification of #12 (`H4XING001`, combined "Semua" attempt, soal #1,
+`listening_tf`): two stacked pills both reading "Listening" — a gold-outline pill on top, a
+blue pill+speaker-icon underneath.
+
+**Traced via `git log -S`, not guessed** — these are two independent, unrelated components that
+happen to share the word "Listening":
+
+- **Gold outline pill = `.sectionBreak`** (CSS `index.html:682`, logic
+  `attemptSectionBreaks`/`index.html:3211-3222,3295-3297`) — **older**, introduced in `ec87492`
+  ("Group writing/reading sets into one combined exam per base code"), well before any of this
+  restyle sequence. It's a **section-transition divider** for combined "Semua" attempts: only
+  renders once, at the first question of each new section (`distinctSections.size > 1` gate,
+  only when the combined exam actually spans >1 section). Nothing to do with question type.
+- **Blue pill+icon = `.qListeningBadge`** (CSS `index.html:829`, logic `index.html:3003` inside
+  `renderListeningTF`) — **newer**, added in `37952ef` (the listening_tf design-comp port,
+  this restyle sequence). It's a **per-question-type indicator**, rendered unconditionally on
+  every `listening_tf` question regardless of position.
+
+**Why it only doubles on soal #1, not every listening_tf question**: the gold divider only
+fires at a section boundary (first question of the listening section within the combined
+attempt) — since `H4XING001` (the listening component set) happens to be first in the combined
+"Semua" order, its first question hits both conditions at once. Any other `listening_tf`
+question later in the same section would show only the blue badge, not both — **not checked
+this session, worth confirming if this comes up again.**
+
+**Not a regression from `37952ef`** — both components are independently correct for what they
+each do; they were simply never checked against each other because no prior session's
+verification happened to land on a combined attempt's very first question. **Not fixed** —
+reporting only, per instruction. Options once the user decides:
+- **(a)** Keep both — they answer different questions ("which section am I in" vs "what type
+  of question is this") and only visually collide on one specific question per combined attempt
+- **(b)** Suppress `.qListeningBadge` specifically when `attemptSectionBreaks` also fires for
+  that index (avoids the one-question collision, keeps both features otherwise)
+- **(c)** Drop `.qListeningBadge` entirely, rely on the section divider + the existing audio
+  player as sufficient "this is a listening question" signal
+
+## 28. `.qListeningBadge` only exists on `listening_tf`, not on `listening_mc`/`image_mc`/`image_tf` — scope was always this narrow, now visibly inconsistent
+
+User-reported: `H4XING001` soal #11 (`listening_mc`, same set, same section, has its own audio
+player) shows **no** badge at all, while soal #1 (`listening_tf`) shows one (doubled, see #27).
+
+**Confirmed by reading `37952ef`'s own scope**: the blue badge was ported *specifically* for
+`listening_tf` because that's the **only** question type source's design comp (`.dc.html`
+`isTest` block) ever demonstrates — `renderListeningMC`/`renderImageMC`/`renderImageTF` were
+never touched by that commit (consistent with HANDOFF's own shared-component note: audio
+player/TF buttons are shared across all 4 listening-adjacent types, but the badge was not).
+Not a bug introduced by accident — it's the literal, intentional scope of that port — but it
+does mean 3 of the 4 audio-bearing question types currently show no "this is a listening
+question" signal while 1 does, which reads as inconsistent to a test-taker moving between them.
+
+**Not fixed — reporting only, per instruction.** Open question for user to decide, not to be
+implemented without sign-off: should `.qListeningBadge` (or equivalent) show on **every**
+question in the listening section (per-section basis — badge reflects `test_sets.section`,
+not `question_type`), or stay scoped to **only** `listening_tf` (per-type basis, current
+state)? Per-section would need moving the badge's render call out of `renderListeningTF`
+specifically and into wherever all 4 listening-adjacent renderers share a common wrapper (none
+currently exists — `renderListeningTF`/`renderListeningMC`/`renderImageMC`/`renderImageTF` are
+4 separate functions dispatched independently from the `question_type` switch at
+`index.html:3338-3344`).
+
+---
+
+## Correction, 2026-07-16 — `H4XING001` is 95 questions, not 90
+
+The `7/45=16, 0/40=0, 0/5=0 → 16/300` verification numbers recorded under #9 (and repeated in
+HANDOFF.md) came from a **different** set than `H4XING001`. `H4XING001` itself is confirmed 95
+questions by live verification this session. Not re-deriving which set the original 45/40/5
+split belongs to here — flagging only so the two numbers aren't conflated if #9's verification
+history gets revisited.
+
 Nothing else pending a decision right now.

@@ -686,14 +686,14 @@
     .qStemTrans{font-size:13px; color:var(--muted); margin-bottom:14px}
     ruby rt{ font-size:0.55em; color:var(--gold); font-weight:600; user-select:none; }
     .choiceList{display:flex; flex-direction:column; gap:8px; margin-top:10px}
-    .choiceItem{display:flex; align-items:baseline; flex-wrap:wrap; gap:8px; padding:12px 14px; background:var(--panel); border:1px solid var(--line); border-radius:12px; cursor:pointer; font-size:14px}
+    .choiceItem{display:flex; align-items:baseline; flex-wrap:wrap; gap:8px; width:auto; margin-top:0; padding:12px 14px; background:var(--panel); border:1px solid var(--line); border-radius:12px; cursor:pointer; font-size:14px; color:var(--text); font-weight:400; text-align:left; line-height:normal}
     .choiceItem.active{border-color:var(--gold); background:rgba(242,176,30,.10)}
     .choiceKey{font-weight:700; color:var(--gold); flex-shrink:0}
     .choiceHanzi{font-family:var(--hanzi-font); font-size:16px}
     .choicePinyin{color:var(--gold); font-size:12px}
     .choiceTrans{color:var(--muted); font-size:12px}
     .segmentList{display:flex; flex-direction:column; gap:8px; margin-top:10px}
-    .segmentItem{display:flex; align-items:center; gap:10px; padding:12px 14px; background:var(--panel); border:1px solid var(--line); border-radius:12px; cursor:pointer}
+    .segmentItem{display:flex; align-items:center; gap:10px; width:auto; margin-top:0; padding:12px 14px; background:var(--panel); border:1px solid var(--line); border-radius:12px; cursor:pointer; color:var(--text); font-weight:400; text-align:left; line-height:normal}
     .segmentItem.picked{border-color:var(--gold); background:rgba(242,176,30,.10)}
     .segmentBadge{width:24px; height:24px; border-radius:50%; background:var(--panel-2); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; color:var(--muted)}
     .segmentItem.picked .segmentBadge{background:linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#241a08; border-color:transparent}
@@ -3027,11 +3027,11 @@
       const active = key === selectedKey ? ' active' : '';
       const pinyinText = attemptShowPinyin ? pinyinStringFallback(text) : '';
       const pinyin = pinyinText ? `<span class="choicePinyin">${escapeHtml(pinyinText)}</span>` : '';
-      return `<div class="choiceItem${active}" data-key="${key}">
+      return `<button type="button" class="choiceItem${active}" data-key="${key}">
         <span class="choiceKey">${key}</span>
         <span class="choiceHanzi">${text ?? ''}</span>
         ${pinyin}
-      </div>`;
+      </button>`;
     }).join('');
     return `<div class="choiceList">${items}</div>`;
   }
@@ -3050,10 +3050,10 @@
     const selectedKey = answer?.correct;
     const items = Object.entries(options||{}).map(([key,path])=>{
       const active = key === selectedKey ? ' active' : '';
-      return `<div class="choiceItem imageChoiceItem${active}" data-key="${key}">
+      return `<button type="button" class="choiceItem imageChoiceItem${active}" data-key="${key}">
         <span class="choiceKey">${key}</span>
         <img class="imageChoiceImg" src="${listeningImageUrl(path)}" alt="Pilihan ${key}" />
-      </div>`;
+      </button>`;
     }).join('');
     return `<div class="choiceList imageChoiceList">${items}</div>`;
   }
@@ -3357,11 +3357,11 @@
       const pinyinText = (withPinyin && attemptShowPinyin) ? pinyinStringFallback(c.hanzi, c.pinyin) : '';
       const pinyin = pinyinText ? `<span class="choicePinyin">${escapeHtml(pinyinText)}</span>` : '';
       const trans = (attemptShowTranslation && c.id) ? `<span class="choiceTrans">${c.id}</span>` : '';
-      return `<div class="choiceItem${active}" data-key="${c.key}">
+      return `<button type="button" class="choiceItem${active}" data-key="${c.key}">
         <span class="choiceKey">${c.key}</span>
         <span class="choiceHanzi">${c.hanzi}</span>
         ${pinyin}${trans}
-      </div>`;
+      </button>`;
     }).join('');
     return `<div class="choiceList">${items}</div>`;
   }
@@ -3373,11 +3373,11 @@
       const picked = idx >= 0 ? ' picked' : '';
       const badge = idx >= 0 ? (idx + 1) : '';
       const trans = (attemptShowTranslation && s.id) ? `<span class="segmentTrans">${s.id}</span>` : '';
-      return `<div class="segmentItem${picked}" data-key="${s.key}">
+      return `<button type="button" class="segmentItem${picked}" data-key="${s.key}">
         <span class="segmentBadge">${badge}</span>
         <span class="segmentHanzi">${hanziPinyinHtml(s.hanzi || s.text)}</span>
         ${trans}
-      </div>`;
+      </button>`;
     }).join('');
     return `<div class="segmentList">${items}</div>`;
   }

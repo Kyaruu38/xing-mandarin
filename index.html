@@ -52,7 +52,7 @@
     }
     body, .sidebar, .pageCard, .statCard, .statBox, .hskCard, .quickTile, .choiceItem,
     .segmentItem, .mockSetCard, .historyItem, .historyCard, .dailyGoalCard, .loginFormPanel, .loginBrandPanel,
-    input, .langBtn, .themeToggle, .packageBadge{
+    input, .loginLangBtn, .loginThemeToggle, .packageBadge{
       transition:background-color .2s ease, color .2s ease, border-color .2s ease;
     }
     body.lang-zh .sidebar, body.lang-zh .pageHeader, body.lang-zh .sub, body.lang-zh .mockSetCard{ font-family:var(--hanzi-font); }
@@ -133,7 +133,7 @@
     .loginWordOfDayMeaning{ font-size:12.5px; color:rgba(255,255,255,.72); margin-top:2px; }
 
     .loginFormPanel{ position:relative; background:linear-gradient(180deg,var(--bg2),var(--bg)); display:flex; align-items:center; justify-content:center; padding:40px 24px; }
-    .loginLangSwitch{ position:absolute; top:24px; right:28px; display:flex; gap:4px; z-index:2; }
+    .loginLangSwitch{ position:absolute; top:24px; right:28px; display:flex; align-items:center; gap:9px; z-index:2; }
     .loginFormBox{ width:100%; max-width:380px; }
     .loginMobileBrand{ display:none; align-items:center; gap:12px; margin-bottom:28px; }
     .loginMobileBrand img{ width:44px; height:44px; object-fit:contain; }
@@ -260,21 +260,29 @@
     .sidebarUserName{ font-weight:700; font-size:14px; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .sidebarUserMeta{ font-size:12px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .sidebarLangSwitch{ display:flex; align-items:center; gap:8px; margin-top:12px; }
-    .langBtn{
-      flex:1 1 auto; padding:5px 9px; text-align:center; background:var(--panel); border:1px solid var(--line);
-      border-radius:8px; color:var(--muted); font-weight:700; cursor:pointer; font-size:11px;
+    /* Login's own lang switch / theme toggle: standalone classes, zero reliance on the
+       shared button{} rule (which was leaking margin-top:22px/width:100%/color:#241a08 --
+       same root cause already fixed for the sidebar below). Ported verbatim from .dc.html's
+       isLogin block (line 70), property-by-property -- toggle is a fixed 42x36px box
+       standing alone, the 3 languages sit inside one shared pill (not 3 independently
+       bordered buttons, which is what this used to be before this fix). Sidebar's own
+       .sbThemeToggle/.sbLangBtn (below) are untouched, separate classes, separate port. */
+    .loginThemeToggle{
+      flex:none; width:42px; height:36px; margin:0; padding:0; display:flex; align-items:center; justify-content:center;
+      background:var(--panel); border:none; border-radius:12px; box-shadow:0 4px 12px -6px rgba(var(--text-rgb),.18);
+      cursor:pointer; font-size:17px; line-height:1; color:inherit; font-weight:400; font-family:inherit;
     }
-    .langBtn.active{ background:linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#241a08; border-color:transparent; }
-    .themeToggle{
-      flex:0 0 auto; width:auto; margin-top:0; padding:5px 9px; background:var(--panel); border:1px solid var(--line);
-      border-radius:8px; cursor:pointer; font-size:13px; line-height:1;
+    .loginLangPill{
+      flex:none; display:flex; gap:3px; background:var(--panel); border-radius:13px; padding:4px;
+      box-shadow:0 3px 10px rgba(var(--text-rgb),.08);
     }
-    /* sidebar-only lang switch / theme toggle: standalone classes, zero reliance on
-       .langBtn/.themeToggle (which are button elements and were silently inheriting
-       leftover properties -- notably margin-top:22px -- from the global button{} rule
-       that scoped overrides never re-declared). Ported verbatim from .dc.html sidebar
-       block (lines 119-127), property-by-property, not just the visually-obvious ones.
-       Login's own .langBtn/.themeToggle row is untouched. */
+    .loginLangBtn{
+      flex:none; width:auto; margin:0; padding:5px 11px; text-align:center;
+      background:transparent; border:none; border-radius:9px;
+      color:rgba(var(--text-rgb),.5); font-weight:600; font-size:12px; cursor:pointer; font-family:inherit;
+    }
+    .loginLangBtn.active{ background:var(--gold); color:#1c2a5e; font-weight:700; }
+    .loginLangBtn[data-lang="zh"]{ font-family:var(--hanzi-font); }
     .sbThemeToggle{
       flex:none; width:34px; height:30px; margin:0; padding:0; display:flex; align-items:center; justify-content:center;
       background:var(--panel); border:none; border-radius:10px; box-shadow:0 2px 8px -4px rgba(var(--text-rgb),.28);
@@ -912,10 +920,12 @@
 
     <div class="loginFormPanel">
       <div class="loginLangSwitch" id="loginLangSwitch">
-        <button type="button" class="langBtn" data-lang="id">ID</button>
-        <button type="button" class="langBtn" data-lang="en">EN</button>
-        <button type="button" class="langBtn" data-lang="zh">中</button>
-        <button type="button" class="themeToggle" id="loginThemeToggle" aria-label="Switch to dark mode">☀️</button>
+        <button type="button" class="loginThemeToggle" id="loginThemeToggle" aria-label="Switch to dark mode">☀️</button>
+        <div class="loginLangPill">
+          <button type="button" class="loginLangBtn" data-lang="id">ID</button>
+          <button type="button" class="loginLangBtn" data-lang="en">EN</button>
+          <button type="button" class="loginLangBtn" data-lang="zh">中</button>
+        </div>
       </div>
       <div class="loginFormBox">
         <div class="loginMobileBrand">
@@ -1765,7 +1775,7 @@
     $('riwayatHeader').textContent = t('mockTestHistory');
 
     document.body.classList.toggle('lang-zh', currentLang === 'zh');
-    document.querySelectorAll('.langBtn, .sbLangBtn').forEach(b=>{
+    document.querySelectorAll('.loginLangBtn, .sbLangBtn').forEach(b=>{
       b.classList.toggle('active', b.dataset.lang === currentLang);
     });
     applyTheme();
@@ -4080,7 +4090,7 @@
   $('navRiwayat').addEventListener('click', ()=> navTo(openRiwayat));
   $('dashSeeAllHistory').addEventListener('click', ()=> navTo(openRiwayat));
 
-  document.querySelectorAll('.langBtn, .sbLangBtn').forEach(b=>{
+  document.querySelectorAll('.loginLangBtn, .sbLangBtn').forEach(b=>{
     b.addEventListener('click', ()=> setLang(b.dataset.lang));
   });
 

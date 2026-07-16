@@ -615,6 +615,20 @@ happen from scratch.
 Kartu tanpa sumber real = tampil TANPA angka. Angka di comp (186/404, 7/10, 82%) = placeholder,
 jangan direplikasi.
 
+### UPDATE by user, 2026-07-16 — hub shell dibangun (`materialsHubCard`), 2 keputusan visual
+
+Screen baru `#materialsHubCard`, terpisah dari `browseCard`/Kamus (yang masih hidup di nav
+Materials seperti sekarang — hub belum menggantikan apa pun). Static markup + styling doang,
+nol JS wiring (search input, filter chip, dan 4 kartu clickable-nanti semuanya tanpa listener).
+
+- **Hub subtitle**: klausa level ("for HSK 4") di-drop di shell karena belum ada wiring.
+  Kandidat: isi dari `profile.target_level` saat hub di-wire. Bukan larangan permanen, cuma
+  belum ada sumbernya.
+- **Badge dekoratif cover di comp** (🌙/✨/pill "HSK 4") di-drop: polanya tidak konsisten,
+  maknanya tidak jelas, kemungkinan artefak designer. TAPI pill level per-kartu = kandidat
+  nyata untuk fase locked-visible (badge level + gembok untuk konten di luar paket). Diputuskan
+  Kyaru, 16 Jul 2026.
+
 **BARU — Sistem paket (hasil audit sesi ini, verdict: ada sebagian, lihat audit lengkap di
 percakapan sesi ini untuk bukti baris kode):**
 - Tier: `hsk_1_4` / `hsk_5` / `hsk_6` / `vip`, **KUMULATIF**: `hsk_5` = level 1-5, `hsk_6` =

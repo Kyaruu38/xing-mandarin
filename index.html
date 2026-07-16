@@ -211,7 +211,7 @@
     @keyframes ringFill{ from{stroke-dashoffset:var(--circ)} to{stroke-dashoffset:var(--off)} }
     @media (prefers-reduced-motion: reduce){
       .sidebarStreakFlame{ animation:none !important; }
-      .statCard, .dashMascot, .pageCard.dash{ animation:none !important; opacity:1 !important; }
+      .statCard, .dashMascot, .pageCard.dash, .pageCard.materialsHub{ animation:none !important; opacity:1 !important; }
       .continueMoonGlow, .continueStar, .continueSparkle, .dailyGoalFill{ animation:none !important; }
       .hskRingProgress{ animation:none !important; }
       .mockResultSparkle, .resultRingProgress, .sectionCardBarFill{ animation:none !important; }
@@ -648,6 +648,66 @@
     .browsePinyin{width:76px; flex-shrink:0; color:var(--gold)}
     .browseMeaning{flex:1; color:var(--text)}
     .browseCount{font-size:11px; color:var(--muted); text-align:center; margin:10px 0 0}
+
+    /* ============ MATERIALS HUB (new screen shell) ============
+       Port of .dc.html's isMaterials block (lines 264-300) + 06-materials.png -- shape only,
+       not wired to any nav yet (see DECISIONS_NEEDED #22, Kamus/browseCard stays the live
+       Materials screen for now). No progress numbers on any card (comp's 186/404, 7/10, 82%
+       are placeholder demo data, not real) -- cards without a real data source render with no
+       number at all, same no-fake-data rule as #14/#15/#21. Decorative cover badges (moon/
+       sparkle emoji, "HSK 4" pill) dropped -- inconsistent pattern in source, no clear meaning,
+       and the level pill specifically doubles as a fabricated-level-number problem same as the
+       subtitle below. Per-card level pill is a real candidate for the later locked-visible/
+       gating pass, not for this shell (#22, 2026-07-16). Subtitle's "for HSK 4" clause dropped
+       for the same reason -- no target_level wiring exists yet in this shell pass.
+       Wrapper: .pageCard.materialsHub overrides to no background/border/shadow (mirrors
+       .pageCard.dash) since hub content is white cards already -- a second wrapper card would
+       be redundant, same contrast rule as dashboard/flashcard. Kamus's own .pageCard wrapper
+       (untouched, see .browse comment above) is a separate decision for a separate content
+       shape -- don't conflate the two. */
+    .pageCard.materialsHub{ background:none; border:none; box-shadow:none; padding:0; max-width:1000px; margin:0 auto; animation:fadeIn .4s ease; }
+    .hubTitle{ font-family:var(--display-font); font-size:28px; font-weight:700; color:var(--text); margin:0; }
+    .hubSubtitle{ margin-top:2px; font-size:14px; color:var(--muted); }
+    .hubToolbar{ margin-top:18px; display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+    .hubSearchWrap{ position:relative; flex:1; min-width:240px; display:flex; align-items:center; }
+    .hubSearchIcon{ position:absolute; left:16px; top:50%; transform:translateY(-50%); display:flex; opacity:.9; pointer-events:none; color:rgba(var(--text-rgb),.4); }
+    .hubSearchInput{
+      width:100%; height:50px; padding:0 16px 0 44px; background:var(--panel); color:var(--text);
+      border:1.5px solid rgba(var(--text-rgb),.09); border-radius:15px; font-size:14px; outline:none; font-family:inherit;
+      box-shadow:0 3px 10px -6px rgba(var(--text-rgb),.12);
+    }
+    .hubSearchInput::placeholder{ color:rgba(var(--text-rgb),.4); }
+    .hubChipRow{ display:flex; gap:8px; flex-wrap:wrap; }
+    .hubChip{
+      width:auto; margin-top:0; padding:9px 15px; background:var(--panel); color:rgba(var(--text-rgb),.6);
+      border:none; border-radius:99px; font-size:12.5px; font-weight:700; cursor:pointer; font-family:inherit;
+      box-shadow:0 2px 8px -4px rgba(var(--text-rgb),.15);
+    }
+    .hubChip.active{ background:var(--gold); color:#1c2a5e; font-weight:800; box-shadow:none; }
+    .hubGrid{ margin-top:22px; display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:18px; }
+    /* .hubCard = shared shape for both the real (button, clickable-later) and coming-soon (div,
+       genuinely inert -- a button that does nothing is the same dead-affordance issue as #6/#8)
+       cards. Button-specific resets (width/margin/padding/border/text-align/color/font-weight)
+       are harmless no-ops on the div variant, so one class covers both tags. */
+    .hubCard{
+      width:100%; margin-top:0; padding:0; border:none; text-align:left; display:block;
+      background:var(--panel); border-radius:22px; overflow:hidden; box-shadow:0 10px 24px -14px rgba(var(--text-rgb),.22);
+      color:inherit; font-family:inherit; font-weight:400; cursor:pointer; transition:transform .18s ease, box-shadow .18s ease;
+    }
+    .hubCard:hover{ transform:translateY(-4px); box-shadow:0 22px 40px -18px rgba(var(--text-rgb),.3); }
+    .hubCard.comingSoon{ cursor:default; }
+    .hubCardCover{ position:relative; height:120px; display:grid; place-items:center; }
+    .hubCardCover.vocab{ background:linear-gradient(140deg,#34A98A,#268a70); }
+    .hubCardCover.grammar{ background:linear-gradient(140deg,#F2B01E,#e09400); }
+    .hubCardCover.listening{ background:linear-gradient(140deg,#5B93D6,#3f76b8); }
+    .hubCardCover.reading{ background:linear-gradient(140deg,#E86F52,#cf5238); }
+    .hubCardCover.writing{ background:linear-gradient(140deg,#8A6BD1,#6f4fb5); }
+    .hubCardCover.mock{ background:linear-gradient(140deg,#2b3c78,#16234E); }
+    .hubCardBody{ padding:16px 18px; }
+    .hubCardTitle{ font-size:15px; font-weight:800; color:var(--text); }
+    .hubCardMeta{ margin-top:3px; font-size:12px; color:var(--muted); }
+    .hubComingSoonLabel{ color:#C7900F; font-weight:700; }
+
     /* mock test list */
     .mocklist{max-width:1200px}
     #mockList{ display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:16px; }
@@ -1290,6 +1350,80 @@
         <div id="riwayatList"></div>
       </div>
 
+      <!-- ============ MATERIALS HUB (new screen shell -- not wired to nav yet, see
+           DECISIONS_NEEDED #22). Static markup + styling only, zero JS wiring: search input
+           and filter chips have no listeners, card buttons have no click handlers. Kamus
+           (browseCard) stays the live screen behind the Materials nav item until a later
+           session swaps them. ============ -->
+      <div id="materialsHubCard" class="pageCard materialsHub hidden">
+        <p class="sub hubTitle" id="hubHeader">Materials</p>
+        <p class="hubSubtitle" id="hubSubtitle">Everything you need — decks, grammar, drills &amp; mock papers.</p>
+
+        <div class="hubToolbar">
+          <div class="hubSearchWrap">
+            <span class="hubSearchIcon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+            <input type="text" class="hubSearchInput" id="hubSearch" placeholder="Search materials, words, grammar…" />
+          </div>
+          <div class="hubChipRow" id="hubChipRow">
+            <button type="button" class="hubChip active" data-filter="all">All</button>
+            <button type="button" class="hubChip" data-filter="vocab">Vocab</button>
+            <button type="button" class="hubChip" data-filter="grammar">Grammar</button>
+            <button type="button" class="hubChip" data-filter="listening">Listening</button>
+            <button type="button" class="hubChip" data-filter="mock">Mock</button>
+          </div>
+        </div>
+
+        <div class="hubGrid">
+          <button type="button" class="hubCard" id="hubCardVocab" data-card="vocab">
+            <div class="hubCardCover vocab"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><rect x="3" y="4" width="14" height="16" rx="2"/><path d="M17 8h4v12H8"/></svg></div>
+            <div class="hubCardBody">
+              <div class="hubCardTitle">Vocab Deck</div>
+              <div class="hubCardMeta">Flashcard deck, per level</div>
+            </div>
+          </button>
+
+          <div class="hubCard comingSoon" data-card="grammar">
+            <div class="hubCardCover grammar"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><path d="M4 5.5A2 2 0 0 1 6 3.5h13v15H6a2 2 0 0 0-2 2z"/><path d="M19 18.5H6"/></svg></div>
+            <div class="hubCardBody">
+              <div class="hubCardTitle">Grammar</div>
+              <div class="hubCardMeta hubComingSoonLabel">Coming soon</div>
+            </div>
+          </div>
+
+          <div class="hubCard comingSoon" data-card="listening">
+            <div class="hubCardCover listening"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a9 9 0 0 1 0 14"/></svg></div>
+            <div class="hubCardBody">
+              <div class="hubCardTitle">Listening</div>
+              <div class="hubCardMeta hubComingSoonLabel">Coming soon</div>
+            </div>
+          </div>
+
+          <button type="button" class="hubCard" id="hubCardReading" data-card="reading">
+            <div class="hubCardCover reading"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><path d="M4 5.5A2 2 0 0 1 6 3.5h13v15H6a2 2 0 0 0-2 2z"/><path d="M19 18.5H6"/></svg></div>
+            <div class="hubCardBody">
+              <div class="hubCardTitle">Reading</div>
+              <div class="hubCardMeta">Reading practice sets</div>
+            </div>
+          </button>
+
+          <button type="button" class="hubCard" id="hubCardWriting" data-card="writing">
+            <div class="hubCardCover writing"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
+            <div class="hubCardBody">
+              <div class="hubCardTitle">Writing</div>
+              <div class="hubCardMeta">Free-write workspace</div>
+            </div>
+          </button>
+
+          <button type="button" class="hubCard" id="hubCardMock" data-card="mock">
+            <div class="hubCardCover mock"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><rect x="5" y="4" width="14" height="17" rx="2.2"/><path d="m9 12 2 2 4-4"/></svg></div>
+            <div class="hubCardBody">
+              <div class="hubCardTitle">Mock Paper</div>
+              <div class="hubCardMeta">Full mock tests</div>
+            </div>
+          </button>
+        </div>
+      </div>
+
     </main>
   </div>
 
@@ -1858,7 +1992,7 @@
 
   /* ---------- navigasi appShell (Task: reskin) ---------- */
   function hideAllPages(){
-    ['dashCard','practiceCard','raportCard','browseCard','mockListCard','attemptCard','resultCard','riwayatCard']
+    ['dashCard','practiceCard','raportCard','browseCard','mockListCard','attemptCard','resultCard','riwayatCard','materialsHubCard']
       .forEach(id => $(id).classList.add('hidden'));
   }
 

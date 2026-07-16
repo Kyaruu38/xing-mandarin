@@ -1,10 +1,35 @@
 # Handoff — session 2 (continuation after /clear)
 
-Scope for this session was capped at 4 items by explicit instruction (context-budget pacing: ~2 screens per session, then `/clear`). All done, verified in-browser with screenshots, committed. Stopping here as instructed.
+Scope is capped and paced explicitly (~1-2 screens per session, then `/clear`, verify-before-commit every time). This session ran long — flashcard drift fix, mock test attempt chrome, and question card + `listening_tf` all landed, verified in-browser and approved before each commit. Stopping here as instructed.
 
 ## Flashcard + fix drift: DONE — `e40aaf1`
 
 Follow-up round after pixel-level screenshot review surfaced 2 more drift items on top of `883a252`. Both fixed, verified in-browser (wrapper-white gone, sparkle visible, "Show answer" sentence case, lang switch + theme toggle spacing correct), committed as `e40aaf1`.
+
+## Question card + listening_tf renderer: DONE — `37952ef`
+
+Scoped strictly to the one question type source shows a worked example of (`isTest` block, `.dc.html` lines 322-336). Verified in-browser against a real `H4XING001` listening_tf question — badge, solid play button, solid progress fill, 23px prompt, True/False padding/radius, navigator + legend, submit button all confirmed matching. Audio playback confirmed working (0:04, pause state). Dark mode confirmed coherent without having been separately touched.
+
+**Drift table**:
+
+| Element | Source (`.dc.html`) | Was | Now |
+|---|---|---|---|
+| Audio play button | Solid `#F2B01E` circle, navy `#1c2a5e` icon, no border, drop shadow | Gradient circle, `#241a08` icon color, 1px border, no shadow | Matches source |
+| Audio progress fill | Solid `#F2B01E` | Gradient | Matches source |
+| Benar/Salah (`.tfBtn`) padding | `18px` uniform (`optStyle()` helper, `.dc.html` line 380) | `14px 0` | `18px` |
+| `.tfBtn` radius/border/weight | `16px` / `2px` / `800` | `12px` / `1px` / `700` | Matches source |
+| `.tfBtn` shadow | Shadow in both states (weaker inactive, gold-tinted active) | None | Matches source |
+| "Listening" badge | Blue pill + speaker icon, per-question | Did not exist | Added, reusing existing `SECTION_ICON`/`SECTION_LABEL`/listening-color tokens rather than re-declaring them |
+| Prompt text size | `23px` / weight `500` | Shared `.qStem` class at `16px` | Scoped to a **local override on this one render call**, not the shared class — 7 other renderers reuse `.qStem` and source gives no signal whether 23px is universal or listening_tf-specific |
+
+**Shared-component note**: `.audioPlayer`/`.audioPlayBtn`/`.audioProgressTrack`/`.audioProgressFill`/`.audioTime` and `.tfRow`/`.tfBtn` are used by `image_tf`, `listening_mc`, and `image_mc` too (via the shared `renderAudioPlayer()`/`renderTFButtons()` helpers) — restyling them for `listening_tf` cosmetically changed those 3 renderers as an unavoidable side effect. Their own distinctive parts (`.listeningImageWrap`/`.listeningImage`, `.choiceList`/`.choiceItem`) were not touched.
+
+**Consciously skipped**: play/pause glyph is still the existing unicode `▶`/`⏸` text, not source's SVG triangle — source only shows the "not playing" state, so porting just that one shape would leave the pause state visually inconsistent with nothing in source to match it to.
+
+### Two items checked post-commit, not fixed (reported, not restyle bugs)
+
+1. **Attempt header showing "H4XING001 LISTENING" in all-caps**: checked every `text-transform` rule in the file (6 total) — none touch `.attemptTitle`, `.attemptHeader`, `.attemptHeaderInfo`, `.pageCard`, or `.attempt`, and `$('attemptTitle').textContent = setRow.title` applies no transform in JS either. **Not a CSS bug** — the raw `title` value in `test_sets` for this set is almost certainly stored uppercase with the section name appended. Data content issue, not a restyle issue — flagging, not fixing.
+2. **"Filled 1/45" while on question 8, only Q1 marked answered**: traced the full path — `.tfBtn` click sets `attemptAnswers[q.id] = {correct: bool}` for both True and False, then calls `renderAttemptQuestion()`, which unconditionally calls `renderAttemptNav()` and `renderQuestionGrid()` on every render. `isQuestionAnswered()` already special-cases `listening_tf`/`image_tf` with `typeof a.correct === 'boolean'` (catches `false` as answered, avoiding the falsy-value trap a naive `!!a.correct` would hit). This is pre-existing logic, untouched this session, and provably correct by reading — the counter re-syncs after every single answer, synchronously, no async/server dependency in this path. **"Filled 1/45" while parked on Q8 having only answered Q1 is the correct expected output**, not a bug.
 
 ## Mock test attempt chrome: DONE — `8ec14ae`
 
@@ -47,6 +72,7 @@ You (Claude) port + syntax-check + report. The user screenshots in a live logged
 - **`883a252`** — Port Flashcard & SRS session view to design handoff comp
 - **`e40aaf1`** — Fix flashcard session chrome (`:has()` → `.sessionActive` class toggle) and sidebar lang switch button margin-top leak
 - **`8ec14ae`** — Port mock test attempt chrome (header/toolbar/nav/navigator/submit), fixing two div-vs-semantic-element accessibility regressions and a second confirmed `button{}` leak
+- **`37952ef`** — Port question card + listening_tf renderer (the only question type with a source comp)
 
 All confirmed via `git log` — nothing left uncommitted in `index.html`.
 
@@ -89,20 +115,14 @@ All confirmed via `git log` — nothing left uncommitted in `index.html`.
 - Flashcard example sentence — no schema field, not built.
 - Deck chip Learning/Review split threshold (`LEARNING_REPS_THRESHOLD = 2`) is our own convention, not from source — flag if a different threshold is wanted.
 
-## Next session: Mock test attempt ONLY — do not pair with anything else
+## Next session: audit the 7 non-listening_tf question renderers — fresh context, judgment-heavy
 
-This is the screen you flagged as highest-risk (audio player, question navigator, listening badge, multiple question-type renderers) and the one most likely to exhaust a context budget on its own.
+Mock test attempt is now fully ported for the one question type source shows (chrome in `8ec14ae`, question card + `listening_tf` in `37952ef`). What's left: `reading_mc`, `error_sentence`, `fill_blank`, `sentence_match`, `ordering`, `char_input`, `essay` (and `listening_mc`/`image_tf`/`image_mc`, which partially inherited the shared audio/TF component restyle already — see below). None of these have a source comp. Source only ever demonstrated `listening_tf`.
 
-**Located in `.dc.html`: `isTest` block, lines 302-358** (NOT `isMock`, which is lines 232-262 and is actually the *result* screen — confusingly named, easy to grab the wrong block). Cross-check against `04-mocktest-attempt.png`.
+**This is explicitly an audit-first session, not a port session.** Per the standing rule (established this session, see the "BOLEH/GA BOLEH" test the user set): shared chrome/tokens/literal-property values can be ported to these renderers, but LAYOUT/STRUCTURE decisions with zero source reference (e.g. how `ordering`'s drag tiles are arranged, what `char_input`'s box looks like) must be skipped and logged to `DECISIONS_NEEDED.md`, not invented. Expect the output of this session to be mostly a table + several new DECISIONS_NEEDED entries, with only the clearly-literal/token-level fixes actually applied.
 
-What's in that block, so next session doesn't have to re-derive it:
-- **Header row** (lines 305-310): set icon (coral checkmark/rect, same icon already used for Mock Test everywhere else in this app) + set title/subtitle, and a timer pill (clock icon + monospace `94:58` countdown, gold-tinted).
-- **Toolbar row** (lines 313-320): Pinyin/Translation toggle chips (checkmark shown when active), "Question 13 / 95" label, then a progress bar (`height:8px`, gold→green gradient — a third, slightly different progress-bar treatment vs. the ones already ported on dashboard/flashcard).
-- **Question card** (lines 322-336): only ONE worked example in source — a **listening, true/false** question. Shows: section badge (blue "Listening" pill with speaker icon — same icon now already ported for Recent History), an audio player (play circle button, progress track, `0:12 / 0:38` time label), Chinese sentence prompt (Noto Sans SC, not serif — different from the flashcard's serif hanzi), optional pinyin/translation lines below it (toggled by the toolbar chips), then Benar/Salah (True/False) answer buttons.
-- **Nav buttons** (lines 338-341): Previous (outlined, muted) / Next (solid navy `#1C2A5E`, high contrast — a new accent color not used elsewhere yet).
-- **Question navigator** (lines 343-352): "Question navigator" label + "Filled 12/95" counter, then a grid of numbered cells (`sc-for` over `qNav`, ~30 shown as placeholder count but real count would be 95), plus a legend (Answered=navy, Current=gold, Flagged=coral outline, Empty=track-gray).
-- **Submit button** (line 354): full-width gold gradient, same treatment as the flashcard's Show-answer button (reuse that styling).
+**Already partially affected as a side effect of `37952ef`** (not a full port, just inherited restyling since these share `.audioPlayer`/`.tfRow`/`.tfBtn` with `listening_tf`): `image_tf` (audio player + TF buttons), `listening_mc`/`image_mc` (audio player only, still use the untouched `.choiceList`/`.choiceItem` for their own options). Worth a quick look first to see what they already inherited before auditing what's still missing.
 
-**Why this is the risky one**: source only demonstrates ONE of what the app calls "8 question types" (true/false + listening). The existing app already has CSS for several other question renderers (`.qPassage`, `.choiceHanzi`, `.segmentHanzi`, `.orderingPreview`/`.orderingReveal`, `.charInputBox`, `.qEssayPrompt`/`.qEssayWord`/`.qEssayArticle` — at minimum reading passages, multiple choice, sentence ordering, character input, and essay). None of those have a source example to port from directly — the plan should be: port the shared chrome (card shell, header, toolbar, progress, nav buttons, question navigator, legend) faithfully from the one example given, then bring each existing question-renderer's *inner* content styling in line with that shared card shell's conventions (same badge style, same fonts/sizes/spacing patterns used elsewhere) rather than inventing new designs for types with zero source reference. Expect this to need its own DECISIONS_NEEDED entries for any question type where "how should this specifically look" isn't inferable from the one given example.
+**Also flagged, not yet acted on**: `.attemptTitle` displaying `test_sets.title` in all-caps with the section name appended ("H4XING001 LISTENING") is very likely raw data in that table, not a CSS bug — verify against the actual DB value if picked up.
 
-Budget this screen alone. Don't start anything else after it in the same session.
+Budget this as its own session. Don't pair with anything else.

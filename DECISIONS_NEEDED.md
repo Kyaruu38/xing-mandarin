@@ -259,4 +259,72 @@ Options for user to decide, not to be implemented without sign-off:
 
 ---
 
+## 12. Answer-selection `<div>`s across ~6 renderers aren't keyboard-reachable — OPEN, HIGH PRIORITY (elevated 2026-07-16, same tier as #9)
+
+Same class of bug as the toggle-chip/gridBtn regressions caught and fixed in `8ec14ae` (real
+exam app, `<div onclick>` can't be Tab'd to or activated with Space/Enter) — but this instance
+is **pre-existing** (not introduced this session) and spans a much bigger footprint:
+
+- `.choiceItem` (via `renderChoiceList()`) — used by `reading_mc`, `error_sentence`,
+  `fill_blank`, `sentence_match`
+- `.choiceItem` (via `renderListeningOptions()`) — used by `listening_mc`
+- `.choiceItem.imageChoiceItem` (via `renderImageOptions()`) — used by `image_mc`
+- `.segmentItem` (via `renderSegmentList()`) — used by `ordering`
+
+That's 6 of the 7 audited renderers relying on the same non-semantic pattern — meaning most
+of a 100-question mock test currently cannot be answered without a mouse. **This is
+functional, not cosmetic**: elevated to the same priority tier as #9 (scoring), since both
+make the platform not sellable as-is (one can't be trusted for accurate results, this one
+locks out keyboard-only users from most of the exam).
+
+**Honest risk assessment** (read every relevant code path before writing this, not guessing):
+this is a **mechanical fix, no hidden traps found**. All four render functions
+(`renderChoiceList`, `renderListeningOptions`, `renderImageOptions`, `renderSegmentList`)
+just emit a template-string `<div class="...">`; the ordering picker's multi-select logic
+(push/remove from an `order` array) lives entirely in the delegated click handler, keyed off
+`e.target.closest('.segmentItem')` / `.choiceItem` and `.dataset.key` — `closest()` and
+`dataset` work identically on a `<button>`. There is no drag, hover, dblclick, or long-press
+interaction anywhere in this path — confirms `ordering` really is click-only, consistent with
+what you'd already guessed. The delegated-click pattern is the exact same one already proven
+working for `.tfBtn`/`.essayGradeBtn`, which are already real buttons today. Converting is:
+swap the tag in 4 template strings, add `type="button"`, and reset the `button{}` leak
+(`margin-top`, `padding`, `width`, `background`) explicitly on `.choiceItem` /
+`.imageChoiceItem` / `.segmentItem` — same recipe as `8ec14ae`'s two fixes, just wider.
+**No logic changes needed, no interaction mechanism changes** (multi-select stays click/tap,
+not drag). Still not touched this session — this needs its own explicit go-ahead given the
+footprint, but there's no technical reason to expect surprises.
+
+## 13. Shadow-elevated vs. bordered-flat container convention — RESOLVED by user, 2026-07-16
+
+Flagged while checking whether `listening_tf`'s port left `image_tf` visually "timpang"
+(your priority check this session). Investigated by counting real occurrences, not by feel —
+here's the count:
+
+- **Shadow-elevated, no border** (`.audioPlayer`, `.tfBtn` — both from `37952ef`): exactly
+  **2 locations**, both literal copies of the *same single paragraph* in `.dc.html`'s `isTest`
+  block, added in the *same commit*. Per this session's own 2-location rule, that's not an
+  independently-established convention — it's one source example applied to two sibling
+  elements.
+- **Bordered, no shadow** (`border:1px solid var(--line)`, no `box-shadow`): **20+ locations**
+  across the whole file, pre-dating this session — `.choiceItem`, `.segmentItem`,
+  `.orderingReveal`, `.qEssayArticle`, `.essayTextarea`, `.essayResult`, `.mockSetCard`,
+  `.statBox`, `.reviewItem`, `.reviewChoice`, and — the one in question —
+  `.listeningImageWrap` itself. This is the app's genuinely dominant, long-established
+  container pattern.
+
+**Rule, settled**: shadow-elevated styling applies **only to interactive elements** (audio
+player, answer buttons) — matching the one thing source actually shows (its only two
+shadow-styled components are both interactive). Bordered-flat stays correct for **passive
+content** (images, article excerpts, previews) — matching the 20+ existing locations, none
+of which get touched or "upgraded." **Nothing is broken; `.listeningImageWrap` was already
+right.** Do not move the app toward shadow-elevated more broadly — this was a real design
+rule, not a compromise, and it doesn't need re-litigating next time a passive-content
+container sits next to a newly-ported interactive one.
+
+Extending the 2-location shadow pattern to override the 20+-location bordered convention
+would have been exactly the kind of rationalized invention this session was told to avoid —
+counting caught it before it happened. **No code change made or needed.**
+
+---
+
 Nothing else pending a decision right now.

@@ -129,12 +129,18 @@ All confirmed via `git log` — nothing left uncommitted in `index.html`.
 - Flashcard example sentence — no schema field, not built.
 - Deck chip Learning/Review split threshold (`LEARNING_REPS_THRESHOLD = 2`) is our own convention, not from source — flag if a different threshold is wanted.
 
+## Remaining session order: result → materials → #12 → dark mode (fixed order, don't reshuffle)
+
+**#12 (`.choiceItem`/`.segmentItem` → real `<button>`) must land BEFORE the dark mode sweep, not after.** That conversion adds new `button{}`-leak CSS resets (`margin-top`, `padding`, `width`, `background`) on classes the dark-mode pass would otherwise need to re-check. Doing dark mode first means redoing it once #12 lands. Dark mode is last on purpose — only make that sweep once all markup for a screen is final.
+
 ## Next session: mock test RESULT screen ONLY — do not pair with #12 or #9
 
 Source comp: `05-mocktest-result.png`, `.dc.html`'s `isMock` block (lines 232-262 — NOT `isTest`, which is the attempt screen already ported). Percentage ring, scaled score text (e.g. "245/300"), per-section breakdown each /100, PASSED/FAILED badge.
 
-**Hard constraint carried over from #9 (still unresolved)**: the real HSK 200/300-point scale, per-section formula, and passing-line treatment for HSK 5-6 are NOT decided yet — formula itself was resolved by the user (`correct/total*100` per section, see DECISIONS_NEEDED #9), but the passing-line question for HSK 5-6 (no official pass score since 2013) is still open, and no combined/full-mock score is currently persisted anywhere (`test_attempts` only stores 3 independent section-level rows for a combined attempt, no group id). **If porting this screen needs a number that doesn't exist yet — a properly-scaled combined score, a badge that depends on the unresolved passing-line decision — skip it and point back to #9. Do not invent a formula or a passing-line default to unblock the visual port.** Port the presentation layer (ring, layout, badge treatment, section breakdown shell) using whatever real numbers already exist (raw `correct_count`/`total_questions`, per-section RPC results) and flag the gaps explicitly rather than filling them with a guess.
+**#9 status**: formula RESOLVED (`correct/total*100` per section) and passing line RESOLVED (option b — HSK 1-4 get a real PASSED/FAILED badge at 180/120; HSK 5-6 show 180 as a labeled *target* with distinct wording/color, e.g. "Target tercapai"/"Belum sampai target" — **never literally "PASSED"/"FAILED" for HSK 5-6**, since no official pass line has existed for those levels since Feb 2013).
 
-**Do not fold in #12** (the `.choiceItem`/`.segmentItem` keyboard-accessibility fix) even though it's now high priority — it's a separate, mechanical, cross-renderer change with its own footprint, not part of a visual port. Its own session.
+**Still blocking, and NOT fixable by this port — this is a schema gap, not a missing formula**: a combined score like "245/300" cannot be built because **no combined/full-mock row is ever persisted**. The "Semua" (all-sections) attempt calls `submit_attempt` 3 times — once per underlying single-section set — and 3 independent section-level rows land in `test_attempts` with no group id linking them back together. There is no query that reconstructs "245/300" from what's stored today. **If the port needs that number, skip it and point back to #9 — do not invent a formula, do not invent a default, do not work around the missing group id.** Port the presentation layer (ring, layout, badge treatment, section breakdown shell) using whatever real numbers already exist per-section (`correct_count`/`total_questions`, per-section RPC results) and flag the gap explicitly.
+
+**Do not fold in #12 or dark mode** into this session — see the fixed ordering above. Result screen only.
 
 Budget this screen alone.

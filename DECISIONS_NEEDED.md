@@ -164,19 +164,24 @@ Reference table (context only, not for hardcoding):
 | HSK 5 | 45 (2.22pt) | 45 (2.22pt) | 10 (10pt) | 300 | **none** |
 | HSK 6 | 50 (2pt) | 50 (2pt) | 1 (100pt!) | 300 | **none** |
 
-### Passing line — still OPEN
+### Passing line — RESOLVED by user, 2026-07-16 (option b)
 
 HSK 5 and 6 have had **no official passing score since Feb 2013** — real HSK only issues a
 raw score report for those levels, no pass/fail line. This matters here specifically: the
 user's own level is HSK 6, so a PASSED/FAILED badge at that level would be factually wrong
 if built naively off the HSK 3-6 180-point line.
 
-Options, not to be chosen without sign-off:
-- **(a)** HSK 1-4 → PASSED/FAILED badge. HSK 5-6 → score only, no badge.
-- **(b)** HSK 5-6 → still show 180 as an unofficial target, different label ("Target
-  tercapai" instead of "PASSED") to avoid implying it's the real pass line.
-- **(c)** All levels → 180/120, treat it as this platform's own internal bar regardless of
-  official status.
+**Decision**: HSK 1-4 → real PASSED/FAILED badge, line 180 (HSK 3-4) / 120 (HSK 1-2). HSK 5-6
+→ still show 180 as a **target**, but with a label and color distinct from PASSED/FAILED —
+e.g. "Target tercapai" / "Belum sampai target" (not "PASSED"/"FAILED", not the same visual
+treatment). **HSK 5-6 must never render the literal words PASSED/FAILED.**
+
+**Reasoning, on record so it doesn't get re-litigated**: writing "FAILED" at HSK 5-6 would be
+a factual lie — no such line exists in the real exam past that level. But this platform is a
+*practice tool*, and a practice tool without any readiness benchmark isn't useful either —
+180 is the de facto benchmark serious HSK 5-6 test-takers already use to judge themselves,
+even without it being an official pass line. Showing it as a labeled *target* rather than a
+*pass/fail verdict* keeps the number useful without asserting something false.
 
 ### Prerequisite findings — checked in code, reporting only, nothing implemented
 

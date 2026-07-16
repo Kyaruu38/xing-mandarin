@@ -123,37 +123,115 @@ Options for user to decide, not to be implemented without sign-off:
 
 ---
 
-## 9. Mock test scoring doesn't map to the real HSK scale — OPEN, core product logic, high priority
+## 9. Mock test scoring doesn't map to the real HSK scale — core product logic, high priority
 
 Result screen currently shows "2/90 Score" and "2/90 Correct" — two cards, identical raw
-numbers, zero added information. Real HSK scoring: HSK 3-6 tests are scored out of 300
-(listening 100 + reading 100 + writing 100), passing line 180; HSK 1-2 are scored out of 200
-(no writing section), passing line 120. Our question sets don't match the real question
-counts either — e.g. our HSK 4 set has 90 questions vs. the real exam's 100 (45/40/15 split
-across sections).
+numbers, zero added information. Real HSK: HSK 3-6 = /300 (listening 100 + reading 100 +
+writing 100), HSK 1-2 = /200 (no writing). Per-question point weight differs **by section by
+level**, not by question type — e.g. HSK 6 writing is a single essay worth 100 of the 300
+points; HSK 1 listening is 20 questions at 5 points each. No per-section minimum exists
+anywhere in the real exam — only the total decides pass/fail.
 
-The design comp (`05-mocktest-result.png`) shows the *target* presentation — a percentage
-ring (82), a scaled score text (245/300), a per-section breakdown each out of 100, and a
-PASSED/FAILED badge — but gives **no computation logic**, since it's a static prototype with
-hardcoded demo numbers. The raw-count → HSK-scale mapping is a product decision, not
-something inferable from the comp.
+The design comp (`05-mocktest-result.png`) shows the *target* presentation — percentage ring,
+scaled score text (245/300), per-section breakdown each /100, PASSED/FAILED badge — but gives
+no computation logic (static prototype, hardcoded demo numbers).
 
-**Not to be guessed or implemented** — decisions needed before this can be built:
-- **(a)** Max score per level: 300 for HSK 3-6, 200 for HSK 1-2?
-- **(b)** Raw→scale mapping: proportional per section (`correct/total * 100` per section,
-  summed), or some other formula?
-- **(c)** Passing line: 180 (HSK 3-6) / 120 (HSK 1-2) — applied to the mapped score, not the
-  raw count?
-- **(d)** What do the two now-redundant cards become? (e.g. Score = HSK-scale number, Correct
-  = raw count — but that's a guess, needs sign-off)
-- **(e)** Does our set's question count diverging from the real exam's (90 vs 100 for HSK 4)
-  need to factor into the mapping, or does the proportional formula already absorb it?
+### Formula — RESOLVED by user, 2026-07-16
 
-**Sequencing note**: this is scoring *logic*, not a restyle — do not build it in the same
-pass as porting the result screen's visual chrome. Port the result screen's presentation
-layer first (ring, layout, badge treatment) using whatever real numbers already exist; if a
-number needed for that port doesn't exist yet (e.g. a properly-scaled score), skip it and
-point back to this item rather than inventing a formula.
+```
+score_section = round(correct_in_section / total_in_section * 100)
+total         = listening + reading + (writing if level >= 3)
+max           = 200 (HSK 1-2) | 300 (HSK 3-6)
+```
+
+`total_in_section` must be read from the actual set's real question count at scoring time,
+**never hardcoded** from the reference table below — it's context, not a lookup table to
+bake into code. Real HSK's official published scoring formula is proprietary, but this
+matches the HSK's own publicly-documented estimation method (correct/total × section max),
+which is legitimate for a mock. This also automatically absorbs any mismatch between our
+sets' question counts and the real exam's (e.g. our HSK 4 reading set has 40 questions,
+matching the real exam's split exactly per `sql/mocktest/hsk4-r-001.sql` — but even where a
+set's count differs, the proportional formula doesn't care).
+
+Reference table (context only, not for hardcoding):
+
+| Level | Listening | Reading | Writing | Max | Pass |
+|---|---|---|---|---|---|
+| HSK 1 | 20 (5pt) | 20 (5pt) | — | 200 | 120 |
+| HSK 2 | 35 (2.86pt) | 25 (4pt) | — | 200 | 120 |
+| HSK 3 | 40 (2.5pt) | 30 (3.33pt) | 10 (10pt) | 300 | 180 |
+| HSK 4 | 45 (2.22pt) | 40 (2.5pt) | 15 (6.67pt) | 300 | 180 |
+| HSK 5 | 45 (2.22pt) | 45 (2.22pt) | 10 (10pt) | 300 | **none** |
+| HSK 6 | 50 (2pt) | 50 (2pt) | 1 (100pt!) | 300 | **none** |
+
+### Passing line — still OPEN
+
+HSK 5 and 6 have had **no official passing score since Feb 2013** — real HSK only issues a
+raw score report for those levels, no pass/fail line. This matters here specifically: the
+user's own level is HSK 6, so a PASSED/FAILED badge at that level would be factually wrong
+if built naively off the HSK 3-6 180-point line.
+
+Options, not to be chosen without sign-off:
+- **(a)** HSK 1-4 → PASSED/FAILED badge. HSK 5-6 → score only, no badge.
+- **(b)** HSK 5-6 → still show 180 as an unofficial target, different label ("Target
+  tercapai" instead of "PASSED") to avoid implying it's the real pass line.
+- **(c)** All levels → 180/120, treat it as this platform's own internal bar regardless of
+  official status.
+
+### Prerequisite findings — checked in code, reporting only, nothing implemented
+
+1. **`question_bank.section` exists as a column**, but it's a denormalized copy written at
+   insert time (`sql/mocktest/hsk4-r-001.sql` line 19 inserts `section` per-row) — every row
+   in a set carries its parent set's section, since a set is single-section by construction.
+   Not an independent per-question value.
+2. **`test_sets.section` is per-set, one of listening/reading/writing** — confirmed via
+   `sql/03_submit_attempt_essay.sql`'s `submit_attempt` RPC, which joins `test_sets` by
+   `set_id` to stamp a single `section` onto each `test_attempts` row. A "full mock"
+   (HSK 4 all sections) isn't one set — it's 3 separate single-section sets stitched together
+   client-side (`startCombinedAttempt`, the "Semua" tab), grouped by shared title base code.
+   **For a combined attempt, `submit_attempt` gets called 3 times (once per underlying
+   set_id)**, and the JS sums the 3 results for the on-screen total — but **no single
+   combined row gets persisted**; 3 independent section-level rows land in `test_attempts`,
+   with no FK/group id linking them back together. If a historical "full mock" score view is
+   ever wanted later, reconstructing it means joining those rows by `user_id` + close
+   `created_at` timestamps, which is fragile — flagging this as a real structural gap, not
+   something to silently work around.
+3. **Writing is graded per-question by the `grade-essay` Edge Function**, literal `"score":
+   <0-100 integer>` from the AI (`supabase/functions/grade-essay/index.ts` line 29's rubric
+   spec), stored in `essay_submissions.ai_score`. This is **completely separate from
+   `submit_attempt`** — `sql/03_submit_attempt_essay.sql` explicitly excludes `essay`-type
+   questions from that RPC's `total_points`/`correct_count`/`score` (patch comment: essay
+   answers used to be counted as always-wrong before this fix). `index.html`'s `showResult()`
+   already has an `isAllEssay` branch (~line 3438) that averages the per-question AI scores
+   client-side instead of reading the RPC's score field — confirms writing-section sets are
+   100% essay-type rows (no mixed objective+essay set exists in this data model). For a
+   multi-question writing section (HSK 4 = 15 essay rows), the section score would need
+   averaging (or summing then rescaling) those per-question 0-100 AI scores into the
+   section's /100 — not yet decided which.
+4. **`test_attempts` stores, per single-section row**: `score`, `total_points` (both
+   points-weighted — but real data currently has `points = 1` on every question row, flat, no
+   per-level weighting baked in yet, confirmed in `sql/mocktest/hsk4-r-001.sql`), and
+   `correct_count`, `total_questions` (raw counts). The raw counts needed for the resolved
+   formula already exist per-section. What does **not** exist: any persisted combined/full
+   -mock record (see #2 above) — that's the real gap, not the per-section raw data.
+
+**Sequencing note unchanged**: this is scoring logic, not a restyle. Port the result screen's
+visual chrome first using whatever real numbers already exist (raw counts, per-section RPC
+results); if a number needed for that port doesn't exist yet (a properly-scaled combined
+score), skip it and point back here rather than inventing a formula.
+
+## 10. HSK 3.0 rollout (July 2026) — out of scope, strategic risk only, user will verify
+
+Not a restyle task, not something to act on. Noting for awareness: HSK 3.0 is scheduled for
+full worldwide implementation this month (July 2026) — syllabus released 2025-11-15, took
+effect 2025-11-18, global trial ran 2026-01-31. Changes: 9 levels instead of 6, beginner/
+intermediate vocabulary lowered, speaking becomes mandatory from level 3 onward. This
+platform is built on HSK 2.0 (6 levels, 4,991-word vocab list, matching the level/vocab
+structure `vocab.meaning_id` and the level-picker UI already assume throughout the app).
+
+**Not something to implement or plan around right now** — user will verify against primary
+sources separately. Recorded here only so it's on record as a known structural risk to the
+platform's core level model, should it come up later.
 
 ---
 

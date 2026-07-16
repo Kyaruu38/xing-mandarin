@@ -225,18 +225,18 @@ visual chrome first using whatever real numbers already exist (raw counts, per-s
 results); if a number needed for that port doesn't exist yet (a properly-scaled combined
 score), skip it and point back here rather than inventing a formula.
 
-## 10. HSK 3.0 rollout (July 2026) — out of scope, strategic risk only, user will verify
+## 10. HSK 3.0 rollout (July 2026) — RESOLVED by user, 2026-07-16
 
-Not a restyle task, not something to act on. Noting for awareness: HSK 3.0 is scheduled for
-full worldwide implementation this month (July 2026) — syllabus released 2025-11-15, took
-effect 2025-11-18, global trial ran 2026-01-31. Changes: 9 levels instead of 6, beginner/
-intermediate vocabulary lowered, speaking becomes mandatory from level 3 onward. This
-platform is built on HSK 2.0 (6 levels, 4,991-word vocab list, matching the level/vocab
-structure `vocab.meaning_id` and the level-picker UI already assume throughout the app).
+Background (unchanged): HSK 3.0 is scheduled for full worldwide implementation this month
+(July 2026) — syllabus released 2025-11-15, took effect 2025-11-18, global trial ran
+2026-01-31. Changes: 9 levels instead of 6, beginner/intermediate vocabulary lowered, speaking
+becomes mandatory from level 3 onward. This platform is built on HSK 2.0 (6 levels, 4,991-word
+vocab list, matching the level/vocab structure `vocab.meaning_id` and the level-picker UI
+already assume throughout the app).
 
-**Not something to implement or plan around right now** — user will verify against primary
-sources separately. Recorded here only so it's on record as a known structural risk to the
-platform's core level model, should it come up later.
+**Decision**: Platform commit ke HSK 2.0 sampai seluruh fitur stabil. HSK 3.0 = future feature
+(track/mode terpisah), BUKAN migrasi. Konsekuensi: `meaning_id` translate 595 kata TIDAK lagi
+gated, boleh dikerjain. Diputuskan Kyaru, 16 Jul 2026.
 
 ## 11. Attempt header title/subtitle now redundant ("...LISTENING" shown twice) — OPEN, display-only
 

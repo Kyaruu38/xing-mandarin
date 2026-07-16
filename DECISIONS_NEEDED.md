@@ -596,6 +596,54 @@ from the contrast rule once the IA underneath it changes — this note (and the 
 in `index.html` next to `.browse{max-width:640px}`) exists so that re-derivation doesn't have to
 happen from scratch.
 
+### UPDATE by user, 2026-07-16 — 3 prasyarat RESOLVED + sistem paket diaudit
+
+**(a) RESOLVED — Hub = launcher + workspace, bukan document library.** Per kartu:
+- **Vocab Deck**: Kamus existing pindah ke sini, dipecah per level HSK. Dashboard "Dictionary"
+  quick action diarahkan ke kartu ini. (= jawaban prasyarat (b) di atas — dictionary pindah ke
+  hub, dashboard quick action ikut retarget.)
+- **Mock Paper**: klik = redirect ke mock test flow existing.
+- **Reading**: launcher ke question set reading existing.
+- **Listening**: kartu "Coming soon", belum clickable (pipeline `edge-tts` nyusul).
+- **Writing**: workspace ngetik bebas (notepad). Fase 1 typed only; integrasi `grade-essay` =
+  fase berikutnya; handwriting/canvas = fase 2, tidak dibangun sekarang.
+- **Grammar**: AKAN dibangun — konten grammar per level HSK + contoh penggunaan, difilter sesuai
+  paket user. Proyek konten baru (schema + generate), track terpisah dari hub shell. Sampai
+  kontennya ada: kartu "Coming soon".
+
+**(c) RESOLVED — Progress numbers hanya dari sumber real** (`user_mastery`, `test_attempts`).
+Kartu tanpa sumber real = tampil TANPA angka. Angka di comp (186/404, 7/10, 82%) = placeholder,
+jangan direplikasi.
+
+**BARU — Sistem paket (hasil audit sesi ini, verdict: ada sebagian, lihat audit lengkap di
+percakapan sesi ini untuk bukti baris kode):**
+- Tier: `hsk_1_4` / `hsk_5` / `hsk_6` / `vip`, **KUMULATIF**: `hsk_5` = level 1-5, `hsk_6` =
+  level 1-6, `vip` = level 1-6 (vip = marketing label, isi sama dengan `hsk_6`). Diputuskan
+  Kyaru, 16 Jul 2026.
+- **KONSEKUENSI (belum dieksekusi)**: `PACKAGE_LEVELS` di `index.html:1350-1357` harus diubah —
+  `hsk_5: [5]` → `[1,2,3,4,5]`, `hsk_6: [6]` → `[1,2,3,4,5,6]`. Arah aman (nambah akses, bukan
+  nyabut).
+- **Konten di luar paket**: LOCKED-VISIBLE (keliatan + gembok + CTA "contact admin untuk
+  upgrade"), menggantikan pola hide total yang sekarang ada di flashcard/dashboard/raport/mock.
+  Preseden pola: business/convo "coming soon" yang sudah ada.
+- **Pricing**: TBD, di luar scope.
+- **GAP tercatat #1**: Kamus (`renderBrowseLevelPicker`, `index.html:2668-2685`) tidak cek
+  `userPackageLevels` — user paket bawah bisa akses vocab level 5/6. Dibayar saat Kamus pindah
+  ke hub.
+- **GAP tercatat #2 (SECURITY DEBT)**: enforcement 100% client-side. `vocab` RLS
+  (`sql/01_vocab_schema.sql`) terbuka untuk semua `authenticated` user tanpa filter package;
+  `startAttempt()`/`startCombinedAttempt()` tidak re-check paket sebelum fetch soal. Acceptable
+  selama user cuma lewat admin (bukan self-serve publik); **WAJIB dibayar (RLS by package)
+  SEBELUM paket dijual komersial.**
+
+**Urutan build (dicatat, belum dieksekusi):**
+1. `PACKAGE_LEVELS` kumulatif fix
+2. Hub shell + Vocab/Kamus (dengan gating) + Mock redirect + coming-soon cards
+   (Listening, Grammar) + locked-visible untuk level/tier di luar paket
+3. Writing typed workspace
+4. Grammar content project (paralel)
+5. `grade-essay` integration, handwriting, RLS hardening — belakangan
+
 ## 23. Three names, one screen — dictionary/Materials/Dictionary all point at the same place
 
 Confirmed: this screen's own header says "Vocabulary Dictionary" / "Kamus Kosakata"

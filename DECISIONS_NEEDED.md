@@ -620,13 +620,17 @@ percakapan sesi ini untuk bukti baris kode):**
 - Tier: `hsk_1_4` / `hsk_5` / `hsk_6` / `vip`, **KUMULATIF**: `hsk_5` = level 1-5, `hsk_6` =
   level 1-6, `vip` = level 1-6 (vip = marketing label, isi sama dengan `hsk_6`). Diputuskan
   Kyaru, 16 Jul 2026.
-- **KONSEKUENSI (belum dieksekusi)**: `PACKAGE_LEVELS` di `index.html:1350-1357` harus diubah —
-  `hsk_5: [5]` → `[1,2,3,4,5]`, `hsk_6: [6]` → `[1,2,3,4,5,6]`. Arah aman (nambah akses, bukan
-  nyabut).
+- **KONSEKUENSI — DONE, 2026-07-16**: `PACKAGE_LEVELS` di `index.html:1350-1358` diubah —
+  `hsk_5: [5]` → `[1,2,3,4,5]`, `hsk_6: [6]` → `[1,2,3,4,5,6]`. Diverifikasi via fixture profile
+  (hsk_5 → picker flashcard/mock/dashboard nunjukin 1-5, query mock list ikut; vip & hsk_1_4
+  spot-check tidak berubah). `business`/`convo`/`hsk_1_4` tidak disentuh.
 - **Konten di luar paket**: LOCKED-VISIBLE (keliatan + gembok + CTA "contact admin untuk
   upgrade"), menggantikan pola hide total yang sekarang ada di flashcard/dashboard/raport/mock.
   Preseden pola: business/convo "coming soon" yang sudah ada.
 - **Pricing**: TBD, di luar scope.
+- **Admin WAJIB isi `target_level` saat create user**; user tanpa `target_level` default ke
+  level terendah paketnya (by design, bukan bug) — dicek ulang saat audit kumulatif fix
+  (2026-07-16): akar masalahnya profil bolong, bukan logic `defaultLevel`. Tidak diubah.
 - **GAP tercatat #1**: Kamus (`renderBrowseLevelPicker`, `index.html:2668-2685`) tidak cek
   `userPackageLevels` — user paket bawah bisa akses vocab level 5/6. Dibayar saat Kamus pindah
   ke hub.
@@ -636,8 +640,8 @@ percakapan sesi ini untuk bukti baris kode):**
   selama user cuma lewat admin (bukan self-serve publik); **WAJIB dibayar (RLS by package)
   SEBELUM paket dijual komersial.**
 
-**Urutan build (dicatat, belum dieksekusi):**
-1. `PACKAGE_LEVELS` kumulatif fix
+**Urutan build:**
+1. ~~`PACKAGE_LEVELS` kumulatif fix~~ — **DONE, 2026-07-16.**
 2. Hub shell + Vocab/Kamus (dengan gating) + Mock redirect + coming-soon cards
    (Listening, Grammar) + locked-visible untuk level/tier di luar paket
 3. Writing typed workspace

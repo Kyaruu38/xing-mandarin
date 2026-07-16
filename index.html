@@ -1347,10 +1347,12 @@
   // Pembatasan akses berdasarkan paket murid (profiles.package). Level yang nggak
   // masuk paket disembunyikan sepenuhnya (bukan dikunci) dari tab HSK, dashboard,
   // dan flashcard. Paket tanpa level (business/convo) belum ada konten levelnya.
+  // Tier KUMULATIF (keputusan Kyaru, 2026-07-16, DECISIONS_NEEDED #22): hsk_5 = level
+  // 1-5, hsk_6 = level 1-6. vip = marketing label, isinya sama dengan hsk_6.
   const PACKAGE_LEVELS = {
     hsk_1_4: [1,2,3,4],
-    hsk_5:   [5],
-    hsk_6:   [6],
+    hsk_5:   [1,2,3,4,5],
+    hsk_6:   [1,2,3,4,5,6],
     business: [],
     convo:    [],
     vip:      [1,2,3,4,5,6]

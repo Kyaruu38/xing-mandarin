@@ -486,4 +486,191 @@ Options for user to decide, not to be implemented without sign-off:
 
 ---
 
+## 22. Materials comp assumes a product this app doesn't have — CORE FINDING, product decision needed
+
+`06-materials.png` / `.dc.html`'s `isMaterials` block (lines 264-300) shows a **content hub**:
+6 card types — Vocab Deck, Grammar PDF, Listening Drills (audio), Reading passages (PDF),
+Writing practice (PDF), Mock Paper. This app has real data for exactly **2** of those (vocab,
+mock test sets) — there is no PDF storage, no audio-drill library, no schema for grammar/
+reading/writing "resource" entities of this kind anywhere in the project.
+
+This is a **product gap, not a design gap** — same class as #14 (percentile needs a user
+cohort that doesn't exist yet) and #6 (speaker button needs an audio source that doesn't
+exist yet). It is not a smaller/uglier version of the comp; it's a different feature that
+happens to share a nav label.
+
+**What this app's "Materials" actually is today**: `browseCard`, wired to `openBrowse()` —
+a vocabulary dictionary (`Kamus Kosakata`): HSK 1-6 level picker + search + paginated list of
+all ~4,991 `vocab` rows (hanzi/pinyin/meaning). Real, live, functional information
+architecture, unrelated to the comp's card-grid-of-resource-types.
+
+**Checked per this session's ask**: the dashboard's "Dictionary" quick action (`#browseBtn`,
+`index.html:989`) calls the exact same `openBrowse()` as the sidebar's Materials nav item
+(`#navMateri`, `index.html:4003`) — **both point at the same `browseCard` screen today.** If
+Materials ever becomes a hub (options b/c below), this quick action needs its own destination
+or it silently breaks / becomes redundant with a new Materials hub.
+
+**Decision deferred to user, not implemented**:
+- **(a)** Materials stays the dictionary permanently; the comp's hub concept is dropped
+- **(b)** Materials becomes a hub later; the dictionary moves to its own nav item (Dictionary
+  quick action would point there instead)
+- **(c)** Materials becomes a hub once real hub content (PDFs/audio drills) exists to back it
+
+**This session's scope** (per explicit instruction): restyle only the chrome that has a literal
+shape-match in the comp — search bar (comp line 269) and the filter-chip row → level picker
+(comp line 270, chip *shape* ported, semantics stay HSK 1-6, not All/Vocab/Grammar/Listening/
+Mock). The card grid itself is untouched. No hub built, no card types invented.
+
+### UPDATE by user, 2026-07-16 — hub is a planned build, not an open question; gap was undercounted
+
+**Decision made**: the Materials hub from the comp **will be built** — this is no longer
+"(a)/(b)/(c), pick one," it's confirmed direction. What's still open is *timing* and the 3
+prerequisites below, not *whether*.
+
+**Timing, fixed**: hub build happens **after #12 (choiceItem/segmentItem → real buttons) and
+the dark-mode sweep**, not folded into any restyle session. Reason: this is a **new screen**,
+not a restyle of an existing one — different class of work from every session in this
+sequence so far. Doing it now would be scope creep into a session budgeted for chrome-only
+changes.
+
+**Corrected gap assessment** — the "2 of 6 real" count above undercounted real content:
+- **Vocab Deck** — data exists (`vocab` + `user_mastery`)
+- **Mock Paper** — data exists (`test_sets` + `test_attempts`)
+- **Reading** — content exists, ~150 SQL files across HSK 1-6 in `question_bank` — not a PDF,
+  shape is a question set, not a document
+- **Writing** — same: content exists as a question set, not a PDF
+- **Listening** — an `edge-tts` pipeline exists (HSK 1 already generated), not yet a full
+  library across levels
+- **Grammar PDF** — genuinely nothing backs this, no schema, no content anywhere → **drop this
+  card type**, it's the one real fabrication risk of the 6
+
+Realistic count is **4-5 of 6 fillable**, not 2 — the original assessment conflated "not a PDF"
+with "no content," which was wrong. Still true that the *shape* (deck/PDF/audio-track cards
+from the comp) doesn't match the *shape* of the real content (question sets) — see prerequisite
+(a) below, that mismatch is exactly why this needs a real design pass, not a literal port.
+
+**3 prerequisites — hub build does not start until user has answered all three**:
+- **(a) What does clicking a card do?** If "Reading: Short Passages" opens a real reading
+  question set, the hub is a **launcher that re-categorizes existing content**, not a document/
+  media library like the comp depicts. That's a different product shape than the comp shows,
+  even with real data behind every card — needs its own decision, not just "port the comp."
+- **(b) Where does the dictionary go?** The 4,991-word searchable Kamus is a real, working
+  feature (see #23 below) — if Materials nav becomes the hub, the dictionary needs a new home,
+  and the dashboard's "Dictionary" quick action (`#browseBtn`) needs a new target or it silently
+  points at the wrong screen.
+- **(c) Where does each card's progress number come from?** ("186/404 learned", "3 of 12
+  done", "7/10 tracks" in the comp.) Vocab → `user_mastery` (real). Reading → `test_attempts`
+  (real). Writing/Listening/Mock → not yet traced. **Any card without a real source for its
+  progress number must not get a fabricated one** — same no-fake-data rule as #14/#15/#21.
+
+**Not started, not to be started early.**
+
+### UPDATE by user, 2026-07-16 — outer `.pageCard` wrapper: kept for Kamus, reverses if/when the hub is built
+
+First pass on the Materials session stripped Kamus's outer white `.pageCard` wrapper, reasoning
+"the comp has no wrapper, so neither should we" (same treatment as `.pageCard.dash` /
+flashcard's `.sessionActive`). **Reverted** — that reasoning doesn't transfer, because the
+*content* isn't the same shape:
+
+- Dashboard / flashcard drop the wrapper because their content **is already a white card**
+  (stat cards, the hanzi card shell) — contrast against the page's cream background comes from
+  the card itself, a wrapper would just be a second redundant card.
+- Mock List / Attempt **keep** the wrapper because their content is flat cream-toned rows/panels
+  — without the wrapper, that content sits directly on the page's cream background with no
+  contrast at all.
+- Kamus's content (`.browseList`/`.browseItem`, plain text rows) is the **second shape**, not
+  the first — same as Mock List. Stripping the wrapper produced cream-on-cream.
+
+**The actual rule this app follows**: content must contrast against the page background — not
+"no wrapper, ever" and not "match whatever the comp shows." Kamus has no design comp at all
+(the comp's "Materials" is the unbuilt hub product from this section, a different IA) — so the
+wrapper call here is a **real product decision** based on this app's own established pattern,
+not a port of anything.
+
+**This reverses if the hub gets built.** The wrapper decision is about *Kamus's content shape*
+(flat cream list), not about "the Materials screen" as a fixed identity. If/when the hub from
+this section ships, its content becomes actual white resource cards (matching the comp) — at
+that point the wrapper should come back off, by the same contrast rule, same reasoning as
+dashboard/flashcard. Don't carry "Materials keeps the wrapper" forward without re-deriving it
+from the contrast rule once the IA underneath it changes — this note (and the matching comment
+in `index.html` next to `.browse{max-width:640px}`) exists so that re-derivation doesn't have to
+happen from scratch.
+
+## 23. Three names, one screen — dictionary/Materials/Dictionary all point at the same place
+
+Confirmed: this screen's own header says "Vocabulary Dictionary" / "Kamus Kosakata"
+(`#browseHeader`), the sidebar nav item that opens it says "Materials" (`#navMateri`), and the
+dashboard quick action that also opens it says "Dictionary" (`#browseBtn`, confirmed same
+`openBrowse()` target as the nav item — see #22). Three different labels on one real feature is
+itself evidence this screen's identity is "dictionary," not "materials hub" — the "Materials"
+label was borrowed from the comp before the comp's actual scope (a content hub) was understood
+to be a different, not-yet-built product.
+
+**Option for #21, not to be implemented**: **(d)** rename the nav item from "Materials" to
+"Dictionary"/"Kamus" now, matching what the screen actually is, and let a *new* nav item called
+"Materials" be added later when the hub from #21 actually gets built. This would make nav
+label, page title, and quick-action label agree today, and leaves room for the real hub to get
+its own honest nav entry later instead of colliding with the dictionary's. **Do not implement
+without sign-off** — this is a nav/IA change, out of scope for a chrome-only restyle session.
+
+## 24. `.practiceExit` (Back to Dashboard / exit buttons) — thin contrast on the white wrapper, GLOBAL issue, not Materials-specific
+
+`.practiceExit{ background:transparent; border:1px solid var(--line); color:var(--muted) }` —
+used identically by `browseExitBtn` (Materials), plus `raportExitBtn` (`raportCard`),
+`mockListExitBtn` (`mockListCard`), `attemptExitBtn` (`attemptCard`), `resultCloseBtn`
+(`resultCard`). All 5 sit inside the same default white `.pageCard` wrapper, so all 5 have the
+identical thin `border:1px solid var(--line)` outline on white — low contrast by the same
+measure that motivated the `.browseList`/search-bar/level-picker cream fix in this session.
+
+### REVISED, 2026-07-16 — `browseMoreBtn` ("Load More") removed from this item, it was miscategorized
+
+`browseMoreBtn` was originally lumped in here as a 6th `.practiceExit` instance, same contrast
+issue. It isn't one: comparing against Mock List's pattern (`.mockSetCard`'s "Mulai"/"Ulangi"
+button = primary gold action, its own "Back to Dashboard" = outline exit), "Load More" is a
+**primary action** (loads more dictionary entries) — same role as "Mulai," not an exit control.
+It had been wearing `.practiceExit`'s outline styling since it was first built, which was a
+semantic mismatch from the start, not a contrast bug. **Fixed this session**: moved to its own
+`.browseMoreBtn` class (gold, ported minimally from `.mockSetBtn`'s pattern — only margin-top
+overridden, everything else falls through from the shared gold `button{}` base, same as
+`.mockSetBtn` itself does). `browseExitBtn` ("Back to Dashboard") stays on `.practiceExit`,
+untouched — it's a real exit control, same role as every other screen's Back to Dashboard.
+
+**What's still open here is only the exit-button contrast itself** (the 5 screens listed above)
+— **not fixed this session**, shared class touching 5 screens at once; fixing it inside a
+Materials-only session would either leave the other 4 inconsistent (partial fix) or silently
+expand scope past "Materials doang." **Do not implement without sign-off.** Likely timing: the
+dark-mode sweep, since that session already needs to walk every screen's contrast checking both
+themes — bundling this global contrast pass into it avoids a second full sweep.
+
+## 25. Mock List text-overlap bug — "minutes" gets covered by the Start button, pre-existing, not a Materials regression
+
+User-reported from live screenshots of `H6XING001`/`002`/`003`: the subtitle line ("HSK 6 ·
+Listening + Reading + Writing · 101 questions · 125 minutes") wraps to 2 lines for these longer
+combined-mock entries, and the wrapped second line ("minutes") gets visually overlapped by the
+"Mulai"/"Ulangi" (Start) button instead of the layout making room for it.
+
+**Not a regression from this session** — Mock List (`mockListCard`/`.mockSetCard`) has not been
+restyled yet in this sequence (it's not on the fixed session order until its own turn comes up),
+so this bug predates any work done here. **Logged only, not fixed** — out of scope for the
+Materials session. Likely cause (not yet traced in code): `.mockSetCard` probably doesn't
+reserve enough bottom space / doesn't let the meta line push the button down when it wraps to 2
+lines — needs its own investigation when Mock List is actually in scope.
+
+## 26. `H6XING001` (HSK 6 full mock, has a writing section) — possible candidate to finally test #17's "pending" state
+
+HSK 6's real writing section is a single 100-point essay (per DECISIONS_NEEDED #9's reference
+table) — `H6XING001` is a combined HSK 6 mock (101 questions across listening/reading/writing)
+surfaced in the user's Mock List screenshots. If its writing section is genuinely `essay`-type in
+`question_bank`, submitting a real attempt against it would be the first live test of #17's
+"pending" hero/Section-Breakdown state (combined attempt + essay-graded writing section), which
+has had **zero real-data confirmation** since it was built.
+
+**Could not be verified from this repository** — only one local mock-test SQL file exists
+(`sql/mocktest/hsk4-r-001.sql`); there is no `H6XING001` file in this repo to read
+`question_type` from, and no database-query tool was available this session to check the live
+`question_bank` table directly. **User needs to confirm directly** (Supabase dashboard/SQL
+editor: `select question_type from question_bank where set_id = (select set_id from test_sets
+where title ilike '%H6XING001%' and section = 'writing')` or equivalent) before treating this as
+a real #17 test candidate. Reporting only, nothing implemented or assumed.
+
 Nothing else pending a decision right now.

@@ -180,27 +180,145 @@ All confirmed via `git log` — nothing left uncommitted in `index.html`.
 - Flashcard example sentence — no schema field, not built.
 - Deck chip Learning/Review split threshold (`LEARNING_REPS_THRESHOLD = 2`) is our own convention, not from source — flag if a different threshold is wanted.
 
-## Remaining session order: ~~result~~ → materials → #12 → dark mode (fixed order, don't reshuffle)
+## Remaining session order: ~~result~~ → ~~materials~~ → #12 → dark mode → materials hub (fixed, don't reshuffle)
 
-Result screen is DONE (this session, see top section — with the 2 CODE COMPLETE/UNVERIFIED
-branches noted there, not blockers). **#12 (`.choiceItem`/`.segmentItem` → real `<button>`) must
-land BEFORE the dark mode sweep, not after.** That conversion adds new `button{}`-leak CSS resets
-(`margin-top`, `padding`, `width`, `background`) on classes the dark-mode pass would otherwise
-need to re-check. Doing dark mode first means redoing it once #12 lands. Dark mode is last on
+Result screen: DONE (2 CODE COMPLETE/UNVERIFIED branches noted in that section, not blockers).
+Materials screen: **DONE, approved, committed** — see section below. **#12
+(`.choiceItem`/`.segmentItem` → real `<button>`) must land BEFORE the dark mode sweep, not
+after.** That conversion adds new `button{}`-leak CSS resets (`margin-top`, `padding`, `width`,
+`background`) on classes the dark-mode pass would otherwise need to re-check. Doing dark mode
+first means redoing it once #12 lands. Dark mode is last among the *restyle* sessions on
 purpose — only make that sweep once all markup for a screen is final.
 
-## Next session: MATERIALS ONLY — do not pair with anything
+**Materials hub (comp's 6-card content grid) is a separate, later item — not part of this
+restyle sequence's normal flow.** It's a new-screen build, not a restyle of an existing one
+(user decision, DECISIONS_NEEDED #21 UPDATE, 2026-07-16), scheduled **after #12 and dark mode**,
+and gated on the user answering 3 prerequisites (what a card click does, where the dictionary
+moves to, where each card's progress number comes from) — do not start it before all 3 are
+answered, and do not fold it into the #12 or dark-mode sessions.
 
-Source comp: `06-materials.png`. Solo scope, same as every session in this sequence — don't fold
-in #12 or dark mode.
+## Materials screen (Kamus Kosakata): DONE, APPROVED, COMMITTED
 
-**Relevant open item from this session**: DECISIONS_NEEDED #19 found that `closeBrowse()` (the
-exit function for the Materials/`browseCard` screen) hides only `browseCard` and shows
-`dashCard`, without a `hideAllPages()` safety net — same shape as the `#resultCard` leak this
-session caught and fixed in `navTo(goBerandaContent)`. Currently unreachable as a live bug
-(traced every entry point), but if this session's port adds any *new* way to leave `browseCard`
-(a new button, a filter-chip that also exits, etc.), re-verify that assumption before assuming
-`hideAllPages()` isn't needed — don't just carry the "it's fine, I checked once" conclusion
-forward without re-checking against the new code.
+Source: `06-materials.png`, `.dc.html`'s `isMaterials` block (lines 264-300) — but this is a
+**chrome-only styling pass on the existing Kamus (dictionary) screen**, not a port of that comp.
+Full reasoning and DECISIONS_NEEDED entries (#21 UPDATE, #22, #23, #24, #25, #26) are in that
+file — summary here.
 
-Budget this screen alone.
+**Central finding, load-bearing for everything else in this section**: the comp depicts a
+content hub (6 resource-type cards: Vocab Deck, Grammar PDF, Listening Drills, Reading, Writing,
+Mock Paper) that this app doesn't have built yet — the live `browseCard` screen is a vocabulary
+dictionary (level picker + search + list over `vocab`, ~4,991 words), a completely different
+information architecture, not a smaller/uglier version of the comp. **This screen is the Kamus,
+not the Materials hub** — the comp's actual product wasn't ported at all this session, per user
+decision (DECISIONS_NEEDED #21 UPDATE): the real hub gets built later, after #12 + dark mode,
+once 3 prerequisites are answered. See DECISIONS_NEEDED #22 for the full gap analysis.
+
+**What shipped this session** (chrome only on the existing Kamus screen, IA and card grid
+untouched):
+- **Outer white `.pageCard` wrapper — KEPT, not stripped.** First pass stripped it (reasoning:
+  "the comp has no wrapper"), then **reverted** — wrong transfer of logic. This app's real rule
+  is **content must contrast against the page's cream background**, not "no wrapper, ever":
+  - Dashboard: no wrapper, content = white stat/continue cards → contrast ✓
+  - Flashcard: no wrapper, hanzi card shell is white → contrast ✓
+  - Mock List: white wrapper, cards inside are cream (`.mockSetCard`) → contrast ✓
+  - Attempt: white wrapper, question card inside is cream → contrast ✓
+  - **Kamus: white wrapper, word list inside is cream → contrast ✓** (this session's fix)
+
+  Dashboard/flashcard drop the wrapper because their content *is already* a white card — a
+  wrapper there would be a redundant second card. Kamus's content is a flat list, same shape as
+  Mock List's — dropping the wrapper there produced cream-on-cream, zero contrast. Kamus has no
+  design comp of its own (the comp's "Materials" is the different, unbuilt hub product above),
+  so this wrapper call is a real product decision based on the app's own established pattern,
+  not a port of anything. **This decision is scoped to Kamus's current content shape, not to
+  "the Materials screen" as a fixed identity — if the hub above ever gets built, its content
+  becomes actual white resource cards (matching the comp), and at that point the wrapper should
+  come off again, same reasoning as dashboard/flashcard.** Don't carry "Materials keeps the
+  wrapper" forward once the IA underneath it changes.
+- **Cream-on-white contrast, inside the wrapper** — with the wrapper back, `.browseSearchInput`,
+  `.browseList`, and `button.levelBtn`'s inactive state were all sitting at `var(--panel)`
+  (white) directly against the white wrapper — invisible. Fixed by porting the exact token pair
+  Mock List already uses for the same problem (`.mockSetCard{background:var(--panel-2);
+  border:1px solid var(--line)}`), not inventing a new combo: `.browseSearchInput` and
+  `button.levelBtn` (inactive) → `var(--panel-2)`; `.browseList` → `var(--panel-2)` +
+  `1px solid var(--line)` border + `12px` radius. Divider correctness note: the container's own
+  horizontal padding was deliberately left at `0` and moved onto `.browseItem` instead
+  (`padding:10px 16px`), so each row's `border-bottom` divider still reaches the container's own
+  left/right edge instead of floating with a gap.
+- **Search bar** — comp's version is a fake `<div>+<span>` placeholder mockup (static prototype,
+  not typeable). Ported the *recipe* onto the real `#browseSearch` `<input>` instead: new
+  `.browseSearchWrap`/`.browseSearchIcon` wrapper + icon (dedicated classes, not reusing
+  `.loginFormPanel`'s `.inputWrap`/`.inputIcon` directly, to avoid coupling the two screens),
+  border/radius/shadow values matching the login input's already-proven recipe. Added an
+  explicit `::placeholder` color rule scoped to `#browseSearch` only — **no `::placeholder` rule
+  existed anywhere in this file before this change**; every input in the app was relying on
+  unstyled browser default placeholder color until now.
+- **Level picker → filter-chip shape, `div` → real `<button>`** — comp's filter chips
+  (All/Vocab/Grammar/Listening/Mock, line 270) are non-semantic `<span>`s; ported the *shape*
+  (pill, gold-solid active state, shadow on inactive, gap) onto the level picker's existing
+  semantics (HSK 1-6 stays HSK 1-6, categories not adopted). New `button.levelBtn`/
+  `button.levelBtn.active` rules, scoped to the `button` tag specifically. **Important scoping
+  catch**: `.levelBtn`/`.levelPicker` is a *shared* class used by 3 render call sites —
+  `renderBrowseLevelPicker()` (Materials/Kamus), `renderMockLevelPicker()`, and the section
+  picker inside it (both Mock Test List, untouched screen). Only `renderBrowseLevelPicker()`'s
+  `div` → `button` conversion happened; the other two still emit `<div>`s, so the tag-scoped
+  `button.levelBtn` selector cannot leak onto them. Same recipe as every prior div-to-button
+  conversion in this sequence (`8ec14ae`): `type="button"`, explicit `button{}`-leak reset. Two
+  extra leaked properties caught by re-checking against the `.gridBtn` precedent specifically
+  (not just eyeballing): `color` and `font-weight` were **not** set anywhere on `.choiceItem`-
+  style elements before, so an unreset `<button>` would silently inherit the global `button{}`
+  rule's `color:#241a08; font-weight:700` — reset explicitly to `color:var(--text)` /
+  `font-weight:400` to preserve the pre-conversion look. `font-family` was checked and found
+  already safe (global `button{}` declares `font-family:inherit`); `line-height` was checked and
+  found genuinely unset anywhere in the cascade, reset to `line-height:normal` to preserve
+  today's inherited value exactly (not a new arbitrary number).
+- **"Load More" reclassified, "Back to Dashboard" left alone** — `browseMoreBtn` had been
+  wearing `.practiceExit`'s outline styling (shared with 4 other screens' exit buttons) since it
+  was first built, which was a semantic mismatch, not a contrast bug: comparing against Mock
+  List's own pattern (`.mockSetCard`'s "Mulai"/"Ulangi" = primary gold action, its own "Back to
+  Dashboard" = outline exit), Load More is a **primary action** (loads more dictionary entries),
+  same role as "Mulai" — not an exit control. Moved to its own `.browseMoreBtn` class, ported
+  minimally from `.mockSetBtn`'s own pattern (only `margin-top` overridden, everything else
+  — gold gradient, navy text, padding, radius — falls through from the shared `button{}` base,
+  same as `.mockSetBtn` itself does). `browseExitBtn` ("Back to Dashboard") stays on
+  `.practiceExit`, untouched — it's a real exit control, same role as every other screen's Back
+  to Dashboard button.
+- **Page title** — `#browseHeader` got a new `.browseTitle` class (Baloo 2, 28px, 700) matching
+  the comp's title styling. It had *no* dedicated styling before this (the bare `.sub` class
+  only gets real styling inside `.dash`) — kept the `.sub` class alongside `.browseTitle` so the
+  existing `body.lang-zh .sub` Chinese-font rule still applies. App's own text ("Kamus
+  Kosakata"/"Vocabulary Dictionary") kept, not comp's ("Materials").
+- **Subtitle — deliberately not added.** Comp's subtitle text ("...decks, grammar, drills & mock
+  papers") describes the hub product this app doesn't have; the app has no subtitle element
+  here today. Per this session's explicit scoping rule: port styling only where there's an
+  existing element to restyle, never invent new copy/elements to carry text the comp specifies
+  but the product doesn't support yet.
+- **Card grid (`browseList`/`browseItem` content, information architecture) — untouched**, per
+  hard scope boundary.
+
+**DECISIONS_NEEDED #19 re-checked** (flagged in the prior session as something to re-verify if
+this session added any new way to leave `browseCard`): no new buttons or exit paths were added —
+search bar and level picker are input/filter controls, not navigation. `closeBrowse()` missing a
+`hideAllPages()` safety net is still unreachable, conclusion unchanged, re-verified against the
+actual new code rather than carried forward blind.
+
+**Screenshot-approved by user, committed this session** — see `git log` for the commit hash
+(index.html + HANDOFF.md + DECISIONS_NEEDED.md, one commit).
+
+**2 items surfaced from the user's Mock List screenshots during review, logged not fixed** (see
+DECISIONS_NEEDED #25/#26 for full detail) — both are about Mock List, which is out of scope for
+this session:
+- **#25**: pre-existing text-overlap bug on Mock List — long 2-line subtitles (e.g. `H6XING001`'s
+  "HSK 6 · Listening + Reading + Writing · 101 questions · 125 minutes") get overlapped by the
+  Start button. Not a regression from this session (Mock List hasn't been restyled yet).
+- **#26**: `H6XING001` is a full HSK 6 mock with a writing section — real HSK 6 writing is a
+  single essay, meaning this specific set is a plausible candidate to finally exercise the
+  never-tested "pending" state from #17. **Could not be verified from this repo** — no local SQL
+  file for `H6XING001` exists (only `sql/mocktest/hsk4-r-001.sql` is present locally) and no
+  database-query tool was available this session. Needs the user to check
+  `question_bank.question_type` for that set directly (Supabase dashboard/SQL editor) before
+  #17 can be tested against it.
+
+Budget note for next session: **#12** (`.choiceItem`/`.segmentItem` → real `<button>`, see
+DECISIONS_NEEDED #12), solo scope, same pacing as every session in this sequence. Materials hub
+does NOT come next — it's gated behind #12, dark mode, and 3 unanswered prerequisites (see top
+of this section).

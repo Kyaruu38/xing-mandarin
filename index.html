@@ -51,7 +51,7 @@
       transition:background-color .2s ease, color .2s ease;
     }
     body, .sidebar, .pageCard, .statCard, .statBox, .hskCard, .quickTile, .choiceItem,
-    .segmentItem, .mockSetCard, .historyItem, .dailyGoalCard, .loginFormPanel, .loginBrandPanel,
+    .segmentItem, .mockSetCard, .historyItem, .historyCard, .dailyGoalCard, .loginFormPanel, .loginBrandPanel,
     input, .langBtn, .themeToggle, .packageBadge{
       transition:background-color .2s ease, color .2s ease, border-color .2s ease;
     }
@@ -207,10 +207,12 @@
     @keyframes fadeUp{ from{opacity:0; transform:translateY(18px)} to{opacity:1; transform:translateY(0)} }
     @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
     @keyframes growW{ from{width:0} }
+    @keyframes ringFill{ from{stroke-dashoffset:var(--circ)} to{stroke-dashoffset:var(--off)} }
     @media (prefers-reduced-motion: reduce){
       .sidebarStreakFlame{ animation:none !important; }
       .statCard, .dashMascot, .pageCard.dash{ animation:none !important; opacity:1 !important; }
       .continueMoonGlow, .continueStar, .continueSparkle, .dailyGoalFill{ animation:none !important; }
+      .hskRingProgress{ animation:none !important; }
     }
     #appShell{ display:flex; min-height:100vh; align-items:stretch; }
     #appShell.hidden{ display:none !important; }
@@ -367,26 +369,58 @@
     .dailyGoalTrack{ margin-top:12px; height:14px; background:var(--track); border-radius:99px; overflow:hidden; }
     .dailyGoalFill{ height:100%; width:0%; background:linear-gradient(90deg,var(--gold),#34A98A); border-radius:99px; transition:width .3s ease; animation:growW 1.3s ease-out; }
 
-    .hskGrid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(96px,1fr)); gap:12px; margin-top:4px; }
-    .hskCard{ background:var(--panel-2); border:1px solid var(--line); border-radius:16px; padding:14px 8px; text-align:center; cursor:pointer; transition:transform .15s ease, box-shadow .15s ease; }
-    .hskCard:hover{ transform:translateY(-2px); box-shadow:var(--shadow-sm); border-color:var(--gold); }
-    .hskRing{ width:60px; height:60px; border-radius:50%; margin:0 auto 8px; background:conic-gradient(var(--gold) calc(var(--pct)*1%), var(--line) 0); display:flex; align-items:center; justify-content:center; }
-    .hskRing span{ width:44px; height:44px; border-radius:50%; background:var(--panel-2); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; color:var(--text); }
-    .hskCardLabel{ font-size:13px; font-weight:700; color:var(--text); }
-    .hskCardSub{ font-size:11px; color:var(--muted); margin-top:2px; }
+    .hskGrid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-top:12px; }
+    .hskCard{ background:var(--panel); border-radius:20px; padding:16px 8px; text-align:center; cursor:pointer; box-shadow:0 8px 18px -10px rgba(var(--text-rgb),.16); transition:transform .15s ease, box-shadow .15s ease; }
+    .hskCard:hover{ transform:translateY(-2px); }
+    .hskRing{ position:relative; width:60px; height:60px; margin:0 auto; }
+    .hskRing svg{ display:block; transform:rotate(-90deg); }
+    .hskRingProgress{ stroke-dashoffset:var(--off); animation:ringFill 1.1s ease-out both; }
+    .hskRingLabel{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800; color:var(--text); }
+    .hskRingLabel.empty{ color:rgba(var(--text-rgb),.4); }
+    .hskCardLabel{ margin-top:8px; font-size:12.5px; font-weight:800; color:var(--text); }
+    .hskCardSub{ font-size:10.5px; color:rgba(var(--text-rgb),.45); }
 
-    .quickGrid{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:4px; }
+    .quickGrid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-top:12px; }
     .quickTile{
-      padding:16px 8px; background:var(--panel-2); border:1px solid var(--line); border-radius:16px;
-      color:var(--text); font-weight:700; font-size:13px; cursor:pointer;
-      display:flex; flex-direction:column; align-items:center; gap:8px;
-      margin-top:0; width:100%;
+      background:var(--panel); border:none; border-radius:20px; padding:22px; text-align:center;
+      box-shadow:0 8px 18px -10px rgba(var(--text-rgb),.16); cursor:pointer;
+      display:flex; flex-direction:column; align-items:center; width:100%;
     }
-    .quickTile:hover{ border-color:var(--gold); }
-    .quickTileIcon{ font-size:22px; }
+    .quickTile:hover{ box-shadow:var(--shadow-sm); }
+    .quickTileIcon{
+      width:48px; height:48px; border-radius:15px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;
+    }
+    .quickTile span:last-child{ margin-top:12px; font-size:14px; font-weight:700; color:var(--text); }
+    .quickTile.test .quickTileIcon{ background:rgba(232,111,82,.14); color:#E86F52; }
+    .quickTile.dict .quickTileIcon{ background:rgba(52,169,138,.14); color:#34A98A; }
+    .quickTile.report .quickTileIcon{ background:rgba(91,147,214,.14); color:#5B93D6; }
 
-    .dashRecentHead{ display:flex; align-items:center; justify-content:space-between; margin-top:20px; }
-    .linkBtn{ font-size:12px; color:var(--gold); font-weight:700; cursor:pointer; }
+    .dashRecentHead{ display:flex; align-items:center; justify-content:space-between; margin-top:28px; }
+    .dashRecentHead .sectionTitle{ margin:0; }
+    .linkBtn{ font-size:12.5px; color:#C7900F; font-weight:700; cursor:pointer; }
+    /* Recent History preview cards on the dashboard -- distinct from the plain .historyItem
+       list rows used by the (not-yet-designed) Raport screen, so that screen isn't touched here. */
+    #dashRecentHistory{ display:flex; flex-direction:column; gap:10px; margin-top:12px; }
+    .historyCard{
+      background:var(--panel); border-radius:16px; padding:15px 18px; box-shadow:0 6px 16px -10px rgba(var(--text-rgb),.14);
+      display:flex; justify-content:space-between; align-items:center; gap:14px;
+    }
+    .historyCardMain{ display:flex; align-items:center; gap:12px; min-width:0; }
+    /* Colors ported literally from the Recent History block of .dc.html (writing/reading rows).
+       listening has no example in that block (source only shows writing+reading there) --
+       #5B93D6 is a user decision, not a guess: it's the listening color already used elsewhere
+       in this design system (Section Breakdown on the result screen, stat-card badges). */
+    .historyCardIcon{ width:38px; height:38px; border-radius:11px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .historyCardIcon.writing{ background:rgba(52,169,138,.14); color:#34A98A; }
+    .historyCardIcon.reading{ background:rgba(242,176,30,.16); color:#F2B01E; }
+    .historyCardIcon.listening{ background:rgba(91,147,214,.14); color:#5B93D6; }
+    .historyCardText{ min-width:0; }
+    .historyCardTitle{ font-size:14px; font-weight:700; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .historyCardMeta{ font-size:12px; color:rgba(var(--text-rgb),.5); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .historyCardScore{ font-size:13px; font-weight:800; padding:5px 12px; border-radius:99px; flex-shrink:0; }
+    .historyCardScore.writing{ color:#2E9E6B; background:rgba(46,158,107,.12); }
+    .historyCardScore.reading{ color:#F2B01E; background:rgba(242,176,30,.15); }
+    .historyCardScore.listening{ color:#4A7CBE; background:rgba(91,147,214,.14); }
     .linkBtn:hover{ text-decoration:underline; }
 
     /* practice / flashcard */
@@ -430,6 +464,8 @@
     .statNum{display:block; font-size:26px; font-weight:700; color:var(--text)}
     .statLabel{display:block; font-size:11px; color:var(--muted); margin-top:4px}
     .sectionTitle{font-size:13px; color:var(--muted); margin:20px 0 10px; font-weight:700; letter-spacing:.3px}
+    /* dashboard-home only: source uses a bold display-font heading here, other screens (raport, account, result review) keep the small muted label untouched */
+    .dash .sectionTitle{ margin:28px 0 0; font-family:var(--display-font); font-size:18px; font-weight:700; letter-spacing:normal; color:var(--text); }
     .levelRow{display:flex; align-items:center; gap:10px; padding:8px 0; font-size:12px}
     .levelName{width:52px; flex-shrink:0; font-weight:700}
     .levelBar{flex:1; height:8px; background:var(--line); border-radius:99px; overflow:hidden}
@@ -802,9 +838,9 @@
 
         <p class="sectionTitle" id="sectionTitleQuickActions">Aksi Cepat</p>
         <div class="quickGrid">
-          <button id="mockTestBtn" class="quickTile" type="button"><span class="quickTileIcon">📝</span><span id="quickTileMockTestLabel">Mock Test</span></button>
-          <button id="browseBtn" class="quickTile" type="button"><span class="quickTileIcon">📚</span><span id="quickTileDictLabel">Kamus</span></button>
-          <button id="raportBtn" class="quickTile" type="button"><span class="quickTileIcon">📈</span><span id="quickTileReportLabel">Raport</span></button>
+          <button id="mockTestBtn" class="quickTile test" type="button"><span class="quickTileIcon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="4" width="14" height="17" rx="2.2"/><path d="m9 12 2 2 4-4"/></svg></span><span id="quickTileMockTestLabel">Mock Test</span></button>
+          <button id="browseBtn" class="quickTile dict" type="button"><span class="quickTileIcon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5.5A2 2 0 0 1 6 3.5h13v15H6a2 2 0 0 0-2 2z"/><path d="M19 18.5H6"/></svg></span><span id="quickTileDictLabel">Kamus</span></button>
+          <button id="raportBtn" class="quickTile report" type="button"><span class="quickTileIcon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V11"/><path d="M10 20V4"/><path d="M16 20v-6"/></svg></span><span id="quickTileReportLabel">Raport</span></button>
         </div>
 
         <div class="dashRecentHead"><p class="sectionTitle" id="sectionTitleRecentHistory" style="margin-bottom:0">Riwayat Terakhir</p><span class="linkBtn" id="dashSeeAllHistory">Lihat semua →</span></div>
@@ -2098,13 +2134,29 @@
       const titleMap = new Map((setsInfo || []).map(s => [s.set_id, s.title]));
       $('dashRecentHistory').innerHTML = history.map(h=>{
         const pct = h.total_points ? Math.round((h.score / h.total_points) * 100) : 0;
-        return `<div class="historyItem">
-          <div class="historyTitle">${titleMap.get(h.set_id) || h.set_id}</div>
-          <div class="historyMeta">HSK ${h.hsk_level} · ${SECTION_LABEL[h.section] || h.section} · ${t('scoreLabel')} ${pct}% · ${formatMockDate(h.created_at)}</div>
+        const sec = h.section in SECTION_ICON ? h.section : 'reading';
+        return `<div class="historyCard">
+          <div class="historyCardMain">
+            <span class="historyCardIcon ${sec}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${SECTION_ICON[sec]}</svg></span>
+            <div class="historyCardText">
+              <div class="historyCardTitle">${titleMap.get(h.set_id) || h.set_id}</div>
+              <div class="historyCardMeta">HSK ${h.hsk_level} · ${SECTION_LABEL[h.section] || h.section} · ${formatMockDate(h.created_at)}</div>
+            </div>
+          </div>
+          <span class="historyCardScore ${sec}">${pct}%</span>
         </div>`;
       }).join('');
     }
   }
+
+  const HSK_RING_COLOR = {
+    1: {stroke:'#34A98A', track:'rgba(52,169,138,.15)'},
+    2: {stroke:'#5B93D6', track:'rgba(91,147,214,.15)'},
+    3: {stroke:'#F2B01E', track:'rgba(242,176,30,.18)'},
+    4: {stroke:'#E86F52', track:'rgba(232,111,82,.16)'},
+    5: {stroke:'#8A6BD1', track:'rgba(138,107,209,.16)'}
+  };
+  const HSK_RING_CIRC = 157;
 
   function renderHskGrid(levelTotals, seenPerLevel){
     const wrap = $('hskGrid');
@@ -2117,10 +2169,22 @@
       const total = levelTotals[lv] || 0;
       const seen = seenPerLevel[lv] || 0;
       const pct = total ? Math.round((seen/total)*100) : 0;
+      const color = HSK_RING_COLOR[lv];
+      const off = HSK_RING_CIRC - (HSK_RING_CIRC * pct / 100);
+      const progressCircle = (color && pct > 0)
+        ? `<circle cx="29" cy="29" r="25" fill="none" stroke="${color.stroke}" stroke-width="6.5" stroke-linecap="round" class="hskRingProgress" style="--circ:${HSK_RING_CIRC};--off:${off};stroke-dasharray:${HSK_RING_CIRC}"/>`
+        : '';
+      const trackColor = (color && pct > 0) ? color.track : 'rgba(var(--text-rgb),.1)';
       const card = document.createElement('div');
       card.className = 'hskCard';
       card.innerHTML = `
-        <div class="hskRing" style="--pct:${pct}"><span>${pct}%</span></div>
+        <div class="hskRing">
+          <svg width="60" height="60" viewBox="0 0 58 58">
+            <circle cx="29" cy="29" r="25" fill="none" stroke="${trackColor}" stroke-width="6.5"/>
+            ${progressCircle}
+          </svg>
+          <span class="hskRingLabel${pct === 0 ? ' empty' : ''}">${pct}%</span>
+        </div>
         <div class="hskCardLabel">HSK ${lv}</div>
         <div class="hskCardSub">${seen}/${total} ${t('wordsUnit')}</div>
       `;
@@ -2240,6 +2304,11 @@
      MOCK TEST — LIST SET (Task 2)
      ========================================================== */
   const SECTION_LABEL = {reading:'Reading', listening:'Listening', writing:'Writing'};
+  const SECTION_ICON = {
+    writing: '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
+    reading: '<path d="M4 5.5A2 2 0 0 1 6 3.5h13v15H6a2 2 0 0 0-2 2z"/><path d="M19 18.5H6"/>',
+    listening: '<path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/>'
+  };
   const SECTION_ORDER = {listening:0, reading:1, writing:2};
   const SECTION_TABS = [
     { key:'all', label:'Set Test' },

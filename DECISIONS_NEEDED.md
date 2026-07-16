@@ -747,4 +747,69 @@ questions by live verification this session. Not re-deriving which set the origi
 split belongs to here — flagging only so the two numbers aren't conflated if #9's verification
 history gets revisited.
 
+---
+
+## 29. Dark mode port — `.gridBtn.answered`/`.legendSwatch.answered` fixed; 2 items logged, not fixed
+
+Dark mode turned out to have a real comp (`screens/08–13-*-dark.png` + `.dc.html`'s existing
+`[data-theme="dark"]` token block, baris 17) — this changed the session from a contrast-judgment
+sweep into a **port**, same rule as light mode: `.dc.html` is source of truth, PNG is cross-check
+only. Full comparison table (screen | design dark | app dark | verdict) worked through in-session;
+summary of what came out of it:
+
+**Fixed** — `.gridBtn.answered`/`.legendSwatch.answered` (`index.html:714,722`): `.dc.html`'s
+"Answered" navigator swatch (baris 348) is a **literal, unconditional `#1C2A5E`** — same across
+both themes, same pattern as `.navBtn.navNext`. App had `background:var(--text)` instead, which
+**happens to equal `#1C2A5E` in light mode** (coincidence — `--text` and the literal value are
+numerically identical there) but flips to near-white (`#EAF0FF`) in dark, since `--text` is a
+theme-adaptive token and the source's value isn't. This is *why the bug survived 6 prior
+restyle sessions* — every light-mode screenshot review looked correct, because the wrong-token
+and the right-literal computed to the same pixel. Only surfaced once the dark comp gave a second
+data point to diff against. Fixed via a `[data-theme="dark"]` override only (see CSS comment
+next to it) — light mode's rule (`var(--text)`) is untouched since it already renders identically.
+
+**Confirmed correct by design, no change** — `.navBtn.navNext` (`#1C2A5E` navy-on-near-navy-panel
+in dark): matches `.dc.html` baris 340 literally, unconditional across themes. Looked like a
+contrast risk before the dark comp existed; comp confirms this is the deliberate design, not a
+bug — do not "fix" this to a higher-contrast color later without re-checking this note.
+
+**Grepped for the same failure shape elsewhere** (`var(--text)`/`var(--muted)` used as
+`background`, not `color`) before fixing anything, per instruction — found exactly these 2
+instances, nothing else. Also found 4 places using `rgba(var(--text-rgb),X)` as background at
+low alpha (`.audioPlayBtn`-adjacent `index.html:335`, `.cardAudioBtn:491`, `.resultBadge.pending:555`,
+`.sectionCard.pending .sectionCardBar:577`) — **decided: leave alone, this is correct token
+behavior** (translucent tint blending with whatever panel sits behind it), not the same bug
+class as an opaque literal-vs-token mismatch. No fix applied, no fix needed.
+
+**Logged, not verifiable this session** — `.resultBadge.pending` and `.sectionCard.pending
+.sectionCardBar` (the "writing section awaiting AI grade" pending state from #17) won't appear
+in this session's dark-mode screenshots, since triggering them needs a real combined attempt with
+an essay-graded writing section in progress (same live-data gap #17/#26 already describe) — not
+faked with dummy data per standing rule. **Dark mode: unverified visually — pending states, rgba
+tint, expected fine** based on the token math (low-alpha rgba over `var(--panel)` dark), but
+nobody has actually looked at it lit up. Re-check the instant `H6XING001` (#26) or any other
+essay-graded combined attempt gets tested in dark mode.
+
+**Logged, not fixed, out of scope** — `.gridBtn.flagged`/`.legendSwatch.flagged` alpha values
+(`rgba(232,111,82,.18/.55)` in app vs `.dc.html` baris 350's `rgba(232,111,82,.3/.6)`) are a
+**pre-existing drift from the light-mode port** (`8ec14ae`), not something dark mode introduced
+— same value in both themes today, so it's not a theme-specific bug, just an unresolved literal-
+value mismatch from an earlier session. Not touched this round (already-approved light mode,
+plus the underlying feature is dead per #8 — flagging isn't worth reopening two settled items
+at once). If #8 (flag feature) or the light-mode Materials-adjacent polish ever comes back into
+scope, re-check this alpha value against `.dc.html` then.
+
+**`.dc.html` dark-block findings that resolved earlier open questions**:
+- Photo/image box (`.listeningImageWrap`/`.imageChoiceImg`, hardcoded `#FFFFFF`) — confirmed
+  `.dc.html`'s `isTest` block has **zero image element**, in light or dark (source only ever
+  demonstrates `listening_tf`). No comp signal either way — stays deferred, not guessed.
+- `.practiceExit` contrast (#24) — comp's Retake/Back-to-home buttons (`.dc.html` baris 258-259)
+  are **100% `var(--surface)`/`var(--ink)`/`rgba(ink-rgb,X)`-based, no dark-specific override
+  exists in source**. This gives no new information beyond what light mode already established —
+  **#24 is not reopened by this finding**, stays exactly as it was (still logged, still not
+  implemented without sign-off).
+- Materials hub PNG (`13-materials-dark.png`) — confirmed **not used** for the Kamus screen's
+  dark pass, per standing #21/#22 product-gap distinction. Kamus dark mode still has no comp of
+  its own; that pass is judgment-based contrast checking, tracked separately from this port.
+
 Nothing else pending a decision right now.

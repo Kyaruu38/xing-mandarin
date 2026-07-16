@@ -423,8 +423,8 @@
     .historyCardScore.listening{ color:#4A7CBE; background:rgba(91,147,214,.14); }
     .linkBtn:hover{ text-decoration:underline; }
 
-    /* practice / flashcard */
-    .practice{max-width:640px}
+    /* practice / flashcard -- level picker & empty state have no design comp yet, left as-is */
+    .practice{max-width:760px}
     .levelPicker{display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 20px}
     .levelBtn{
       flex:1 1 auto; min-width:50px; padding:10px 0; text-align:center;
@@ -432,27 +432,54 @@
       color:var(--text); font-weight:700; cursor:pointer; font-size:14px;
     }
     .levelBtn.active{background:linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#241a08; border-color:transparent}
-    #sessionView{ display:flex; flex-direction:column; justify-content:center; min-height:70vh; }
-    .sessionProgressTrack{ height:4px; background:var(--line); border-radius:99px; overflow:hidden; margin-bottom:20px; }
-    .sessionProgressFill{ height:100%; width:0%; background:linear-gradient(90deg,var(--gold-soft),var(--gold)); border-radius:99px; transition:width .3s ease; }
+
+    /* session view, ported from .dc.html isPractice block (lines 185-229) */
+    .deckHeader{ display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:12px; }
+    .deckHeaderTitle{ font-family:var(--display-font); font-size:28px; font-weight:700; color:var(--text); }
+    .deckHeaderSub{ margin-top:2px; font-size:14px; color:rgba(var(--text-rgb),.6); }
+    .deckChips{ display:flex; gap:8px; }
+    .deckChip{ font-size:12px; font-weight:800; padding:7px 13px; border-radius:99px; }
+    .deckChip.new{ background:rgba(52,169,138,.14); color:#2E9E6B; }
+    .deckChip.learning{ background:rgba(242,176,30,.16); color:#C7900F; }
+    .deckChip.review{ background:rgba(91,147,214,.14); color:#4A7CBE; }
+    .sessionProgressRow{ margin-top:16px; display:flex; align-items:center; gap:12px; }
+    .sessionProgressTrack{ flex:1; height:10px; border-radius:99px; background:var(--track); overflow:hidden; }
+    .sessionProgressFill{ height:100%; width:0%; background:linear-gradient(90deg,var(--gold),#34A98A); border-radius:99px; transition:width .3s ease; }
+    .sessionProgressLabel{ font-size:12.5px; font-weight:700; color:rgba(var(--text-rgb),.6); flex-shrink:0; }
+
     .cardArea{
-      background:var(--panel-2); border:1px solid var(--line); border-radius:18px;
-      max-width:560px; width:100%; margin:0 auto; padding:40px; text-align:center; min-height:260px;
-      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
+      position:relative; margin-top:22px; background:var(--panel); border-radius:28px; min-height:340px;
+      box-shadow:0 30px 60px -28px rgba(var(--text-rgb),.4); overflow:hidden;
     }
-    .hanzi-big{
-      font-size:72px; font-weight:700; letter-spacing:1px;
-      font-family:var(--hanzi-font);
+    .cardBadge{ position:absolute; top:18px; left:20px; background:rgba(232,111,82,.14); color:#E86F52; font-size:11px; font-weight:800; padding:5px 12px; border-radius:99px; }
+    .cardAudioBtn{
+      position:absolute; top:20px; right:22px; width:38px; height:38px; border-radius:50%;
+      background:rgba(var(--text-rgb),.05); border:none; display:flex; align-items:center; justify-content:center;
+      color:var(--text); cursor:pointer; margin-top:0; padding:0;
     }
-    .pinyin-line{font-size:20px; color:var(--gold)}
-    .meaning-line{font-size:16px; color:var(--text); margin-top:4px}
-    .revealBtn{margin-top:24px; padding:16px}
-    .gradeRow{display:flex; gap:10px; margin-top:20px}
-    .gradeBtn{flex:1; margin-top:0; padding:14px 0; font-size:14px; border-radius:10px}
-    .gradeBtn.again{background:linear-gradient(180deg,#f0a49c,var(--danger)); color:#3a0f0c}
-    .gradeBtn.hard{background:linear-gradient(180deg,var(--gold-soft),#d99614); color:#241a08}
-    .gradeBtn.good{background:linear-gradient(180deg,#8fd1a6,var(--ok)); color:#0d2414}
-    .gradeBtn.easy{background:linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#241a08}
+    .cardContent{ text-align:center; padding:64px 40px 40px; }
+    .cardContent.flipped{ padding:52px 44px 40px; }
+    .hanzi-big{ font-family:'Noto Serif SC',serif; font-weight:700; font-size:80px; line-height:1; color:var(--text); }
+    .cardContent.flipped .hanzi-big{ font-weight:600; font-size:46px; }
+    .cardFlipHint{ margin-top:26px; font-size:13px; color:rgba(var(--text-rgb),.4); font-weight:600; }
+    .pinyin-line{ margin-top:10px; font-size:22px; font-weight:800; color:#C7900F; letter-spacing:.01em; }
+    .meaning-line{ margin-top:6px; font-size:16px; color:rgba(var(--text-rgb),.7); }
+    .meaning-line .pos{ color:rgba(var(--text-rgb),.5); }
+    .revealBtn{
+      margin-top:20px; height:56px; padding:0; border-radius:16px; font-size:16px; font-weight:800;
+      background:linear-gradient(180deg,#F8C13A,#F2B01E); color:#1c2a5e;
+      box-shadow:0 14px 28px -12px rgba(242,176,30,.85); transition:transform .15s ease;
+    }
+    .revealBtn:hover{ transform:translateY(-2px); }
+    .gradeRow{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:20px; }
+    .gradeBtn{ margin-top:0; width:auto; border:none; border-radius:15px; padding:16px 8px; font-family:inherit; cursor:pointer; transition:transform .15s ease; }
+    .gradeBtn:hover{ transform:translateY(-2px); }
+    .gradeBtnLabel{ font-size:16px; font-weight:800; }
+    .gradeBtnSub{ margin-top:2px; font-size:11px; opacity:.8; font-weight:600; }
+    .gradeBtn.again{background:rgba(232,111,82,.12); color:#E86F52;}
+    .gradeBtn.hard{background:rgba(242,176,30,.16); color:#C7900F;}
+    .gradeBtn.good{background:rgba(52,169,138,.14); color:#2E9E6B;}
+    .gradeBtn.easy{background:rgba(91,147,214,.14); color:#4A7CBE;}
     .exampleBtn{margin-top:10px; background:transparent; border:1px solid var(--line); color:var(--muted); font-weight:600; font-size:13px}
     .sessionMeta{display:flex; justify-content:space-between; font-size:12px; color:var(--muted); margin-bottom:8px}
     .practiceExit{margin-top:20px; background:transparent; border:1px solid var(--line); color:var(--muted); font-weight:600}
@@ -862,19 +889,37 @@
         </div>
 
         <div id="sessionView" class="hidden">
-          <div class="sessionMeta"><span id="sessionProgress">0 / 0</span><span id="sessionLevelLabel">—</span></div>
-          <div class="sessionProgressTrack"><div class="sessionProgressFill" id="sessionProgressFill"></div></div>
+          <div class="deckHeader">
+            <div>
+              <div class="deckHeaderTitle" id="deckHeaderTitle">Flashcard &amp; SRS</div>
+              <div class="deckHeaderSub" id="sessionLevelLabel">—</div>
+            </div>
+            <div class="deckChips">
+              <span class="deckChip new" id="deckChipNew">—</span>
+              <span class="deckChip learning" id="deckChipLearning">—</span>
+              <span class="deckChip review" id="deckChipReview">—</span>
+            </div>
+          </div>
+          <div class="sessionProgressRow">
+            <div class="sessionProgressTrack"><div class="sessionProgressFill" id="sessionProgressFill"></div></div>
+            <span class="sessionProgressLabel" id="sessionProgress">0 / 0</span>
+          </div>
           <div class="cardArea">
-            <div class="hanzi-big" id="cardHanzi">—</div>
-            <div class="pinyin-line hidden" id="cardPinyin"></div>
-            <div class="meaning-line hidden" id="cardMeaning"></div>
+            <span class="cardBadge" id="cardBadge">—</span>
+            <button type="button" class="cardAudioBtn" id="cardAudioBtn" aria-label="Play audio"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a9 9 0 0 1 0 14"/></svg></button>
+            <div class="cardContent" id="cardContent">
+              <div class="hanzi-big" id="cardHanzi">—</div>
+              <div class="cardFlipHint hidden" id="cardFlipHint">Tap "Show answer" when you're ready</div>
+              <div class="pinyin-line hidden" id="cardPinyin"></div>
+              <div class="meaning-line hidden" id="cardMeaning"></div>
+            </div>
           </div>
           <button id="revealBtn" class="revealBtn">Lihat Jawaban</button>
           <div class="gradeRow hidden" id="gradeRow">
-            <button class="gradeBtn again" data-grade="again" id="gradeBtnAgain">Lupa</button>
-            <button class="gradeBtn hard" data-grade="hard" id="gradeBtnHard">Susah</button>
-            <button class="gradeBtn good" data-grade="good" id="gradeBtnGood">Oke</button>
-            <button class="gradeBtn easy" data-grade="easy" id="gradeBtnEasy">Gampang</button>
+            <button class="gradeBtn again" data-grade="again" id="gradeBtnAgain"><div class="gradeBtnLabel">Lupa</div><div class="gradeBtnSub" id="gradeBtnAgainSub">—</div></button>
+            <button class="gradeBtn hard" data-grade="hard" id="gradeBtnHard"><div class="gradeBtnLabel">Susah</div><div class="gradeBtnSub" id="gradeBtnHardSub">—</div></button>
+            <button class="gradeBtn good" data-grade="good" id="gradeBtnGood"><div class="gradeBtnLabel">Oke</div><div class="gradeBtnSub" id="gradeBtnGoodSub">—</div></button>
+            <button class="gradeBtn easy" data-grade="easy" id="gradeBtnEasy"><div class="gradeBtnLabel">Gampang</div><div class="gradeBtnSub" id="gradeBtnEasySub">—</div></button>
           </div>
           <button id="exampleBtn" class="exampleBtn hidden">Contoh Kalimat</button>
           <button id="practiceExitBtn2" class="practiceExit">Selesai / Kembali</button>
@@ -1066,6 +1111,8 @@
   let sessionIndex = 0;
   let sessionStats = { correct:0, total:0 };
   let revealed = false;
+  let deckCounts = { new:0, learning:0, review:0 };
+  const LEARNING_REPS_THRESHOLD = 2; // reps below this = still "learning", at/above = "review" (SRS convention, not in source data)
 
   const DUE_LIMIT = 20;
   const NEW_CANDIDATE_LIMIT = 200;
@@ -1104,6 +1151,10 @@
           practiceLevelPrompt:'Pilih level HSK buat latihan', back:'Kembali', showAnswer:'Lihat Jawaban',
           gradeAgain:'Lupa', gradeHard:'Susah', gradeGood:'Oke', gradeEasy:'Gampang',
           exampleSentence:'Contoh Kalimat', doneBack:'Selesai / Kembali',
+          flashcardTitle:'Flashcard & SRS', deckLabel:'Deck · Kosakata HSK {level}',
+          chipNew:'Baru', chipLearning:'Belajar', chipReview:'Ulang',
+          cardProgress:'Kartu {n} / {total}', flipHint:'Ketuk "Lihat Jawaban" kalau udah siap',
+          intervalOneDay:'1 hari', intervalDays:'{n} hari',
           emptyNoDue:'Belum ada kartu due-review, dan semua kata populer di HSK {level} udah pernah kamu lihat. Coba lagi nanti atau pilih level lain.',
           sessionComplete:'Sesi selesai! {correct} / {total} kartu terjawab benar.',
           backToDashboard:'Kembali ke Dashboard', weakestWords:'Kata Terlemah', mockTestHistory:'Riwayat Mock Test',
@@ -1168,6 +1219,10 @@
           practiceLevelPrompt:'Choose an HSK level to practice', back:'Back', showAnswer:'Show Answer',
           gradeAgain:'Forgot', gradeHard:'Hard', gradeGood:'Good', gradeEasy:'Easy',
           exampleSentence:'Example Sentence', doneBack:'Done / Back',
+          flashcardTitle:'Flashcard & SRS', deckLabel:'Deck · HSK {level} Vocabulary',
+          chipNew:'New', chipLearning:'Learning', chipReview:'Review',
+          cardProgress:'Card {n} / {total}', flipHint:'Tap "Show answer" when you\'re ready',
+          intervalOneDay:'1 day', intervalDays:'{n} days',
           emptyNoDue:'No cards due for review, and you have already seen all the popular words for HSK {level}. Try again later or pick another level.',
           sessionComplete:'Session complete! {correct} / {total} cards answered correctly.',
           backToDashboard:'Back to Dashboard', weakestWords:'Weakest Words', mockTestHistory:'Mock Test History',
@@ -1232,6 +1287,10 @@
           practiceLevelPrompt:'选择HSK等级开始练习', back:'返回', showAnswer:'显示答案',
           gradeAgain:'忘记', gradeHard:'困难', gradeGood:'良好', gradeEasy:'简单',
           exampleSentence:'例句', doneBack:'完成 / 返回',
+          flashcardTitle:'闪卡与SRS', deckLabel:'卡组 · HSK {level} 词汇',
+          chipNew:'新词', chipLearning:'学习中', chipReview:'复习',
+          cardProgress:'卡片 {n} / {total}', flipHint:'准备好了就点"显示答案"',
+          intervalOneDay:'1 天', intervalDays:'{n} 天',
           emptyNoDue:'暂无待复习卡片，HSK {level} 常用词你都学过了。请稍后再试或选择其他等级',
           sessionComplete:'本次学习完成！{correct} / {total} 张卡片回答正确',
           backToDashboard:'返回主页', weakestWords:'最薄弱词汇', mockTestHistory:'模拟考试记录',
@@ -1353,14 +1412,19 @@
 
     $('practiceLevelPrompt').textContent = t('practiceLevelPrompt');
     $('practiceExitBtn1').textContent = t('back');
+    $('deckHeaderTitle').textContent = t('flashcardTitle');
+    $('cardFlipHint').textContent = t('flipHint');
     $('revealBtn').textContent = t('showAnswer');
-    $('gradeBtnAgain').textContent = t('gradeAgain');
-    $('gradeBtnHard').textContent = t('gradeHard');
-    $('gradeBtnGood').textContent = t('gradeGood');
-    $('gradeBtnEasy').textContent = t('gradeEasy');
+    $('gradeBtnAgain').querySelector('.gradeBtnLabel').textContent = t('gradeAgain');
+    $('gradeBtnHard').querySelector('.gradeBtnLabel').textContent = t('gradeHard');
+    $('gradeBtnGood').querySelector('.gradeBtnLabel').textContent = t('gradeGood');
+    $('gradeBtnEasy').querySelector('.gradeBtnLabel').textContent = t('gradeEasy');
     $('exampleBtn').textContent = t('exampleSentence');
     $('practiceExitBtn2').textContent = t('doneBack');
     $('practiceExitBtn3').textContent = t('backToDashboard');
+    renderDeckLabel();
+    renderDeckChips();
+    renderGradeSubs();
 
     $('raportHeader').textContent = t('raportHeader');
     $('raportLabelDue').textContent = t('dueToday');
@@ -1769,7 +1833,7 @@
     if(dueRows && dueRows.length){
       const dueHanzi = dueRows.map(r=>r.item_key);
       const { data: dueVocab, error: dvErr } = await sb
-        .from('vocab').select('hanzi,pinyin,meaning_en,meaning_id')
+        .from('vocab').select('hanzi,pinyin,meaning_en,meaning_id,pos')
         .in('hanzi', dueHanzi);
       if(dvErr){ alert(t('errFetchCardDetail') + ' ' + dvErr.message); return; }
       const vocabMap = new Map((dueVocab||[]).map(v=>[v.hanzi, v]));
@@ -1783,7 +1847,7 @@
     }
 
     const { data: levelVocab, error: lvErr } = await sb
-      .from('vocab').select('hanzi,pinyin,meaning_en,meaning_id,frequency')
+      .from('vocab').select('hanzi,pinyin,meaning_en,meaning_id,pos,frequency')
       .eq('hsk_level', level)
       .order('frequency', { ascending:true })
       .limit(NEW_CANDIDATE_LIMIT);
@@ -1798,6 +1862,17 @@
     sessionIndex = 0;
     sessionStats = { correct:0, total:0 };
 
+    // "New"/"Learning"/"Review" split for the deck chips: new = never seen, review = an SRS
+    // card that has graduated past its first couple of reps, learning = everything still short
+    // of that. .dc.html shows these 3 buckets but has no data behind them (static prototype),
+    // so this threshold is our own reasonable SRS convention, not something ported from source.
+    deckCounts = { new: newCards.length, learning: 0, review: 0 };
+    dueCards.forEach(c=>{
+      const reps = c.prev?.srs_reps ?? 0;
+      if(reps < LEARNING_REPS_THRESHOLD) deckCounts.learning += 1;
+      else deckCounts.review += 1;
+    });
+
     if(sessionQueue.length === 0){
       $('levelPickerView').classList.add('hidden');
       $('sessionView').classList.add('hidden');
@@ -1809,18 +1884,47 @@
     $('levelPickerView').classList.add('hidden');
     $('emptyView').classList.add('hidden');
     $('sessionView').classList.remove('hidden');
-    $('sessionLevelLabel').textContent = 'HSK ' + level;
+    renderDeckLabel();
+    renderDeckChips();
     renderCard();
+  }
+
+  function renderDeckLabel(){
+    const el = $('sessionLevelLabel');
+    if(!el || practiceLevel == null) return;
+    el.textContent = t('deckLabel').replace('{level}', practiceLevel);
+  }
+
+  function renderDeckChips(){
+    $('deckChipNew').textContent = t('chipNew') + ' ' + deckCounts.new;
+    $('deckChipLearning').textContent = t('chipLearning') + ' ' + deckCounts.learning;
+    $('deckChipReview').textContent = t('chipReview') + ' ' + deckCounts.review;
+  }
+
+  function formatIntervalDays(days){
+    return days === 1 ? t('intervalOneDay') : t('intervalDays').replace('{n}', days);
+  }
+
+  function renderGradeSubs(){
+    const card = sessionQueue[sessionIndex];
+    if(!card) return;
+    ['again','hard','good','easy'].forEach(grade=>{
+      const days = sm2Update(card.prev, grade).srs_interval;
+      $('gradeBtn' + grade[0].toUpperCase() + grade.slice(1) + 'Sub').textContent = formatIntervalDays(days);
+    });
   }
 
   function renderCard(){
     revealed = false;
     const card = sessionQueue[sessionIndex];
-    $('sessionProgress').textContent = (sessionIndex+1) + ' / ' + sessionQueue.length;
+    $('sessionProgress').textContent = t('cardProgress').replace('{n}', sessionIndex+1).replace('{total}', sessionQueue.length);
     $('sessionProgressFill').style.width = (((sessionIndex+1) / sessionQueue.length) * 100) + '%';
+    $('cardBadge').textContent = 'HSK ' + practiceLevel + ' · ' + card.hanzi;
     $('cardHanzi').textContent = card.hanzi;
     $('cardPinyin').textContent = card.pinyin;
-    $('cardMeaning').textContent = card.meaning_id || card.meaning_en;
+    $('cardMeaning').innerHTML = (card.meaning_id || card.meaning_en) + (card.pos ? ' · <span class="pos">' + card.pos + '</span>' : '');
+    $('cardContent').classList.remove('flipped');
+    $('cardFlipHint').classList.remove('hidden');
     $('cardPinyin').classList.add('hidden');
     $('cardMeaning').classList.add('hidden');
     $('revealBtn').classList.remove('hidden');
@@ -1829,10 +1933,13 @@
 
   function revealCard(){
     revealed = true;
+    $('cardContent').classList.add('flipped');
+    $('cardFlipHint').classList.add('hidden');
     $('cardPinyin').classList.remove('hidden');
     $('cardMeaning').classList.remove('hidden');
     $('revealBtn').classList.add('hidden');
     $('gradeRow').classList.remove('hidden');
+    renderGradeSubs();
   }
 
   async function gradeCard(grade){

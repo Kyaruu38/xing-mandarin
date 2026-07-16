@@ -916,4 +916,30 @@ scope, re-check this alpha value against `.dc.html` then.
   dark pass, per standing #21/#22 product-gap distinction. Kamus dark mode still has no comp of
   its own; that pass is judgment-based contrast checking, tracked separately from this port.
 
+---
+
+## 30. Admin panel v1 (user management) — pre-implementation audit + final decisions
+
+Comp for admin panel v1 (user management) exists. Before implementation, audited 3 things the
+comp itself can't answer (backend capability, current account-creation mechanism, delete
+semantics) — full findings recorded in this session's conversation, not duplicated here.
+Verdict summary: create/delete auth users and password reset are **not currently possible from
+the client at all** (anon-key-only app, confirmed no `service_role` key anywhere in
+`index.html`) — these need a new Edge Function using `SUPABASE_SERVICE_ROLE_KEY` +
+`supabase.auth.admin.*`, gated by the existing `is_admin()` Postgres function (already used in
+`vocab`'s RLS policies) or an equivalent server-side admin check. Editing `profiles` fields
+(display_name, target_level, package, status, subscription_end) and deactivating (`status =
+'expired'`) **can** happen straight from the client under RLS, same pattern as everything else
+in this app — no Edge Function needed for those. FK/cascade behavior for permanent delete
+**could not be verified** — no local schema file exists for `profiles`/`user_mastery`/
+`test_attempts`/`essay_submissions` (only `vocab` has a committed `CREATE TABLE`), so cascade
+vs. restrict vs. orphaned-row behavior is unknown until checked directly in Supabase.
+
+**Final decisions, both diputuskan Kyaru, 16 Jul 2026**:
+- Admin page pakai sidebar existing apa adanya. Comp TIDAK menggambar toggle theme/lang karena
+  area sidebar bawah di luar frame comp — bukan berarti dihapus. `.sbThemeToggle` +
+  `.sbLangBtn` yang sudah ada tetap berlaku. JANGAN bikin toggle baru di dalam admin page.
+- Form pattern: 1a MODAL (bukan slide-over/full page). Alasan: task pendek, konteks list tetap
+  terlihat, konsisten dengan pola dialog delete-confirm.
+
 Nothing else pending a decision right now.

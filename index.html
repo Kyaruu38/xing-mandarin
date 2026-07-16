@@ -77,7 +77,8 @@
     @keyframes twinkle{ 0%,100%{opacity:.25; transform:scale(.7)} 50%{opacity:1; transform:scale(1.15)} }
     @keyframes floatY{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
     @media (prefers-reduced-motion: reduce){
-      .loginMoonGlow, .loginStar, .loginSparkle, .loginBrandLogoCard, .loginWordOfDay{ animation:none !important; }
+      .loginMoonGlow, .loginStar, .loginSparkle, .loginBrandLogoCard, .loginWordOfDay,
+      .cardSparkle{ animation:none !important; }
     }
 
     .loginScreen{ display:grid; grid-template-columns:minmax(420px,46%) 1fr; min-height:100vh; }
@@ -267,17 +268,28 @@
       flex:0 0 auto; width:auto; margin-top:0; padding:5px 9px; background:var(--panel); border:1px solid var(--line);
       border-radius:8px; cursor:pointer; font-size:13px; line-height:1;
     }
-    /* sidebar-only: theme toggle + lang pills grouped like the design (login's own row is untouched) */
-    .sidebarLangSwitch .themeToggle{
-      width:34px; height:30px; padding:0; display:flex; align-items:center; justify-content:center;
-      border:none; border-radius:10px; font-size:14px; box-shadow:0 2px 8px -4px rgba(var(--text-rgb),.28);
+    /* sidebar-only lang switch / theme toggle: standalone classes, zero reliance on
+       .langBtn/.themeToggle (which are button elements and were silently inheriting
+       leftover properties -- notably margin-top:22px -- from the global button{} rule
+       that scoped overrides never re-declared). Ported verbatim from .dc.html sidebar
+       block (lines 119-127), property-by-property, not just the visually-obvious ones.
+       Login's own .langBtn/.themeToggle row is untouched. */
+    .sbThemeToggle{
+      flex:none; width:34px; height:30px; margin:0; padding:0; display:flex; align-items:center; justify-content:center;
+      background:var(--panel); border:none; border-radius:10px; box-shadow:0 2px 8px -4px rgba(var(--text-rgb),.28);
+      cursor:pointer; font-size:14px; line-height:1; color:inherit; font-weight:400; font-family:inherit;
     }
-    .sidebarLangPill{
+    .sbLangPill{
       flex:1 1 auto; display:flex; gap:3px; background:var(--panel); border-radius:11px; padding:4px;
       box-shadow:0 2px 8px -4px rgba(var(--text-rgb),.15);
     }
-    .sidebarLangPill .langBtn{ flex:1 1 auto; background:transparent; border:none; padding:4px 9px; font-size:11.5px; font-weight:600; }
-    .sidebarLangPill .langBtn.active{ background:var(--gold); color:#1c2a5e; font-weight:700; }
+    .sbLangBtn{
+      flex:1 1 auto; width:auto; margin:0; padding:4px 9px; text-align:center;
+      background:transparent; border:none; border-radius:8px;
+      color:rgba(var(--text-rgb),.5); font-weight:600; font-size:11.5px; cursor:pointer; font-family:inherit;
+    }
+    .sbLangBtn.active{ background:var(--gold); color:#1c2a5e; font-weight:700; }
+    .sbLangBtn[data-lang="zh"]{ font-family:var(--hanzi-font); }
     .mainContent{
       flex:1; min-width:0; padding:clamp(24px,3vw,40px); overflow-x:hidden;
       background:radial-gradient(120% 80% at 100% 0%, var(--bg2), var(--bg) 60%);
@@ -425,6 +437,11 @@
 
     /* practice / flashcard -- level picker & empty state have no design comp yet, left as-is */
     .practice{max-width:760px}
+    /* source's isPractice block (line 186) has no white card wrapper -- session content floats
+       directly on the page gradient, only the hanzi card itself (.cardArea) is white. Gated by
+       .sessionActive, toggled in JS alongside #sessionView's .hidden class, so levelPicker/emptyView
+       keep the default .pageCard chrome untouched. */
+    .pageCard.practice.sessionActive{ background:none; border:none; box-shadow:none; padding:0; }
     .levelPicker{display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 20px}
     .levelBtn{
       flex:1 1 auto; min-width:50px; padding:10px 0; text-align:center;
@@ -452,6 +469,7 @@
       box-shadow:0 30px 60px -28px rgba(var(--text-rgb),.4); overflow:hidden;
     }
     .cardBadge{ position:absolute; top:18px; left:20px; background:rgba(232,111,82,.14); color:#E86F52; font-size:11px; font-weight:800; padding:5px 12px; border-radius:99px; }
+    .cardSparkle{ position:absolute; top:40px; left:120px; animation:twinkle 4.5s ease-in-out infinite; pointer-events:none; }
     .cardAudioBtn{
       position:absolute; top:20px; right:22px; width:38px; height:38px; border-radius:50%;
       background:rgba(var(--text-rgb),.05); border:none; display:flex; align-items:center; justify-content:center;
@@ -791,11 +809,11 @@
         <div class="sidebarUserName" id="sideUserName">—</div>
         <div class="sidebarUserMeta" id="sideUserMeta">—</div>
         <div class="sidebarLangSwitch" id="langSwitch">
-          <button type="button" class="themeToggle" id="themeToggle" aria-label="Switch to dark mode">☀️</button>
-          <div class="sidebarLangPill">
-            <button type="button" class="langBtn" data-lang="id">ID</button>
-            <button type="button" class="langBtn" data-lang="en">EN</button>
-            <button type="button" class="langBtn" data-lang="zh">中</button>
+          <button type="button" class="sbThemeToggle" id="themeToggle" aria-label="Switch to dark mode">☀️</button>
+          <div class="sbLangPill">
+            <button type="button" class="sbLangBtn" data-lang="id">ID</button>
+            <button type="button" class="sbLangBtn" data-lang="en">EN</button>
+            <button type="button" class="sbLangBtn" data-lang="zh">中</button>
           </div>
         </div>
         <button class="logout" id="logoutBtn">Keluar</button>
@@ -907,6 +925,7 @@
           <div class="cardArea">
             <span class="cardBadge" id="cardBadge">—</span>
             <button type="button" class="cardAudioBtn" id="cardAudioBtn" aria-label="Play audio"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a9 9 0 0 1 0 14"/></svg></button>
+            <svg class="cardSparkle" width="14" height="14" viewBox="0 0 24 24" fill="rgba(242,176,30,.4)"><path d="M12 0c1 6 5 10 12 12-7 2-11 6-12 12-1-6-5-10-12-12 7-2 11-6 12-12z"/></svg>
             <div class="cardContent" id="cardContent">
               <div class="hanzi-big" id="cardHanzi">—</div>
               <div class="cardFlipHint hidden" id="cardFlipHint">Tap "Show answer" when you're ready</div>
@@ -914,7 +933,7 @@
               <div class="meaning-line hidden" id="cardMeaning"></div>
             </div>
           </div>
-          <button id="revealBtn" class="revealBtn">Lihat Jawaban</button>
+          <button id="revealBtn" class="revealBtn">Lihat jawaban</button>
           <div class="gradeRow hidden" id="gradeRow">
             <button class="gradeBtn again" data-grade="again" id="gradeBtnAgain"><div class="gradeBtnLabel">Lupa</div><div class="gradeBtnSub" id="gradeBtnAgainSub">—</div></button>
             <button class="gradeBtn hard" data-grade="hard" id="gradeBtnHard"><div class="gradeBtnLabel">Susah</div><div class="gradeBtnSub" id="gradeBtnHardSub">—</div></button>
@@ -1148,12 +1167,12 @@
           errSessionTakenOver:'Sesi kamu diambil alih perangkat lain. Silakan login ulang.',
           errLoggedInElsewhere:'Akun kamu login di perangkat lain. Kamu keluar otomatis.',
           dailyGoalProgress:'{count} / {total} kata direview hari ini', wordsUnit:'kata', scoreLabel:'Skor',
-          practiceLevelPrompt:'Pilih level HSK buat latihan', back:'Kembali', showAnswer:'Lihat Jawaban',
+          practiceLevelPrompt:'Pilih level HSK buat latihan', back:'Kembali', showAnswer:'Lihat jawaban',
           gradeAgain:'Lupa', gradeHard:'Susah', gradeGood:'Oke', gradeEasy:'Gampang',
           exampleSentence:'Contoh Kalimat', doneBack:'Selesai / Kembali',
           flashcardTitle:'Flashcard & SRS', deckLabel:'Deck · Kosakata HSK {level}',
           chipNew:'Baru', chipLearning:'Belajar', chipReview:'Ulang',
-          cardProgress:'Kartu {n} / {total}', flipHint:'Ketuk "Lihat Jawaban" kalau udah siap',
+          cardProgress:'Kartu {n} / {total}', flipHint:'Ketuk "Lihat jawaban" kalau udah siap',
           intervalOneDay:'1 hari', intervalDays:'{n} hari',
           emptyNoDue:'Belum ada kartu due-review, dan semua kata populer di HSK {level} udah pernah kamu lihat. Coba lagi nanti atau pilih level lain.',
           sessionComplete:'Sesi selesai! {correct} / {total} kartu terjawab benar.',
@@ -1216,7 +1235,7 @@
           errSessionTakenOver:'Your session was taken over on another device. Please sign in again.',
           errLoggedInElsewhere:'Your account signed in on another device. You were signed out automatically.',
           dailyGoalProgress:'{count} / {total} words reviewed today', wordsUnit:'words', scoreLabel:'Score',
-          practiceLevelPrompt:'Choose an HSK level to practice', back:'Back', showAnswer:'Show Answer',
+          practiceLevelPrompt:'Choose an HSK level to practice', back:'Back', showAnswer:'Show answer',
           gradeAgain:'Forgot', gradeHard:'Hard', gradeGood:'Good', gradeEasy:'Easy',
           exampleSentence:'Example Sentence', doneBack:'Done / Back',
           flashcardTitle:'Flashcard & SRS', deckLabel:'Deck · HSK {level} Vocabulary',
@@ -1457,7 +1476,7 @@
     $('riwayatHeader').textContent = t('mockTestHistory');
 
     document.body.classList.toggle('lang-zh', currentLang === 'zh');
-    document.querySelectorAll('.langBtn').forEach(b=>{
+    document.querySelectorAll('.langBtn, .sbLangBtn').forEach(b=>{
       b.classList.toggle('active', b.dataset.lang === currentLang);
     });
     applyTheme();
@@ -1775,6 +1794,7 @@
     $('practiceCard').classList.remove('hidden');
     $('levelPickerView').classList.remove('hidden');
     $('sessionView').classList.add('hidden');
+    $('practiceCard').classList.remove('sessionActive');
     $('emptyView').classList.add('hidden');
     renderLevelPicker();
   }
@@ -1876,6 +1896,7 @@
     if(sessionQueue.length === 0){
       $('levelPickerView').classList.add('hidden');
       $('sessionView').classList.add('hidden');
+      $('practiceCard').classList.remove('sessionActive');
       $('emptyView').classList.remove('hidden');
       $('emptyMsg').textContent = t('emptyNoDue').replace('{level}', level);
       return;
@@ -1884,6 +1905,7 @@
     $('levelPickerView').classList.add('hidden');
     $('emptyView').classList.add('hidden');
     $('sessionView').classList.remove('hidden');
+    $('practiceCard').classList.add('sessionActive');
     renderDeckLabel();
     renderDeckChips();
     renderCard();
@@ -1969,6 +1991,7 @@
     sessionIndex += 1;
     if(sessionIndex >= sessionQueue.length){
       $('sessionView').classList.add('hidden');
+      $('practiceCard').classList.remove('sessionActive');
       $('emptyView').classList.remove('hidden');
       $('emptyMsg').textContent = t('sessionComplete').replace('{correct}', sessionStats.correct).replace('{total}', sessionStats.total);
       return;
@@ -2301,6 +2324,7 @@
         $('practiceCard').classList.remove('hidden');
         $('levelPickerView').classList.add('hidden');
         $('sessionView').classList.add('hidden');
+        $('practiceCard').classList.remove('sessionActive');
         $('emptyView').classList.add('hidden');
         startSession(lv);
       });
@@ -3603,7 +3627,7 @@
   $('navRiwayat').addEventListener('click', ()=> navTo(openRiwayat));
   $('dashSeeAllHistory').addEventListener('click', ()=> navTo(openRiwayat));
 
-  document.querySelectorAll('.langBtn').forEach(b=>{
+  document.querySelectorAll('.langBtn, .sbLangBtn').forEach(b=>{
     b.addEventListener('click', ()=> setLang(b.dataset.lang));
   });
 

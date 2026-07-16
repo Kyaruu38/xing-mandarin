@@ -1,13 +1,33 @@
 # Handoff — session 2 (continuation after /clear)
 
-Scope for this session was capped at 4 items by explicit instruction (context-budget pacing: ~2 screens per session, then `/clear`). All 4 done, verified in-browser with screenshots, committed. Stopping here as instructed.
+Scope for this session was capped at 4 items by explicit instruction (context-budget pacing: ~2 screens per session, then `/clear`). All done, verified in-browser with screenshots, committed. Stopping here as instructed.
+
+## Flashcard + fix drift: DONE — `e40aaf1`
+
+Follow-up round after pixel-level screenshot review surfaced 2 more drift items on top of `883a252`. Both fixed, verified in-browser (wrapper-white gone, sparkle visible, "Show answer" sentence case, lang switch + theme toggle spacing correct), committed as `e40aaf1`.
+
+## ⚠️ ROOT CAUSE — global `button{}` margin-top leak (relevant to every screen with buttons)
+
+`button{ margin-top:22px }` is a **global rule that applies to every `<button>` in the file** unless a more specific selector explicitly resets `margin-top`. This was the actual cause of 3 separate rounds of "lang switch spacing looks off" complaints — the sidebar's `.langBtn`/`.themeToggle` classes never re-declared `margin-top`, so the base rule silently won. Fixed in `e40aaf1` by giving the sidebar lang switch its own standalone classes (`.sbThemeToggle`/`.sbLangPill`/`.sbLangBtn`) ported property-by-property from the design comp, instead of layering overrides onto the shared `.langBtn`/`.themeToggle` base.
+
+**This will recur.** Screens still to port that are button-heavy:
+- **Mock test attempt** — question navigator (95 buttons), answer-choice buttons, Previous/Next, Pinyin/Translation toggle, audio play button
+- **Mock test result** — Review/Retake/Back-to-home buttons
+- **Materials** — filter chips (All/Vocab/Grammar/Listening/Mock)
+
+**Rule going forward**: if any of these look oversized or oddly spaced, check for a `margin-top:22px` leak from the base `button{}` rule *before* suspecting the grid/flex layout. Reset it explicitly in a new dedicated class (like `.sbThemeToggle` etc.), never by patching the shared base rule.
+
+## Verification pattern (standing process)
+
+You (Claude) port + syntax-check + report. The user screenshots in a live logged-in browser and approves. **Only then** commit. Claude cannot log in / drive the real app, so the user is the only one who can visually confirm a change — never commit on the strength of a syntax check alone.
 
 ## Commits this session
 
 - **`78b9787`** — Port progress rings, quick action icons, and Recent History cards (Chunk C + Recent History)
 - **`883a252`** — Port Flashcard & SRS session view to design handoff comp
+- **`e40aaf1`** — Fix flashcard session chrome (`:has()` → `.sessionActive` class toggle) and sidebar lang switch button margin-top leak
 
-Both confirmed via `git log` — nothing left uncommitted in `index.html`.
+All confirmed via `git log` — nothing left uncommitted in `index.html`.
 
 ## Screenshot verification
 
@@ -24,7 +44,7 @@ Both confirmed via `git log` — nothing left uncommitted in `index.html`.
 | Card area shell | `border-radius:28px`, `box-shadow:0 30px 60px -28px rgba(ink-rgb,.4)`, no padding on the shell itself (inner content carries its own padding), line 193 | `border-radius:18px`, flat `1px solid` border, flex-centered with a fixed `gap:10px` between hanzi/pinyin/meaning regardless of state | Shell now radius 28px, matching shadow, `overflow:hidden`, no padding; inner `.cardContent` carries state-specific padding instead of a fixed gap | **Fixed.** The old fixed-gap approach is the same class of bug flagged on the dashboard's continue-card text block last session (parent spacing stacking with children's own margins) — avoided here by not using gap at all, matching source's block-flow-with-margins approach. |
 | HSK+word badge (top-left of card) | coral pill `HSK 4 · 图书`, line 194 | Did not exist | Added `.cardBadge`, showing `HSK {level} · {hanzi}` | **Ported, with one simplification**: source's badge text is a *different, shorter* string ("图书") than the card's main word ("图书馆") — likely a demo-content quirk, not a real second field. Used the same hanzi for both badge and main display since there's no separate "short form" data field to pull from. |
 | Audio icon (top-right of card) | circular button with a speaker/volume SVG, line 195 | Did not exist | Added `.cardAudioBtn` with the literal speaker icon from source, positioned/styled to match | **Visual port only — not wired.** No audio data source exists for individual vocab words in the current schema. Clicking it does nothing right now. Backlog item, not fabricated. |
-| Decorative sparkle on card | small twinkling star SVG, line 196 | Did not exist | Not added | **Skipped**, purely decorative and non-essential; can revisit if wanted, low priority. |
+| Decorative sparkle on card | small twinkling star SVG, `position:absolute;top:40px;left:120px`, line 196 | Did not exist | Added `.cardSparkle`, same hardcoded `top:40px;left:120px` as source | **Ported in `e40aaf1`.** Position is hardcoded in source too (source's badge text is also fixed-width there), so kept hardcoded rather than inventing a badge-relative fix that doesn't exist upstream. Flagged as a real risk since our badge width is dynamic (e.g. "HSK 1 · 的" vs "HSK 4 · 图书馆") — revisit if it visibly misaligns on short/long badges. |
 | Hanzi typography (not flipped) | `font-family:'Noto Serif SC',serif`, `font-size:80px`, `font-weight:700`, line 199 | `font-family:var(--hanzi-font)` (= Noto **Sans** SC, the sans-serif token used everywhere else in the app), `font-size:72px` | `font-family:'Noto Serif SC',serif` (font already loaded via the existing Google Fonts `<link>`, just never applied here), `font-size:80px` | **Fixed — this was a real, pre-existing drift** (wrong font family entirely, not just a size mismatch), independent of anything from Chunk A/C. |
 | Hanzi typography (flipped) | `font-weight:600`, `font-size:46px`, line 205 | Same element/size as not-flipped state (no distinct flipped styling) | `.cardContent.flipped .hanzi-big` overrides to 46px/600 | **Fixed.** |
 | Flip hint text | "Tap "Show answer" when you're ready", muted, line 200 | Did not exist | Added `.cardFlipHint`, shown only in not-flipped state | **Ported.** |

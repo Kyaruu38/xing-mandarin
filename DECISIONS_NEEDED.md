@@ -629,6 +629,18 @@ nol JS wiring (search input, filter chip, dan 4 kartu clickable-nanti semuanya t
   nyata untuk fase locked-visible (badge level + gembok untuk konten di luar paket). Diputuskan
   Kyaru, 16 Jul 2026.
 
+### UPDATE by user, 2026-07-16 — status slot reusable (`.hubStatusPill`)
+
+Status slot hub = pill di pojok cover + cover dim. Coming-soon dan locked-visible WAJIB pakai
+komponen yang sama, beda isi doang. Diputuskan Kyaru, 16 Jul 2026.
+
+Diimplementasikan: `.hubStatusPill` (posisi `top:12px;right:12px` di dalam `.hubCardCover`,
+bukan di `.hubCardBody`/slot deskripsi — itu masalah yang lagi dibenerin, status kebaca kayak
+deskripsi) + `.hubCard.comingSoon .hubCardCover{filter:saturate(.6) brightness(.85)}` buat dim
+ringan. Grammar & Listening pakai slot ini sekarang isinya "Coming soon". Locked-visible nanti
+reuse class & posisi yang sama, ganti isi jadi ikon gembok + label paket — **jangan bikin
+komponen status kedua**, extend yang ini.
+
 **BARU — Sistem paket (hasil audit sesi ini, verdict: ada sebagian, lihat audit lengkap di
 percakapan sesi ini untuk bukti baris kode):**
 - Tier: `hsk_1_4` / `hsk_5` / `hsk_6` / `vip`, **KUMULATIF**: `hsk_5` = level 1-5, `hsk_6` =

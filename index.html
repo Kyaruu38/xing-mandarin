@@ -706,7 +706,19 @@
     .hubCardBody{ padding:16px 18px; }
     .hubCardTitle{ font-size:15px; font-weight:800; color:var(--text); }
     .hubCardMeta{ margin-top:3px; font-size:12px; color:var(--muted); }
-    .hubComingSoonLabel{ color:#C7900F; font-weight:700; }
+    /* Reusable status slot -- SAME pill (position/shape/size) the later locked-visible pass
+       reuses for gated content, per DECISIONS_NEEDED #22 (2026-07-16): only the icon/text
+       inside changes ("Coming soon" now, a lock + package label later), never the slot itself.
+       Lives inside .hubCardCover (not .hubCardBody) so it reads as a status on the whole card,
+       not a line of descriptive text -- that's the exact problem this replaces. */
+    .hubStatusPill{
+      position:absolute; top:12px; right:12px; display:inline-flex; align-items:center; gap:5px;
+      background:rgba(255,255,255,.25); color:#fff; font-size:10px; font-weight:800;
+      padding:4px 10px; border-radius:99px;
+    }
+    /* Light desaturate/dim on the cover only (not the whole card) for non-interactive status
+       states -- same trigger (.hubCard.comingSoon) the locked-visible pass reuses later. */
+    .hubCard.comingSoon .hubCardCover{ filter:saturate(.6) brightness(.85); }
 
     /* mock test list */
     .mocklist{max-width:1200px}
@@ -1383,18 +1395,22 @@
           </button>
 
           <div class="hubCard comingSoon" data-card="grammar">
-            <div class="hubCardCover grammar"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><rect x="4" y="4" width="16" height="11" rx="3"/><path d="M9 15 6 19v-4"/><path d="M7.5 8h9M7.5 11h6"/></svg></div>
+            <div class="hubCardCover grammar">
+              <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><rect x="4" y="4" width="16" height="11" rx="3"/><path d="M9 15 6 19v-4"/><path d="M7.5 8h9M7.5 11h6"/></svg>
+              <span class="hubStatusPill">Coming soon</span>
+            </div>
             <div class="hubCardBody">
               <div class="hubCardTitle">Grammar</div>
-              <div class="hubCardMeta hubComingSoonLabel">Coming soon</div>
             </div>
           </div>
 
           <div class="hubCard comingSoon" data-card="listening">
-            <div class="hubCardCover listening"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a9 9 0 0 1 0 14"/></svg></div>
+            <div class="hubCardCover listening">
+              <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a9 9 0 0 1 0 14"/></svg>
+              <span class="hubStatusPill">Coming soon</span>
+            </div>
             <div class="hubCardBody">
               <div class="hubCardTitle">Listening</div>
-              <div class="hubCardMeta hubComingSoonLabel">Coming soon</div>
             </div>
           </div>
 

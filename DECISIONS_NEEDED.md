@@ -233,6 +233,30 @@ structure `vocab.meaning_id` and the level-picker UI already assume throughout t
 sources separately. Recorded here only so it's on record as a known structural risk to the
 platform's core level model, should it come up later.
 
+## 11. Attempt header title/subtitle now redundant ("...LISTENING" shown twice) — OPEN, display-only
+
+Corrected characterization from the post-`37952ef` report: `.attemptTitle` showing
+"H4XING001 LISTENING" in caps is **not a data quality issue** — `H{level}XING{seq} SECTION`
+is the user's own deliberate `test_sets.title` naming scheme, not junk data. Confirmed
+harmless as a naming convention.
+
+The actual issue: `8ec14ae` **added the subtitle line** ("HSK 4 · Listening · 45 questions")
+that didn't exist before. Before that commit, the title carrying the section name was the
+*only* place section showed up in the header, so it was doing necessary work. Now the
+subtitle also states the section, so "Listening" appears twice in the same header. The
+redundancy is a side effect of adding the subtitle, not a pre-existing data problem.
+
+**Do not fix by editing `test_sets.title` in the DB** — that column is read directly (not
+reprocessed) in the mock list, mock/attempt history, and Recent History displays too; a DB
+edit would ripple everywhere those render, not just this one header.
+
+Options for user to decide, not to be implemented without sign-off:
+- **(a)** Strip the section token from the title *display-only*, just in the attempt header
+  (e.g. regex/split on the known `H{level}XING{seq} SECTION` pattern), leaving the stored
+  `title` and every other screen that reads it untouched.
+- **(b)** Leave the redundancy as-is (harmless, just slightly repetitive).
+- **(c)** Drop the section from the subtitle instead, since the title already carries it.
+
 ---
 
 Nothing else pending a decision right now.

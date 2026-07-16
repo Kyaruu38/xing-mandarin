@@ -541,15 +541,35 @@
     .mockSetScore{font-size:12px; color:var(--gold); margin-bottom:10px; font-weight:600}
     .mockSetBtn{margin-top:0}
     /* mock test attempt */
-    .attempt{max-width:680px}
-    .attemptHeader{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px}
-    .attemptTitle{font-weight:700; font-size:14px}
-    .attemptTimer{font-weight:700; font-size:17px; font-variant-numeric:tabular-nums; color:var(--text)}
-    .attemptTimer.low{color:var(--danger)}
-    .attemptToggles{display:flex; gap:16px; margin-bottom:12px; font-size:12px; color:var(--muted)}
-    .attemptToggles label{display:flex; align-items:center; gap:6px; cursor:pointer}
-    .attemptProgress{font-size:12px; color:var(--muted); margin-bottom:8px}
-    .attemptBody{background:var(--panel-2); border:1px solid var(--line); border-radius:18px; padding:18px; min-height:160px}
+    .attempt{max-width:920px}
+    /* mock test attempt chrome, ported from .dc.html isTest block (lines 302-358). Question-type
+       renderers below (.qPassage, .choiceItem, etc.) and the question card itself are untouched --
+       chrome-only pass, see DECISIONS_NEEDED.md for the per-renderer audit. */
+    .attemptHeader{display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap; padding-bottom:16px; border-bottom:1px solid rgba(var(--text-rgb),.07)}
+    .attemptHeaderInfo{display:flex; align-items:center; gap:12px}
+    .attemptIcon{width:40px; height:40px; border-radius:12px; background:rgba(232,111,82,.14); color:#E86F52; display:flex; align-items:center; justify-content:center; flex-shrink:0}
+    .attemptTitle{font-weight:800; font-size:16px}
+    .attemptSubtitle{margin-top:2px; font-size:12px; color:rgba(var(--text-rgb),.5)}
+    .attemptTimer{display:flex; align-items:center; gap:8px; background:rgba(242,176,30,.14); border:1px solid rgba(242,176,30,.35); border-radius:12px; padding:8px 15px; flex:none}
+    .attemptTimer span{font-family:ui-monospace,Menlo,monospace; font-weight:800; font-size:17px; color:var(--text); letter-spacing:.02em}
+    .attemptTimer.low span{color:var(--danger)}
+    .attemptToolbar{margin-top:20px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap}
+    .attemptToggles{display:flex; gap:10px}
+    /* checkbox+label kept as real form controls (not a styled div) so the toggle stays
+       Tab-reachable and Space-toggleable -- this is an exam screen, keyboard nav matters.
+       Input is visually hidden via clip, not display:none, so it stays focusable. */
+    .toggleChip{position:relative; display:inline-flex; align-items:center; gap:7px; padding:7px 14px; border-radius:11px; cursor:pointer; font-size:13px; font-weight:700; border:1.5px solid rgba(var(--text-rgb),.14); background:var(--panel); color:rgba(var(--text-rgb),.6); transition:all .15s ease}
+    .toggleChipInput{position:absolute; width:1px; height:1px; margin:-1px; padding:0; border:0; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap}
+    .toggleChip svg{display:none}
+    .toggleChip.active{border-color:var(--gold); background:rgba(242,176,30,.16); color:var(--text)}
+    .toggleChip.active svg{display:block}
+    /* :focus-within (not :has -- long-standing, universally supported since ~2017, unlike
+       :has()) is the only non-:has way to ring the label from its visually-hidden child input. */
+    .toggleChip:focus-within{outline:2px solid var(--gold); outline-offset:2px}
+    .attemptProgress{font-size:13px; font-weight:700; color:rgba(var(--text-rgb),.6)}
+    .attemptProgressTrack{margin-top:12px; height:8px; border-radius:99px; background:var(--track); overflow:hidden}
+    .attemptProgressFill{height:100%; width:0%; background:linear-gradient(90deg,var(--gold),#34A98A); border-radius:99px; transition:width .3s ease}
+    .attemptBody{margin-top:22px; background:linear-gradient(180deg,var(--bg2),var(--bg)); border:1px solid rgba(var(--text-rgb),.06); border-radius:22px; padding:24px; min-height:160px}
     .qInstruction{font-size:11px; color:var(--muted); margin-bottom:10px; text-transform:uppercase; letter-spacing:.4px}
     .sectionBreak{display:inline-block; padding:4px 12px; margin-bottom:14px; background:rgba(242,176,30,.16); border:1px solid var(--gold); border-radius:999px; font-size:12px; font-weight:700; color:var(--text); letter-spacing:.3px}
     .qPassage{font-size:15px; line-height:1.85; margin-bottom:14px; padding-bottom:14px; border-bottom:1px solid var(--line); font-family:var(--hanzi-font); white-space:pre-line}
@@ -571,15 +591,33 @@
     .segmentItem.picked .segmentBadge{background:linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#241a08; border-color:transparent}
     .segmentHanzi{font-family:var(--hanzi-font); font-size:15px}
     .segmentTrans{color:var(--muted); font-size:12px; margin-left:auto; text-align:right}
-    .attemptNav{display:flex; gap:8px; margin-top:16px}
-    .navBtn{margin-top:0; flex:1; background:var(--panel-2); border:1px solid var(--line); color:var(--text); font-weight:600}
+    .attemptNav{display:flex; gap:12px; margin-top:18px}
+    .navBtn{margin-top:0; flex:1; height:50px; border-radius:14px; font-size:14px; cursor:pointer}
+    .navBtn.navPrev{border:1.5px solid rgba(var(--text-rgb),.12); background:var(--panel); color:rgba(var(--text-rgb),.5); font-weight:700}
+    .navBtn.navNext{border:none; background:#1C2A5E; color:#fff; font-weight:800; box-shadow:0 12px 22px -12px rgba(var(--text-rgb),.7)}
     .navBtn:disabled{opacity:.4; cursor:not-allowed}
-    .questionGrid{display:flex; flex-wrap:wrap; gap:6px; margin-top:16px}
-    .gridBtn{width:34px; height:34px; border-radius:8px; background:var(--panel-2); border:1px solid var(--line); color:var(--muted); font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; cursor:pointer}
-    .gridBtn.answered{background:rgba(47,158,91,.12); border-color:var(--ok); color:var(--ok)}
-    .gridBtn.current{border-color:var(--gold); color:var(--text)}
-    .attemptFilledCount{font-size:12px; color:var(--muted); text-align:center; margin-top:10px}
-    .attemptFilledCount.done{color:var(--ok); font-weight:700}
+    .questionNavHeader{margin-top:24px; display:flex; align-items:center; justify-content:space-between}
+    .questionNavLabel{font-size:13.5px; font-weight:800; color:var(--text)}
+    .questionGrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(40px,1fr)); gap:8px; margin-top:12px}
+    /* real <button> now (was a div -- no keyboard access), so every property the global
+       button{} rule sets must be reset explicitly here, not just the visually-obvious ones --
+       margin-top:22px and padding:13px would otherwise blow up a 40px grid cell. */
+    .gridBtn{width:auto; margin-top:0; padding:0; height:40px; border:none; border-radius:11px; font-size:13px; font-weight:700; font-family:inherit; display:flex; align-items:center; justify-content:center; cursor:pointer; background:var(--track); color:rgba(var(--text-rgb),.55)}
+    .gridBtn.answered{background:var(--text); color:var(--panel)}
+    .gridBtn.current{background:var(--gold); color:#1C2A5E; box-shadow:0 6px 14px -6px rgba(242,176,30,.9)}
+    .gridBtn.flagged{background:rgba(232,111,82,.18); color:#E86F52; border:1.5px solid rgba(232,111,82,.55)}
+    .attemptFilledCount{font-size:12.5px; color:rgba(var(--text-rgb),.55); font-weight:700}
+    .attemptFilledCount.done{color:var(--ok)}
+    .questionLegend{margin-top:14px; display:flex; gap:16px; flex-wrap:wrap; font-size:11.5px; color:rgba(var(--text-rgb),.55); font-weight:600}
+    .questionLegend span{display:inline-flex; align-items:center; gap:6px}
+    .legendSwatch{width:12px; height:12px; border-radius:4px; display:inline-block}
+    .legendSwatch.answered{background:var(--text)}
+    .legendSwatch.current{background:var(--gold)}
+    .legendSwatch.flagged{background:rgba(232,111,82,.3); border:1.5px solid rgba(232,111,82,.6)}
+    .legendSwatch.empty{background:var(--track)}
+    .attemptSubmitBtn{width:100%; margin-top:22px; height:54px; padding:0; border:none; border-radius:16px; background:linear-gradient(180deg,#F8C13A,#F2B01E); color:#1c2a5e; font-size:16px; font-weight:800; cursor:pointer; box-shadow:0 14px 28px -12px rgba(242,176,30,.85); transition:transform .15s ease}
+    .attemptSubmitBtn:hover{transform:translateY(-2px)}
+    .attemptSubmitBtn:disabled{opacity:.6; cursor:not-allowed; transform:none}
     /* mock test result / review */
     .result{max-width:720px}
     .reviewItem{background:var(--panel-2); border:1px solid var(--line); border-radius:16px; padding:14px 16px; margin-bottom:12px}
@@ -998,27 +1036,45 @@
       <!-- ============ MOCK TEST — NGERJAIN SOAL ============ -->
       <div id="attemptCard" class="pageCard attempt hidden">
         <div class="attemptHeader">
-          <div class="attemptTitle" id="attemptTitle">—</div>
-          <div class="attemptTimer" id="attemptTimer">00:00</div>
+          <div class="attemptHeaderInfo">
+            <span class="attemptIcon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="4" width="14" height="17" rx="2.2"/><path d="m9 12 2 2 4-4"/></svg></span>
+            <div>
+              <div class="attemptTitle" id="attemptTitle">—</div>
+              <div class="attemptSubtitle" id="attemptSubtitle">—</div>
+            </div>
+          </div>
+          <div class="attemptTimer" id="attemptTimer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C7900F" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5l3 2"/></svg><span id="attemptTimerText">00:00</span></div>
         </div>
 
-        <div class="attemptToggles">
-          <label><input type="checkbox" id="togglePinyin" /> <span id="toggleLabelPinyin">Pinyin</span></label>
-          <label><input type="checkbox" id="toggleTranslation" /> <span id="toggleLabelTranslation">Terjemahan</span></label>
+        <div class="attemptToolbar">
+          <div class="attemptToggles">
+            <label class="toggleChip" for="togglePinyin"><input type="checkbox" class="toggleChipInput" id="togglePinyin" /><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#F2B01E" stroke-width="3.2"><path d="M20 6 9 17l-5-5"/></svg><span id="toggleLabelPinyin">Pinyin</span></label>
+            <label class="toggleChip" for="toggleTranslation"><input type="checkbox" class="toggleChipInput" id="toggleTranslation" /><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#F2B01E" stroke-width="3.2"><path d="M20 6 9 17l-5-5"/></svg><span id="toggleLabelTranslation">Terjemahan</span></label>
+          </div>
+          <div class="attemptProgress" id="attemptProgress">Soal 1 / 1</div>
         </div>
+        <div class="attemptProgressTrack"><div class="attemptProgressFill" id="attemptProgressFill"></div></div>
 
-        <div class="attemptProgress" id="attemptProgress">Soal 1 / 1</div>
         <div class="attemptBody" id="attemptBody"></div>
 
         <div class="attemptNav">
-          <button id="attemptPrevBtn" class="navBtn">‹ Sebelumnya</button>
-          <button id="attemptNextBtn" class="navBtn">Berikutnya ›</button>
+          <button id="attemptPrevBtn" class="navBtn navPrev">‹ Sebelumnya</button>
+          <button id="attemptNextBtn" class="navBtn navNext">Berikutnya ›</button>
         </div>
 
+        <div class="questionNavHeader">
+          <span class="questionNavLabel" id="questionNavLabel">Question navigator</span>
+          <span class="attemptFilledCount" id="attemptFilledCount">Terisi 0/0</span>
+        </div>
         <div class="questionGrid" id="questionGrid"></div>
-        <div class="attemptFilledCount" id="attemptFilledCount">Terisi 0/0</div>
+        <div class="questionLegend">
+          <span><span class="legendSwatch answered"></span><span id="legendAnswered">Answered</span></span>
+          <span><span class="legendSwatch current"></span><span id="legendCurrent">Current</span></span>
+          <span><span class="legendSwatch flagged"></span><span id="legendFlagged">Flagged</span></span>
+          <span><span class="legendSwatch empty"></span><span id="legendEmpty">Empty</span></span>
+        </div>
 
-        <button id="attemptSubmitBtn">Submit</button>
+        <button id="attemptSubmitBtn" class="attemptSubmitBtn">Submit</button>
         <button id="attemptExitBtn" class="practiceExit">Keluar (batal)</button>
       </div>
 
@@ -1182,6 +1238,8 @@
           searchPlaceholder:'Cari hanzi, pinyin, atau arti...', loadMore:'Muat Lebih Banyak',
           pinyinLabel:'Pinyin', translationLabel:'Terjemahan',
           questionProgress:'Soal {current} / {total}', prevBtn:'‹ Sebelumnya', nextBtn:'Berikutnya ›',
+          questionNavigator:'Navigator soal', legendAnswered:'Terjawab', legendCurrent:'Sekarang',
+          legendFlagged:'Ditandai', legendEmpty:'Kosong',
           filledCount:'Terisi {filled}/{total}', submitBtn:'Submit', exitCancel:'Keluar (batal)',
           exitAttemptConfirm:'Keluar sekarang? Progres jawaban bakal ilang (belum di-submit).',
           timeLabel:'Waktu', answerReview:'Review Jawaban', backToMockList:'Kembali ke Daftar Mock Test',
@@ -1250,6 +1308,8 @@
           searchPlaceholder:'Search hanzi, pinyin, or meaning...', loadMore:'Load More',
           pinyinLabel:'Pinyin', translationLabel:'Translation',
           questionProgress:'Question {current} / {total}', prevBtn:'‹ Previous', nextBtn:'Next ›',
+          questionNavigator:'Question navigator', legendAnswered:'Answered', legendCurrent:'Current',
+          legendFlagged:'Flagged', legendEmpty:'Empty',
           filledCount:'Filled {filled}/{total}', submitBtn:'Submit', exitCancel:'Exit (cancel)',
           exitAttemptConfirm:'Exit now? Your unsubmitted answers will be lost.',
           timeLabel:'Time', answerReview:'Answer Review', backToMockList:'Back to Mock Test List',
@@ -1318,6 +1378,8 @@
           searchPlaceholder:'搜索汉字、拼音或释义...', loadMore:'加载更多',
           pinyinLabel:'拼音', translationLabel:'翻译',
           questionProgress:'第 {current} / {total} 题', prevBtn:'‹ 上一题', nextBtn:'下一题 ›',
+          questionNavigator:'题目导航', legendAnswered:'已作答', legendCurrent:'当前',
+          legendFlagged:'已标记', legendEmpty:'空白',
           filledCount:'已填 {filled}/{total}', submitBtn:'提交', exitCancel:'退出（取消）',
           exitAttemptConfirm:'现在退出？未提交的答案将会丢失',
           timeLabel:'用时', answerReview:'答案回顾', backToMockList:'返回模拟考试列表',
@@ -1464,6 +1526,11 @@
     $('toggleLabelTranslation').textContent = t('translationLabel');
     $('attemptPrevBtn').textContent = t('prevBtn');
     $('attemptNextBtn').textContent = t('nextBtn');
+    $('questionNavLabel').textContent = t('questionNavigator');
+    $('legendAnswered').textContent = t('legendAnswered');
+    $('legendCurrent').textContent = t('legendCurrent');
+    $('legendFlagged').textContent = t('legendFlagged');
+    $('legendEmpty').textContent = t('legendEmpty');
     $('attemptSubmitBtn').textContent = t('submitBtn');
     $('attemptExitBtn').textContent = t('exitCancel');
 
@@ -2885,11 +2952,14 @@
     attemptShowPinyin = false;
     attemptShowTranslation = false;
     $('togglePinyin').checked = false;
+    $('togglePinyin').closest('.toggleChip').classList.remove('active');
     $('toggleTranslation').checked = false;
+    $('toggleTranslation').closest('.toggleChip').classList.remove('active');
 
     hideAllPages();
     $('attemptCard').classList.remove('hidden');
     $('attemptTitle').textContent = setRow.title;
+    $('attemptSubtitle').textContent = `HSK ${setRow.hsk_level} · ${SECTION_LABEL[setRow.section] || setRow.section} · ${setRow.total_questions} ${t('soal')}`;
 
     renderAttemptQuestion();
     startAttemptTimer(setRow.time_limit_seconds);
@@ -2949,11 +3019,15 @@
     attemptShowPinyin = false;
     attemptShowTranslation = false;
     $('togglePinyin').checked = false;
+    $('togglePinyin').closest('.toggleChip').classList.remove('active');
     $('toggleTranslation').checked = false;
+    $('toggleTranslation').closest('.toggleChip').classList.remove('active');
 
     hideAllPages();
     $('attemptCard').classList.remove('hidden');
     $('attemptTitle').textContent = code;
+    const combinedSectionLabels = groupSets.map(s => SECTION_LABEL[s.section] || s.section).join(' + ');
+    $('attemptSubtitle').textContent = `HSK ${attemptSet.hsk_level} · ${combinedSectionLabels} · ${attemptSet.total_questions} ${t('soal')}`;
 
     renderAttemptQuestion();
     startAttemptTimer(attemptSet.time_limit_seconds);
@@ -2974,7 +3048,7 @@
     const remainSec = Math.max(0, Math.round((attemptDeadline - Date.now()) / 1000));
     const mm = String(Math.floor(remainSec / 60)).padStart(2,'0');
     const ss = String(remainSec % 60).padStart(2,'0');
-    $('attemptTimer').textContent = `${mm}:${ss}`;
+    $('attemptTimerText').textContent = `${mm}:${ss}`;
     $('attemptTimer').classList.toggle('low', remainSec < 120);
     if(remainSec <= 0){
       stopAttemptTimer();
@@ -3216,6 +3290,7 @@
 
   function renderAttemptNav(){
     $('attemptProgress').textContent = t('questionProgress').replace('{current}', attemptIndex + 1).replace('{total}', attemptQuestions.length);
+    $('attemptProgressFill').style.width = (((attemptIndex + 1) / attemptQuestions.length) * 100) + '%';
     $('attemptPrevBtn').disabled = attemptIndex === 0;
     $('attemptNextBtn').disabled = attemptIndex === attemptQuestions.length - 1;
   }
@@ -3227,7 +3302,8 @@
     attemptQuestions.forEach((q, i) => {
       const answered = isQuestionAnswered(q);
       if(answered) filled++;
-      const btn = document.createElement('div');
+      const btn = document.createElement('button');
+      btn.type = 'button';
       btn.className = 'gridBtn' + (answered ? ' answered' : '') + (i === attemptIndex ? ' current' : '');
       btn.textContent = i + 1;
       btn.addEventListener('click', () => goToAttemptQuestion(i));
@@ -3554,8 +3630,8 @@
       if(groupSets) startCombinedAttempt(groupBtn.dataset.group, groupSets);
     }
   });
-  $('togglePinyin').addEventListener('change', e=>{ attemptShowPinyin = e.target.checked; renderAttemptQuestion(); });
-  $('toggleTranslation').addEventListener('change', e=>{ attemptShowTranslation = e.target.checked; renderAttemptQuestion(); });
+  $('togglePinyin').addEventListener('change', e=>{ attemptShowPinyin = e.target.checked; e.target.closest('.toggleChip').classList.toggle('active', attemptShowPinyin); renderAttemptQuestion(); });
+  $('toggleTranslation').addEventListener('change', e=>{ attemptShowTranslation = e.target.checked; e.target.closest('.toggleChip').classList.toggle('active', attemptShowTranslation); renderAttemptQuestion(); });
   $('attemptPrevBtn').addEventListener('click', ()=> goToAttemptQuestion(attemptIndex - 1));
   $('attemptNextBtn').addEventListener('click', ()=> goToAttemptQuestion(attemptIndex + 1));
   $('attemptSubmitBtn').addEventListener('click', ()=> submitAttempt(false));

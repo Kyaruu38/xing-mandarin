@@ -641,6 +641,12 @@ ringan. Grammar & Listening pakai slot ini sekarang isinya "Coming soon". Locked
 reuse class & posisi yang sama, ganti isi jadi ikon gembok + label paket — **jangan bikin
 komponen status kedua**, extend yang ini.
 
+### CATATAN — hub shell i18n debt, ditemukan 16 Jul 2026
+
+Hub shell: semua teks (judul kartu, subtitle, coming-soon pill, placeholder search, chip
+filter) HARDCODE English, tidak lewat sistem i18n. App trilingual (ID/EN/中) — hub belum pernah
+dites di ID/中. Debt tercatat, dibayar saat hub di-wire.
+
 **BARU — Sistem paket (hasil audit sesi ini, verdict: ada sebagian, lihat audit lengkap di
 percakapan sesi ini untuk bukti baris kode):**
 - Tier: `hsk_1_4` / `hsk_5` / `hsk_6` / `vip`, **KUMULATIF**: `hsk_5` = level 1-5, `hsk_6` =

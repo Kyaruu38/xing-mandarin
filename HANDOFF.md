@@ -6,16 +6,36 @@ Scope for this session was capped at 4 items by explicit instruction (context-bu
 
 Follow-up round after pixel-level screenshot review surfaced 2 more drift items on top of `883a252`. Both fixed, verified in-browser (wrapper-white gone, sparkle visible, "Show answer" sentence case, lang switch + theme toggle spacing correct), committed as `e40aaf1`.
 
+## Mock test attempt chrome: DONE — `8ec14ae`
+
+Header/toolbar/toggles/progress bar/nav buttons/question navigator/submit button ported from `.dc.html`'s `isTest` block (lines 302-358), chrome-only. Question card content and the 7 non-listening_tf question-type renderers are untouched — separate commit, separate audit (see DECISIONS_NEEDED.md #9 area / next-session section below). Verified in-browser and approved before commit.
+
 ## ⚠️ ROOT CAUSE — global `button{}` margin-top leak (relevant to every screen with buttons)
 
 `button{ margin-top:22px }` is a **global rule that applies to every `<button>` in the file** unless a more specific selector explicitly resets `margin-top`. This was the actual cause of 3 separate rounds of "lang switch spacing looks off" complaints — the sidebar's `.langBtn`/`.themeToggle` classes never re-declared `margin-top`, so the base rule silently won. Fixed in `e40aaf1` by giving the sidebar lang switch its own standalone classes (`.sbThemeToggle`/`.sbLangPill`/`.sbLangBtn`) ported property-by-property from the design comp, instead of layering overrides onto the shared `.langBtn`/`.themeToggle` base.
 
-**This will recur.** Screens still to port that are button-heavy:
-- **Mock test attempt** — question navigator (95 buttons), answer-choice buttons, Previous/Next, Pinyin/Translation toggle, audio play button
+**Confirmed a second time in `8ec14ae`**: `#attemptSubmitBtn` (mock test attempt) had zero explicit class and was fully inheriting the global rule — wrong radius/height/color/gradient-stops/shadow (margin-top happened to coincidentally match at 22px, everything else didn't). Fixed the same way: dedicated `.attemptSubmitBtn` class with every property declared explicitly.
+
+**Still-open screens that are button-heavy** (check for this leak first, before suspecting layout):
+- **Mock test attempt question card** — answer-choice/option buttons for the listening_tf renderer, still to port (commit 2, this session)
 - **Mock test result** — Review/Retake/Back-to-home buttons
 - **Materials** — filter chips (All/Vocab/Grammar/Listening/Mock)
 
-**Rule going forward**: if any of these look oversized or oddly spaced, check for a `margin-top:22px` leak from the base `button{}` rule *before* suspecting the grid/flex layout. Reset it explicitly in a new dedicated class (like `.sbThemeToggle` etc.), never by patching the shared base rule.
+**Rule going forward**: reset every property the base rule sets explicitly in a new dedicated class, never rely on a coincidental match, never patch the shared base rule.
+
+## ⚠️ SECOND RECURRING RISK — source's static-prototype `<div>`s vs. this app's real interaction needs
+
+Source (`.dc.html`) is a non-interactive prototype — clickable-looking elements (toggle chips, question navigator cells) are plain `<div>`s with an `onClick` prop, which is fine for a mockup nobody tabs through. Porting that literally into `index.html` is a real regression here: this is a live exam app, and a `<div>` can't be reached with Tab or activated with Space/Enter, and carries no screen-reader semantics.
+
+Hit twice in `8ec14ae`, both caught before commit:
+- **Toggle chips (Pinyin/Translation)**: first ported as bare `<div>`s. Reverted to `<input type="checkbox"> + <label class="toggleChip">` — input visually hidden via `clip` (not `display:none`, which would remove it from the tab order), `:focus-within` ring on the label for keyboard visibility (not `:has()` — see below).
+- **Question navigator's 95-cell grid**: this one was **pre-existing** (`document.createElement('div')`, not introduced this session) but got fixed while in the area — converted to real `<button type="button">`. Converting a div to a button re-exposes it to the `button{}` leak above (a div never inherited that rule) — had to add explicit `margin-top:0; padding:0` resets that weren't needed before.
+
+**Rule going forward**: when porting any clickable-looking element from `.dc.html`, check whether source used a real form control / button or a styled div — if source is a div, that's a byproduct of it being a prototype, not a spec to copy. Use the semantic element the interaction actually calls for.
+
+## Still avoiding `:has()` / new CSS techniques — one addition
+
+Needed a way to show a focus ring on a label when its visually-hidden child checkbox is focused. `:has()` would do it in one line but is still off-limits project-wide (no browser-support confidence yet, per the earlier `--muted-rgb` precedent). Used `:focus-within` instead — a different, much older pseudo-class (~2017, universally supported, not in the same risk category as `:has()`) — on the label itself. Noting this as the accepted pattern for "style a wrapper based on a hidden descendant's focus state" going forward, so it doesn't need re-litigating next time it comes up.
 
 ## Verification pattern (standing process)
 
@@ -26,6 +46,7 @@ You (Claude) port + syntax-check + report. The user screenshots in a live logged
 - **`78b9787`** — Port progress rings, quick action icons, and Recent History cards (Chunk C + Recent History)
 - **`883a252`** — Port Flashcard & SRS session view to design handoff comp
 - **`e40aaf1`** — Fix flashcard session chrome (`:has()` → `.sessionActive` class toggle) and sidebar lang switch button margin-top leak
+- **`8ec14ae`** — Port mock test attempt chrome (header/toolbar/nav/navigator/submit), fixing two div-vs-semantic-element accessibility regressions and a second confirmed `button{}` leak
 
 All confirmed via `git log` — nothing left uncommitted in `index.html`.
 

@@ -104,6 +104,57 @@ Options for user to decide, not to be implemented without sign-off:
 - **(c)** Use a radical field (would need to check if one exists in the `vocab` schema)
 - **(d)** Leave the redundant duplicate as-is
 
+## 8. Mock test navigator legend "Flagged" — dead state, same class as #6 — OPEN, product decision
+
+Ported the 4-swatch legend (Answered/Current/Flagged/Empty) verbatim from `.dc.html`'s
+`isTest` block (literal colors from the `tile()` helper, lines 380-393) as part of the mock
+test attempt chrome pass. The app has **no flag-a-question feature** — no click/long-press
+handler anywhere sets a `.gridBtn.flagged` state, and source itself doesn't show how one
+would flag a question either (the `qNav` demo array just hardcodes 2 of 95 cells as
+`'flagged'` for the screenshot, no real interaction exists in source). Result: the legend
+permanently advertises a color that can never appear. Same category of issue as #6 (dead
+speaker button) — a visible affordance/explanation for something inert.
+
+Options for user to decide, not to be implemented without sign-off:
+- **(a)** Hide the "Flagged" legend entry until a real flag feature exists
+- **(b)** Build the feature — some way to flag a question (right-click / long-press on a
+  grid cell), source gives no interaction spec for this, would need its own design decision
+- **(c)** Leave it as-is (harmless, just permanently unused)
+
+---
+
+## 9. Mock test scoring doesn't map to the real HSK scale — OPEN, core product logic, high priority
+
+Result screen currently shows "2/90 Score" and "2/90 Correct" — two cards, identical raw
+numbers, zero added information. Real HSK scoring: HSK 3-6 tests are scored out of 300
+(listening 100 + reading 100 + writing 100), passing line 180; HSK 1-2 are scored out of 200
+(no writing section), passing line 120. Our question sets don't match the real question
+counts either — e.g. our HSK 4 set has 90 questions vs. the real exam's 100 (45/40/15 split
+across sections).
+
+The design comp (`05-mocktest-result.png`) shows the *target* presentation — a percentage
+ring (82), a scaled score text (245/300), a per-section breakdown each out of 100, and a
+PASSED/FAILED badge — but gives **no computation logic**, since it's a static prototype with
+hardcoded demo numbers. The raw-count → HSK-scale mapping is a product decision, not
+something inferable from the comp.
+
+**Not to be guessed or implemented** — decisions needed before this can be built:
+- **(a)** Max score per level: 300 for HSK 3-6, 200 for HSK 1-2?
+- **(b)** Raw→scale mapping: proportional per section (`correct/total * 100` per section,
+  summed), or some other formula?
+- **(c)** Passing line: 180 (HSK 3-6) / 120 (HSK 1-2) — applied to the mapped score, not the
+  raw count?
+- **(d)** What do the two now-redundant cards become? (e.g. Score = HSK-scale number, Correct
+  = raw count — but that's a guess, needs sign-off)
+- **(e)** Does our set's question count diverging from the real exam's (90 vs 100 for HSK 4)
+  need to factor into the mapping, or does the proportional formula already absorb it?
+
+**Sequencing note**: this is scoring *logic*, not a restyle — do not build it in the same
+pass as porting the result screen's visual chrome. Port the result screen's presentation
+layer first (ring, layout, badge treatment) using whatever real numbers already exist; if a
+number needed for that port doesn't exist yet (e.g. a properly-scaled score), skip it and
+point back to this item rather than inventing a formula.
+
 ---
 
 Nothing else pending a decision right now.

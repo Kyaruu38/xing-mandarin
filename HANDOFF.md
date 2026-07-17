@@ -1,3 +1,128 @@
+# Handoff — session 13 (Mobile fase 1 — bottom nav + header + login port, #47 logged)
+
+Scope: app had zero mobile breakpoint handling beyond a partial icon-shrink at 760px that
+never actually solved the "sidebar eats horizontal space, content cut off" symptom on real
+phone widths. Report-first (sidebar structure, existing breakpoints, setActiveNav risk,
+screen-by-screen blast radius) before any code, same pattern as every session in this
+sequence — full writeup in DECISIONS_NEEDED (mobile fase 1 planning, this session).
+
+## Mobile fase 1: DONE, APPROVED, VERIFIED LIVE, COMMITTED
+
+**Sidebar → header + bottom nav, desktop untouched**: reused the existing `max-width:760px`
+breakpoint (previously just shrank the sidebar to 76px icon-only, never solved the real
+problem) — now `display:none`s the sidebar entirely and shows two new elements: `.mobileHeader`
+(logo, package badge, theme toggle, ID/EN/中, logout icon) and `.bottomNav` (5 items: Home,
+Practice & Test, Materials, Progress, History — Admin deliberately excluded, desktop-only per
+explicit decision). Streak card: no new markup needed, the dashboard's own existing
+`#dashStreak` stat tile already satisfies "streak visible in page content, not floating" —
+sidebar's gold widget just disappears with the rest of the sidebar on mobile.
+
+**`setActiveNav()` needed zero changes** — already selector-based
+(`querySelectorAll('.navItem')` + `data-page` dataset), so the new bottom-nav buttons reuse
+the exact same class/attribute convention and light up automatically alongside the sidebar.
+Click-wiring (per-ID, not delegated in the existing code) got 5 new `addEventListener`
+registrations mirroring the sidebar's own, pointing at the identical `navTo(...)` calls — not
+a second source of truth, just a second entry point into the same functions. Theme toggle
+(`applyTheme()`'s icon-sync array) and package badge (`renderDash()`'s single write site) both
+already followed a "one value, multiple render targets" pattern — the mobile header's own
+duplicates (`themeToggleMobile`, `packageBadgeMobile`) slotted into those same arrays/write
+sites with one line each, no new pattern invented.
+
+**Bottom nav vs fixed CTA collision (the one real new risk this phase introduces)**: attempt
+screen's Submit/Exit and result screen's Retake/Back both sit at the bottom of a long
+scrollable card — verified live (scrolled all the way down on both) that `.mainContent`'s
+added `padding-bottom:calc(76px + safe-area-inset-bottom)` keeps them clear of the fixed
+bottom nav. Not just eyeballed — confirmed via screenshot with visible clearance on both
+screens.
+
+## `latihanShort` label fix: DONE, VERIFIED all 3 languages
+
+"Practice & Test"/"Latihan & Tes" was the only one of 5 nav labels that ellipsis-truncated in
+the ~70px bottom-nav column (confirmed via live test, not guessed) — Materials/Progress/
+History all fit fine at every language. Added a `latihanShort` key to all 3 `LANG` dicts
+(ID:"Latihan", EN:"Practice", ZH:"练习" — Kyaru's own copy call), wired only to the mobile nav
+label; desktop keeps the full `latihan` key untouched. **ZH audited specifically** (hanzi are
+wider per-character, worth checking rather than assuming safe) — all 4 other ZH labels
+(首页/学习资料/学习进度/历史记录) fit with zero truncation, confirmed no other key needed a
+short variant.
+
+## Login screen mobile: PORTED from `Xing Mandarin Mobile.dc.html` lines 42-60, not guessed
+
+Design handoff has a dedicated mobile comp (`design_handoff_xing_mandarin/.../Xing Mandarin
+Mobile.dc.html`) that was checked for BEFORE writing anything, per this project's standing
+"port, don't interpret from a screenshot" rule. Login block (`isLogin`, lines 41-60): centered
+glow-wrapped logo -> large "学中文，走天下" hanzi headline (comp has no separate "Xing Mandarin"
+wordmark text in this block, so none was invented) -> "Welcome back" -> subtitle -> icon-only
+email/password fields (comp has no visible "Email"/"Password" text) -> Forgot password -> Sign
+in -> footer. Reused the *existing* 880px login breakpoint (no new `@media`), restyled content
+inside `.loginFormPanel`/`.loginMobileBrand` only.
+
+**Two explicit deviations from a literal comp port, both per Kyaru's own call, not invented**:
+- Email/Password labels: comp shows none, but the comp is a static mockup with no screen
+  reader to fail — kept the real `<label>` elements in the DOM, made them visually sr-only
+  (`position:absolute; width/height:1px; clip:rect(0,0,0,0)`) rather than removing them.
+  Verified via `getComputedStyle` that they're genuinely accessible (in DOM, correct text)
+  and genuinely invisible (1x1px, clipped).
+- "Remember me": comp doesn't show it, kept anyway — it's a real feature (#33, single-device
+  session enforcement), not something the comp ever needed to depict.
+
+**Verified**: ID/EN/ZH, light+dark, mobile (390px width-constrained iframe) — matches comp
+composition. **Desktop re-checked in a separate fresh tab, pixel-identical to before**: split
+brand panel intact, Email/Password labels visible again (sr-only correctly scoped to the
+880px breakpoint only), 38px left-aligned heading unchanged.
+
+## Verification method note: `resize_window` is inert in this environment
+
+Tried to resize the actual browser window to real phone dimensions (390x844) for testing --
+confirmed dead (window stayed at 1920x911 regardless of target size, tried twice). Reported
+this honestly rather than silently falling back to something weaker. Used a same-origin
+iframe hard-constrained to 390x844 instead -- genuine CSS reflow against a real narrow
+viewport (media queries evaluate against the iframe's own width), not a DevTools
+scale-emulation trick. Kyaru verified independently on a real iPhone before approving.
+
+## Logged, not fixed — #47, a real bug (not a devtools artifact)
+
+Console showed `invalid input syntax for type uuid: "null"` during rapid iframe-recreation
+testing. Initially miscategorized as a test-harness artifact (reproduced clean on a careful
+isolated retry) -- **corrected by Kyaru**: that only explains *when* it fired, not *what it
+is*. Unlike #42's `503` finding (a devtools logging quirk on HEAD responses, the actual
+request succeeded), this is a genuine Postgres rejection -- a real request reached the DB
+carrying a value that failed UUID parsing. Traced to a strong candidate:
+`watchSession(userId)` (`index.html:2594-2606`) builds its realtime filter via raw string
+concatenation (`'id=eq.'+userId`) -- if `userId` is JS `null`/`undefined` at call time, this
+produces the literal string `"id=eq.null"`, matching the error exactly. Normal call sites
+(`doLogin()`/`boot()` -> `loadProfile()` -> `watchSession()`) all trace back to real UUIDs from
+Supabase Auth, so this isn't reachable in ordinary use -- likely a teardown/logout race
+(page destroyed or logged out mid-async-chain) that hasn't yet been reproduced under a
+realistic user scenario, only under forced rapid iframe teardown. Possibly related to a
+separate `Cannot read properties of null (reading 'addEventListener')` seen in the same test
+run (`$('modalOverlay')` returning null) -- same *class* of bug (code not guarding against
+running mid-teardown), not confirmed the same root cause. Not blocking this release (never
+hit in any normal flow tested), logged as a real backlog item, not dismissed.
+
+## Commits this session
+
+- (this session's commit) — `index.html` (mobile header/bottom-nav, `latihanShort` label,
+  login mobile port), `DECISIONS_NEEDED.md` (mobile fase 1 planning + #47).
+
+**Sengaja TIDAK di-commit** (sama seperti semua sesi sebelumnya): `supabase/functions/
+grade-essay/index.ts` — perubahan uncommitted di file itu bukan dari sesi manapun di urutan
+ini, dibiarkan apa adanya.
+
+## Belum dikerjakan / kandidat follow-up
+
+- **#47** — `watchSession()`'s unparameterized filter string, needs a controlled repro of a
+  realistic trigger (not just forced iframe teardown) before writing a fix.
+- **#44/#45** (carried over from session 12) — frontend crash on `submit_attempt` error path;
+  `image_tf` payload-shape crash on 10 `H1XING00N` sets. Neither touched this session.
+- **Gap #2 remainder** (carried over) — RLS-by-package, blocked on `package_levels`
+  source-of-truth decision.
+- Mobile fase 2 candidates, not scoped yet: any other screens needing a closer mobile pass
+  beyond what fase 1's sidebar-removal fixed for free (most content already used
+  `flex-wrap`/`auto-fit` grids, confirmed during fase 1's planning read).
+
+---
+
 # Handoff — session 12 (Gap #2 step 2 APPLIED to live + submit-button ratchet fix, #42-46)
 
 Scope: continuation of Gap #2 (server-side enforcement audit, #22/#41/#42) — this session took

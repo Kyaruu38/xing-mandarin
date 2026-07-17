@@ -144,10 +144,25 @@
     .loginFormPanel{ position:relative; background:linear-gradient(180deg,var(--bg2),var(--bg)); display:flex; align-items:center; justify-content:center; padding:40px 24px; }
     .loginLangSwitch{ position:absolute; top:24px; right:28px; display:flex; align-items:center; gap:9px; z-index:2; }
     .loginFormBox{ width:100%; max-width:380px; }
-    .loginMobileBrand{ display:none; align-items:center; gap:12px; margin-bottom:28px; }
-    .loginMobileBrand img{ width:44px; height:44px; object-fit:contain; }
-    .loginMobileBrandTitle{ font-weight:800; font-size:16px; color:var(--text); }
-    .loginMobileBrandTagline{ font-size:11px; color:var(--muted); font-family:var(--hanzi-font); }
+    /* Centered hero (logo + big hanzi tagline), matches Mobile.dc.html lines 49-50 -- only
+       ever visible <=880px (base display:none here, flipped to flex in that media query). */
+    .loginMobileBrand{ display:none; flex-direction:column; align-items:center; margin-bottom:20px; }
+    .loginMobileLogoWrap{ position:relative; width:80px; height:80px; }
+    .loginMobileLogoGlow{
+      position:absolute; inset:-18px; border-radius:50%;
+      background:radial-gradient(circle, rgba(242,176,30,.3), transparent 70%);
+      animation:moonGlow 5.5s ease-in-out infinite;
+    }
+    .loginMobileLogoCard{
+      position:relative; width:80px; height:80px; border-radius:23px; background:#F7F1DE;
+      display:flex; align-items:center; justify-content:center;
+      box-shadow:0 18px 32px -14px rgba(var(--text-rgb),.55);
+    }
+    .loginMobileLogoCard img{ width:66px; height:66px; object-fit:contain; display:block; }
+    .loginMobileTagline{
+      margin-top:16px; font-family:var(--hanzi-serif-font); font-weight:700;
+      font-size:29px; line-height:1; color:var(--text);
+    }
 
     .loginFormTitle{ font-family:var(--display-font); font-size:38px; font-weight:700; margin:0 0 7px; color:var(--text); line-height:1.1; }
     .loginFormSub{ color:rgba(var(--text-rgb),.6); font-size:14.5px; margin:0 0 28px; }
@@ -220,6 +235,20 @@
       .loginMobileBrand{ display:flex; }
       .loginFormPanel{ padding:32px 20px; }
       .loginLangSwitch{ top:14px; right:14px; }
+
+      /* Rest below: ported from Mobile.dc.html lines 51-55 (isLogin) -- centered heading,
+         sr-only field labels (comp has icon-only inputs, no visible "Email"/"Password" text --
+         but it's a static mockup with no screen reader, so the label stays in the DOM for
+         real accessibility, just visually hidden here instead of removed). Desktop's own
+         .loginFormTitle/.loginFormSub/label/.inputWrap rules above are untouched -- these are
+         overrides scoped to this existing breakpoint only, not a new one. */
+      .loginFormTitle{ text-align:center; font-size:25px; margin:0 0 3px; }
+      .loginFormSub{ text-align:center; font-size:13px; margin:0 0 24px; }
+      .loginFormPanel label:not(.rememberMe){
+        position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+        overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+      }
+      .loginFormPanel .inputWrap + .inputWrap{ margin-top:11px; }
     }
 
 
@@ -326,6 +355,47 @@
     .mainContent{
       flex:1; min-width:0; padding:clamp(24px,3vw,40px); overflow-x:hidden;
       background:radial-gradient(120% 80% at 100% 0%, var(--bg2), var(--bg) 60%);
+    }
+
+    /* ============ mobile header + bottom nav (fase 1, <=760px only) ============
+       Hidden here by default (desktop) -- @media (max-width:760px) below is what turns
+       these on and hides .sidebar. Reuses .packageBadge/.sbThemeToggle/.sbLangPill/
+       .sbLangBtn/.logout/.navItem verbatim from the sidebar's own styling; only the
+       container layout here is new. */
+    .mobileHeader{
+      display:none; align-items:center; justify-content:space-between; gap:10px;
+      padding:10px 14px; background:var(--panel-2); border-bottom:1px solid var(--line);
+      position:sticky; top:0; z-index:20;
+    }
+    .mobileHeaderLogo .sidebarLogoIconWrap{ width:34px; height:32px; border-radius:9px; }
+    .mobileHeaderLogo img{ width:26px; height:26px; object-fit:contain; display:block; }
+    .mobileHeaderActions{ display:flex; align-items:center; gap:8px; flex-wrap:nowrap; }
+    /* .logout's own base styling assumes the sidebar's full-width text button -- reset for
+       the icon-only compact header slot the same way every div-to-button conversion in this
+       file resets the shared button{} leak (width/margin-top/padding), not a new pattern. */
+    #logoutBtnMobile{
+      width:34px; height:30px; margin-top:0; padding:0; flex:none;
+      display:flex; align-items:center; justify-content:center; font-size:15px;
+    }
+    .bottomNav{
+      display:none; position:fixed; left:0; right:0; bottom:0; z-index:20;
+      background:var(--panel-2); border-top:1px solid var(--line);
+      padding:6px 4px calc(6px + env(safe-area-inset-bottom, 0px));
+      justify-content:space-around; align-items:stretch; gap:2px;
+    }
+    /* Compact icon-top/label-bottom variant, scoped to .bottomNav so the sidebar's own
+       .navItem (icon-left/label-right, desktop-only) is completely untouched. */
+    .bottomNav .navItem{
+      flex-direction:column; justify-content:center; align-items:center; gap:2px;
+      padding:6px 4px; border-radius:10px; font-size:10.5px; font-weight:600;
+      flex:1 1 0; min-width:0; text-align:center;
+    }
+    .bottomNav .navItem .navIcon{ width:20px; height:20px; }
+    .bottomNav .navItem span:not(.navIcon){
+      overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:100%;
+    }
+    .bottomNav .navItem.active{
+      background:var(--panel); box-shadow:inset 0 3px 0 var(--gold), 0 -8px 18px -14px rgba(242,176,30,.55);
     }
 
     .pageCard{
@@ -982,13 +1052,15 @@
     .imageReviewChoice{ flex-direction:column; align-items:center; gap:6px; flex:1 1 30%; min-width:110px; }
 
     @media (max-width: 760px){
-      .sidebar{ width:76px; padding:16px 8px; }
-      .navItem span:not(.navIcon){ display:none; }
-      .navItem{ justify-content:center; }
-      .sidebarUserName, .sidebarUserMeta, .sidebarStreakLabel, .sidebarStreakUnit{ display:none; }
-      .sidebarLogo{ padding:8px; justify-content:center; }
-      .sidebarLogoText{ display:none; }
-      .mainContent{ padding:20px 14px; }
+      /* Fase 1 mobile nav (DECISIONS_NEEDED mobile fase 1) -- sidebar replaced by
+         .mobileHeader (top) + .bottomNav (bottom), desktop markup/CSS above untouched.
+         #appShell switches to a column stack so header/main flow vertically; .bottomNav
+         stays position:fixed regardless (its own rule already sets that). */
+      #appShell{ flex-direction:column; }
+      .sidebar{ display:none; }
+      .mobileHeader{ display:flex; }
+      .bottomNav{ display:flex; }
+      .mainContent{ padding:20px 14px calc(76px + env(safe-area-inset-bottom, 0px)); }
       .statGrid{ grid-template-columns:repeat(2,1fr); }
       .adminListHead{ display:none; }
       .adminRow{ grid-template-columns:1fr; gap:6px; }
@@ -1132,12 +1204,17 @@
         </div>
       </div>
       <div class="loginFormBox">
+        <!-- Ported from design_handoff_xing_mandarin/.../Xing Mandarin Mobile.dc.html lines
+             42-60 (isLogin block) -- centered logo+glow, big hanzi tagline standing in for a
+             headline (comp has no separate "Xing Mandarin" wordmark text in this block, so
+             none is added here). Only shown <=880px, see .loginMobileBrand's own display:none
+             base + the existing 880px media query below. -->
         <div class="loginMobileBrand">
-          <img src="logo.png" alt="Xing Mandarin" />
-          <div>
-            <div class="loginMobileBrandTitle">Xing Mandarin</div>
-            <div class="loginMobileBrandTagline">学中文 · 走天下</div>
+          <div class="loginMobileLogoWrap">
+            <div class="loginMobileLogoGlow"></div>
+            <div class="loginMobileLogoCard"><img src="logo.png" alt="Xing Mandarin" /></div>
           </div>
+          <div class="loginMobileTagline">学中文，走天下</div>
         </div>
 
         <h2 class="loginFormTitle"><span id="loginWelcome">Selamat datang</span> 👋</h2>
@@ -1170,6 +1247,43 @@
 
   <!-- ============ APP SHELL ============ -->
   <div id="appShell" class="hidden">
+    <!-- Mobile header (fase 1, <=760px only -- see .mobileHeader/@media). Desktop untouched,
+         this is display:none there. Package badge/theme/lang duplicate the sidebar's own
+         elements (same shared-state pattern as dashStreak/sideStreak and themeToggle/
+         loginThemeToggle below -- one value, several render targets, single JS write site). -->
+    <header class="mobileHeader">
+      <div class="mobileHeaderLogo">
+        <div class="sidebarLogoIconWrap"><img src="logo.png" alt="Xing Mandarin" /></div>
+      </div>
+      <div class="mobileHeaderActions">
+        <span class="packageBadge" id="packageBadgeMobile">
+          <span class="packageBadgeIcon planIcon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 5.5A2 2 0 0 1 6 3.5h13v15H6a2 2 0 0 0-2 2z"/><path d="M8 5v14"/></svg></span>
+          <span class="packageBadgeIcon crownIcon">👑</span>
+          <span id="packageBadgeTextMobile">HSK 1&ndash;4</span>
+        </span>
+        <button type="button" class="sbThemeToggle" id="themeToggleMobile" aria-label="Switch to dark mode">☀️</button>
+        <div class="sbLangPill">
+          <button type="button" class="sbLangBtn" data-lang="id">ID</button>
+          <button type="button" class="sbLangBtn" data-lang="en">EN</button>
+          <button type="button" class="sbLangBtn" data-lang="zh">中</button>
+        </div>
+        <button type="button" class="logout" id="logoutBtnMobile" aria-label="Log out">⏻</button>
+      </div>
+    </header>
+    <!-- Bottom nav (fase 1, <=760px only). Reuses .navItem class + the SAME data-page values
+         as the sidebar's own nav items -- setActiveNav() is already selector-based
+         (querySelectorAll('.navItem')), so this needs zero changes there; it lights up
+         automatically alongside the sidebar. Click wiring is separate (per-ID, mirroring the
+         sidebar's own pattern) -- see the addEventListener block near the sidebar's own nav
+         listeners. Admin deliberately NOT included here (desktop-only nav item, per explicit
+         decision -- 5 items only). -->
+    <nav class="bottomNav">
+      <div class="navItem active" id="navBerandaMobile" data-page="beranda"><span class="navIcon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/></svg></span><span id="navLabelBerandaMobile">Beranda</span></div>
+      <div class="navItem" id="navLatihanMobile" data-page="latihan"><span class="navIcon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="4" width="14" height="17" rx="2.2"/><path d="m9 12 2 2 4-4"/></svg></span><span id="navLabelLatihanMobile">Latihan</span></div>
+      <div class="navItem" id="navMateriMobile" data-page="materi"><span class="navIcon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5.5A2 2 0 0 1 6 3.5h13v15H6a2 2 0 0 0-2 2z"/><path d="M8 5v14"/></svg></span><span id="navLabelMateriMobile">Materi</span></div>
+      <div class="navItem" id="navProgresMobile" data-page="progres"><span class="navIcon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V11"/><path d="M10 20V4"/><path d="M16 20v-6"/></svg></span><span id="navLabelProgresMobile">Progres</span></div>
+      <div class="navItem" id="navRiwayatMobile" data-page="riwayat"><span class="navIcon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5l3 2"/></svg></span><span id="navLabelRiwayatMobile">Riwayat</span></div>
+    </nav>
     <aside class="sidebar">
       <div class="sidebarLogo">
         <div class="sidebarLogoIconWrap"><img src="logo.png" alt="Xing Mandarin" /></div>
@@ -1805,7 +1919,7 @@
   // i18n untuk UI chrome (sidebar, login, dashboard, tombol, label kartu) — TIDAK
   // dipakai buat konten soal (hanzi/opsi/explanation), itu selalu tampil apa adanya dari DB.
   const LANG = {
-    id: { beranda:'Beranda', latihan:'Latihan & Tes', materi:'Materi', progres:'Progres', riwayat:'Riwayat',
+    id: { beranda:'Beranda', latihan:'Latihan & Tes', latihanShort:'Latihan', materi:'Materi', progres:'Progres', riwayat:'Riwayat',
           streak:'STREAK', hari:'hari', keluar:'Keluar', mulai:'Mulai', ulangi:'Ulangi',
           soal:'soal', menit:'menit', terakhir:'Terakhir:', benar:'Benar', mockTest:'Mock Test',
           welcomeBack:'Selamat datang', loginSub:'Masuk untuk lanjut belajar.', emailLabel:'Email', passwordLabel:'Password',
@@ -1898,7 +2012,7 @@
           questionNumber:'Soal {n}', gradedByAI:'Dinilai AI', wrongLabel:'Salah', explanationLabel:'Penjelasan',
           wordOfDayLabel:'KATA HARI INI', yourPlanLabel:'Paket kamu',
           continueSubtitle:'Lanjutin dari terakhir kamu berhenti — {n} kartu jatuh tempo hari ini' },
-    en: { beranda:'Home', latihan:'Practice & Test', materi:'Materials', progres:'Progress', riwayat:'History',
+    en: { beranda:'Home', latihan:'Practice & Test', latihanShort:'Practice', materi:'Materials', progres:'Progress', riwayat:'History',
           streak:'STREAK', hari:'days', keluar:'Log out', mulai:'Start', ulangi:'Retry',
           soal:'questions', menit:'minutes', terakhir:'Last:', benar:'Correct', mockTest:'Mock Test',
           welcomeBack:'Welcome back', loginSub:'Sign in to continue learning.', emailLabel:'Email', passwordLabel:'Password',
@@ -1991,7 +2105,7 @@
           questionNumber:'Question {n}', gradedByAI:'Graded by AI', wrongLabel:'Incorrect', explanationLabel:'Explanation',
           wordOfDayLabel:'WORD OF THE DAY', yourPlanLabel:'Your plan',
           continueSubtitle:'Pick up where you left off — {n} cards due today' },
-    zh: { beranda:'首页', latihan:'练习与测试', materi:'学习资料', progres:'学习进度', riwayat:'历史记录',
+    zh: { beranda:'首页', latihan:'练习与测试', latihanShort:'练习', materi:'学习资料', progres:'学习进度', riwayat:'历史记录',
           streak:'连续天数', hari:'天', keluar:'退出', mulai:'开始', ulangi:'重做',
           soal:'题', menit:'分钟', terakhir:'上次：', benar:'正确', mockTest:'模拟考试',
           welcomeBack:'欢迎回来', loginSub:'登录以继续学习', emailLabel:'邮箱', passwordLabel:'密码',
@@ -2101,7 +2215,7 @@
     document.documentElement.setAttribute('data-theme', currentTheme);
     const icon = currentTheme === 'dark' ? '🌙' : '☀️';
     const label = currentTheme === 'dark' ? t('themeToLight') : t('themeToDark');
-    ['themeToggle', 'loginThemeToggle'].forEach(id=>{
+    ['themeToggle', 'loginThemeToggle', 'themeToggleMobile'].forEach(id=>{
       const btn = $(id);
       if(!btn) return;
       btn.textContent = icon;
@@ -2128,6 +2242,15 @@
     $('sideStreakLabel').textContent = t('streak');
     $('sideStreakUnit').textContent = t('hari');
     $('logoutBtn').textContent = t('keluar');
+    // Mobile bottom nav labels (fase 1) -- same t() keys as the sidebar's own labels above.
+    $('navLabelBerandaMobile').textContent = t('beranda');
+    $('navLabelLatihanMobile').textContent = t('latihanShort');
+    $('navLabelMateriMobile').textContent = t('materi');
+    $('navLabelProgresMobile').textContent = t('progres');
+    $('navLabelRiwayatMobile').textContent = t('riwayat');
+    // Mobile header's logout is icon-only (space-constrained) -- localize aria-label only,
+    // not textContent (would overwrite the icon).
+    $('logoutBtnMobile').setAttribute('aria-label', t('keluar'));
     if($('mockListHeader')) $('mockListHeader').textContent = t('mockTest');
 
     $('loginWelcome').textContent = t('welcomeBack');
@@ -2436,6 +2559,10 @@
     const pkg = PACKAGE_BADGE_LABEL[profile.package] ? profile.package : 'hsk_1_4';
     $('packageBadgeText').textContent = PACKAGE_BADGE_LABEL[pkg];
     $('packageBadge').classList.toggle('vip', pkg === 'vip');
+    // Mobile header's own badge, fase 1 -- same value, second render target (mirrors the
+    // dashStreak/sideStreak pattern below).
+    $('packageBadgeTextMobile').textContent = PACKAGE_BADGE_LABEL[pkg];
+    $('packageBadgeMobile').classList.toggle('vip', pkg === 'vip');
 
     const hasName = profile.display_name && profile.display_name.trim();
     $('dGreetingNamed').classList.toggle('hidden', !hasName);
@@ -5142,6 +5269,7 @@
   $('loginBtn').addEventListener('click', doLogin);
   $('password').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
   $('logoutBtn').addEventListener('click', ()=> forceLogout(null));
+  $('logoutBtnMobile').addEventListener('click', ()=> forceLogout(null));
   $('practiceBtn').addEventListener('click', openPractice);
   $('practiceExitBtn1').addEventListener('click', backToDash);
   $('practiceExitBtn2').addEventListener('click', backToDash);
@@ -5256,11 +5384,20 @@
   $('navAdmin').addEventListener('click', ()=> navTo(openAdmin));
   $('dashSeeAllHistory').addEventListener('click', ()=> navTo(openRiwayat));
 
+  // Mobile bottom nav (fase 1) -- separate registrations, same target functions as the
+  // sidebar's own listeners directly above (not a second source of truth, just a second
+  // click-entry point into the same navTo() calls). No admin entry -- desktop-only nav item.
+  $('navBerandaMobile').addEventListener('click', ()=> navTo(goBerandaContent));
+  $('navLatihanMobile').addEventListener('click', ()=> navTo(()=> openMockList('all','nav')));
+  $('navMateriMobile').addEventListener('click', ()=> navTo(openMaterialsHub));
+  $('navProgresMobile').addEventListener('click', ()=> navTo(openRaport));
+  $('navRiwayatMobile').addEventListener('click', ()=> navTo(openRiwayat));
+
   document.querySelectorAll('.loginLangBtn, .sbLangBtn').forEach(b=>{
     b.addEventListener('click', ()=> setLang(b.dataset.lang));
   });
 
-  ['themeToggle', 'loginThemeToggle'].forEach(id=>{
+  ['themeToggle', 'loginThemeToggle', 'themeToggleMobile'].forEach(id=>{
     $(id).addEventListener('click', toggleTheme);
   });
 

@@ -1745,4 +1745,61 @@ error**, di semua 5 submission, light maupun dark.
 
 Diputuskan + diverifikasi Kyaru + Claude Code, 17 Jul 2026.
 
+## 47. Console error `invalid input syntax for type uuid: "null"` pas testing mobile fase 1 — REAL bug, BUKAN artefak devtools, JANGAN DIKERJAIN SEKARANG
+
+Ketemu pas verifikasi mobile fase 1 (login screen port + label fix), sesi ini. Awalnya
+dikategoriin salah — dicap "artefak test harness" (iframe di-destroy+dibikin ulang cepet)
+karena reproduksi bersih di tab isolated pake klik pelan. **Koreksi Kyaru, benar**: kesimpulan
+"artefak" itu cuma nutup pertanyaan "kapan ini kejadian", bukan "apa ini beneran bug".
+`"invalid input syntax for type uuid"` itu error dari **Postgres sendiri** — beda kelas total
+dari temuan `statusCode:503` di #42 (itu devtools salah nge-log response HEAD, request-nya
+sendiri sukses, dibuktiin manggil `sb.from(...)` langsung dari console dapet `status:206`).
+Kali ini: **request beneran nyampe DB bawa value yang gagal di-parse sebagai UUID** — itu
+fakta, independen dari kenapa/kapan triggernya.
+
+**Kandidat root cause, ditelusuri dari kode (bukan tebakan)**: `watchSession(userId)`
+(`index.html:2594-2606`) baris 2598:
+```js
+filter:'id=eq.'+userId
+```
+**String concatenation mentah, bukan parameterized.** Kalau `userId` itu JS `null`/`undefined`
+pas function ini dipanggil, hasilnya literal `"id=eq.null"` (atau `"id=eq.undefined"`) —
+dikirim ke Supabase Realtime sebagai filter, diteruskan ke Postgres, ditolak `"invalid input
+syntax for type uuid: null"`. **Match persis** sama pesan error yang kebukti.
+
+**Jalur pemanggilan NORMAL — ditelusuri, kelihatannya aman**: `watchSession(userId)` cuma
+dipanggil dari `loadProfile(userId)` (:2651), yang cuma dipanggil dari `doLogin()` (:2704,
+`userId = data.user.id` — UUID asli dari Supabase Auth) dan `boot()` (`session.user.id` —
+sama). Di jalur NORMAL, `userId` seharusnya SELALU UUID asli, nggak pernah null. Jadi bug ini
+**bukan soal parameter salah di jalur biasa** — kemungkinan besar soal **race pas teardown**:
+halaman/tab dihancurin di tengah rantai async (`boot()`/`loadProfile()` lagi jalan), dan
+sisa promise yang masih nyambung entah gimana manggil `watchSession` dengan `userId` yang
+udah nggak valid. Trigger yang kebukti kejadian (iframe test di-destroy cepet berkali-kali)
+itu skenario nggak biasa buat user asli — tapi BENTUKNYA sama kayak skenario nyata: user
+nutup tab / navigasi keluar di tengah proses login/boot. **Belum direproduksi di skenario user
+asli** — baru kebukti di teardown paksa test harness.
+
+**Kemungkinan nyambung**: `TypeError: Cannot read properties of null (reading
+'addEventListener')` di `$('modalOverlay').addEventListener(...)` (:3503) muncul bareng di
+sesi test yang sama. Beda mekanisme (DOM element nggak ketemu, bukan string filter), tapi
+**kelas bug yang sama**: kode yang nganggep state/DOM tertentu udah siap, nol guard buat
+kondisi "halaman lagi di-teardown/re-load di tengah jalan." Belum dikonfirmasi satu akar
+sama `watchSession`, dicatet sebagai kemungkinan terkait, bukan kepastian.
+
+**Kandidat audit** (diusulin Kyaru, cocok sama temuan): `watchSession()` (paling kuat,
+match persis bentuk error), `claim_session` heartbeat (`:2657`, baca
+`localStorage.getItem(SESSION_KEY)` — beda mekanisme, RPC param bukan string filter, tapi
+worth dicek), jalur `localLogout()`/`forceLogout()` (:2614-2638) — nggak manggil
+`watchSession` sendiri, tapi nentuin KAPAN `currentUser` di-null-in, relevan buat nyari race
+window-nya.
+
+**Kenapa nggak dikerjain sekarang**: butuh reproduksi yang lebih terkontrol (bukan cuma
+iframe-destroy-berkali-kali) buat mastiin skenario user ASLI yang bisa micu ini (tab close
+mid-login? navigasi cepet antar halaman? race logout+realtime callback?), sebelum nulis fix
+yang bisa jadi nambal gejala yang salah. **Nggak blocking** rilis mobile fase 1 (nggak
+kejadian di flow normal manapun yang udah dites), tapi harus di-treat sebagai bug beneran di
+backlog, bukan "sekali muncul terus ilang."
+
+Diputuskan Kyaru + Claude Code, 17 Jul 2026.
+
 Nothing else pending a decision right now.

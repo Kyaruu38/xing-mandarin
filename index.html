@@ -1740,6 +1740,61 @@
   const NEW_LIMIT = 10;
   const DAILY_GOAL = 20;
 
+  // Supabase project's own max-rows response cap (server-side, confirmed empirically --
+  // even an explicit .range() asking for more gets truncated to this). Used as the page
+  // size when a query needs to walk past 1000 rows via looped .range() calls.
+  const VOCAB_BATCH_SIZE = 1000;
+  // Separate concern from VOCAB_BATCH_SIZE: this bounds .in() filter LIST length, not
+  // response row count -- a long .in() list is a GET query-string that can exceed
+  // proxy/gateway URL length limits well before hitting the row cap above.
+  const MASTERY_IN_CHUNK = 200;
+
+  // Loops .range() over `queryFn` (level: (from,to) => a supabase query with that range
+  // applied) until a partial/empty page comes back -- no upfront count() needed, the
+  // short final page is itself the stop signal.
+  async function fetchAllRanged(queryFn, batchSize){
+    let start = 0;
+    let all = [];
+    while(true){
+      const { data, error } = await queryFn(start, start + batchSize - 1);
+      if(error) throw error;
+      all = all.concat(data || []);
+      if(!data || data.length < batchSize) break;
+      start += batchSize;
+    }
+    return all;
+  }
+
+  // Splits `arr` into MASTERY_IN_CHUNK-sized pieces, runs `queryFn` (chunk => supabase
+  // query using .in() on that chunk) once per piece in parallel, concatenates results.
+  async function fetchChunkedIn(arr, queryFn){
+    if(arr.length === 0) return [];
+    const chunks = [];
+    for(let i=0; i<arr.length; i+=MASTERY_IN_CHUNK) chunks.push(arr.slice(i, i+MASTERY_IN_CHUNK));
+    const results = await Promise.all(chunks.map(async c=>{
+      const { data, error } = await queryFn(c);
+      if(error) throw error;
+      return data || [];
+    }));
+    return results.flat();
+  }
+
+  // {1:total,...,6:total} -- 6 parallel head:true count requests (zero rows in the
+  // response body), not a bulk fetch. Used anywhere a per-level DENOMINATOR is needed
+  // without needing the actual vocab rows.
+  async function fetchVocabLevelCounts(){
+    const levels = [1,2,3,4,5,6];
+    const results = await Promise.all(levels.map(lv=>
+      sb.from('vocab').select('*', { count:'exact', head:true }).eq('hsk_level', lv)
+    ));
+    const totals = {};
+    levels.forEach((lv,i)=>{
+      if(results[i].error) throw results[i].error;
+      totals[lv] = results[i].count || 0;
+    });
+    return totals;
+  }
+
   /* ---------- util tampilan ---------- */
   const $ = id => document.getElementById(id);
   function trackLabel(key){
@@ -2599,10 +2654,14 @@
     practiceLevel = level;
     $('practiceCard').classList.remove('hidden');
 
-    const { data: seenRows, error: seenErr } = await sb
-      .from('user_mastery').select('item_key')
-      .eq('user_id', currentUser).eq('item_type', 'word');
-    if(seenErr){ alert(t('errFetchProgress') + ' ' + seenErr.message); return; }
+    let seenRows;
+    try{
+      seenRows = await fetchAllRanged((from,to)=> sb
+        .from('user_mastery').select('item_key')
+        .eq('user_id', currentUser).eq('item_type', 'word')
+        .order('item_key', { ascending:true })
+        .range(from, to), VOCAB_BATCH_SIZE);
+    }catch(e){ alert(t('errFetchProgress') + ' ' + e.message); return; }
     const seenSet = new Set((seenRows||[]).map(r=>r.item_key));
 
     const { data: dueRows, error: dueErr } = await sb
@@ -2836,22 +2895,30 @@
   }
 
   async function loadRaport(){
-    const { data: vocabAll, error: vErr } = await sb.from('vocab').select('hanzi,hsk_level');
-    if(vErr){ alert(t('errFetchVocab') + ' ' + vErr.message); return; }
-    const levelOf = new Map(vocabAll.map(v=>[v.hanzi, v.hsk_level]));
-    const levelTotals = {1:0,2:0,3:0,4:0,5:0,6:0};
-    vocabAll.forEach(v=>{ levelTotals[v.hsk_level] = (levelTotals[v.hsk_level]||0) + 1; });
-
-    const { data: mastery, error: mErr } = await sb
-      .from('user_mastery').select('item_key,mastery_level,times_seen,times_correct,srs_due,last_reviewed')
-      .eq('user_id', currentUser).eq('item_type', 'word');
-    if(mErr){ alert(t('errFetchProgress') + ' ' + mErr.message); return; }
+    let levelTotals, mastery;
+    try{
+      [levelTotals, mastery] = await Promise.all([
+        fetchVocabLevelCounts(),
+        fetchAllRanged((from,to)=> sb
+          .from('user_mastery').select('item_key,mastery_level,times_seen,times_correct,srs_due,last_reviewed')
+          .eq('user_id', currentUser).eq('item_type', 'word')
+          .order('item_key', { ascending:true })
+          .range(from, to), VOCAB_BATCH_SIZE)
+      ]);
+    }catch(e){ alert(t('errFetchProgress') + ' ' + e.message); return; }
 
     const dueCount = mastery.filter(m => m.srs_due && m.srs_due <= todayStr()).length;
     $('rDue').textContent = dueCount;
 
     const dateSet = new Set(mastery.filter(m=>m.last_reviewed).map(m=>m.last_reviewed.slice(0,10)));
     $('rStreak').textContent = computeStreak(dateSet);
+
+    let levelOf = new Map();
+    try{
+      const masteryVocab = await fetchChunkedIn(mastery.map(m=>m.item_key), chunk=> sb
+        .from('vocab').select('hanzi,hsk_level').in('hanzi', chunk));
+      levelOf = new Map(masteryVocab.map(v=>[v.hanzi, v.hsk_level]));
+    }catch(e){ alert(t('errFetchVocab') + ' ' + e.message); return; }
 
     const seenPerLevel = {1:0,2:0,3:0,4:0,5:0,6:0};
     const masteredPerLevel = {1:0,2:0,3:0,4:0,5:0,6:0};
@@ -2970,16 +3037,17 @@
     $('hskGrid').innerHTML = '';
     $('dashRecentHistory').innerHTML = `<p class="emptyState">${t('loading')}</p>`;
 
-    const { data: vocabAll, error: vErr } = await sb.from('vocab').select('hanzi,hsk_level');
-    if(vErr){ console.error('Gagal ambil vocab buat dashboard:', vErr.message); return; }
-    const levelOf = new Map(vocabAll.map(v=>[v.hanzi, v.hsk_level]));
-    const levelTotals = {1:0,2:0,3:0,4:0,5:0,6:0};
-    vocabAll.forEach(v=>{ levelTotals[v.hsk_level] = (levelTotals[v.hsk_level]||0) + 1; });
-
-    const { data: mastery, error: mErr } = await sb
-      .from('user_mastery').select('item_key,mastery_level,srs_due,last_reviewed')
-      .eq('user_id', currentUser).eq('item_type', 'word');
-    if(mErr){ console.error('Gagal ambil mastery buat dashboard:', mErr.message); return; }
+    let levelTotals, mastery;
+    try{
+      [levelTotals, mastery] = await Promise.all([
+        fetchVocabLevelCounts(),
+        fetchAllRanged((from,to)=> sb
+          .from('user_mastery').select('item_key,mastery_level,srs_due,last_reviewed')
+          .eq('user_id', currentUser).eq('item_type', 'word')
+          .order('item_key', { ascending:true })
+          .range(from, to), VOCAB_BATCH_SIZE)
+      ]);
+    }catch(e){ console.error('Gagal ambil data buat dashboard:', e.message); return; }
 
     const dueCount = mastery.filter(m => m.srs_due && m.srs_due <= todayStr()).length;
     $('dashDue').textContent = dueCount;
@@ -2990,6 +3058,13 @@
     const streak = computeStreak(dateSet);
     $('dashStreak').textContent = streak;
     $('sideStreak').textContent = streak;
+
+    let levelOf = new Map();
+    try{
+      const masteryVocab = await fetchChunkedIn(mastery.map(m=>m.item_key), chunk=> sb
+        .from('vocab').select('hanzi,hsk_level').in('hanzi', chunk));
+      levelOf = new Map(masteryVocab.map(v=>[v.hanzi, v.hsk_level]));
+    }catch(e){ console.error('Gagal ambil vocab buat dashboard:', e.message); return; }
 
     const seenPerLevel = {1:0,2:0,3:0,4:0,5:0,6:0};
     let totalMastered = 0;
@@ -3223,11 +3298,14 @@
     $('browseList').innerHTML = `<p class="emptyState">${t('loading')}</p>`;
     $('browseCount').textContent = '';
     $('browseMoreBtn').classList.add('hidden');
-    const { data, error } = await sb
-      .from('vocab').select('hanzi,pinyin,meaning_en,meaning_id,frequency')
-      .eq('hsk_level', level)
-      .order('frequency', { ascending:true });
-    if(error){ alert(t('errFetchWordList') + ' ' + error.message); return; }
+    let data;
+    try{
+      data = await fetchAllRanged((from,to)=> sb
+        .from('vocab').select('hanzi,pinyin,meaning_en,meaning_id,frequency')
+        .eq('hsk_level', level)
+        .order('frequency', { ascending:true })
+        .range(from, to), VOCAB_BATCH_SIZE);
+    }catch(e){ alert(t('errFetchWordList') + ' ' + e.message); return; }
     browseCache = (data||[]).map(v => ({
       ...v,
       _search: stripDiacritics(v.hanzi + ' ' + v.pinyin + ' ' + v.meaning_en + ' ' + (v.meaning_id||''))

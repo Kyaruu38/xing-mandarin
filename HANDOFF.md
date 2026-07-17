@@ -1,3 +1,94 @@
+# Handoff — session 11 (1000-row PostgREST cap — dashboard/raport/Kamus/user_mastery, #41)
+
+Scope: user reported "Progress by Level" denominators wrong (HSK4 `404` instead of `598`, HSK5
+`1`, HSK6 `0`, total exactly `1000`) — audited first (report-only, no code) per standing rule,
+confirmed hypothesis, then planned + implemented the fix across every call site sharing the same
+root cause. Full writeup: DECISIONS_NEEDED #41.
+
+## Root cause: unbounded `vocab`/`user_mastery` fetches hitting Supabase's default 1000-row cap
+
+`loadBerandaExtras()` (dashboard) and `loadRaport()` both fetched the entire `vocab` table
+(`select('hanzi,hsk_level')`, no `.limit()`/`.range()`) just to count rows per level in JS —
+PostgREST's server-side max-rows (confirmed empirically: even an explicit `.range(0,2499)`
+request gets truncated to 1000) silently cut the response to 1000 rows, skewed toward low HSK
+levels. Reproduced the exact broken numbers (`150/147/298/404/1/0`) by replaying the identical
+query directly against the DB. Real counts (verified via `count=exact` HEAD requests): HSK1=150,
+HSK2=147, HSK3=298, **HSK4=598, HSK5=1298, HSK6=2500**.
+
+**Wider disease, audited before fixing anything** (DECISIONS_NEEDED #41 has full detail): same
+missing-bound pattern in 3 more shapes —
+- `loadBrowseLevel()` (Kamus, per-level fetch) — safe for HSK1-4 (all under 1000) but **silently
+  truncated HSK5 (1298→1000, missing 298 words) and HSK6 (2500→1000, missing 1500 words)** with
+  zero error shown. Worse than the dashboard bug: a paying VIP/hsk_6-package user browsing the
+  dictionary got 1000 of 2500 words with no indication anything was missing.
+- `user_mastery` per-user unbounded fetches (`loadBerandaExtras`, `loadRaport`,
+  `startSession`/flashcard) — dormant, not yet triggered by any real user's total review count,
+  but same pattern, same eventual failure mode.
+
+## Fix: DONE, VERIFIED, COMMITTED
+
+Zero schema/RPC/view changes, per explicit constraint. New helpers (`index.html`, near the other
+tuning constants):
+- `VOCAB_BATCH_SIZE = 1000` — Supabase's own confirmed row cap, used as the page size for looped
+  `.range()` fetches (`fetchAllRanged()`) wherever more than 1000 rows might exist.
+- `MASTERY_IN_CHUNK = 200` — separate constant, separate concern: bounds `.in()` filter LIST
+  length (URL query-string size), not response row count. Caught before coding: a power user's
+  full `.in('hanzi', masteredKeys)` list could hit ~20k+ encoded characters, well past typical
+  proxy/gateway URL limits. `fetchChunkedIn()` splits into 200-item chunks, runs in parallel,
+  concatenates.
+- `fetchVocabLevelCounts()` — 6 parallel `head:true` count requests (one per HSK level), zero
+  rows in the response body. Replaces the "fetch 4991 rows just to count them" pattern in both
+  dashboard and raport.
+
+**Per call site**:
+- `loadBerandaExtras()` / `loadRaport()` — `levelTotals` now from `fetchVocabLevelCounts()`.
+  `levelOf` (hanzi→level lookup, previously built from the capped `vocabAll`) now built from
+  `fetchChunkedIn(mastery.map(m=>m.item_key), ...)` — bounded by the user's own mastery size, not
+  the vocab table size. This was also the fix for **Words Mastered silently under-reporting**:
+  the stat was gated through `levelOf`, so any mastered word whose hanzi wasn't in the capped
+  1000-row map got silently dropped from the count — explains why "Words Mastered" could show a
+  wrong low/zero number in the same screen as a correct, ungated "Daily Goal reviewed today"
+  count (that one never went through `levelOf`).
+- `loadBrowseLevel()` (Kamus) — now `fetchAllRanged()` looped per level, reusing
+  `loadWordOfDay()`'s existing count→range precedent rather than inventing a new pattern.
+  `applyBrowseFilter()`/`renderBrowseChunk()`/`BROWSE_PAGE_SIZE` (client-side search + "Load
+  More" chunking) untouched — they just now receive a complete `browseCache` instead of a
+  truncated one.
+- `startSession()` (flashcard `seenSet`) — same `fetchAllRanged()` loop, fixes the dormant
+  same-shape risk before it could ever silently re-serve mastered words as "new" past 1000
+  reviewed items.
+
+**Explicitly not touched**, per constraint: `loadWordOfDay()`, `DUE_LIMIT`/`NEW_CANDIDATE_LIMIT`/
+`WEAK_LIMIT`-bounded queries, schema, RPC/views.
+
+## Verification — fresh login, console read at every step, per rule #38
+
+Live site (`xingmandarin.com`) still ran the pre-fix code (fresh login there showed HSK4=`404`,
+confirming the deployed version needed this fix) — switched to `python -m http.server` serving
+the locally-edited `index.html` against the **real** Supabase backend (same technique as prior
+sessions), fresh login each time, `claudecodelivetest@gmail.com` (VIP package, so HSK5/6 unlocked
+for Kamus).
+
+- **Dashboard Progress by Level**: HSK5 `1298`, HSK6 `2500` (0% since this account has zero
+  mastery — expected). Light + dark, console clean.
+- **Raport**: same denominators, HSK5 `1298`/HSK6 `2500`. Light + dark, console clean.
+- **Kamus HSK6**: `50/2500` on open → drove "Load More" to exhaustion programmatically (49
+  clicks) → `2500/2500`, button correctly hides. Confirmed `browseCache.length === 2500` directly
+  (proves the data actually arrived, not just a correct-looking label).
+- **Kamus HSK5**: same pattern, `1298/1298`, `browseCache.length === 1298`.
+- **Network tab**: dashboard load fires exactly 6 `HEAD` requests
+  (`vocab?...&hsk_level=eq.{1..6}`), zero bulk row fetch. One false alarm: the network panel
+  showed `statusCode:503` on those HEAD requests — checked by calling `sb.from('vocab')...`
+  directly from the console, got `status:206, count:2500, error:null` — confirmed a devtools
+  logging quirk on HEAD responses, not a real failure (dashboard numbers were already correct,
+  consistent with the requests actually succeeding).
+- **Words Mastered silent-drop**: not testable with the disposable account (zero mastery data) —
+  **verified separately by the user on their own HSK6-mastery account, confirmed fixed.**
+
+Stopped before commit as instructed; this entry + DECISIONS_NEEDED #41 written up post-approval.
+
+---
+
 # Handoff — session 10 (Mock hub wiring VERIFIED + level-lock consistency, #37-followup/#38/#39/#40)
 
 Scope: this session picked up mock-wiring work that had **already landed live via `8c1da2b`**

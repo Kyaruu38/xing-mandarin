@@ -1337,4 +1337,59 @@ bikin inline-note ketiga). **JANGAN dikerjain sesi ini** — di luar scope (#8 c
 
 Diputuskan Kyaru + Claude Code, 17 Jul 2026.
 
+## 41. 1000-row PostgREST cap — dashboard/raport/Kamus/user_mastery — RESOLVED
+
+**Gejala**: "Progress by Level" nunjukin HSK1=150, HSK2=147, HSK3=298, HSK4=404, HSK5=1, HSK6=0 —
+total PERSIS 1000.
+
+**Verdict audit (sebelum kode ditulis)**: hipotesis user BENAR. `loadBerandaExtras()` (dashboard)
+dan `loadRaport()` sama-sama fetch SELURUH tabel `vocab` (`select('hanzi,hsk_level')`, nol
+`.limit()`/`.range()`) cuma buat dihitung per level di JS — kena default max-rows PostgREST
+(dibuktikan empiris: bahkan `.range(0,2499)` eksplisit tetep dipotong ke 1000, bukan cuma query
+tanpa range). Direplay query persis itu langsung ke DB, hasilnya byte-identical ke angka di
+layar. Angka DB real (`count=exact` HEAD request): HSK1=150, HSK2=147, HSK3=298, **HSK4=598,
+HSK5=1298, HSK6=2500**.
+
+**Sebaran penyakit, diaudit sebelum fix apapun ditulis** — pola sama muncul di 3 bentuk lain:
+- `loadBrowseLevel()` (Kamus per-level) — aman buat HSK1-4 (di bawah 1000), tapi **HSK5
+  (1298→1000, hilang 298 kata) dan HSK6 (2500→1000, hilang 1500 kata) kepotong diam-diam, nol
+  error**. Lebih serius dari bug dashboard — user paket VIP/hsk_6 yang bayar 2500 kata cuma
+  dapet 1000 di Kamus, tanpa tau ada yang ilang.
+- `user_mastery` per-user unbounded fetch di 3 titik (`loadBerandaExtras`, `loadRaport`,
+  `startSession`/flashcard) — dorman, belum ada user yang lewat 1000 baris interaksi, tapi pola
+  identik, bakal gagal sama persis begitu ke-trigger.
+
+**Fix, nol schema/RPC/view baru**:
+- `VOCAB_BATCH_SIZE = 1000` (row cap Supabase, dibuktikan empiris) + `fetchAllRanged()` — loop
+  `.range()` sampe halaman pendek/kosong, dipakai di `loadBrowseLevel()` dan `startSession()`'s
+  `seenSet`.
+- `MASTERY_IN_CHUNK = 200` (concern beda — panjang URL query-string buat `.in()` list, bukan row
+  cap) + `fetchChunkedIn()` — `.in('hanzi', masteredKeys)` di-split 200 per chunk, paralel,
+  digabung. Ranjau ini ditemuin SEBELUM kode ditulis: `.in()` list user rajin (2500 hanzi) bisa
+  ~20rb+ char di URL, lewat limit proxy/gateway umum (~8rb).
+- `fetchVocabLevelCounts()` — 6× `head:true` count paralel, ganti fetch-4991-baris-buat-ngitung.
+- `levelOf` map (gerbang "Words Mastered") dibalik arahnya: dulu dibangun dari `vocabAll` yang
+  kepotong, sekarang dari `fetchChunkedIn` bounded by ukuran mastery user sendiri — ini juga yang
+  jelasin kenapa **"Words Mastered" bisa 0 padahal "Daily Goal reviewed today" benar**: dua-duanya
+  dari array `mastery` yang sama, tapi Words Mastered digerbang `levelOf` (ikut kepotong), Daily
+  Goal enggak (langsung count, nggak lewat gerbang itu).
+
+**Tidak disentuh**, sesuai batasan: `loadWordOfDay()`, `DUE_LIMIT`/`NEW_CANDIDATE_LIMIT`/
+`WEAK_LIMIT`, schema, RPC/view.
+
+**Verifikasi — login segar, console dibaca tiap langkah, sesuai aturan #38** (full detail di
+HANDOFF.md sesi 11): live site (`xingmandarin.com`) masih kode lama (HSK4 masih `404` pas login
+segar dicek — konfirmasi belum ke-deploy) → pindah ke `python -m http.server` serving file lokal
+yang udah diedit, tetep connect ke Supabase asli. Dashboard + Raport: HSK5=1298, HSK6=2500, light+
+dark, console bersih. Kamus HSK6: Load More di-drive sampe abis (49 klik terprogram) → `2500/2500`,
+`browseCache.length` dicek langsung = 2500 (data beneran nyampe, bukan cuma label). Kamus HSK5:
+sama, `1298/1298`. Network tab dashboard: persis 6 request `HEAD` count, nol bulk fetch (satu
+false-alarm `statusCode:503` di panel network ternyata artefak devtools buat HEAD response —
+dicek manual manggil `sb.from('vocab')...` dari console, hasilnya `status:206, count:2500,
+error:null`, beneran sukses). **Words Mastered silent-drop**: nggak bisa dites pake akun
+disposable (nol mastery data) — **diverifikasi terpisah oleh user pake akun HSK6 sendiri,
+dikonfirmasi fixed.**
+
+Diputuskan + diverifikasi Kyaru + Claude Code, 17 Jul 2026.
+
 Nothing else pending a decision right now.

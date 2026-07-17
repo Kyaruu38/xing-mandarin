@@ -1270,4 +1270,71 @@ di komit yang sama.
 
 Diputuskan Kyaru + Claude Code, 17 Jul 2026.
 
+## 38. POST-MORTEM — `browseOrigin` never declared, live down ~1 jam, 17 Jul 2026
+
+**Sebab**: `let browseOrigin` ga pernah dideklarasi di mana pun. Kode NULIS ke situ di
+`openBrowse()` (`browseOrigin = origin === 'hub' ? 'hub' : 'dash';`) — assignment ke variabel
+yang belum pernah dideklarasi bikin JS nyiptain implicit global, jadi ini "aman" (nol error)
+selama `openBrowse()` udah pernah kepanggil duluan. Kode BACA dari situ di
+`renderBrowseExitLabel()`, dipanggil dari `applyStaticI18n()` → dipanggil dari alur
+login/`renderDash`. Kalau `renderBrowseExitLabel()` kepanggil SEBELUM `openBrowse()` pernah
+sekalipun kejalan (login segar, user belum pernah buka Kamus/hub sesi itu) →
+`ReferenceError: browseOrigin is not defined`, dan itu motong seluruh rantai
+`doLogin → loadProfile → renderDash → applyStaticI18n`, jadi dashboard render kosong ("—"
+di semua angka) meski login-nya sendiri sukses.
+
+**Kenapa lolos verifikasi sesi 9**: bug ini cuma reproducible dari login segar SEBELUM Kamus
+pernah dibuka di sesi itu. Verifikasi sesi 9 (yang nge-build fitur ini) selalu dilakuin dari
+sesi browser yang udah sempet buka Kamus/hub duluan (implicit global udah kebentuk), jadi
+jalur crash-nya ga pernah ketriger pas testing.
+
+**Bukan sabotase commit `8c1da2b`** — dicek pakai `git log -S browseOrigin`: deklarasi
+`let browseOrigin` ga pernah ada di commit manapun sebelum fix (`57ca985`). Bug ada sejak
+`15c245e` pertama kali nulis pola ini, cuma ke-mask sama urutan testing yang kebetulan aman.
+
+**Fix**: `let browseOrigin = 'dash';` ditambahin sebaris sama `let mockOrigin` (`57ca985`),
+nol perubahan lain. Diverifikasi live: login segar, console bersih, dashboard keisi angka
+beneran.
+
+**Aturan verifikasi baru, berlaku semua sesi ke depan**:
+1. Syntax check (`node --check`/`new Function()`) BUKAN verifikasi — cuma nangkep parse error,
+   nol runtime coverage buat bug kelas ini (ReferenceError yang bergantung urutan pemanggilan).
+2. Verifikasi WAJIB dari login segar (incognito atau hard refresh + logout dulu), bukan sesi
+   browser yang udah "anget"/udah pernah buka layar lain — persis kondisi yang nge-mask bug ini.
+3. WAJIB baca console (F12) tiap verifikasi, lapor eksplisit bersih/enggak. Screenshot dashboard
+   doang ga cukup — dashboard bisa keliatan normal padahal ada error yang udah kejadian sebelum
+   render (atau sebaliknya, ke-skip kalau screenshot diambil dari state yang salah).
+
+Diputuskan Kyaru + Claude Code, 17 Jul 2026.
+
+## 39. Commit `8c1da2b` nyampur kerjaan dua sesi — indikasi 2 sesi CC paralel di file yang sama
+
+Commit `8c1da2b` ("feat: listening_mc_stmt renderer (HSK6 听力 第一部分)") pesannya cuma nyebut
+fitur HSK6 renderer, tapi diff-nya ikut kebawa seluruh kerjaan mock-wiring sesi ini (hub card
+Listening jadi button, `mockOrigin`/`openMockList(section, origin)`, `renderMockExitLabel`).
+Indikasi kuat: 2 sesi Claude Code jalan paralel nulis ke `index.html` yang sama, terus salah
+satu sesi commit snapshot working-tree yang isinya udah kecampur kerjaan sesi lain, tanpa sadar.
+
+Kali ini nol kerusakan nyata dari percampurannya sendiri (dua-duanya kode yang valid) — masalah
+yang muncul (#38) murni bug pre-existing dari `15c245e`, bukan akibat commit ini nyampur. Tapi
+percampuran ini yang bikin revert `15c245e` konflik pas dicoba (lihat #38 punya thread), jadi
+langsung nambah friksi pas insiden.
+
+**Aturan**: JANGAN jalanin 2 sesi Claude Code yang ngedit file yang sama secara bersamaan.
+
+Diputuskan Kyaru + Claude Code, 17 Jul 2026.
+
+## 40. `renderLevelPicker()` (flashcard) — level di luar paket ngumpet, bukan locked-visible
+
+Sama penyakit kayak #8 (mock, sekarang udah difix): `renderLevelPicker()` (`index.html:2573`,
+level picker buat mulai sesi flashcard) masih pakai `userPackageLevels.forEach` — level di luar
+paket user nggak dirender sama sekali, bukan ditampilin dim+🔒 kayak pola Kamus (#22).
+
+Status per 3 level picker yang ada: Kamus (#22) ✅ locked-visible, Mock (#8, sesi ini) ✅
+locked-visible, **Flashcard ❌ masih ngumpet**. Kandidat follow-up buat nyamain sisa satu ini ke
+pola yang sama (`div.levelBtn.locked`, reuse komponen yang sama persis kalau dikerjain — jangan
+bikin inline-note ketiga). **JANGAN dikerjain sesi ini** — di luar scope (#8 cuma minta fix mock).
+
+Diputuskan Kyaru + Claude Code, 17 Jul 2026.
+
 Nothing else pending a decision right now.

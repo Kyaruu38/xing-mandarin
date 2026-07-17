@@ -1,3 +1,87 @@
+# Handoff — session 10 (Mock hub wiring VERIFIED + level-lock consistency, #37-followup/#38/#39/#40)
+
+Scope: this session picked up mock-wiring work that had **already landed live via `8c1da2b`**
+(hub Listening/Reading/Writing/Mock Paper cards, `mockOrigin`/`openMockList(section,origin)`,
+`renderMockExitLabel`) without ever being verified — a second session appears to have committed
+a working-tree snapshot that bundled this work in with an unrelated HSK6 renderer commit (see
+#39). Nothing in this session's own diffs touches that renderer.
+
+## Incident: `browseOrigin` ReferenceError, live down ~1h — RESOLVED, `57ca985`
+
+Full writeup: DECISIONS_NEEDED #38. `let browseOrigin` was never declared anywhere (only ever
+assigned inside `openBrowse()`) — reading it from `renderBrowseExitLabel()` on a fresh login
+(before Kamus/hub had ever been opened that session) threw `ReferenceError`, killing
+`doLogin -> loadProfile -> renderDash -> applyStaticI18n` and leaving the dashboard blank. Bug
+predates this session (introduced in `15c245e`, confirmed via `git log -S`), surfaced now because
+this was the first time a genuinely fresh-login path got exercised end-to-end. Fixed with one
+added line, verified live (`xingmandarin.com`, console clean, dashboard populated), pushed.
+
+**New standing rule, all future sessions** (DECISIONS_NEEDED #38): syntax check is not
+verification; verification must start from a fresh login (incognito/hard refresh, not an
+already-warm session); console must be read at every step, not just screenshotted.
+
+## Mock hub wiring — VERIFIED (was live, unverified, since `8c1da2b`)
+
+Full checklist + results: DECISIONS_NEEDED (conversation record, not a numbered entry — see
+session transcript). Fresh-login verified, console clean at every step, light+dark, ID+EN:
+hub Listening card no longer coming-soon (styling byte-identical to the other 5 cards, confirmed
+via `getComputedStyle`, not just eyeballing a screenshot), hub→Reading/Listening/Writing/Mock
+Paper each filter to the right section, exit label follows origin (`backToMateri` vs
+`backToDashboard`), the hub→section→exit→sidebar-nav cross-navigation leak (`mockSection`
+module-level state) does NOT reproduce, Writing+HSK1 empty state renders plain (not locked).
+
+**Real gap found, fixed this session**: mock level picker only rendered `userPackageLevels`
+(HSK5/6 simply absent for an `hsk_1_4` account) instead of the locked-visible pattern Kamus uses
+(#22). Fixed — see below.
+
+## Mock level picker → locked-visible, matching Kamus (#22) — DONE, VERIFIED
+
+`renderMockLevelPicker()` rewritten to render all 6 HSK levels always (previously
+`userPackageLevels.forEach`, silently omitting out-of-package levels). Out-of-package levels:
+dim + 🔒, click → inline note (`#mockLevelLockedMsg`, reuses `.msg.lock` + `errLevelLocked` key
+verbatim, zero new CSS/copy). `loadMockList()`/`test_sets` fetch only ever wired to the unlocked
+branch — confirmed zero network request fires for a locked level (`read_network_requests`, not
+assumed).
+
+**CSS scoping bug caught before commit, self-corrected**: first pass added a bare
+`.levelBtn.locked` rule. That collides with the pre-existing `button.levelBtn.locked` (Kamus's
+pill, deliberately scoped to the `button` tag only since the #22 session, per its own comment) —
+both would apply to Kamus's locked pill, two sources of truth for one appearance (values happened
+to match today, but that's coincidence, not by design). Caught by the user before commit. Fixed
+by scoping the new rule to `div.levelBtn.locked` — mirrors the existing `.levelBtn.active` split
+(div and button variants already deliberately look different: rectangular chip vs. gold pill),
+and removes the overlap entirely rather than relying on CSS specificity to resolve it.
+**Re-verified after the scope fix**: Kamus's locked pill re-checked via `getComputedStyle`
+(`opacity:0.5, cursor:not-allowed, boxShadow:none`, byte-identical to before this session touched
+anything), mock's locked div separately confirmed (`opacity:0.5, cursor:not-allowed`) — zero
+cross-contamination, light+dark, console clean throughout.
+
+**Orthogonality confirmed, explicitly re-tested after the lock feature landed**: Writing+HSK1 for
+an `hsk_1_4` account (unlocked level, zero matching `test_sets` rows) still renders the plain
+`emptyNoMockForLevel` empty state, not the lock message — the two code paths (level-gate vs.
+query-result-empty) never share a branch.
+
+## Logged, not fixed this session
+
+- **DECISIONS_NEEDED #40**: `renderLevelPicker()` (flashcard start screen, `index.html:2573`) has
+  the same `userPackageLevels.forEach`-hides-locked-levels gap Mock had. Kamus and Mock are now
+  both locked-visible; flashcard is the one picker still behind. Candidate follow-up, explicitly
+  out of scope this session.
+- **DECISIONS_NEEDED #39**: two Claude Code sessions apparently edited `index.html` concurrently
+  at some point, one of which committed a snapshot mixing unrelated work. No damage this time,
+  but flagged as a standing rule: don't run two CC sessions against the same file concurrently.
+- Gap #2 (#22) — RLS-by-package server-side enforcement — still debt, still not started, severity
+  unchanged (confirmed extending to `test_sets`+`question_bank` too, per the live `hsk_1_4`→HSK6
+  probe noted in DECISIONS_NEEDED).
+
+## Commits this session
+
+- `57ca985` — `browseOrigin` missing-declaration fix (emergency, pushed immediately).
+- Locked-visible mock level picker + `div.levelBtn.locked` scoping — see git log for hash (pushed
+  same session as this handoff entry).
+
+---
+
 # Handoff — session 9 (Kamus → Vocab Deck hub + gating, #22/#37)
 
 Scope: **Kamus pindah ke Materials hub sebagai Vocab Deck + level gating** (Gap #1 dari #22).

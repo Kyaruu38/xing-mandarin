@@ -482,6 +482,10 @@
       color:var(--text); font-weight:700; cursor:pointer; font-size:14px;
     }
     .levelBtn.active{background:linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#241a08; border-color:transparent}
+    /* Locked-visible for the plain-div .levelBtn variant (mockLevelPicker) -- same dim+not-allowed
+       intent as button.levelBtn.locked below, sibling rule because that one is intentionally
+       scoped to the button tag only (Kamus's pill shape), never touched here. */
+    div.levelBtn.locked{ opacity:.5; cursor:not-allowed; }
     /* Materials-only level-picker chip, ported from .dc.html isMaterials filter-chip row
        (line 270 -- pill shape/active-state/gap/shadow, semantics stay HSK 1-6, not the source's
        All/Vocab/Grammar/Listening/Mock categories, per DECISIONS_NEEDED #22). Scoped to the
@@ -1380,6 +1384,7 @@
         <p class="sub" id="mockListHeader">Mock Test</p>
 
         <div class="levelPicker" id="mockLevelPicker"></div>
+        <div id="mockLevelLockedMsg" class="msg"></div>
         <div class="levelPicker sectionPicker" id="mockSectionPicker"></div>
         <div id="mockList"></div>
 
@@ -3797,28 +3802,54 @@
     });
   }
 
+  // Hides the locked-level inline note -- same component/reasoning as hideBrowseLockedMsg (#22).
+  function hideMockLockedMsg(){
+    const el = $('mockLevelLockedMsg');
+    el.className = 'msg';
+    el.textContent = '';
+  }
+
+  // Renders all 6 HSK levels always (locked-visible, same pattern as renderBrowseLevelPicker/#22)
+  // -- levels outside userPackageLevels stay on screen dimmed+locked instead of being omitted.
+  // loadMockList() is only ever wired to the unlocked branch below, so no test_sets fetch fires
+  // for a locked level. This is orthogonal to DECISIONS_NEEDED #9's empty state (Writing HSK1/2
+  // for an hsk_1_4 account): that level is unlocked (isLevelAllowed(1)===true), so it still goes
+  // through the normal loadMockList() -> emptyNoMockForLevel path, never the lock branch.
   function renderMockLevelPicker(){
     const wrap = $('mockLevelPicker');
     wrap.innerHTML = '';
-    if(userPackageLevels.length === 0){
+    hideMockLockedMsg();
+    const hasAnyAllowed = userPackageLevels.length > 0;
+    const defaultLevel = hasAnyAllowed
+      ? ((currentProfile?.target_level && isLevelAllowed(currentProfile.target_level)) ? currentProfile.target_level : userPackageLevels[0])
+      : null;
+    for(let lv=1; lv<=6; lv++){
+      const locked = !isLevelAllowed(lv);
+      const b = document.createElement('div');
+      b.className = 'levelBtn' + (!locked && lv===defaultLevel ? ' active' : '') + (locked ? ' locked' : '');
+      b.textContent = (locked ? '🔒 ' : '') + 'HSK ' + lv;
+      if(locked){
+        b.addEventListener('click', ()=>{
+          const el = $('mockLevelLockedMsg');
+          el.textContent = t('errLevelLocked');
+          el.className = 'msg lock';
+        });
+      } else {
+        b.addEventListener('click', ()=>{
+          hideMockLockedMsg();
+          [...wrap.children].forEach(c=>c.classList.remove('active'));
+          b.classList.add('active');
+          loadMockList(lv);
+        });
+      }
+      wrap.appendChild(b);
+    }
+    if(hasAnyAllowed){
+      loadMockList(defaultLevel);
+    } else {
       $('mockSectionPicker').innerHTML = '';
       $('mockList').innerHTML = `<p class="emptyState">${t('comingSoon')}</p>`;
-      return;
     }
-    const defaultLevel = (currentProfile?.target_level && isLevelAllowed(currentProfile.target_level))
-      ? currentProfile.target_level : userPackageLevels[0];
-    userPackageLevels.forEach(lv=>{
-      const b = document.createElement('div');
-      b.className = 'levelBtn' + (lv===defaultLevel ? ' active' : '');
-      b.textContent = 'HSK ' + lv;
-      b.addEventListener('click', ()=>{
-        [...wrap.children].forEach(c=>c.classList.remove('active'));
-        b.classList.add('active');
-        loadMockList(lv);
-      });
-      wrap.appendChild(b);
-    });
-    loadMockList(defaultLevel);
   }
 
   function formatMockDate(iso){

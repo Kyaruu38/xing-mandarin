@@ -1541,16 +1541,15 @@
             </div>
           </div>
 
-          <div class="hubCard comingSoon" data-card="listening">
+          <button type="button" class="hubCard" id="hubCardListening" data-card="listening">
             <div class="hubCardCover listening">
               <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a9 9 0 0 1 0 14"/></svg>
-              <span class="hubStatusPill" id="hubStatusListening">Coming soon</span>
             </div>
             <div class="hubCardBody">
               <div class="hubCardTitle" id="hubCardListeningTitle">Listening</div>
               <div class="hubCardMeta" id="hubCardListeningMeta">Audio drills, per level</div>
             </div>
-          </div>
+          </button>
 
           <button type="button" class="hubCard" id="hubCardReading" data-card="reading">
             <div class="hubCardCover reading"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><path d="M4 5.5A2 2 0 0 1 6 3.5h13v15H6a2 2 0 0 0-2 2z"/><path d="M8 5v14"/></svg></div>
@@ -2144,7 +2143,6 @@
     $('hubStatusGrammar').textContent = t('comingSoon');
     $('hubCardGrammarTitle').textContent = t('hubCardGrammarTitle');
     $('hubCardGrammarMeta').textContent = t('hubCardGrammarMeta');
-    $('hubStatusListening').textContent = t('comingSoon');
     $('hubCardListeningTitle').textContent = t('hubCardListeningTitle');
     $('hubCardListeningMeta').textContent = t('hubCardListeningMeta');
     $('hubCardReadingTitle').textContent = t('hubCardReadingTitle');
@@ -2155,7 +2153,7 @@
     $('hubCardMockMeta').textContent = t('hubCardMockMeta');
     $('hubExitBtn').textContent = t('backToDashboard');
 
-    $('mockListExitBtn').textContent = t('backToDashboard');
+    renderMockExitLabel();
 
     $('toggleLabelPinyin').textContent = t('pinyinLabel');
     $('toggleLabelTranslation').textContent = t('translationLabel');
@@ -3729,6 +3727,12 @@
   let mockLevel = null;
   let mockSection = 'all';
   let mockGroupedSets = new Map(); // baseCode -> array of test_sets rows, buat tombol "Mulai" di tab Semua
+  // Which screen opened Mock List -- 'hub' (Materials hub's Reading/Writing/Listening/Mock cards),
+  // 'nav' (sidebar Latihan & Tes), or 'dash' (dashboard quick action). Same pattern as browseOrigin
+  // (DECISIONS_NEEDED #22): closeMockList() returns to whichever one it was. 'nav' and 'dash' both
+  // exit to the dashboard today (same label/target) -- kept as a distinct value anyway per explicit
+  // instruction, in case either ever needs its own exit destination later.
+  let mockOrigin = 'dash';
 
   function sectionRank(section){
     return SECTION_ORDER[section] ?? 99;
@@ -3743,15 +3747,33 @@
     return /^H\d+XING\d+/i.test(first) ? first : t;
   }
 
-  function openMockList(){
+  // section: 'all'|'reading'|'listening'|'writing' -- required, no implicit default. mockSection is
+  // module-level state that never resets on its own, so a caller that omits this argument would
+  // silently inherit whatever tab was last active from a previous visit (DECISIONS_NEEDED #37-class
+  // cross-navigation leak). origin: 'hub'|'nav'|'dash', see mockOrigin above.
+  function openMockList(section, origin){
+    mockSection = section;
+    mockOrigin = origin === 'hub' ? 'hub' : origin === 'nav' ? 'nav' : 'dash';
     setActiveNav('latihan');
     $('dashCard').classList.add('hidden');
     $('mockListCard').classList.remove('hidden');
+    renderMockExitLabel();
     renderMockSectionPicker();
     renderMockLevelPicker();
   }
 
+  // Exit label must follow mockOrigin, same reasoning as renderBrowseExitLabel (DECISIONS_NEEDED
+  // #21/#22) -- called from openMockList() (origin just changed) and from applyStaticI18n()
+  // (language just changed, origin didn't) so both cases stay correct.
+  function renderMockExitLabel(){
+    $('mockListExitBtn').textContent = t(mockOrigin === 'hub' ? 'backToMateri' : 'backToDashboard');
+  }
+
   function closeMockList(){
+    if(mockOrigin === 'hub'){
+      navTo(openMaterialsHub);
+      return;
+    }
     setActiveNav('beranda');
     $('mockListCard').classList.add('hidden');
     $('dashCard').classList.remove('hidden');
@@ -4337,7 +4359,10 @@
       html += renderEssayQuestion(p, q, answer);
     } else if(q.question_type === 'listening_tf'){
       html += renderListeningTF(p, answer);
-    } else if(q.question_type === 'listening_mc'){
+    } else if(q.question_type === 'listening_mc' || q.question_type === 'listening_mc_stmt'){
+      // listening_mc_stmt (HSK6 听力 第一部分): sama komponennya, cuma payload-nya nggak punya
+      // `question` sama sekali (part 1 murni audio -> langsung pilih pernyataan) -- renderListeningMC
+      // udah nge-skip blok pertanyaan kalau p.question nggak ada, jadi reuse langsung, nggak perlu fungsi baru.
       html += renderListeningMC(p, answer);
     } else if(q.question_type === 'image_tf'){
       html += renderImageTF(p, answer);
@@ -4896,7 +4921,7 @@
       html += buildReviewTF(p, item.user_answer, item.correct_answer, false);
     } else if(q.question_type === 'image_tf'){
       html += buildReviewTF(p, item.user_answer, item.correct_answer, true);
-    } else if(q.question_type === 'listening_mc'){
+    } else if(q.question_type === 'listening_mc' || q.question_type === 'listening_mc_stmt'){
       html += buildReviewListeningMC(p, item.user_answer, item.correct_answer);
     } else if(q.question_type === 'image_mc'){
       html += buildReviewImageMC(p, item.user_answer, item.correct_answer);
@@ -5019,8 +5044,12 @@
   $('adminPkgFilter').addEventListener('change', applyAdminFilter);
   $('adminStatusFilter').addEventListener('change', applyAdminFilter);
   $('adminAddBtn').addEventListener('click', openCreateUserModal);
-  $('mockTestBtn').addEventListener('click', ()=> navTo(openMockList));
+  $('mockTestBtn').addEventListener('click', ()=> navTo(()=> openMockList('all','dash')));
   $('mockListExitBtn').addEventListener('click', closeMockList);
+  $('hubCardReading').addEventListener('click', ()=> navTo(()=> openMockList('reading','hub')));
+  $('hubCardListening').addEventListener('click', ()=> navTo(()=> openMockList('listening','hub')));
+  $('hubCardWriting').addEventListener('click', ()=> navTo(()=> openMockList('writing','hub')));
+  $('hubCardMock').addEventListener('click', ()=> navTo(()=> openMockList('all','hub')));
   $('mockList').addEventListener('click', e=>{
     const setBtn = e.target.closest('button[data-set]');
     if(setBtn){ startAttempt(setBtn.dataset.set); return; }
@@ -5100,7 +5129,7 @@
   });
 
   $('navBeranda').addEventListener('click', ()=> navTo(goBerandaContent));
-  $('navLatihan').addEventListener('click', ()=> navTo(openMockList));
+  $('navLatihan').addEventListener('click', ()=> navTo(()=> openMockList('all','nav')));
   $('navMateri').addEventListener('click', ()=> navTo(openMaterialsHub));
   $('navProgres').addEventListener('click', ()=> navTo(openRaport));
   $('navRiwayat').addEventListener('click', ()=> navTo(openRiwayat));

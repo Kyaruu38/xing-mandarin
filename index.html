@@ -64,6 +64,15 @@
       font-family:inherit;
     }
     input:focus{border-color:var(--gold)}
+    /* Admin panel v1 (DECISIONS_NEEDED #30/#31) -- first <select> in the app, no prior
+       pattern to port from. Base styling mirrors input{} above for visual consistency. */
+    select{
+      width:100%; padding:12px 14px; background:var(--panel-2); color:var(--text);
+      border:1px solid var(--line); border-radius:10px; font-size:15px; outline:none;
+      font-family:inherit; cursor:pointer;
+    }
+    select:focus{border-color:var(--gold)}
+    select:disabled{opacity:.6; cursor:not-allowed}
     button{
       width:100%; margin-top:22px; padding:13px; border:none; border-radius:10px;
       background:linear-gradient(180deg,var(--gold-soft),var(--gold));
@@ -246,6 +255,10 @@
       background:var(--panel); color:var(--text); font-weight:800;
       box-shadow:inset 4px 0 0 var(--gold), 0 8px 18px -10px rgba(242,176,30,.55);
     }
+    /* Admin panel v1 (DECISIONS_NEEDED #30) -- reuses .planBlockLabel's small-caps recipe,
+       not a new type scale. Group + its one nav item are hidden by default, shown only when
+       profile.role === 'admin' (see renderDash). */
+    .navGroupLabel{ font-size:10.5px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:rgba(var(--text-rgb),.42); margin:14px 4px 4px; }
     .sidebarStreak{
       /* design hardcodes 18px directly, off the --radius-md(16px) scale; radius tokens don't vary by theme so hardcoding here is zero risk */
       margin-top:auto; margin-bottom:14px; background:linear-gradient(135deg,var(--gold),#F79C3D); border:none; border-radius:18px;
@@ -946,7 +959,84 @@
       .sidebarLogoText{ display:none; }
       .mainContent{ padding:20px 14px; }
       .statGrid{ grid-template-columns:repeat(2,1fr); }
+      .adminListHead{ display:none; }
+      .adminRow{ grid-template-columns:1fr; gap:6px; }
     }
+
+    /* ============ ADMIN — USER MANAGEMENT (v1, DECISIONS_NEEDED #30/#31) ============
+       No design-comp pixel port here beyond what #30 already settled (sidebar as-is, modal
+       form pattern) -- toolbar/list/pill styling below reuses this app's own established
+       tokens (var(--panel-2)+var(--line) card recipe, .resultBadge pill recipe for status,
+       .planBlockLabel small-caps recipe) rather than inventing a new visual language. */
+    .adminToolbar{ display:flex; gap:10px; margin:14px 0 4px; flex-wrap:wrap; }
+    .adminToolbar .browseSearchWrap{ flex:1 1 240px; margin:0; }
+    .adminFilterSelect{ width:auto; min-width:170px; }
+
+    .adminListHead{
+      display:grid; grid-template-columns:2fr 1fr .8fr 1fr 1fr; gap:10px; padding:0 16px;
+      margin-top:18px; font-size:11px; font-weight:800; text-transform:uppercase;
+      letter-spacing:.06em; color:rgba(var(--text-rgb),.42);
+    }
+    .adminList{ margin-top:6px; background:var(--panel-2); border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+    .adminRow{
+      display:grid; grid-template-columns:2fr 1fr .8fr 1fr 1fr; gap:10px; align-items:center;
+      padding:14px 16px; border-bottom:1px solid var(--line); cursor:pointer;
+      transition:background .15s ease;
+    }
+    .adminRow:last-child{ border-bottom:none; }
+    .adminRow:hover{ background:var(--panel); }
+    .adminRowName{ display:block; font-weight:700; font-size:14px; color:var(--text); }
+    /* display_name NULL (manual Supabase account creation, no raw_user_meta_data) --
+       DECISIONS_NEEDED #31: explicit placeholder + UUID sub-identifier, not a blank row. */
+    .adminRowNamePlaceholder{ font-style:italic; font-weight:500; color:var(--muted); }
+    .adminRowSubId{ display:block; font-size:11px; color:var(--muted); margin-top:2px; font-family:monospace; }
+    .adminPkgPill{
+      display:inline-flex; align-items:center; justify-content:center; width:fit-content;
+      font-size:11.5px; font-weight:700; padding:5px 10px; border-radius:99px;
+      background:rgba(var(--text-rgb),.08); color:var(--text);
+    }
+    .adminLevelText{ font-size:13.5px; color:var(--text); font-weight:600; }
+    /* Same pill recipe as .resultBadge.pass/.fail -- established ok/danger pair, not new. */
+    .adminStatusPill{
+      display:inline-flex; align-items:center; justify-content:center; width:fit-content;
+      font-size:11.5px; font-weight:800; padding:5px 10px; border-radius:99px; color:#fff;
+    }
+    .adminStatusPill.active{ background:var(--ok); }
+    .adminStatusPill.expired{ background:var(--danger); }
+    .adminSubText{ font-size:13px; color:var(--muted); }
+    .adminCount{ margin-top:10px; font-size:12.5px; color:var(--muted); }
+
+    /* ============ MODAL SHELL (DECISIONS_NEEDED #31) ============
+       New component -- codebase previously only had native confirm(). Deliberately minimal:
+       overlay + panel + close (X/backdrop/Esc) + basic focus trap. Reused verbatim by the
+       Edit User modal and the Deactivate confirm dialog (see JS), and intended for Create
+       user in v1.5 -- no second modal component, no animation, no stacking. */
+    .modalOverlay{
+      position:fixed; inset:0; background:rgba(15,20,40,.55); display:flex;
+      align-items:center; justify-content:center; padding:20px; z-index:200;
+    }
+    .modalPanel{
+      background:var(--panel); border-radius:20px; width:100%; max-width:440px;
+      max-height:88vh; overflow-y:auto; padding:24px 24px 22px;
+      box-shadow:0 40px 70px -24px rgba(0,0,0,.5); outline:none;
+    }
+    .modalHeader{ display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+    .modalTitle{ font-family:var(--display-font); font-size:19px; font-weight:700; color:var(--text); margin:0; }
+    .modalCloseBtn{ width:32px; height:32px; margin-top:0; padding:0; border-radius:10px; background:transparent; color:var(--muted); font-size:16px; font-weight:400; }
+    .modalCloseBtn:hover{ background:var(--panel-2); color:var(--text); }
+    .modalBody label:first-child{ margin-top:4px; }
+    .adminFieldHint{ font-size:12px; color:var(--muted); margin:6px 0 0; line-height:1.5; }
+    .adminFieldWarning{
+      font-size:12.5px; color:var(--danger); background:rgba(214,69,69,.1);
+      border:1px solid rgba(214,69,69,.3); border-radius:8px; padding:8px 10px; margin:6px 0 8px;
+      line-height:1.5;
+    }
+    .modalActions{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:22px; }
+    .modalActionsRight{ display:flex; gap:10px; margin-left:auto; }
+    .modalBtn{ width:auto; margin-top:0; padding:11px 18px; font-size:13.5px; }
+    .modalBtn.ghost{ background:transparent; border:1px solid var(--line); color:var(--muted); font-weight:600; }
+    .modalBtn.danger{ background:var(--danger); color:#fff; }
+    .modalBtn.primary{ background:linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#241a08; }
   </style>
 </head>
 <body>
@@ -1052,6 +1142,10 @@
         <div class="navItem" id="navMateri" data-page="materi"><span class="navIcon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5.5A2 2 0 0 1 6 3.5h13v15H6a2 2 0 0 0-2 2z"/><path d="M8 5v14"/></svg></span><span id="navLabelMateri">Materi</span></div>
         <div class="navItem" id="navProgres" data-page="progres"><span class="navIcon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V11"/><path d="M10 20V4"/><path d="M16 20v-6"/></svg></span><span id="navLabelProgres">Progres</span></div>
         <div class="navItem" id="navRiwayat" data-page="riwayat"><span class="navIcon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5l3 2"/></svg></span><span id="navLabelRiwayat">Riwayat</span></div>
+        <!-- Admin panel v1 (DECISIONS_NEEDED #30): existing sidebar as-is, no new toggle.
+             Group + item hidden unless profile.role === 'admin' (see renderDash). -->
+        <div class="navGroupLabel hidden" id="navGroupAdmin">Admin</div>
+        <div class="navItem hidden" id="navAdmin" data-page="admin"><span class="navIcon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span id="navLabelAdmin">User Management</span></div>
       </nav>
       <div class="sidebarStreak">
         <span class="sidebarStreakFlame">🔥</span>
@@ -1442,7 +1536,46 @@
         </div>
       </div>
 
+      <!-- ============ ADMIN — USER MANAGEMENT (v1, DECISIONS_NEEDED #30/#31). Nav item
+           hidden unless profile.role === 'admin'. No email column -- see #31 for why. ============ -->
+      <div id="adminCard" class="pageCard admin hidden">
+        <p class="sub" id="adminHeader">User Management</p>
+
+        <div class="adminToolbar">
+          <div class="browseSearchWrap">
+            <span class="browseSearchIcon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+            <input id="adminSearch" class="browseSearchInput" type="text" placeholder="Search by name..." />
+          </div>
+          <select id="adminPkgFilter" class="adminFilterSelect"></select>
+          <select id="adminStatusFilter" class="adminFilterSelect">
+            <option value="all">All statuses</option>
+            <option value="active">Active</option>
+            <option value="expired">Expired</option>
+          </select>
+        </div>
+
+        <div class="adminListHead">
+          <span>Name</span><span>Package</span><span>Level</span><span>Status</span><span>Subscription end</span>
+        </div>
+        <div class="adminList" id="adminList"></div>
+        <p class="adminCount" id="adminCount"></p>
+
+        <button id="adminExitBtn" class="practiceExit">Back to Dashboard</button>
+      </div>
+
     </main>
+
+    <!-- ============ MODAL SHELL (DECISIONS_NEEDED #31) -- generic overlay+panel, content
+         swapped per use via JS (openModal). Reused by Edit User and Deactivate confirm. ============ -->
+    <div id="modalOverlay" class="modalOverlay hidden">
+      <div class="modalPanel" id="modalPanel" tabindex="-1">
+        <div class="modalHeader">
+          <h3 class="modalTitle" id="modalTitle">—</h3>
+          <button type="button" class="modalCloseBtn" id="modalCloseBtn" aria-label="Close">✕</button>
+        </div>
+        <div class="modalBody" id="modalBody"></div>
+      </div>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1524,6 +1657,22 @@
     convo: 'Conversation',
     vip: 'VIP'
   };
+
+  // Admin panel v1 (DECISIONS_NEEDED #31). Role/status DB values -- 'user' (label "Student"
+  // in UI, per Kyaru's correction to the design comp) / 'admin'; 'active' / 'expired'. Package
+  // dropdown deliberately does NOT get its own hardcoded list here -- it's built straight off
+  // Object.keys(PACKAGE_LEVELS) at render time, so it can never drift out of sync with the
+  // packages the rest of the app actually knows about (root cause of the corruption risk #31
+  // flagged: a dropdown missing a real DB value silently rewrites that user's package on Save).
+  const ROLE_OPTIONS = [
+    { value:'user', label:'Student' },
+    { value:'admin', label:'Admin' }
+  ];
+  const STATUS_OPTIONS = ['active','expired'];
+
+  function escapeHTML(s){
+    return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
 
   let practiceLevel = null;
   let sessionQueue = [];
@@ -2010,7 +2159,7 @@
 
   /* ---------- navigasi appShell (Task: reskin) ---------- */
   function hideAllPages(){
-    ['dashCard','practiceCard','raportCard','browseCard','mockListCard','attemptCard','resultCard','riwayatCard','materialsHubCard']
+    ['dashCard','practiceCard','raportCard','browseCard','mockListCard','attemptCard','resultCard','riwayatCard','materialsHubCard','adminCard']
       .forEach(id => $(id).classList.add('hidden'));
   }
 
@@ -2135,6 +2284,11 @@
     $('dContinueLevel').textContent = profile.target_level || 1;
     $('sideUserName').textContent = profile.display_name || t('genericStudent');
     $('sideUserMeta').textContent = (trackLabel(profile.active_track) || t('notSet')) + ' · HSK ' + (profile.target_level || '-');
+
+    // Admin panel v1 (DECISIONS_NEEDED #30) -- nav group only rendered for admins.
+    const isAdmin = profile.role === 'admin';
+    $('navGroupAdmin').classList.toggle('hidden', !isAdmin);
+    $('navAdmin').classList.toggle('hidden', !isAdmin);
 
     loadBerandaExtras();
   }
@@ -2883,6 +3037,283 @@
     browseShown += next.length;
     $('browseCount').textContent = browseShown + ' / ' + browseFiltered.length + ' ' + t('wordsUnit');
     $('browseMoreBtn').classList.toggle('hidden', browseShown >= browseFiltered.length);
+  }
+
+  /* ==========================================================
+     MODAL SHELL (DECISIONS_NEEDED #31) -- generic overlay+panel, content swapped per use.
+     Reused by Edit User + Deactivate confirm below. Minimal focus trap: Tab/Shift+Tab cycle
+     within the panel's focusable elements, Esc/backdrop-click/X close, focus returns to
+     whatever triggered the open. Not a general-purpose dialog system -- built for exactly
+     these 2 call sites (+ Create user, v1.5), nothing more.
+     ========================================================== */
+  let modalPrevFocus = null;
+
+  function getModalFocusable(){
+    return [...$('modalPanel').querySelectorAll('button, input, select, textarea, a[href]')]
+      .filter(el => !el.disabled && el.offsetParent !== null);
+  }
+
+  function openModal(title, bodyHTML){
+    $('modalTitle').textContent = title;
+    $('modalBody').innerHTML = bodyHTML;
+    modalPrevFocus = document.activeElement;
+    $('modalOverlay').classList.remove('hidden');
+    const focusable = getModalFocusable();
+    (focusable[0] || $('modalPanel')).focus();
+  }
+
+  function closeModal(){
+    $('modalOverlay').classList.add('hidden');
+    $('modalBody').innerHTML = '';
+    if(modalPrevFocus && typeof modalPrevFocus.focus === 'function') modalPrevFocus.focus();
+    modalPrevFocus = null;
+  }
+
+  $('modalOverlay').addEventListener('click', e=>{
+    if(e.target === $('modalOverlay')) closeModal();
+  });
+  $('modalCloseBtn').addEventListener('click', closeModal);
+  document.addEventListener('keydown', e=>{
+    if($('modalOverlay').classList.contains('hidden')) return;
+    if(e.key === 'Escape'){ closeModal(); return; }
+    if(e.key === 'Tab'){
+      const f = getModalFocusable();
+      if(f.length === 0) return;
+      const first = f[0], last = f[f.length-1];
+      if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+      else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+    }
+  });
+
+  /* ==========================================================
+     ADMIN — USER MANAGEMENT (v1, DECISIONS_NEEDED #30/#31)
+     Client-side only, anon key, zero Edge Functions -- RLS is_admin() covers every read/write
+     this screen does. No email column (auth.users isn't reachable from the client; that needs
+     a service_role Edge Function, deferred to v1.5 alongside create-user). "Delete permanently"
+     was cut in #30 (no RLS DELETE policy + FK CASCADE would wipe a user's learning history) --
+     Deactivate (status='expired') is the only destructive action.
+     ========================================================== */
+  let adminCache = [];
+  let adminFiltered = [];
+
+  function openAdmin(){
+    setActiveNav('admin');
+    $('dashCard').classList.add('hidden');
+    $('adminCard').classList.remove('hidden');
+    renderAdminFilterOptions();
+    $('adminSearch').value = '';
+    $('adminPkgFilter').value = 'all';
+    $('adminStatusFilter').value = 'all';
+    loadAdminUsers();
+  }
+
+  function closeAdmin(){
+    setActiveNav('beranda');
+    $('adminCard').classList.add('hidden');
+    $('dashCard').classList.remove('hidden');
+  }
+
+  // Package filter options come straight off PACKAGE_LEVELS (same object the rest of the app
+  // gates access with) so this list can never drift out of sync with real package values --
+  // built once, not rebuilt every openAdmin() call (the option set can't change mid-session).
+  function renderAdminFilterOptions(){
+    const sel = $('adminPkgFilter');
+    if(sel.dataset.built) return;
+    sel.innerHTML = `<option value="all">All packages</option>` +
+      Object.keys(PACKAGE_LEVELS).map(key=>{
+        const noContent = PACKAGE_LEVELS[key].length === 0;
+        const label = (PACKAGE_BADGE_LABEL[key] || key) + (noContent ? ' (belum ada konten)' : '');
+        return `<option value="${key}">${escapeHTML(label)}</option>`;
+      }).join('');
+    sel.dataset.built = '1';
+  }
+
+  async function loadAdminUsers(){
+    $('adminList').innerHTML = `<p class="emptyState">${t('loading')}</p>`;
+    $('adminCount').textContent = '';
+    const { data, error } = await sb.from('profiles').select('*').order('created_at', { ascending:false });
+    if(error){ alert('Gagal ambil daftar user: ' + error.message); return; }
+    adminCache = data || [];
+    applyAdminFilter();
+  }
+
+  function applyAdminFilter(){
+    const q = stripDiacritics($('adminSearch').value.trim());
+    const pkg = $('adminPkgFilter').value;
+    const status = $('adminStatusFilter').value;
+    adminFiltered = adminCache.filter(p=>{
+      if(q && !stripDiacritics(p.display_name || '').includes(q)) return false;
+      if(pkg !== 'all' && p.package !== pkg) return false;
+      if(status !== 'all' && p.status !== status) return false;
+      return true;
+    });
+    renderAdminList();
+  }
+
+  function renderAdminList(){
+    const wrap = $('adminList');
+    wrap.innerHTML = '';
+    if(adminFiltered.length === 0){
+      wrap.innerHTML = `<p class="emptyState">Tidak ada user yang cocok.</p>`;
+      $('adminCount').textContent = '';
+      return;
+    }
+    adminFiltered.forEach(p=>{
+      const row = document.createElement('div');
+      row.className = 'adminRow';
+      const hasName = p.display_name && p.display_name.trim();
+      // display_name NULL (manual Supabase account, no raw_user_meta_data) -- explicit
+      // placeholder + 8-char UUID sub-identifier, never a blank row (DECISIONS_NEEDED #31).
+      const nameHTML = hasName
+        ? `<span class="adminRowName">${escapeHTML(p.display_name)}</span>`
+        : `<span class="adminRowName adminRowNamePlaceholder">(Nama belum diisi)</span><span class="adminRowSubId">${escapeHTML(p.id.slice(0,8))}</span>`;
+      const pkgLabel = PACKAGE_BADGE_LABEL[p.package] || p.package || '—';
+      const statusCls = p.status === 'active' ? 'active' : 'expired';
+      const statusLabel = p.status === 'active' ? 'Active' : 'Expired';
+      row.innerHTML = `
+        <div class="adminRowMain">${nameHTML}</div>
+        <span class="adminPkgPill">${escapeHTML(pkgLabel)}</span>
+        <span class="adminLevelText">${p.target_level ? 'HSK ' + p.target_level : '—'}</span>
+        <span class="adminStatusPill ${statusCls}">${statusLabel}</span>
+        <span class="adminSubText">${escapeHTML(p.subscription_end || '—')}</span>
+      `;
+      row.addEventListener('click', ()=> openEditUserModal(p));
+      wrap.appendChild(row);
+    });
+    $('adminCount').textContent = adminFiltered.length + (adminFiltered.length === 1 ? ' user' : ' users');
+  }
+
+  function openEditUserModal(profile){
+    const isSelf = profile.id === currentUser;
+    const knownPkg = Object.prototype.hasOwnProperty.call(PACKAGE_LEVELS, profile.package);
+    const pkgOptionsHTML = Object.keys(PACKAGE_LEVELS).map(key=>{
+      const noContent = PACKAGE_LEVELS[key].length === 0;
+      const label = (PACKAGE_BADGE_LABEL[key] || key) + (noContent ? ' (belum ada konten)' : '');
+      const selected = profile.package === key ? ' selected' : '';
+      return `<option value="${key}"${selected}>${escapeHTML(label)}</option>`;
+    }).join('');
+    // Unknown package value on this row -- DECISIONS_NEEDED #31 hard rule: never silently
+    // fall back to the first option (that would rewrite the user's real package on Save).
+    // Show it literally, flagged, as an extra selected option instead.
+    const pkgSelectExtra = (!knownPkg && profile.package)
+      ? `<option value="${escapeHTML(profile.package)}" selected>⚠ ${escapeHTML(profile.package)} (unknown)</option>`
+      : '';
+    const unknownPkgWarning = (!knownPkg && profile.package)
+      ? `<p class="adminFieldWarning">⚠ Nilai package saat ini: "<b>${escapeHTML(profile.package)}</b>" — tidak dikenal sistem. Tidak diubah otomatis; pilih manual sebelum Save kalau ini perlu dikoreksi.</p>`
+      : '';
+
+    // target_level NULL (never set, e.g. #30's "admin lupa isi saat create user" case) needs
+    // its own explicit option -- without one, the <select> silently shows option 1 (HSK 1) as
+    // browser-default-selected, and an admin who saves without touching this field would
+    // silently overwrite NULL with 1. Same corruption class DECISIONS_NEEDED #31 flagged for
+    // package, caught live while screenshotting this exact row before reporting.
+    const levelNotSetOption = !profile.target_level ? `<option value="" selected>— Not set —</option>` : '';
+    const levelOptionsHTML = [1,2,3,4,5,6].map(lv=>{
+      const selected = profile.target_level === lv ? ' selected' : '';
+      return `<option value="${lv}"${selected}>HSK ${lv}</option>`;
+    }).join('');
+
+    const knownStatus = STATUS_OPTIONS.includes(profile.status);
+    const statusOptionsHTML = STATUS_OPTIONS.map(s=>{
+      const selected = profile.status === s ? ' selected' : '';
+      const label = s === 'active' ? 'Active' : 'Expired';
+      return `<option value="${s}"${selected}>${label}</option>`;
+    }).join('');
+    const statusSelectExtra = (!knownStatus && profile.status)
+      ? `<option value="${escapeHTML(profile.status)}" selected>⚠ ${escapeHTML(profile.status)} (unknown)</option>`
+      : '';
+    const unknownStatusWarning = (!knownStatus && profile.status)
+      ? `<p class="adminFieldWarning">⚠ Nilai status saat ini: "<b>${escapeHTML(profile.status)}</b>" — tidak dikenal sistem. Tidak diubah otomatis.</p>`
+      : '';
+
+    const roleOptionsHTML = ROLE_OPTIONS.map(r=>{
+      const selected = profile.role === r.value ? ' selected' : '';
+      return `<option value="${r.value}"${selected}>${escapeHTML(r.label)}</option>`;
+    }).join('');
+
+    openModal('Edit User', `
+      <label for="editName">Display name</label>
+      <input type="text" id="editName" value="${escapeHTML(profile.display_name || '')}" placeholder="(Nama belum diisi)" />
+
+      <label for="editPackage">Package</label>
+      ${unknownPkgWarning}
+      <select id="editPackage">${pkgSelectExtra}${pkgOptionsHTML}</select>
+
+      <label for="editLevel">Target level</label>
+      <select id="editLevel">${levelNotSetOption}${levelOptionsHTML}</select>
+
+      <label for="editStatus">Status</label>
+      ${unknownStatusWarning}
+      <select id="editStatus">${statusSelectExtra}${statusOptionsHTML}</select>
+
+      <label for="editSubEnd">Subscription end</label>
+      <input type="date" id="editSubEnd" value="${escapeHTML(profile.subscription_end || '')}" />
+
+      <label for="editRole">Role</label>
+      <select id="editRole"${isSelf ? ' disabled' : ''}>${roleOptionsHTML}</select>
+      ${isSelf ? `<p class="adminFieldHint">Kamu tidak bisa mengubah role akun sendiri lewat sini — kamu satu-satunya admin saat ini, mengganti ke Student akan mengunci akses admin secara permanen (recovery cuma lewat Supabase SQL Editor).</p>` : ''}
+
+      <div class="modalActions">
+        <button type="button" class="modalBtn danger" id="editDeactivateBtn"${profile.status === 'expired' ? ' disabled' : ''}>Deactivate</button>
+        <div class="modalActionsRight">
+          <button type="button" class="modalBtn ghost" id="editCancelBtn">Cancel</button>
+          <button type="button" class="modalBtn primary" id="editSaveBtn">Save</button>
+        </div>
+      </div>
+    `);
+
+    $('editCancelBtn').addEventListener('click', closeModal);
+    $('editSaveBtn').addEventListener('click', ()=> saveEditUser(profile));
+    $('editDeactivateBtn').addEventListener('click', ()=> openDeactivateConfirm(profile));
+  }
+
+  async function saveEditUser(profile){
+    const btn = $('editSaveBtn');
+    btn.disabled = true;
+    const payload = {
+      display_name: $('editName').value.trim() || null,
+      package: $('editPackage').value,
+      target_level: $('editLevel').value ? Number($('editLevel').value) : null,
+      status: $('editStatus').value,
+      subscription_end: $('editSubEnd').value || null
+    };
+    // Self-demotion guard (DECISIONS_NEEDED #31): role <select> is disabled when editing your
+    // own row, so it's simply never included in the update -- role can't change via a disabled
+    // field even if this handler were reached some other way.
+    if(profile.id !== currentUser){
+      payload.role = $('editRole').value;
+    }
+    const { error } = await sb.from('profiles').update(payload).eq('id', profile.id);
+    btn.disabled = false;
+    if(error){ alert('Gagal menyimpan: ' + error.message); return; }
+    closeModal();
+    loadAdminUsers();
+  }
+
+  function openDeactivateConfirm(profile){
+    const name = (profile.display_name && profile.display_name.trim())
+      ? escapeHTML(profile.display_name) : '(Nama belum diisi)';
+    openModal('Deactivate user?', `
+      <p>Nonaktifkan <b>${name}</b>? Status jadi <b>Expired</b> — user tidak bisa login sampai
+      diaktifkan lagi. Ini bukan penghapusan permanen, data dan riwayat belajar tetap aman.</p>
+      <div class="modalActions">
+        <div class="modalActionsRight">
+          <button type="button" class="modalBtn ghost" id="deactivateCancelBtn">Cancel</button>
+          <button type="button" class="modalBtn danger" id="deactivateConfirmBtn">Deactivate</button>
+        </div>
+      </div>
+    `);
+    $('deactivateCancelBtn').addEventListener('click', ()=> openEditUserModal(profile));
+    $('deactivateConfirmBtn').addEventListener('click', ()=> confirmDeactivate(profile));
+  }
+
+  async function confirmDeactivate(profile){
+    const btn = $('deactivateConfirmBtn');
+    btn.disabled = true;
+    const { error } = await sb.from('profiles').update({ status:'expired' }).eq('id', profile.id);
+    if(error){ alert('Gagal menonaktifkan: ' + error.message); btn.disabled = false; return; }
+    closeModal();
+    loadAdminUsers();
   }
 
   /* ==========================================================
@@ -4157,6 +4588,10 @@
   $('browseExitBtn').addEventListener('click', closeBrowse);
   $('browseSearch').addEventListener('input', applyBrowseFilter);
   $('browseMoreBtn').addEventListener('click', renderBrowseChunk);
+  $('adminExitBtn').addEventListener('click', closeAdmin);
+  $('adminSearch').addEventListener('input', applyAdminFilter);
+  $('adminPkgFilter').addEventListener('change', applyAdminFilter);
+  $('adminStatusFilter').addEventListener('change', applyAdminFilter);
   $('mockTestBtn').addEventListener('click', ()=> navTo(openMockList));
   $('mockListExitBtn').addEventListener('click', closeMockList);
   $('mockList').addEventListener('click', e=>{
@@ -4242,6 +4677,7 @@
   $('navMateri').addEventListener('click', ()=> navTo(openBrowse));
   $('navProgres').addEventListener('click', ()=> navTo(openRaport));
   $('navRiwayat').addEventListener('click', ()=> navTo(openRiwayat));
+  $('navAdmin').addEventListener('click', ()=> navTo(openAdmin));
   $('dashSeeAllHistory').addEventListener('click', ()=> navTo(openRiwayat));
 
   document.querySelectorAll('.loginLangBtn, .sbLangBtn').forEach(b=>{

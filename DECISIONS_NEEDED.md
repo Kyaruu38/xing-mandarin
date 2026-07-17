@@ -942,4 +942,68 @@ vs. restrict vs. orphaned-row behavior is unknown until checked directly in Supa
 - Form pattern: 1a MODAL (bukan slide-over/full page). Alasan: task pendek, konteks list tetap
   terlihat, konsisten dengan pola dialog delete-confirm.
 
+## 31. Admin panel v1 (user management) — implementation decisions, 2026-07-17
+
+Follow-up to #30, resolving the remaining open points before coding started.
+
+**Email — DI-SKIP dari v1, bukan ditunda tanpa alasan.** `profiles` tidak punya kolom email;
+`auth.users` tidak ter-expose lewat anon key/PostgREST (skema `auth` bukan bagian dari exposed
+schema Supabase). Satu-satunya jalan ambil email adalah `supabase.auth.admin.listUsers()` /
+`getUserById()`, yang butuh `service_role` key — sama Edge Function yang sudah pasti dibangun
+untuk create-user di v1.5 (keputusan #30, opsi B). Bangun Edge Function tipis khusus email di v1
+= bayar ongkos infra penuh (service_role secret, `is_admin()` gate, CORS, deploy) untuk manfaat
+kecil. **v1: tidak ada kolom email sama sekali** (bukan kosong, bukan read-only-blank) —
+`display_name` jadi identifier utama di list dan modal. Diputuskan Kyaru, 17 Jul 2026.
+
+**`display_name` NULL** — akun dibuat manual di Supabase tanpa `raw_user_meta_data`, trigger
+`handle_new_user()` cuma isi dari `raw_user_meta_data->>'display_name'`, jadi hasilnya NULL.
+Render: baris 1 = "(Nama belum diisi)" / "(No name set)", muted+italic; baris 2 = 8 karakter
+pertama UUID, kecil+muted, sebagai sub-identifier (placeholder saja bikin semua row-tanpa-nama
+identik, UUID saja kelihatan seperti data corrupt — gabungan keduanya kasih status jelas +
+tetap bisa dibedakan). Row tetap full-clickable → admin isi nama lewat Edit modal. Admin page
+jadi alat deteksi profil bolong. Diputuskan Kyaru, 17 Jul 2026.
+
+**Modal shell — komponen baru, dibangun sekali, reusable.** Codebase sebelumnya cuma punya
+native `confirm()` — native dialog abu-abu browser di tengah UI navy+gold app = dua gaya dialog
+di satu layar, kelas masalah yang sama dengan "dua sistem status" yang dihindari di Materials
+hub. Scope sengaja minimal: overlay + panel + close (X / backdrop click / Esc) + focus trap
+dasar, styled light+dark. Reusable untuk Edit modal, Deactivate confirm, dan Create user (v1.5)
+tanpa nambah komponen baru. Tidak dibangun: animasi/transition, modal stacking, varian di luar
+2 dialog ini, generic design system. Diputuskan Kyaru, 17 Jul 2026.
+
+**Package dropdown wajib memuat SEMUA value yang ada di `PACKAGE_LEVELS`** (`hsk_1_4`, `hsk_5`,
+`hsk_6`, `vip`, `business`, `convo` — termasuk `business`/`convo` yang `PACKAGE_LEVELS`-nya
+array kosong, "coming soon"). Dropdown yang tidak memuat value existing = data corruption saat
+Save: kalau user existing punya `package='business'` dan dropdown cuma 4 opsi, select jatuh ke
+opsi pertama secara diam-diam, Save menulis paket yang salah. `business`/`convo` dikasih label
+jujur ("Business (belum ada konten)" / "Conversation (belum ada konten)"), tidak disembunyikan
+dan tidak dihapus dari opsi. **Value dari DB yang tidak match opsi manapun**: tampilkan apa
+adanya (literal value-nya) + tandai visual sebagai tidak dikenal, JANGAN diam-diam fallback ke
+opsi pertama — dan lapor ke user kalau ini terjadi. Diputuskan Kyaru, 17 Jul 2026.
+
+**Self-demotion guard.** Saat ini hanya ada 1 admin. Kalau admin itu membuka profilnya sendiri
+di Edit modal dan mengganti role jadi `user`, dia kehilangan akses admin permanen — tidak ada
+admin lain yang bisa mengembalikan lewat UI, recovery cuma lewat Supabase SQL Editor. Guard:
+role dropdown **disabled** (bukan dicegah lewat `confirm()` tambahan) ketika row yang diedit
+== user yang sedang login, dengan hint text menjelaskan kenapa. Diputuskan Kyaru, 17 Jul 2026.
+
+**`target_level` NULL — same corruption class as the package dropdown, caught during
+self-verification, not by user report.** Ditemukan pas screenshot-testing modal untuk row
+dengan `target_level=NULL` (kasus nyata: admin lupa isi saat create user, lihat #30's catatan
+"Admin WAJIB isi target_level saat create user"): dropdown Target Level cuma punya opsi HSK 1-6,
+tidak ada satupun yang dapet atribut `selected` waktu `target_level` NULL, jadi browser
+default-select opsi pertama ("HSK 1") — terlihat seperti pilihan sengaja padahal bukan. Kalau
+admin buka modal cuma buat benerin field lain (misal nama) lalu langsung Save tanpa nyentuh
+dropdown ini, `target_level` NULL bakal ke-overwrite jadi `1` diam-diam. Sama persis kelasnya
+dengan bug package yang di atas — dropdown tanpa representasi eksplisit untuk "belum
+diisi/tidak dikenal" = data ditulis ulang secara tidak sengaja saat Save.
+
+Fix: opsi eksplisit `"— Not set —"` (value kosong) ditambahkan & di-`selected` saat
+`profile.target_level` falsy; save handler mengirim `target_level: null` kalau opsi itu yang
+aktif, bukan `Number('')` (yang jadi `NaN`/`0`, dua-duanya salah). Ditemukan dan diperbaiki
+sebelum dilaporkan ke user (bukan hasil user-report) — dicatat di sini juga sebagai pengingat
+pola: **setiap dropdown yang mewakili kolom DB nullable/open-ended butuh opsi eksplisit
+untuk "kosong"/"tidak dikenal", jangan andalkan browser default-select.** Kalau ada dropdown
+lain ditambahkan ke admin panel nanti (mis. saat Create user v1.5), cek ulang pola ini duluan.
+
 Nothing else pending a decision right now.

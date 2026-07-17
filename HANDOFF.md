@@ -1,3 +1,91 @@
+# Handoff — session 7 (admin panel v1.5, create user + email)
+
+Scope: **Edge Function untuk create user + email column**, gated behind admin v1 (session 6,
+`b7739f0`) being done and approved. Report-first (`git pull` → baca #30/#31 → lapor rencana,
+nol kode) sebelum implementasi, sama pola kayak session 6.
+
+## Admin panel v1.5: DONE, APPROVED, COMMITTED — `e3cb10d`
+
+Full decision writeup: DECISIONS_NEEDED #31 (email/password/modal-shell/partial-failure
+decisions, ditulis sebelum coding) → #32 (secret key choice + implementation) → #33 (bug session
+guard, ditemukan sampingan, belum di-fix) → #34 (root cause investigation, lihat di bawah).
+
+**Yang jadi**:
+- Edge Function baru `admin-users` — gerbang `is_admin()` (forward caller JWT + anon key,
+  sebelum client privileged dibuat sama sekali) → 2 action: `createUser` (bikin auth user +
+  isi `profiles` dari form) dan `listEmails` (isi kolom Email di list, kosong sejak v1 karena
+  `auth.users` nggak reachable dari anon key).
+- Partial-failure (`createUser` sukses, UPDATE `profiles` gagal) dilaporkan eksplisit ke admin
+  (`207` + alert jelas), nggak pernah disamarkan jadi sukses. Nggak ada rollback/delete-on-failure
+  (nggak ada RLS DELETE, delete auth user CASCADE ke riwayat belajar — sama alasan #30).
+- Frontend: tombol "+ Add User" + Create modal (reuse modal shell dari v1), kolom Email balik ke
+  list (fetch async, soft-fail ke "—" kalau function gagal, nggak pernah fabricate).
+- Password: admin set langsung di Create modal (opsi a) — **DEBT tercatat** (#31), wajib
+  direvisi sebelum ada admin kedua atau paket dijual komersial.
+
+**Root cause hunt "permission denied for table profiles" — 4 ronde, akhirnya GRANT-level**
+(full detail #34, ringkasan di sini biar nggak perlu buka dua file buat ngerti urutannya):
+1. **Ronde 1** — `SUPABASE_SECRET_KEYS['default']` (key format baru, direkomendasikan Supabase,
+   diverifikasi dulu ke project ini sebelum dipakai — lihat #32). `listEmails` (GoTrue) sukses
+   live. `createUser`'s UPDATE ke `profiles` (PostgREST) gagal `"permission denied for table
+   profiles"`.
+2. **Ronde 2** — hipotesis: raw secret key kesisip ke header `Authorization` sebagai session
+   fallback, gateway salah konversi ke JWT `service_role` buat PostgREST. Dicoba
+   `{ auth: { persistSession:false, autoRefreshToken:false } }` — **gagal identik**. Teori
+   terbantahkan.
+3. **Ronde 3** — fallback ke `SUPABASE_SERVICE_ROLE_KEY` (legacy JWT), dicatat sebagai DEBT
+   (legacy ditarget deprecated akhir 2026). Kode ini yang dipakai buat verifikasi berikutnya.
+4. **Ronde 4 — akar masalah sebenarnya**: Kyaru cek grant langsung ke DB — `service_role` cuma
+   punya `REFERENCES, TRIGGER, TRUNCATE` di `public.profiles`, **NOL SELECT/INSERT/UPDATE/
+   DELETE**. `vocab` sama persis (project-wide, kemungkinan sisa security hardening lama).
+   `anon` juga ke-revoke. Nggak pernah kedeteksi sebelumnya karena app selalu jalan sebagai
+   `authenticated` (grant lengkap) — Edit modal (client-side, sesi admin) selalu sehat,
+   `admin-users` (server-side, `service_role`/`anon`) selalu kena, **apapun format key-nya**.
+   Fix: `grant select, insert, update on public.profiles to service_role;` (sengaja tanpa
+   DELETE, sama alasan #30). **Diverifikasi empiris**: test5 (sebelum grant) = semua field
+   default/NULL; test6 (sesudah grant, kode identik nol redeploy) = semua field kepasang benar,
+   200, nol partial. Ronde 1-2 (soal `sb_secret_`) **salah didiagnosis** — bukan soal key sama
+   sekali. Kode tetap di `SUPABASE_SERVICE_ROLE_KEY` untuk sekarang; balik ke
+   `SUPABASE_SECRET_KEYS` dicatat sebagai kandidat follow-up terpisah, sengaja nggak digabung
+   sama perubahan grant supaya tiap perubahan diverifikasi sendiri-sendiri.
+
+**Anomali "Mimilll" (create pertama, sempat kelihatan partial-success yang aneh) — CLOSED.**
+`target_level`-nya ternyata kesentuh lewat Edit modal (sesi `authenticated`, grant lengkap,
+nggak pernah kena masalah ini) di sesi diagnosis terpisah, bukan dari `createUser`'s UPDATE
+sendiri. `createUser` Mimilll sebenarnya gagal total sama kayak test2/test3 — dua aksi manusia
+(create yang gagal + edit manual belakangan) kelihatan kayak satu peristiwa. Bukan flakiness,
+bukan jalur kode kedua.
+
+**Verifikasi**: `listEmails` dan `createUser` dua-duanya sudah diverifikasi live oleh Kyaru
+sendiri (login admin asli, browser asli) — Claude nggak pernah nyoba `createUser` sendiri
+(kebijakan: nggak bikin auth user beneran tanpa Kyaru yang eksekusi/approve langsung).
+
+**Bug sampingan ditemukan, sengaja belum di-fix** (#33): `forceLogout()` manggil `signOut()`
+tanpa `scope` arg = default `'global'` = login di satu device nendang device lama **dan** ikut
+matiin device baru yang justru menang klaim sesi. Ditemukan pas dua tab (live + localhost) login
+bareng buat testing. Fix kandidat sudah ada (`signOut({scope:'local'})`), sengaja nggak dikerjain
+bareng sesi ini biar nggak nyampur scope perubahan.
+
+## Commit sesi ini
+
+- **`e3cb10d`** — `index.html` + `supabase/functions/admin-users/index.ts` (baru) +
+  `DECISIONS_NEEDED.md` (#31-34).
+
+**Sengaja TIDAK di-commit**: `supabase/functions/grade-essay/index.ts` — ada perubahan
+uncommitted di file itu yang bukan dari sesi ini (kerjaan Kyaru sendiri, paralel), dibiarkan
+apa adanya sesuai instruksi eksplisit.
+
+## Belum dikerjakan / kandidat follow-up
+
+- Balik `admin-users` ke `SUPABASE_SECRET_KEYS` sekarang grant DB sudah benar (bukan blocker,
+  cuma belum diverifikasi ulang — lihat #34).
+- `signOut({scope:'local'})` fix di `forceLogout()` (#33) — bug nyata, dampak ke semua user,
+  bukan cuma admin panel, tapi di luar scope sesi ini.
+- v2/v1.5-adjacent yang masih kandidat: must-change-password flag atau invite-email (upgrade dari
+  password-langsung-oleh-admin, #31), dan RLS-by-package sebelum paket dijual komersial (#22).
+
+---
+
 # Handoff — session 6 (admin panel v1, user management)
 
 Scope: **Admin Panel v1 — user management**, client-side only (anon key, zero Edge Functions).

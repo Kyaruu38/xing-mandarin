@@ -1482,18 +1482,32 @@ section PENDING.
     `service_role` manapun ke depan (pipeline audio, dsb.) yang nyentuh salah satu dari 5
     tabel ini bakal kena "permission denied" identik sama saga `#34`, tinggal nunggu
     ke-trigger.
-11. **BARU, ketauan dari perbandingan source live vs tracked file — `submit_attempt` drift
-    beneran, bukan cuma teori.** Live version (query 6) nge-`continue` duluan buat soal essay
-    SEBELUM `v_total := v_total + 1` sempet jalan — jadi `v_total` (-> `total_questions` di
-    response RPC dan baris `test_attempts`) **cuma ngitung soal non-essay**. Tracked file
-    (`sql/03_submit_attempt_essay.sql`) nge-increment `v_total` TANPA SYARAT buat SETIAP baris
-    sebelum cek `question_type`, dan komentarnya sendiri eksplisit bilang "soal essay tetap
-    dihitung di total_questions (biar progress "soal ke-N dari total" tetap benar)". Live
-    behavior sekarang KONTRADIKSI niat yang tertulis di file — buat section writing yang
-    100% essay (HSK3+, per #9 prereq 3), `total_questions` balik `0`, bukan jumlah soal
-    beneran. Ini bug korektnes yang HIDUP SEKARANG, di luar scope Gap #2 (bukan soal
-    security), ketemu sebagai efek samping dump ini. **Belum ditriase, belum difix** —
-    dicatet di sini karena ini persis kelas drift yang lagi dicari sesi ini.
+11. **KOREKSI, 17 Jul 2026 — BUKAN bug.** Awalnya dicatet sebagai bug korektnes: live version
+    (query 6) nge-`continue` duluan buat soal essay SEBELUM `v_total := v_total + 1` sempet
+    jalan, jadi `v_total` (-> `total_questions`) cuma ngitung soal non-essay — kontradiksi
+    komentar `sql/03_submit_attempt_essay.sql` yang bilang "soal essay tetap dihitung di
+    total_questions". **Diinvestigasi sebelum ditulis fix-nya (DECISIONS_NEEDED #43), verdict
+    dibalik**: `total_questions` semantiknya SEKARANG (dan di SETIAP titik pemakaiannya)
+    adalah "penyebut rasio objektif", bukan "jumlah soal literal". Bukti — 3 titik formula
+    persen di `index.html` semuanya masangin `total_questions` sama `correct_count`
+    (`showResult()` :~4851-4854, Accuracy stat combined :~4918-4920, per-section breakdown
+    :~4954), dan `correct_count` STRUKTURAL nggak pernah nyakup essay (`is_correct` essay
+    selalu `null`, `v_correct` nggak pernah nambah buat `question_type='essay'`). Kalau
+    `total_questions` ikut nyakup essay sementara `correct_count` mustahil, section CAMPURAN
+    (sebagian objektif + sebagian essay — cth HSK5 writing = 完成句子 + 2 essay) bakal nunjukin
+    persen yang MUSTAHIL nyampe 100% walau semua soal objektif dijawab bener (kasus konkret:
+    8 objektif bener semua + 2 essay = 8/10 = 80%, padahal akurasi objektif beneran 8/8=100%).
+    Jalur "all-essay pending" (#17, `setQuestions.every(q=>q.question_type==='essay')`) cuma
+    nangkep section 100% essay, BUKAN section campuran — jadi section campuran bakal langsung
+    kena formula yang salah itu. Justifikasi komentar `sql/03` ("progress soal ke-N dari
+    total") juga nggak match kebutuhan nyata manapun — indikator progress pas attempt LAGI
+    JALAN dihitung dari `attemptQuestions.length` (client-side, :~4364), bukan dari
+    `total_questions` yang di-persist RPC ini. **Kesimpulan**: perilaku live (essay exclude
+    dari `total_questions`) SUDAH BENAR. Yang salah komentar `sql/03`, bukan kodenya. **TIDAK
+    DIFIX** — lihat blok komentar besar di `sql/05_submit_attempt_gap2_fixes.sql` (di atas
+    definisi function) biar sesi depan nggak "nemuin" ini lagi dan ngulang kesalahan yang
+    sama (termasuk kesalahan Claude Code sendiri sesi ini, yang sempet ngusulin fix ini
+    sebelum dikoreksi Kyaru).
 
 ### Urutan eksekusi Gap #2 — DISEPAKATI Kyaru + Claude Code, 17 Jul 2026
 
@@ -1523,6 +1537,113 @@ RLS tabel, jalur beda). Dua-duanya tetep harus dibenerin, cuma `submit_attempt` 
 
 **Belum ditulis SQL fix apapun** — sesi ini scope-nya audit + dump doang, per instruksi
 eksplisit.
+
+Diputuskan Kyaru + Claude Code, 17 Jul 2026.
+
+## 43. Gap #2 step 2 — `submit_attempt`: fix `is_published` + bug #11 DIKERJAIN, throttle (opsi b) DITOLAK, exam-integrity hole DICATET SEBAGAI DEBT TERBUKA
+
+Lanjutan #42. Rencana awal (2 opsi) buat nutup temuan #42 poin 7 (`submit_attempt` balikin
+`answer`/`explanation` buat `set_id` apapun, nol cek paket, nol cek submission asli-atau-bukan):
+opsi (a) validasi `test_sets.is_published` (bug murni, ketauan pas nyusun rencana — RPC ini
+nggak pernah ngecek publish status sama sekali, beda dari RLS `qbank read published`/
+`test_sets read published` yang eksplisit ngecek itu buat direct-read) dan opsi (b) throttle
+berbasis hitungan `distinct set_id` per window waktu dari `test_attempts` yang udah ada (nol
+tabel baru).
+
+### Opsi (b) DITOLAK Kyaru — alasannya benar, dicatet biar nggak dicoba lagi tanpa re-derive
+
+`startCombinedAttempt()` (tab "Semua") manggil `submit_attempt` **sekali per set_id di dalam
+group, loop, dalam hitungan detik** — combined HSK3-6 = 3 set_id (listening/reading/writing)
+kepanggil beruntun. Ambang throttle manapun yang masuk akal (dicoba: >3 set_id beda dalam 5
+menit) **ketrigger sama SATU mock combined + sedikit aktivitas normal lain** — false positive
+ke murid rajin, bukan ke penyerang. Ditambah, oleh laporan sendiri: script yang sabar (submit
+pelan, di bawah ambang) tetep nyicil panen tanpa kena — jadi throttle nggak nangkep ancaman
+yang serius, cuma ngerusak UX user sah. Nambah failure mode di jalur paling kritis (SEMUA
+submit mock test lewat `submit_attempt`) buat proteksi yang secara desain nggak efektif =
+tradeoff negatif. **Jangan dicoba lagi tanpa alasan baru** — kelemahan ini struktural
+(combined attempt's call pattern), bukan soal salah pilih angka ambang.
+
+### Exam-integrity hole (panen `answer`/`explanation` dalam paket sendiri via RPC "kosong") — STRUKTURAL, DITERIMA SEBAGAI DEBT TERBUKA
+
+Kesimpulan dari rencana sebelumnya, dikonfirmasi di sini: **server nggak punya cara ngebedain
+"submit asli abis ngerjain" vs "panggil RPC langsung, jawaban kosong"** — dua-duanya request
+yang identik bentuknya (`p_set_id`, `p_answers`, `p_time_taken` — semua nilai `p_time_taken`
+pun disuplai client, nggak diverifikasi server-side sama sekali). Nggak ada token/session
+server-side yang bisa nyatetin "user ini beneran buka soal duluan." Ini bukan bug yang bisa
+ditambal dari DALAM `submit_attempt` — proteksi apapun yang cuma baca ulang `test_attempts`
+(kayak opsi b) cuma nge-throttle, nggak nutup akarnya, dan kebukti dari kasus combined attempt
+sendiri kalau throttle malah salah sasaran.
+
+**Fix beneran = opsi (c) dari rencana sebelumnya**: konsep exam-session server-side —
+`startAttempt` bikin baris/token attempt DI SERVER dulu (dengan timestamp mulai, expiry),
+`submit_attempt` WAJIB nyocokin token itu sebelum ngasih skor+review. Ini **butuh schema baru**
+(tabel/kolom token session) — di luar batasan sesi ini (`nol tabel baru`, `package_levels` juga
+udah ditunda ke step 3 dengan alasan yang sama).
+
+**Keputusan**: **DITERIMA sebagai debt terbuka, DICATET, BUKAN ditambal setengah-setengah**
+dengan opsi (b) yang justru nambah resiko di jalur kritis buat proteksi yang lemah. Diterima
+selama user cuma masuk lewat admin (bukan self-serve publik), sama persis pola penerimaan
+debt di #22 Gap #2 sebelumnya.
+
+**TRIGGER buat wajib dikerjain**: **sebelum ada user berbayar yang bukan orang dalam/partner
+test.** Begitu ada penjualan self-serve publik, exam-session server-side (opsi c) jadi
+prasyarat, bukan nice-to-have — proteksi klien-side + RLS + `is_published` check doang nggak
+cukup buat produk yang integritas exam-nya jadi janji komersial ke pembeli.
+
+### Yang DIKERJAIN sesi ini (satu `CREATE OR REPLACE FUNCTION submit_attempt`, is_published-only)
+
+1. **Validasi `test_sets.is_published`** — RPC sekarang nolak (`raise exception`) kalau
+   `p_set_id` nggak match baris `test_sets` yang `is_published = true`. Sebelumnya nol
+   validasi ini sama sekali (RPC bisa dipanggil buat set_id apapun, published atau draft).
+   Zero behavior change buat set yang beneran dipakai user (semua yang keliatan di Mock List
+   udah pasti `is_published=true`, dijamin filter `loadMockList()` sendiri).
+2. **Bug #11 — TIDAK DIFIX, dikoreksi jadi BUKAN bug** (lihat #42 finding 11, revisi). Fix yang
+   sempet diusulin (increment `v_total` di cabang essay) DITOLAK setelah investigasi: bakal
+   ngerusak formula #9 (`correct_count/total_questions`) buat section campuran objektif+essay
+   (skor jadi mustahil 100% walau semua soal objektif bener). Live behavior (essay exclude
+   dari `total_questions`) sudah benar, dipertahankan apa adanya.
+3. **`correct_answer`/`explanation` TETAP dibalikin normal** — nol perubahan ke fitur review,
+   sesuai keputusan bahwa opsi (b) ditolak dan opsi (c) di luar scope. Exam-integrity hole di
+   atas masih terbuka, dicatet, bukan disembunyiin.
+
+SQL final + kerangka verifikasi: lihat commit/HANDOFF sesi ini.
+
+### VERIFIED live, 17 Jul 2026
+
+- Sebelum paste: `hsk6-reading-1` (`is_published=false`) → RPC sukses (200), balikin data
+  (kunci jawaban ke-panen dari set yang belum publish — persis lubang yang dimaksud).
+- Sesudah paste: `hsk6-reading-1` → ditolak (`400`), server-side, sesuai fix.
+- Submit normal (set published) → jalan sama persis kayak sebelumnya, review utuh, nol
+  regresi.
+
+Diputuskan Kyaru + Claude Code, 17 Jul 2026.
+
+## 44. Frontend belum siap buat `submit_attempt` gagal — RPC error path baru pernah ke-trigger sekarang, JANGAN DIKERJAIN SEKARANG
+
+Ditemuin pas verifikasi live fix #43 (`is_published` gate): abis RPC balikin error (`400`,
+`"set not found or not published"`), console nunjukin **`TypeError: Cannot read properties of
+undefined (reading 'replace')`** — bukan pesan error yang rapi ke user, crash JS.
+
+**Sebab, ditelusuri dari kode (belum dikonfirmasi baris persis dari stack trace, tapi ini
+satu-satunya kandidat yang cocok)**: jalur combined attempt (`submitAttempt()`,
+`index.html:4734-4735`) manggil `t('errSubmitFailedNamed').replace('{title}', s.title)` pas
+`error` ada. Selama ini `submit_attempt` **NGGAK PERNAH gagal** (nol validasi apapun sebelum
+fix #43) — jadi jalur `if(error){...}` di kedua call site (combined :4734, single :4791) itu
+kode yang DITULIS tapi **belum pernah beneran ke-exercise sama produksi nyata sampai fix ini
+ada**. Begitu RPC BISA gagal (fix #43 sengaja bikin ini terjadi), jalur error yang selama ini
+"aman di atas kertas" ketauan belum teruji beneran.
+
+**Skenario nyata yang bisa kena**: admin nge-unpublish satu set (misal lagi direvisi) PAS ada
+user yang udah kadung buka attempt buat set itu (fetch soal duluan lewat `startAttempt`/
+`startCombinedAttempt` sebelum status berubah) — begitu dia Submit, `submit_attempt` nolak
+(set udah nggak published), frontend crash, **layar mati tanpa pesan yang jelas ke user**
+(bukan cuma "gagal submit," tapi JS exception yang bisa nyetop render lanjutan).
+
+**Kenapa nggak dikerjain sekarang**: di luar scope Gap #2 (ini bug frontend error-handling,
+bukan security/RLS), butuh diagnosis sendiri (harus dikonfirmasi persis baris mana yang
+nge-throw, dicek juga jalur single-section yang KELIHATANNYA lebih aman — nol `.replace()` di
+:4792 — apa beneran aman atau ada TypeError lain di situ juga). **Kandidat follow-up sesi
+terpisah.**
 
 Diputuskan Kyaru + Claude Code, 17 Jul 2026.
 

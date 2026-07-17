@@ -1304,6 +1304,20 @@ beneran.
 3. WAJIB baca console (F12) tiap verifikasi, lapor eksplisit bersih/enggak. Screenshot dashboard
    doang ga cukup — dashboard bisa keliatan normal padahal ada error yang udah kejadian sebelum
    render (atau sebaliknya, ke-skip kalau screenshot diambil dari state yang salah).
+4. **(Ditambahin 18 Jul 2026, dari kesalahan nyata #48)** Query DB pake JWT non-admin (akun
+   test biasa) buat audit KEBERADAAN data (ada/nggak ada baris) itu TERBATAS oleh RLS — hasil
+   "0 rows" dari akun non-admin **CUMA BUKTI "nggak keliatan buat role ini"**, BUKAN bukti
+   "nggak ada di DB". Kasus nyata: query `test_sets`/`question_bank` HSK6 listening pake akun
+   test (`role='user'`) balikin 0 baris, disimpulin "verdict (c): data nggak ada sama sekali"
+   — SALAH. Data ADA (10 set, `is_published=false`), cuma ke-filter policy `USING(is_published
+   =true OR is_admin())` — akun non-admin nggak pernah bisa liat baris unpublished siapapun,
+   `question_bank`-nya ikut ke-gate lewat EXISTS ke `test_sets.is_published` yang sama.
+   **Aturan**: sebelum nyimpulin "data nggak ada" dari hasil query non-admin, WAJIB declare
+   eksplisit "ini cuma yang keliatan buat role non-admin, unpublished/baris user lain bisa
+   nggak kebaca" — dan kalau pertanyaannya soal KEBERADAAN (bukan soal "apa yang authenticated
+   biasa bisa akses", yang itu justru pertanyaan yang tepat buat akun non-admin), **minta user
+   jalanin query lewat SQL Editor** (jalan sebagai `postgres`, bypass RLS) alih-alih nyimpulin
+   dari hasil yang ke-filter.
 
 Diputuskan Kyaru + Claude Code, 17 Jul 2026.
 
@@ -1445,6 +1459,13 @@ section PENDING.
    UDAH bener (column grant), dan kena SEMUA user (bukan cuma yang di luar paket) — user
    `hsk_1_4` yang sah pun bisa panen kunci jawaban HSK1-4 yang dia bayar tanpa ngerjain soal
    beneran, karena RPC ini nggak peduli itu percobaan "asli" atau bukan.
+
+   **BUKTI NYATA, bukan teori (ditemuin 18 Jul 2026, audit #48)**: Kyaru punya baris
+   `test_attempts` beneran — set `h6-listening-3`, `is_published=false`, attempt tanggal
+   16 Jul 2026 — **SEBELUM** fix `is_published` (#43) di-deploy 17 Jul. Ini attempt yang
+   beneran nembus ke set yang belum published, persis lubang yang #43 tutup, bukan skenario
+   hipotetis. Dicatet di sini sesuai instruksi eksplisit Kyaru, biar temuan #43 punya bukti
+   konkret nempel di entry asal masalahnya, bukan cuma di entry fix-nya.
 8. **`rls_auto_enable`** — event trigger, DIKONFIRMASI dari source live (query 6): pada
    `CREATE TABLE` di schema `public`, otomatis jalanin `ALTER TABLE ... ENABLE ROW LEVEL
    SECURITY` — dan CUMA itu, nol policy pernah ditambahin sama function ini. Relevan buat
@@ -1799,6 +1820,96 @@ mid-login? navigasi cepet antar halaman? race logout+realtime callback?), sebelu
 yang bisa jadi nambal gejala yang salah. **Nggak blocking** rilis mobile fase 1 (nggak
 kejadian di flow normal manapun yang udah dites), tapi harus di-treat sebagai bug beneran di
 backlog, bukan "sekali muncul terus ilang."
+
+Diputuskan Kyaru + Claude Code, 17 Jul 2026.
+
+## 48. HSK 6 listening — verdict FINAL (a): konten LENGKAP, kerjaan = publish bukan generate, 2 blocker + bom waktu grouping title-vs-set_id — JANGAN DIKERJAIN SEKARANG
+
+Audit diminta karena kontradiksi kelihatan: `H6XING001` combined cuma nunjukin "Reading +
+Writing", padahal level lain (mis. `H4XING001`) nunjukin listening+reading+writing, dan Mock
+Test History user ada baris naming lama ("H6-listening-1").
+
+### KOREKSI — verdict awal (c) SALAH, sebab metodologi (dicatet juga di #38 poin 4)
+
+Audit pertama dijalanin pake JWT akun test (`role='user'`, bukan admin), query `test_sets`
+balikin 0 baris buat `hsk_level=6 AND section='listening'`, disimpulin "data nggak ada sama
+sekali". **SALAH** — dibuktikan Kyaru lewat SQL Editor (jalan sebagai `postgres`, bypass RLS):
+**data ADA — 10 baris, `set_id: h6-listening-1..10`, `title: H6XING001-010 LISTENING`,
+`is_published: FALSE` SEMUA.** RLS `test_sets read published`
+(`USING(is_published=true OR is_admin())`) nyaring baris unpublished dari akun non-admin —
+`question_bank`-nya ikut ke-gate karena policy-nya sendiri gerbang lewat
+`EXISTS(...test_sets.is_published)`. "0 rows" yang saya laporin itu bukti "nggak keliatan
+buat role non-admin", bukan bukti "nggak ada di DB" — dua hal beda yang kegabung jadi
+kesimpulan yang salah.
+
+**Fakta yang SEKARANG diketahui (dari SQL Editor Kyaru, bukan REST akun test)**: 10
+`test_sets` HSK6 listening ADA, `is_published=false`, **title-nya UDAH BENAR** ikut skema baru
+(`H6XING00N LISTENING`) — beda dari dugaan awal kalau HSK6 "ketinggalan" total.
+
+### VERDICT FINAL: (a) — konten LENGKAP, kerjaan = PUBLISH, bukan generate
+
+`question_bank` dicek (Kyaru, SQL Editor): **10 set × 50 soal, tipe `listening_mc` +
+`listening_mc_stmt`, cocok spec Hanban** (听力 第一部分/第二部分 HSK6). **Nol yang perlu
+digenerate dari nol** — koreksi total dari dugaan awal "proyek 500 soal + audio pipeline".
+
+**Renderer-nya JUGA udah ada** — `listening_mc_stmt` itu persis tipe yang di-render commit
+`8c1da2b` ("feat: listening_mc_stmt renderer (HSK6 听力 第一部分)"), commit misterius dari sesi
+CC paralel yang udah dicatet di #39 (dua sesi Claude Code kepentok nulis `index.html` yang
+sama, satu sesi commit snapshot working-tree yang kecampur). Jadi: **konten ada, renderer ada
+— murni soal publish, ketahan 2 blocker:**
+
+1. **#45 (crash `listeningAudioUrl()`/`listeningImageUrl()`) — PRASYARAT WAJIB, bukan antrian
+   terpisah.** Kalau di-publish sekarang dan ada payload yang field audio-nya kosong/nggak
+   sesuai bentuk yang renderer harapin, user ngerjain → submit → layar review MELEDAK (`Cannot
+   read properties of undefined (reading 'replace')`) — persis mekanisme #45 yang udah kebukti
+   di 10 set `H1XING001-010`. Publish HSK6 listening SEBELUM #45 beres = nambah 500 soal baru
+   ke tempat yang bisa crash, bukan cuma masalah 10 set lama.
+2. **Alasan `is_published=false`-nya belum jelas** — 500 soal nggak bikin sendiri, jadi ada
+   keputusan sengaja nahan publish. Dugaan kuat: audio belum siap (belum di-generate/di-upload
+   ke Storage) — cocok sama pola #45 (payload nggak punya `audio_url`/`image_url` yang valid).
+   **Kyaru lagi cek payload-nya langsung buat mastiin** — belum final, jangan diasumsikan.
+
+**Belum dimulai apapun** — nunggu #45 kelar (prasyarat keras) DAN kejelasan soal blocker
+audio (poin 2) sebelum publish.
+
+### BOM WAKTU tersembunyi — grouping combined jalan KARENA KEBETULAN, bukan by design
+
+Ditemuin pas audit ini (efek samping, bukan tujuan awal): rename ke skema `H{level}XING{seq}`
+**cuma pernah nyentuh kolom `title`**, nggak pernah nyentuh `set_id`. Dibuktikan langsung —
+HSK4/HSK5 listening: `set_id:"h4-listening-1"` (skema lama, apa adanya) tapi
+`title:"H4XING001 LISTENING"` (skema baru). Sementara `renderMockGroupedList()`
+(`index.html:4125-4131`) ngelompokin combined attempt pake `getBaseCode(s.title)` —
+**JUDUL, bukan `set_id`**.
+
+**Kenapa ini bom waktu**: combined mock test (listening+reading+writing jadi satu attempt)
+SEKARANG jalan bukan karena `set_id`-nya konsisten/terhubung secara struktural — jalan karena
+STRING `title`-nya KEBETULAN cocok base code-nya sama section lain di level yang sama. Nggak
+ada constraint/relasi DB yang jamin itu tetep gitu. **Begitu ada yang ngedit/ngerapiin title**
+(typo fix, konsistensi copy, migrasi konten, dsb.) **tanpa sadar title itu juga fungsi sebagai
+grouping key** — combined attempt buat level itu pecah SENYAP: listening ilang dari grup,
+NOL ERROR yang keliatan (bukan crash, bukan pesan — cuma section yang tau-tau nggak nongol di
+combined attempt lagi, persis kayak gejala HSK6 yang awalnya (salah) diduga soal data absen).
+
+**HSK6 sendiri udah ikut pola yang sama** (`set_id:h6-listening-N` skema lama, `title:
+H6XING00N LISTENING` skema baru) — jadi begitu di-publish nanti, combined HSK6 otomatis bakal
+kegrup bareng reading/writing lewat mekanisme title yang sama persis, rapuh yang sama persis.
+
+**Kandidat fix** (keputusan nanti, BUKAN sekarang):
+- (a) Samain `set_id` listening HSK1-5 ke skema baru (`H{level}XING{seq}` konsisten sama
+  reading/writing) — tapi `set_id` kemungkinan direferensiin `question_bank`/`test_attempts`
+  histori lama, jadi ini migrasi data, bukan sekadar rename kolom.
+  bukan cuma nyentuh `test_sets`.
+- (b) Grouping pindah dari `title` ke kolom/skema khusus (mis. kolom `base_code` eksplisit di
+  `test_sets`, diisi programatik bukan dari parsing string judul) — lebih aman dari perubahan
+  copy di masa depan, tapi butuh schema change (kolom baru).
+- (c) Minimal: dokumentasiin eksplisit di kode (`renderMockGroupedList()`) kalau `title` itu
+  DUA FUNGSI SEKALIGUS (label tampilan DAN grouping key) — biar sesi depan yang mau "rapiin
+  copy judul" nggak nyentuh ini tanpa sadar. Ini paling murah, bisa jadi mitigasi sementara
+  sambil (a)/(b) belum diputusin, tapi TETEP nggak dikerjain sesi ini per instruksi eksplisit.
+
+**Kenapa nggak dikerjain sekarang**: audit doang yang diminta, keputusan desain (a) vs (b)
+vs (c) belum diambil, dan (a)/(b) dua-duanya nyentuh area yang lebih luas dari scope HSK6
+listening yang lagi diaudit.
 
 Diputuskan Kyaru + Claude Code, 17 Jul 2026.
 

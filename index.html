@@ -857,15 +857,16 @@
     .qEssayWordList{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px}
     .qEssayWordChip{padding:5px 12px; background:var(--panel); border:1px solid var(--line); border-radius:999px; font-family:var(--hanzi-font); font-size:14px; color:var(--text)}
     .qEssayArticle{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px; margin-bottom:14px; font-size:14px; line-height:1.85; font-family:var(--hanzi-font); white-space:pre-line; max-height:260px; overflow-y:auto}
+    .qEssayImageWrap{margin:0 0 14px; text-align:center}
+    .qEssayImageWrap svg{display:block; max-width:100%; height:auto; margin:0 auto}
     .essayTextarea{width:100%; min-height:160px; padding:12px 14px; background:var(--panel); color:var(--text); border:1px solid var(--line); border-radius:10px; font-size:15px; line-height:1.7; font-family:var(--hanzi-font); resize:vertical; outline:none}
     .essayTextarea:focus{border-color:var(--gold)}
     .essayCharCount{font-size:12px; color:var(--muted); margin:6px 0 14px; text-align:right}
     .essayCharCount.short{color:var(--danger)}
     .essayCharCount.ok{color:var(--ok)}
-    .essayGradeBtn{margin-top:0}
-    .essayGradeBtn:disabled{opacity:.6; cursor:not-allowed}
     .essayResult{margin-top:16px; background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px}
     .essayResultLoading{text-align:center; color:var(--muted); font-size:13px; padding:14px 0}
+    .essayRetryGradeBtn{width:auto; display:block; margin:10px 0 0; padding:7px 16px; font-size:13px}
     .essayScoreRow{display:flex; align-items:baseline; gap:12px; margin-bottom:10px}
     .essayScoreNum{font-size:34px; font-weight:700; color:var(--text)}
     .essayBand{padding:3px 12px; border-radius:999px; font-size:12px; font-weight:700; background:rgba(47,158,91,.12); color:var(--ok)}
@@ -968,24 +969,35 @@
        form pattern) -- toolbar/list/pill styling below reuses this app's own established
        tokens (var(--panel-2)+var(--line) card recipe, .resultBadge pill recipe for status,
        .planBlockLabel small-caps recipe) rather than inventing a new visual language. */
+    .adminHeaderRow{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+    /* Reuses the shared gold button{} base (margin-top/padding/font-size reset only), same
+       minimal-override recipe as .mockSetBtn -- this is a primary action, not an exit control. */
+    .adminAddBtn{ width:auto; margin-top:0; padding:11px 18px; font-size:13.5px; }
+
     .adminToolbar{ display:flex; gap:10px; margin:14px 0 4px; flex-wrap:wrap; }
     .adminToolbar .browseSearchWrap{ flex:1 1 240px; margin:0; }
     .adminFilterSelect{ width:auto; min-width:170px; }
 
+    /* 6 columns: name, email (v1.5, DECISIONS_NEEDED #32 -- was deliberately absent in v1,
+       #31), package, level, status, subscription end. */
     .adminListHead{
-      display:grid; grid-template-columns:2fr 1fr .8fr 1fr 1fr; gap:10px; padding:0 16px;
+      display:grid; grid-template-columns:1.6fr 1.4fr 1fr .8fr 1fr 1fr; gap:10px; padding:0 16px;
       margin-top:18px; font-size:11px; font-weight:800; text-transform:uppercase;
       letter-spacing:.06em; color:rgba(var(--text-rgb),.42);
     }
     .adminList{ margin-top:6px; background:var(--panel-2); border:1px solid var(--line); border-radius:12px; overflow:hidden; }
     .adminRow{
-      display:grid; grid-template-columns:2fr 1fr .8fr 1fr 1fr; gap:10px; align-items:center;
+      display:grid; grid-template-columns:1.6fr 1.4fr 1fr .8fr 1fr 1fr; gap:10px; align-items:center;
       padding:14px 16px; border-bottom:1px solid var(--line); cursor:pointer;
       transition:background .15s ease;
     }
     .adminRow:last-child{ border-bottom:none; }
     .adminRow:hover{ background:var(--panel); }
     .adminRowName{ display:block; font-weight:700; font-size:14px; color:var(--text); }
+    /* Fetched separately via the admin-users Edge Function (listEmails) after the row already
+       rendered from `profiles` alone -- shows "…" until that resolves, "—" if it fails, never
+       fabricated. See loadAdminEmails() / DECISIONS_NEEDED #32. */
+    .adminRowEmail{ font-size:13px; color:var(--muted); overflow-wrap:anywhere; }
     /* display_name NULL (manual Supabase account creation, no raw_user_meta_data) --
        DECISIONS_NEEDED #31: explicit placeholder + UUID sub-identifier, not a blank row. */
     .adminRowNamePlaceholder{ font-style:italic; font-weight:500; color:var(--muted); }
@@ -1536,10 +1548,15 @@
         </div>
       </div>
 
-      <!-- ============ ADMIN — USER MANAGEMENT (v1, DECISIONS_NEEDED #30/#31). Nav item
-           hidden unless profile.role === 'admin'. No email column -- see #31 for why. ============ -->
+      <!-- ============ ADMIN — USER MANAGEMENT (v1 + v1.5, DECISIONS_NEEDED #30/#31/#32).
+           Nav item hidden unless profile.role === 'admin'. Create user + email column both go
+           through the admin-users Edge Function (service_role-gated, is_admin() checked
+           server-side before any privileged call). ============ -->
       <div id="adminCard" class="pageCard admin hidden">
-        <p class="sub" id="adminHeader">User Management</p>
+        <div class="adminHeaderRow">
+          <p class="sub" id="adminHeader">User Management</p>
+          <button type="button" class="adminAddBtn" id="adminAddBtn">+ Add User</button>
+        </div>
 
         <div class="adminToolbar">
           <div class="browseSearchWrap">
@@ -1555,7 +1572,7 @@
         </div>
 
         <div class="adminListHead">
-          <span>Name</span><span>Package</span><span>Level</span><span>Status</span><span>Subscription end</span>
+          <span>Name</span><span>Email</span><span>Package</span><span>Level</span><span>Status</span><span>Subscription end</span>
         </div>
         <div class="adminList" id="adminList"></div>
         <p class="adminCount" id="adminCount"></p>
@@ -1770,6 +1787,7 @@
           articleToSummarize:'Artikel untuk diringkas', yourAnswer:'Jawaban kamu',
           writeAnswerPlaceholder:'Tulis jawabanmu di sini...', gradingLabel:'Menilai...', gradeButtonLabel:'Nilai',
           gradingInProgress:'Sedang menilai jawaban kamu, tunggu beberapa detik...', gradingFailedPrefix:'Gagal menilai:',
+          retryGradingLabel:'Coba nilai lagi',
           essayErrors:'Kesalahan', essayCorrectedVersion:'Versi Diperbaiki', essayStrengths:'Kelebihan', essaySuggestions:'Saran',
           correctAnswerLabel:'Jawaban benar', correctOrderLabel:'Urutan benar', notAnsweredYet:'(belum dijawab)',
           trueLabel:'Benar', falseLabel:'Salah',
@@ -1852,6 +1870,7 @@
           articleToSummarize:'Article to summarize', yourAnswer:'Your answer',
           writeAnswerPlaceholder:'Write your answer here...', gradingLabel:'Grading...', gradeButtonLabel:'Grade',
           gradingInProgress:'Grading your answer, this will take a few seconds...', gradingFailedPrefix:'Grading failed:',
+          retryGradingLabel:'Retry grading',
           essayErrors:'Errors', essayCorrectedVersion:'Corrected Version', essayStrengths:'Strengths', essaySuggestions:'Suggestions',
           correctAnswerLabel:'Correct answer', correctOrderLabel:'Correct order', notAnsweredYet:'(not answered)',
           trueLabel:'True', falseLabel:'False',
@@ -1934,6 +1953,7 @@
           articleToSummarize:'需要概括的文章', yourAnswer:'你的答案',
           writeAnswerPlaceholder:'在这里写下你的答案...', gradingLabel:'评分中...', gradeButtonLabel:'打分',
           gradingInProgress:'正在评分，请稍等几秒...', gradingFailedPrefix:'评分失败：',
+          retryGradingLabel:'重新评分',
           essayErrors:'错误', essayCorrectedVersion:'修改版', essayStrengths:'优点', essaySuggestions:'建议',
           correctAnswerLabel:'正确答案', correctOrderLabel:'正确顺序', notAnsweredYet:'（未作答）',
           trueLabel:'正确', falseLabel:'错误',
@@ -3095,6 +3115,7 @@
      ========================================================== */
   let adminCache = [];
   let adminFiltered = [];
+  let adminEmailMap = {}; // id -> email, filled by loadAdminEmails() (v1.5, DECISIONS_NEEDED #32)
 
   function openAdmin(){
     setActiveNav('admin');
@@ -3105,6 +3126,7 @@
     $('adminPkgFilter').value = 'all';
     $('adminStatusFilter').value = 'all';
     loadAdminUsers();
+    loadAdminEmails();
   }
 
   function closeAdmin(){
@@ -3135,6 +3157,25 @@
     if(error){ alert('Gagal ambil daftar user: ' + error.message); return; }
     adminCache = data || [];
     applyAdminFilter();
+  }
+
+  // Email lives in auth.users, not reachable from the client directly (DECISIONS_NEEDED #31/
+  // #32) -- fetched separately through the admin-users Edge Function and merged in after the
+  // list already rendered from `profiles` alone. Soft-fail on purpose: the list is fully usable
+  // without email (that's how v1 shipped), so a failed/not-yet-deployed function here shouldn't
+  // block the screen -- rows just keep showing "…" in that column, never a fabricated value.
+  async function loadAdminEmails(){
+    try{
+      const { data, error } = await sb.functions.invoke('admin-users', { body:{ action:'listEmails' } });
+      if(error) throw error;
+      adminEmailMap = (data && data.emails) || {};
+    }catch(e){
+      console.error('loadAdminEmails failed:', e);
+      adminEmailMap = {};
+    }
+    // Runs in parallel with loadAdminUsers() -- only re-render if the list has already loaded
+    // at least once, otherwise this races ahead of it and briefly flashes an empty list.
+    if(adminCache.length > 0) renderAdminList();
   }
 
   function applyAdminFilter(){
@@ -3170,8 +3211,13 @@
       const pkgLabel = PACKAGE_BADGE_LABEL[p.package] || p.package || '—';
       const statusCls = p.status === 'active' ? 'active' : 'expired';
       const statusLabel = p.status === 'active' ? 'Active' : 'Expired';
+      // "…" until loadAdminEmails() resolves, "—" if that call failed/hasn't been made yet --
+      // never fabricated, never left silently blank (same rule as #31's other placeholders).
+      const emailText = Object.prototype.hasOwnProperty.call(adminEmailMap, p.id)
+        ? (adminEmailMap[p.id] || '—') : '…';
       row.innerHTML = `
         <div class="adminRowMain">${nameHTML}</div>
+        <span class="adminRowEmail">${escapeHTML(emailText)}</span>
         <span class="adminPkgPill">${escapeHTML(pkgLabel)}</span>
         <span class="adminLevelText">${p.target_level ? 'HSK ' + p.target_level : '—'}</span>
         <span class="adminStatusPill ${statusCls}">${statusLabel}</span>
@@ -3314,6 +3360,146 @@
     if(error){ alert('Gagal menonaktifkan: ' + error.message); btn.disabled = false; return; }
     closeModal();
     loadAdminUsers();
+  }
+
+  /* ==========================================================
+     ADMIN — CREATE USER (v1.5, DECISIONS_NEEDED #32)
+     Goes through the admin-users Edge Function (service_role-gated server-side, see that
+     function's own gate). Password is set directly by the admin, not emailed/invited --
+     accepted as debt in #32, must be revisited before a second admin exists or packages are
+     sold commercially.
+     ========================================================== */
+  function openCreateUserModal(){
+    const pkgOptionsHTML = Object.keys(PACKAGE_LEVELS).map(key=>{
+      const noContent = PACKAGE_LEVELS[key].length === 0;
+      const label = (PACKAGE_BADGE_LABEL[key] || key) + (noContent ? ' (belum ada konten)' : '');
+      return `<option value="${key}"${key === 'hsk_1_4' ? ' selected' : ''}>${escapeHTML(label)}</option>`;
+    }).join('');
+    const levelOptionsHTML = `<option value="" selected>— Not set —</option>` +
+      [1,2,3,4,5,6].map(lv => `<option value="${lv}">HSK ${lv}</option>`).join('');
+    const statusOptionsHTML = STATUS_OPTIONS.map(s=>
+      `<option value="${s}"${s === 'active' ? ' selected' : ''}>${s === 'active' ? 'Active' : 'Expired'}</option>`
+    ).join('');
+    const roleOptionsHTML = ROLE_OPTIONS.map(r=>
+      `<option value="${r.value}"${r.value === 'user' ? ' selected' : ''}>${escapeHTML(r.label)}</option>`
+    ).join('');
+
+    openModal('Add User', `
+      <label for="createEmail">Email</label>
+      <input type="email" id="createEmail" placeholder="user@example.com" />
+
+      <label for="createPassword">Password</label>
+      <input type="password" id="createPassword" placeholder="Set password for this user" />
+      <p class="adminFieldHint">Password ini yang akan diberikan langsung ke user untuk login pertama kali — pastikan disampaikan lewat kanal privat, bukan chat publik.</p>
+
+      <label for="createName">Display name</label>
+      <input type="text" id="createName" placeholder="(opsional)" />
+
+      <label for="createPackage">Package</label>
+      <select id="createPackage">${pkgOptionsHTML}</select>
+
+      <label for="createLevel">Target level</label>
+      <select id="createLevel">${levelOptionsHTML}</select>
+
+      <label for="createStatus">Status</label>
+      <select id="createStatus">${statusOptionsHTML}</select>
+
+      <label for="createSubEnd">Subscription end</label>
+      <input type="date" id="createSubEnd" />
+
+      <label for="createRole">Role</label>
+      <select id="createRole">${roleOptionsHTML}</select>
+
+      <p class="adminFieldWarning hidden" id="createError"></p>
+
+      <div class="modalActions">
+        <div class="modalActionsRight">
+          <button type="button" class="modalBtn ghost" id="createCancelBtn">Cancel</button>
+          <button type="button" class="modalBtn primary" id="createSubmitBtn">Create</button>
+        </div>
+      </div>
+    `);
+
+    $('createCancelBtn').addEventListener('click', closeModal);
+    $('createSubmitBtn').addEventListener('click', submitCreateUser);
+  }
+
+  // Extracts the Edge Function's own {error:"..."} body out of a FunctionsHttpError -- without
+  // this, a non-2xx response (400/401/403/500) surfaces supabase-js's generic "non-2xx status
+  // code" message instead of the specific reason (invalid email, admin gate rejection, etc.).
+  async function extractFunctionErrorMessage(error){
+    if(error && error.context && typeof error.context.json === 'function'){
+      try{
+        const body = await error.context.json();
+        if(body && body.error) return body.error;
+      }catch(_e){ /* body wasn't JSON -- fall through to generic message */ }
+    }
+    return (error && error.message) || String(error);
+  }
+
+  async function submitCreateUser(){
+    const errEl = $('createError');
+    errEl.classList.add('hidden');
+    errEl.textContent = '';
+
+    const email = $('createEmail').value.trim();
+    const password = $('createPassword').value;
+    if(!email || !password){
+      errEl.textContent = 'Email dan password wajib diisi.';
+      errEl.classList.remove('hidden');
+      return;
+    }
+
+    const btn = $('createSubmitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Creating...';
+
+    const payload = {
+      action: 'createUser',
+      email,
+      password,
+      display_name: $('createName').value.trim() || null,
+      package: $('createPackage').value,
+      target_level: $('createLevel').value || null,
+      status: $('createStatus').value,
+      subscription_end: $('createSubEnd').value || null,
+      role: $('createRole').value
+    };
+
+    const { data: result, error } = await sb.functions.invoke('admin-users', { body: payload });
+
+    if(error){
+      const msg = await extractFunctionErrorMessage(error);
+      btn.disabled = false;
+      btn.textContent = 'Create';
+      errEl.textContent = 'Gagal membuat user: ' + msg;
+      errEl.classList.remove('hidden');
+      return;
+    }
+
+    if(result && result.status === 'partial'){
+      // DECISIONS_NEEDED #32 -- partial failure must never look like success. The auth user and
+      // a default profiles row both exist (recoverable via Edit modal); admin must be told
+      // explicitly, not left thinking the form's package/level/status settings applied.
+      closeModal();
+      alert('User dibuat, TAPI setting paket/level/status gagal:\n' + result.error +
+        '\n\nUser sudah muncul di list dengan setting default -- perbaiki lewat Edit modal.');
+      loadAdminUsers();
+      loadAdminEmails();
+      return;
+    }
+
+    if(!result || result.status !== 'ok'){
+      btn.disabled = false;
+      btn.textContent = 'Create';
+      errEl.textContent = (result && result.error) || 'Gagal membuat user (unknown error).';
+      errEl.classList.remove('hidden');
+      return;
+    }
+
+    closeModal();
+    loadAdminUsers();
+    loadAdminEmails();
   }
 
   /* ==========================================================
@@ -3756,6 +3942,7 @@
   let attemptShowTranslation = false;
   let attemptGroupSets = null;              // != null kalau ini exam gabungan (tab Semua)
   let attemptSectionBreaks = new Map();      // index soal -> label section, buat pemisah antar bagian
+  let attemptLastReviewArr = [];             // cache reviewArr terakhir, buat re-render pas retry grading esai
 
   async function startAttempt(setId){
     const { data: setRow, error: setErr } = await sb
@@ -4042,20 +4229,14 @@
     if(p.article){
       html += `<div class="qEssayLabel">${t('articleToSummarize')}</div><div class="qEssayArticle">${p.article}</div>`;
     }
+    if(p.task_type === 'picture_essay' && p.image_svg){
+      html += `<div class="qEssayImageWrap">${p.image_svg}</div>`;
+    }
 
     html += `<div class="qEssayLabel">${t('yourAnswer')}</div>
       <textarea class="essayTextarea" data-qid="${q.id}" placeholder="${escapeHtml(t('writeAnswerPlaceholder'))}">${escapeHtml(text)}</textarea>
-      <div class="essayCharCount ${cls}" id="essayCharCount-${q.id}">${label}</div>
-      <button class="essayGradeBtn" data-qid="${q.id}" ${answer?.grading ? 'disabled' : ''}>${answer?.grading ? t('gradingLabel') : t('gradeButtonLabel')}</button>
-      <div class="essayResult${(!answer?.grading && !answer?.ai_error && !answer?.ai_result) ? ' hidden' : ''}" id="essayResult-${q.id}">${renderEssayResultHTML(answer)}</div>`;
+      <div class="essayCharCount ${cls}" id="essayCharCount-${q.id}">${label}</div>`;
     return html;
-  }
-
-  function renderEssayResultHTML(answer){
-    if(answer?.grading) return `<div class="essayResultLoading">${t('gradingInProgress')}</div>`;
-    if(answer?.ai_error) return `<div class="essayResultLoading" style="color:var(--danger)">${t('gradingFailedPrefix')} ${escapeHtml(answer.ai_error)}</div>`;
-    if(answer?.ai_result) return buildEssayResultHTML(answer.ai_result);
-    return '';
   }
 
   function buildEssayResultHTML(g){
@@ -4083,13 +4264,15 @@
     return html;
   }
 
+  // Dipanggil dari submitAttempt() (batch, paralel lewat Promise.all) dan dari retry di halaman
+  // review -- makanya nggak pernah throw (network error ketangkep sendiri) dan nggak nge-render
+  // apa-apa; pemanggil yang nentuin kapan/apa yang di-render ulang.
   async function gradeEssay(q){
     const answer = attemptAnswers[q.id] || {};
     const text = (answer.essay_text || '').trim();
-    if(!text){ alert(t('errEssayEmpty')); return; }
+    if(!text) return;
 
     attemptAnswers[q.id] = { ...answer, grading: true, ai_error: null };
-    if(attemptQuestions[attemptIndex]?.id === q.id) renderAttemptQuestion();
 
     const p = q.payload;
     const body = {
@@ -4101,19 +4284,24 @@
       article: p.article,
       min_chars: p.min_chars,
       target_chars: p.target_chars,
+      scene_cn: p.scene_cn,
       student_text: text,
       question_id: q.id,
       set_id: attemptSet.set_id
     };
 
-    const { data, error } = await sb.functions.invoke('grade-essay', { body });
-    const current = attemptAnswers[q.id] || {};
-    if(error || !data || data.error){
-      attemptAnswers[q.id] = { ...current, grading:false, ai_error: (data && data.error) || error?.message || t('errGradingFailed') };
-    } else {
-      attemptAnswers[q.id] = { ...current, grading:false, ai_error:null, ai_result: data };
+    try {
+      const { data, error } = await sb.functions.invoke('grade-essay', { body });
+      const current = attemptAnswers[q.id] || {};
+      if(error || !data || data.error){
+        attemptAnswers[q.id] = { ...current, grading:false, ai_error: (data && data.error) || error?.message || t('errGradingFailed') };
+      } else {
+        attemptAnswers[q.id] = { ...current, grading:false, ai_error:null, ai_result: data };
+      }
+    } catch(e){
+      const current = attemptAnswers[q.id] || {};
+      attemptAnswers[q.id] = { ...current, grading:false, ai_error: e?.message || t('errGradingFailed') };
     }
-    if(attemptQuestions[attemptIndex]?.id === q.id) renderAttemptQuestion();
   }
 
   function renderAttemptNav(){
@@ -4153,10 +4341,13 @@
     const out = {};
     attemptQuestions.forEach(q => {
       if(!isQuestionAnswered(q)) return;
-      // Buat esai cuma kirim teksnya — bukan state UI (grading/ai_result), itu udah
-      // kesimpen sendiri lewat essay_submissions pas panggil grade-essay.
+      // Esai: essay_text + hasil grading (ai_result/ai_error) ikut dikirim ke submit_attempt,
+      // nempel ke test_attempts.answers (kolom jsonb, RPC nyimpen p_answers apa adanya, nol
+      // migrasi). Belum ada yang baca balik data ini (DECISIONS_NEEDED #35) -- ini cuma nulis,
+      // biar nggak nulis ulang pas fitur "buka attempt lama" beneran dibangun.
       if(q.question_type === 'essay'){
-        out[q.id] = { essay_text: attemptAnswers[q.id].essay_text };
+        const a = attemptAnswers[q.id];
+        out[q.id] = { essay_text: a.essay_text, ai_result: a.ai_result || null, ai_error: a.ai_error || null };
       } else if(q.question_type === 'char_input'){
         out[q.id] = { correct: attemptAnswers[q.id].correct.trim() };
       } else {
@@ -4174,6 +4365,18 @@
     }
     stopAttemptTimer();
     $('attemptSubmitBtn').disabled = true;
+
+    // Semua esai (essay_text non-kosong) digrading sekali di sini, paralel -- jumlahnya kecil
+    // per test (2-5 soal), jadi paralel jauh lebih cepat daripada berurutan tanpa risiko rate
+    // limit berarti (satu murid, satu kali submit). Satu gagal nggak nge-throw (gradeEssay udah
+    // nangkep errornya sendiri) jadi nggak pernah nge-gagalin submit yang lain.
+    const essayQs = attemptQuestions.filter(q => q.question_type === 'essay' && (attemptAnswers[q.id]?.essay_text || '').trim());
+    if(essayQs.length){
+      $('attemptSubmitBtn').textContent = t('gradingLabel');
+      await Promise.all(essayQs.map(q => gradeEssay(q)));
+      $('attemptSubmitBtn').textContent = t('submitBtn');
+    }
+
     const answers = gatherAttemptAnswers();
     const timeTaken = attemptSet.time_limit_seconds - Math.max(0, Math.round((attemptDeadline - Date.now()) / 1000));
 
@@ -4429,6 +4632,7 @@
   }
 
   function renderReview(reviewArr){
+    attemptLastReviewArr = reviewArr;
     resultAudio.pause();
     delete resultAudio.dataset.currentSrc;
 
@@ -4552,8 +4756,9 @@
     return html;
   }
 
-  // Penilaian esai dilakukan langsung pas ngerjain (tombol "Nilai / 提交"), bukan lewat submit_attempt.
-  // Jadi review-nya ambil dari attemptAnswers yang masih ada di memori sesi ini, bukan dari `item`.
+  // Penilaian esai dijalanin otomatis sekali pas submitAttempt(), bukan per-soal lagi. Review-nya
+  // masih ambil dari attemptAnswers yang ada di memori sesi ini (bukan dari `item`) -- lihat
+  // DECISIONS_NEEDED #35 soal kenapa ini belum selamat dari refresh.
   function buildReviewEssay(p, item, savedAnswer){
     let html = `<div class="reviewStem">${p.prompt || ''}</div>`;
     if(p.prompt_id) html += `<div class="reviewStemTrans">${p.prompt_id}</div>`;
@@ -4561,12 +4766,28 @@
     const text = savedAnswer?.essay_text || '';
     html += `<div class="reviewExplain"><span class="reviewExplainLabel">${t('yourAnswer')}</span>${text ? escapeHtml(text) : t('notAnsweredYet')}</div>`;
 
+    if(!text) return html; // nggak dijawab -> nggak ada yang digrading, nggak perlu blok AI
+
     if(savedAnswer?.ai_result){
       html += `<div class="essayResult" style="margin-top:10px">${buildEssayResultHTML(savedAnswer.ai_result)}</div>`;
+    } else if(savedAnswer?.grading){
+      html += `<div class="essayResultLoading" style="margin-top:10px">${t('gradingInProgress')}</div>`;
     } else {
-      html += `<div class="reviewExplain"><span class="reviewExplainLabel">Penilaian AI</span>Belum dinilai saat pengerjaan.</div>`;
+      const errMsg = savedAnswer?.ai_error || t('errGradingFailed');
+      html += `<div class="essayResultLoading" style="margin-top:10px; color:var(--danger)">${t('gradingFailedPrefix')} ${escapeHtml(errMsg)}
+        <button type="button" class="essayRetryGradeBtn" data-qid="${item.id}">${t('retryGradingLabel')}</button>
+      </div>`;
     }
     return html;
+  }
+
+  async function retryGradeEssayReview(qid){
+    const q = attemptQuestions.find(qq => String(qq.id) === String(qid));
+    if(!q) return;
+    const pending = gradeEssay(q);
+    renderReview(attemptLastReviewArr);
+    await pending;
+    renderReview(attemptLastReviewArr);
   }
 
   /* ---------- events ---------- */
@@ -4592,6 +4813,7 @@
   $('adminSearch').addEventListener('input', applyAdminFilter);
   $('adminPkgFilter').addEventListener('change', applyAdminFilter);
   $('adminStatusFilter').addEventListener('change', applyAdminFilter);
+  $('adminAddBtn').addEventListener('click', openCreateUserModal);
   $('mockTestBtn').addEventListener('click', ()=> navTo(openMockList));
   $('mockListExitBtn').addEventListener('click', closeMockList);
   $('mockList').addEventListener('click', e=>{
@@ -4641,10 +4863,6 @@
       renderAttemptQuestion();
       return;
     }
-    const gradeBtn = e.target.closest('.essayGradeBtn');
-    if(gradeBtn){
-      gradeEssay(q);
-    }
   });
   $('attemptBody').addEventListener('input', e=>{
     const ta = e.target.closest('.essayTextarea');
@@ -4670,7 +4888,11 @@
       renderQuestionGrid();
     }
   });
-  $('resultReview').addEventListener('click', e=>{ handleAudioPlayerClick(e, resultAudio); });
+  $('resultReview').addEventListener('click', e=>{
+    if(handleAudioPlayerClick(e, resultAudio)) return;
+    const retryBtn = e.target.closest('.essayRetryGradeBtn');
+    if(retryBtn) retryGradeEssayReview(retryBtn.dataset.qid);
+  });
 
   $('navBeranda').addEventListener('click', ()=> navTo(goBerandaContent));
   $('navLatihan').addEventListener('click', ()=> navTo(openMockList));

@@ -1006,4 +1006,173 @@ pola: **setiap dropdown yang mewakili kolom DB nullable/open-ended butuh opsi ek
 untuk "kosong"/"tidak dikenal", jangan andalkan browser default-select.** Kalau ada dropdown
 lain ditambahkan ke admin panel nanti (mis. saat Create user v1.5), cek ulang pola ini duluan.
 
+## 32. Admin panel v1.5 (create user + email) — implementation decisions
+
+Edge Function baru `admin-users` (2 action: `createUser`, `listEmails`), satu gerbang admin di
+awal sebelum client service_role/secret dibuat — full reasoning ada di komentar kode
+(`supabase/functions/admin-users/index.ts`). Ringkasan keputusan:
+
+**Secret key: `SUPABASE_SECRET_KEYS['default']`, bukan `SUPABASE_SERVICE_ROLE_KEY`.** Diverifikasi
+langsung ke project ini (`supabase projects api-keys`) sebelum dipakai, bukan asumsi dari
+dokumentasi doang — legacy service_role dikonfirmasi ditandai deprecated (target akhir 2026 per
+Supabase), key baru `sb_secret_...` di project ini sudah ada duluan (sejak 2026-07-08) dengan
+`secret_jwt_template.role === "service_role"` (privilege identik). Diputuskan Kyaru, 17 Jul 2026.
+
+**Password: opsi (a), admin set langsung di Create modal.** Sama persis alur manual yang sudah
+jalan sekarang (Kyaru bikin akun, Kyaru set password, Kyaru kasih ke murid) — nol regresi.
+**DEBT, dicatat eksplisit**: acceptable karena Kyaru satu-satunya admin & sudah tahu credential
+murid di alur manual sekarang. **WAJIB direvisi sebelum** (1) ada admin kedua selain owner, atau
+(2) paket dijual komersial — admin tidak boleh tahu credential murid. Opsi upgrade nanti: invite
+email (butuh SMTP, belum dicek statusnya) atau must-change-password flag (butuh kolom baru di
+`profiles`). Diputuskan Kyaru, 17 Jul 2026.
+
+**Partial failure (createUser sukses, UPDATE profiles gagal): tidak pernah dilaporkan sebagai
+sukses.** Response `207` + pesan eksplisit ke UI ("User dibuat tapi setting paket/level gagal —
+perbaiki lewat Edit modal"), bukan silent success. User itu tetap muncul di list dengan default
+DB (`hsk_1_4`/`active`/`user`) — recoverable via Edit modal yang sudah ada. **Tidak ada
+rollback/delete-on-failure**: tidak ada RLS DELETE policy, dan delete auth user CASCADE ke
+`user_mastery`/`test_attempts`/dll — terlalu bahaya buat automatic recovery path. Diputuskan
+Kyaru, 17 Jul 2026.
+
+**`listUsers` page size**: single-page fetch (`perPage: 200`), cukup di skala sekarang (2 user).
+**Revisit item, bukan dikerjain sekarang**: kalau jumlah user tembus ~50, butuh pagination beneran.
+
+**Deploy + verifikasi live, 2026-07-17**: `admin-users` deployed (`supabase functions deploy`,
+status `ACTIVE`). Diverifikasi dari 2 arah:
+- Tanpa kredensial (curl langsung, tanpa `Authorization` / dengan token palsu): ditolak `401` di
+  **platform gateway Supabase** (`verify_jwt` layer), request tidak pernah nyampe kode function.
+- Dari browser Kyaru yang login admin beneran: `listEmails` **SUKSES** —
+  `{"data":{"emails":{...2 user...}},"error":null}`. Ini mengonfirmasi dua hal sekaligus: gerbang
+  `is_admin()` di dalam function jalan (bukan cuma platform layer), **dan** kekhawatiran soal
+  supabase-js issue #1568 (`bad_jwt` dari `auth.admin.*` dengan key format baru) **tidak
+  terjadi** — `SUPABASE_SECRET_KEYS['default']` jalan apa adanya lewat `auth.admin.listUsers()`.
+  **Fallback ke `SUPABASE_SERVICE_ROLE_KEY` TIDAK dipakai** — komentar di kode yang menjelaskan
+  fallback itu dibiarkan sebagai catatan konteks, bukan langkah yang perlu diambil.
+
+`createUser` (satu-satunya action yang benar-benar menulis data — bikin auth user beneran di
+project live) **belum diverifikasi** — sengaja ditunda, Kyaru yang akan test end-to-end lewat
+browser sendiri (bukan Claude, biar tidak ada auth user tidak sengaja tercipta dari sesi testing).
+
+## 33. BUG — session guard's `signOut()` kills the session that just won, not just the old one
+
+Ditemukan saat verifikasi admin v1.5 (`createUser` gagal "Invalid session" padahal baru login).
+
+`forceLogout()` (`index.html:2330-2338`) manggil `sb.auth.signOut()` tanpa `scope` arg — default
+supabase-js adalah `'global'`, yang mencabut **semua sesi user itu di semua device**, bukan cuma
+sesi yang manggil `forceLogout()`. Single-device enforcement maunya: login di device B nendang
+device A (device lama). Yang beneran kejadian: login di device B nendang device A **DAN**
+device B ikut mati juga — karena device A yang kalah klaim tetap jalanin `forceLogout()` →
+`signOut()` global → server cabut sesi device B (yang justru baru menang) bareng sesi device A.
+UI device B tidak sadar (state lokal — `currentUser`/tampilan login — tidak disentuh, karena
+listener `watchSession` di device B sendiri tidak pernah mismatch), sampai ada request yang
+divalidasi server (contoh nyata: `admin-users` Edge Function-nya `auth.getUser()`) baru ketauan
+sesinya udah dicabut.
+
+**Ini bug, bukan fitur jalan sesuai desain** — dampak nyata ke user biasa: ganti device/browser
+bisa bikin login sebelumnya ikut mati tanpa alasan jelas ke user itu sendiri, bukan cuma
+device lama yang seharusnya ke-invalidate.
+
+**Fix kandidat**: `sb.auth.signOut({ scope: 'local' })` di `forceLogout()` — hanya mencabut sesi
+device yang manggil, bukan semua device. **Belum dikerjakan** — perlu sesi tersendiri +
+verifikasi (dampak ke seluruh alur single-device enforcement, bukan perubahan sepele), sengaja
+tidak dikerjakan sambil verifikasi admin v1.5 supaya nggak nyampur dua perubahan berbeda scope.
+Ditemukan saat verifikasi admin v1.5, 17 Jul 2026.
+
+## 34. Root cause "permission denied for table profiles" — RESOLVED, GRANT-level, bukan soal key sama sekali
+
+3 ronde sebelumnya (default `sb_secret_` client, `persistSession:false` client, fallback ke
+`SUPABASE_SERVICE_ROLE_KEY`) **salah didiagnosis sebagai isu key format**. Akar masalah
+sebenarnya: `service_role` **tidak punya GRANT DML di `public` schema** — cek langsung ke
+`profiles`: cuma `REFERENCES, TRIGGER, TRUNCATE`, **NOL SELECT/INSERT/UPDATE/DELETE**. `vocab`
+sama persis — ini **project-wide**, bukan spesifik `profiles`. `anon` juga ter-revoke (nggak
+punya SELECT di `profiles`). Kemungkinan sisa security hardening lama. Nggak pernah kedeteksi
+sebelumnya karena app selalu jalan sebagai `authenticated` (grant lengkap) — makanya Edit modal
+(client-side, sesi admin `authenticated`) selalu sehat, sementara `admin-users` (server-side,
+`service_role`/`anon`) selalu kena, apapun format key-nya.
+
+`"permission denied for table"` itu error **level-GRANT**, bukan level-RLS-policy — persis
+seperti yang diidentifikasi dari awal, cuma penyebabnya bukan yang dikira (bukan `sb_secret_`
+gagal dikonversi jadi JWT `service_role` di gateway — itu teori yang masuk akal berdasarkan
+riset dokumentasi, tapi terbantahkan empiris: grant yang beneran hilang, bukan
+role-recognition-nya).
+
+**Fix**: `grant select, insert, update on public.profiles to service_role;` — **sengaja TANPA
+DELETE**, konsisten dengan keputusan #30 (delete permanen dicoret, FK CASCADE bahaya) —
+pertahanan berlapis, bukan cuma soal RLS.
+
+**RESOLVED, dikonfirmasi empiris — bukti before/after, kode identik nol redeploy antara dua
+titik ini**:
+- **test5 (sebelum grant)**: `package`/`target_level`/`subscription_end` semua default/NULL —
+  UPDATE tertolak total, konsisten sama test2/test3.
+- **test6 (sesudah grant)**: `package=vip` ✅, `target_level=6` ✅, `subscription_end=2026-07-31`
+  ✅ — status 200, nol alert, nol `207`. `admin-users` tetap v3 (`SUPABASE_SERVICE_ROLE_KEY`,
+  legacy JWT) di kedua test, **tidak ada perubahan kode/deploy di antaranya** — satu-satunya
+  variabel yang berubah adalah grant DB. Ini mengunci kesimpulan: root cause GRANT-level,
+  bukan format key.
+
+**`sb_secret_` TIDAK bermasalah.** Kandidat balik ke `SUPABASE_SECRET_KEYS` sekarang terbuka lagi
+(sesuai alasan awal #32: legacy key ditarget deprecated akhir 2026) — **belum dikerjakan di
+commit ini**, sengaja diverifikasi satu perubahan per satu waktu (grant dulu, key nanti kalau mau
+dicoba lagi), jangan gabung dua perubahan dalam satu langkah.
+
+**Anomali "Mimilll" — CLOSED, bukan hantu.** `target_level=6` di Mimilll ternyata datang dari
+**Edit modal** (Kyaru sempat ngedit Mimilll buat tes package=VIP secara terpisah, target_level
+ikut kesentuh di sesi edit yang sama), **bukan** dari `createUser`'s UPDATE. Edit modal jalan
+sebagai sesi `authenticated` (grant lengkap, nggak pernah kena masalah GRANT ini) — jadi
+konsisten 100% sama root cause: `createUser` (jalur `service_role`) Mimilll sebenarnya **gagal
+total** sama seperti test2/test3, cuma hasil edit belakangan bikin datanya kelihatan "sebagian
+sukses". Nggak ada jalur kedua, nggak ada flakiness — cuma dua aksi (create yang gagal + edit
+manual belakangan) yang keliatannya satu peristiwa.
+
+Ditemukan & diselesaikan Kyaru, 17 Jul 2026.
+
+## 35. Essay AI-grading pindah ke submit-time — review-reload & retry-persist DIUTANGKAN, bukan dibangun
+
+Konteks: tombol "Nilai" per-soal esai dihapus. Semua esai (essay_text non-kosong) sekarang
+digrading otomatis sekali, paralel, pas murid pencet Submit — hasilnya (`ai_result`/`ai_error`)
+langsung kepakai buat skor rata-rata dan halaman review, persis kayak alur lama, cuma pemicunya
+pindah dari klik tombol ke event submit.
+
+**Dicek dulu (via `supabase db query --linked`, skema di-inspect langsung, bukan nebak)**:
+- `test_attempts.answers` — kolom `jsonb`, dan `submit_attempt()` nyimpen `p_answers` **apa
+  adanya, tanpa validasi bentuk**. Artinya nempelin `ai_result`/`ai_error` ke entry esai di
+  `gatherAttemptAnswers()` itu **gratis** — nol migrasi, nol kolom baru. Ini SUDAH dikerjakan
+  (write-through) di `gatherAttemptAnswers()`.
+- `essay_submissions` (ai_score/ai_feedback) sudah ada dan sudah nerima insert di setiap
+  panggilan `grade-essay`, tapi murni audit log tulis-doang — nggak punya `attempt_id` (nggak
+  bisa dikorelasiin ke attempt tertentu kalau murid ngulang set yang sama), dan **tidak ada satu
+  pun kode di frontend yang baca tabel ini balik**.
+- `submit_attempt()` return value (`score/total_points/correct_count/total_questions/review`)
+  **tidak termasuk `id` baris `test_attempts` yang baru diinsert**.
+- Halaman Riwayat cuma nampilin ringkasan (`score/correct_count/total_questions/created_at`) —
+  **tidak ada satupun jalur kode yang buka ulang satu attempt lama dan rebuild halaman review
+  item-per-item dari situ.** Ini berlaku buat SEMUA tipe soal, bukan cuma esai — refresh browser
+  di halaman review hari ini sudah menghilangkan review reading_mc/fill_blank/ordering juga,
+  karena seluruh `renderReview()` cuma jalan sekali dari return value RPC + `attemptAnswers` di
+  memori, nggak pernah dibangun ulang dari data tersimpan.
+
+**Diputuskan DIUTANGKAN, bukan dikerjakan sekarang** (dua item, satu paket):
+1. **RPC `submit_attempt` balikin `id` attempt yang baru diinsert.** Perubahan kecil (`insert
+   ... returning id into v_id`, tambahin ke `jsonb_build_object`), tapi tetap perubahan fungsi
+   backend yang dipakai semua submit, jadi butuh keputusan eksplisit, bukan nyelip di tengah task
+   lain.
+2. **Fitur "buka ulang attempt lama"** — baca balik satu baris `test_attempts`, join ulang ke
+   `question_bank` buat `correct_answer`/`is_correct`, rebuild `buildReviewHTML()` dari situ.
+   Baru fitur ini yang bikin halaman review bisa selamat dari refresh — buat SEMUA tipe soal,
+   bukan cuma esai.
+
+**Kenapa retry-grading-di-review nggak sekalian ditulis ke DB sekarang**: nilainya nol tanpa #2.
+Kalau retry nulis ke `test_attempts` sekarang padahal belum ada yang baca balik, itu nambah
+kerumitan (ubah signature RPC + `UPDATE` di client) demi data yang nggak pernah kepakai. #1 itu
+bagian dari #2, bukan pekerjaan berdiri sendiri — dikerjain bareng pas #2 beneran dibangun, biar
+`id` attempt yang dibalikin RPC dipakai buat dua-duanya sekaligus (reload awal + update abis
+retry).
+
+**Apa yang tetap jalan meski dua ini diutangin**: retry tombol grading di halaman review tetap
+ada dan berguna DALAM SATU SESI (grading gagal → pencet Retry → berhasil, tanpa ngulang test).
+Cuma nggak selamat dari refresh — dan itu konsisten, karena review-nya sendiri juga nggak
+(bukan regresi baru, cuma belum pernah ada dari awal).
+
+Diputuskan Kyaru + Claude Code, 17 Jul 2026.
+
 Nothing else pending a decision right now.

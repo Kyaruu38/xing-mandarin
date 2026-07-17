@@ -1,3 +1,76 @@
+# Handoff — session 8 (session guard bug, #33)
+
+Scope: **cuma §33** — bug session guard yang ditemukan sampingan pas verifikasi admin v1.5
+(session 7). Report-first + diagnosis-before-fix, sama pola kayak sesi-sesi sebelumnya.
+
+## Session guard fix: DONE, APPROVED, COMMITTED — `e274984`
+
+Full writeup: DECISIONS_NEEDED #33 (RESOLVED).
+
+**Bug asli**: `forceLogout()` manggil `sb.auth.signOut()` tanpa `scope` arg — default supabase-js
+`'global'`, mencabut **semua sesi user itu di semua device**. Single-device enforcement maunya
+device baru (B) nendang device lama (A); yang beneran kejadian: device A yang kalah klaim, dalam
+proses nge-logout dirinya sendiri, ikut nyabut sesi device B yang justru baru menang. Ketemu pas
+2 tab (live + localhost) login bareng buat testing admin panel — `createUser` gagal "Invalid
+session" padahal baru login.
+
+**Temuan penting sebelum fix**: `SESSIONS_SINGLE_PER_USER` di Supabase Dashboard **OFF dan
+nggak bisa dinyalain** (fitur Pro plan ke atas, project ini Free plan). Konsekuensi ganda:
+1. Mekanisme custom `active_session_id`/`claim_session` **satu-satunya** cara enforce
+   single-device di sini — bukan lapisan redundan di atas fitur native GoTrue.
+2. Kondisi itu **persis** precondition bug upstream `supabase/auth#2036` ("local logout
+   invalidates all sessions") — jadi opsi fix yang dipertimbangkan (`{scope:'local'}` vs
+   `{scope:'others'}`) punya risiko nyata, bukan teoretis, kena bug itu juga.
+
+**Arsitektur baru — enforcement pindah arah, bukan cuma ganti scope**:
+- **Sebelum**: device yang KALAH klaim (A) bunuh diri sendiri (`signOut()` global) pas ketauan
+  ketendang lewat realtime. Enforcement-nya reaktif, bergantung tab A nyala + connect realtime.
+- **Sekarang**: device yang MENANG klaim (B) yang aktif nendang — `doLogin()` manggil
+  `signOut({scope:'others'})` **persis setelah** `claim_session` sukses. Device A ke-revoke di
+  server **nggak peduli A online/offline** — nutup bug §33 (B nggak lagi ikut mati) **dan** gap
+  lama yang baru ketauan (A offline pas ditendang = sesinya idup selamanya sebelum fix ini) dalam
+  satu perubahan.
+- `watchSession()`'s realtime handler + `boot()`'s stale-session check **nggak manggil
+  `signOut()` lagi sama sekali** — diganti `localLogout()` (fungsi baru): bersih state lokal +
+  tampilin pesan "logged in elsewhere" doang, karena sesinya udah dicabut di server oleh device
+  pemenang. Ini murni cleanup/UX sekarang, bukan sumber enforcement.
+- 3 titik `gateReason` (subscription expired/lewat tanggal — `loadProfile`, `doLogin`, `boot`)
+  **tetap `global` scope, sengaja** (langganan abis = wajar ke-logout di semua device) — cuma
+  sekarang eksplisit (`forceLogout(reason, 'global')`), bukan kebetulan dari argumen kosong.
+- Titik lain (`logoutBtn` manual, profil gagal fetch, `claim_session` RPC gagal) — **nol
+  perubahan**, `forceLogout()` tanpa argumen kedua = byte-identical ke perilaku lama.
+- **Error handling**: kalau `signOut({scope:'others'})` gagal setelah `claim_session` sukses
+  (network hiccup dsb.) — best-effort, `console.error` eksplisit + login tetap lanjut (nggak ada
+  rollback bersih buat `claim_session` yang udah commit). Risiko sisa cuma di skenario ganda
+  (kick gagal + device lama kebetulan offline bebarengan) — diterima, bukan dikerjain retry.
+
+**Verifikasi — 2 ronde, sesuai standing rule "tes empiris, jangan tebak"**:
+1. **Sebelum implementasi**: 2 browser context terpisah, `sb.auth.signInWithPassword()` dipanggil
+   langsung dari console (skip `claim_session`, isolasi murni perilaku Supabase Auth) — B
+   `signOut({scope:'others'})`, verifikasi B selamat (`getUser()` sukses) DAN A mati (403 dari
+   server, `AuthSessionMissingError`, dites tanpa reload halaman A supaya kebukti pencabutan
+   beneran server-side bukan cuma state lokal). `#2036` **tidak terpicu** meskipun kondisinya
+   match.
+2. **Setelah implementasi, di kode fix (`localhost:8796`, bukan live)**: login 2 device beda —
+   device A dapet pesan "logged in elsewhere" ✅, device B **selamat total** (masuk dashboard,
+   buka mock test H5XING002 100 soal, timer+audio jalan normal) ✅, dikonfirmasi query nyata
+   (`profiles.select`) dari console B sukses = sesi B valid di server, bukan cuma UI ✅.
+
+## Commit sesi ini
+
+- **`e274984`** — `index.html` (fix) + `DECISIONS_NEEDED.md` (§33 RESOLVED).
+
+**Sengaja TIDAK di-commit** (sama seperti sesi 7): `supabase/functions/grade-essay/index.ts` —
+perubahan uncommitted di file itu bukan dari sesi ini, dibiarkan apa adanya.
+
+## Belum dikerjakan / kandidat follow-up (nggak berubah dari sesi 7)
+
+- Balik `admin-users` Edge Function ke `SUPABASE_SECRET_KEYS` sekarang grant DB udah benar (#34).
+- Must-change-password flag / invite-email buat admin v1.5's create-user (#31).
+- RLS-by-package sebelum paket dijual komersial (#22).
+
+---
+
 # Handoff — session 7 (admin panel v1.5, create user + email)
 
 Scope: **Edge Function untuk create user + email column**, gated behind admin v1 (session 6,

@@ -1392,4 +1392,138 @@ dikonfirmasi fixed.**
 
 Diputuskan + diverifikasi Kyaru + Claude Code, 17 Jul 2026.
 
+## 42. Gap #2 (RLS server-side enforcement) — audit lanjutan: RLS/GRANT/function snapshot + urutan eksekusi disepakati
+
+Lanjutan #22 Gap #2. Audit sebelumnya (dalam sesi ini, sebelum entry ini ditulis) nemuin
+sebagian besar RLS tabel (`test_sets`/`question_bank`/`profiles`/`user_mastery`) + 5 helper
+function (`is_admin`, `claim_session`, `submit_attempt`, plus 2 yang baru ketauan:
+`handle_new_user`, `rls_auto_enable`) **nggak ada di SQL yang di-track repo** — cuma idup di
+Supabase Dashboard, sama pola drift kayak GRANT fix session 7 (#34). Sebelum nulis policy
+baru, Kyaru jalanin 6 query read-only lewat SQL Editor (Claude nggak punya akses) buat dump
+kondisi asli. Hasil lengkap (yang berhasil ke-capture): `sql/04_rls_snapshot.sql`.
+
+**CAPTURE LENGKAP**: 5 percobaan pertama paste query 2/2b/4/6 gagal (placeholder text doang,
+bukan data — Kyaru sendiri konfirmasi belakangan itu placeholder yang ketinggalan, bukan data
+ilang), ditandain PENDING dulu biar nggak ada yang dikarang. Percobaan berikutnya semua 6
+query berhasil ke-paste sebagai data asli. `sql/04_rls_snapshot.sql` sekarang lengkap, nol
+section PENDING.
+
+### Temuan — SEMUA dikonfirmasi lewat dump asli (query 1-6, `sql/04_rls_snapshot.sql`)
+
+1. **`vocab` punya 2 policy SELECT** — `vocab_select_authenticated` (role `{authenticated}`,
+   ADA di `sql/01_vocab_schema.sql`) DAN `public read vocab` (role `{public}`, `USING(true)`,
+   **TIDAK ADA di file manapun di repo**). `{public}` di Postgres otomatis nyakup `anon` —
+   ini persis mekanisme di balik drift yang udah kekonfirmasi 2 sesi lalu (anon bisa `SELECT
+   vocab` padahal komentar file bilang enggak). Sekarang punya nama policy persis, bukan cuma
+   dugaan dari perilaku REST.
+2. **`test_sets read published`** (`is_published=true OR is_admin()`) dan **`qbank read
+   published`** (`is_admin() OR EXISTS(...s.is_published)`) — **nol referensi ke hsk_level
+   atau paket apapun**. Konfirmasi persis temuan audit sebelumnya (raw REST tanpa filter
+   balikin semua 150 baris `test_sets`, semua level).
+3. **`user_mastery`/`test_attempts` row-isolation — SEKARANG KEBUKTI**, sebelumnya
+   "inconclusive" (akun test nol data, nggak bisa mastiin). `own mastery rw` (`auth.uid() =
+   user_id`, semua command) + `admin reads mastery` terpisah; `attempts own
+   select`/`attempts own insert` (`user_id = auth.uid()` (OR `is_admin()` buat select)).
+   **Bener, nggak perlu disentuh.**
+4. **`profiles` nol policy "user updates own profile"** — cuma admin insert/update, user
+   cuma bisa baca baris sendiri. Konsisten sama nggak adanya fitur edit-profil-sendiri di
+   app — dicatet sebagai observasi, bukan gap (belum ada fitur yang butuh itu).
+5. **Semua 5 function `SECURITY DEFINER=true`**, termasuk 2 yang baru ketauan
+   (`handle_new_user`, `rls_auto_enable`) — source lengkap tiap function sekarang ADA di
+   `sql/04_rls_snapshot.sql` section 6 (query 6, real dump).
+6. **`rls_forced=false` di semua 6 tabel** (default Supabase, owner/superuser tetep bypass
+   RLS-nya sendiri) — konteks teknis kenapa `submit_attempt` (SECURITY DEFINER) bisa nembus
+   proteksi kolom `question_bank.answer`/`explanation`.
+7. **`submit_attempt` balikin `answer`+`explanation` buat `set_id` APAPUN, nol cek paket —
+   DIKONFIRMASI 1:1 dari source live** (query 6, bukan lagi cross-reference ke file repo).
+   SECURITY DEFINER nembus column GRANT yang bener-bener ngelindungin `answer`/`explanation`
+   (dikonfirmasi query 4 — cuma 8 dari 11 kolom yang di-GRANT SELECT ke `authenticated`,
+   `answer`/`explanation`/`created_at` sengaja nggak masuk). Source live nulis
+   `'correct_answer': r.answer, 'explanation': r.explanation` ke `v_review` buat tiap soal
+   non-essay, dikirim balik ke caller RPC manapun, nol cek level/paket di seluruh function
+   body. **Ini lubang TERBESAR** — lebih gede dari RLS tabel, karena nembus proteksi yang
+   UDAH bener (column grant), dan kena SEMUA user (bukan cuma yang di luar paket) — user
+   `hsk_1_4` yang sah pun bisa panen kunci jawaban HSK1-4 yang dia bayar tanpa ngerjain soal
+   beneran, karena RPC ini nggak peduli itu percobaan "asli" atau bukan.
+8. **`rls_auto_enable`** — event trigger, DIKONFIRMASI dari source live (query 6): pada
+   `CREATE TABLE` di schema `public`, otomatis jalanin `ALTER TABLE ... ENABLE ROW LEVEL
+   SECURITY` — dan CUMA itu, nol policy pernah ditambahin sama function ini. Relevan buat
+   rencana bikin `package_levels` (kalau opsi migrasi-ke-tabel dari #41's poin 3 diambil):
+   tabel baru bakal RLS-enabled otomatis + nol policy = default-deny total, termasuk ke app
+   sendiri. **Harus direncanain eksplisit** (bikin policy READ buat `authenticated` di sesi/
+   migrasi yang SAMA pas tabelnya dibuat), bukan diasumsikan "nanti nyala sendiri kalau udah
+   ada datanya."
+9. **`handle_new_user`** — DIKONFIRMASI dari source live (query 6): trigger bikin baris
+   `profiles` pas user baru signup, `insert into profiles (id, display_name) values (new.id,
+   ...)` — **cuma 2 kolom itu doang yang diisi**. `package`, `role`, `status`,
+   `subscription_end`, `target_level` semua nggak disentuh function ini, jatuh ke DB default
+   masing-masing (DDL `profiles` sendiri nggak ke-track di repo, jadi default persisnya nggak
+   diketahui dari sini — tapi function-nya sendiri konfirmasi nggak pernah nyetel eksplisit).
+   `profiles.package` NULL buat user baru itu konsekuensi LANGSUNG dari sini, bukan bug di
+   tempat lain. Beda sama catatan lama soal `target_level` NULL (yang udah ada fallback JS:
+   `PACKAGE_LEVELS[profile.package] || PACKAGE_LEVELS.hsk_1_4`, aman di client) — **kalau
+   nanti RLS ditulis langsung ngerujuk `profiles.package` di SQL, perbandingan `package =
+   'hsk_1_4'` di Postgres balikin `NULL`/false buat user yang package-nya NULL, BUKAN
+   otomatis fallback ke hsk_1_4 kayak JS**. Policy SQL yang naif bakal default-deny total
+   buat user yang belum di-set admin, beda perilaku sama app hari ini. Harus ditangani
+   eksplisit kalau/pas RLS per-paket ditulis.
+10. **Anomali GRANT `service_role` — DIKONFIRMASI query 2/2b, LEBIH LUAS dari laporan awal.**
+    Awalnya dilaporkan "nol SELECT di `vocab` doang." Dump asli nunjukin polanya jauh lebih
+    lebar — tabulasi per tabel:
+    - `profiles`: INSERT, SELECT, UPDATE (+ REFERENCES/TRIGGER/TRUNCATE) — **lengkap**, satu-
+      satunya tabel yang lengkap.
+    - `question_bank` / `test_sets`: SELECT doang — **nol INSERT/UPDATE/DELETE**.
+    - `test_attempts` / `user_mastery` / `vocab`: **NOL SELECT JUGA** (cuma REFERENCES/
+      TRIGGER/TRUNCATE) — 3 tabel, bukan cuma vocab.
+    `profiles` lengkap itu bukan kebetulan — itu persis tabel yang di-GRANT manual di session
+    7 (`#34`, abis `admin-users` Edge Function kena "permission denied for table profiles").
+    Fix itu nggak pernah di-extend ke 5 tabel lain — kelimanya masih di state yang sama
+    persis kayak `profiles` SEBELUM `#34` dibenerin. Resiko konkret: Edge Function
+    `service_role` manapun ke depan (pipeline audio, dsb.) yang nyentuh salah satu dari 5
+    tabel ini bakal kena "permission denied" identik sama saga `#34`, tinggal nunggu
+    ke-trigger.
+11. **BARU, ketauan dari perbandingan source live vs tracked file — `submit_attempt` drift
+    beneran, bukan cuma teori.** Live version (query 6) nge-`continue` duluan buat soal essay
+    SEBELUM `v_total := v_total + 1` sempet jalan — jadi `v_total` (-> `total_questions` di
+    response RPC dan baris `test_attempts`) **cuma ngitung soal non-essay**. Tracked file
+    (`sql/03_submit_attempt_essay.sql`) nge-increment `v_total` TANPA SYARAT buat SETIAP baris
+    sebelum cek `question_type`, dan komentarnya sendiri eksplisit bilang "soal essay tetap
+    dihitung di total_questions (biar progress "soal ke-N dari total" tetap benar)". Live
+    behavior sekarang KONTRADIKSI niat yang tertulis di file — buat section writing yang
+    100% essay (HSK3+, per #9 prereq 3), `total_questions` balik `0`, bukan jumlah soal
+    beneran. Ini bug korektnes yang HIDUP SEKARANG, di luar scope Gap #2 (bukan soal
+    security), ketemu sebagai efek samping dump ini. **Belum ditriase, belum difix** —
+    dicatet di sini karena ini persis kelas drift yang lagi dicari sesi ini.
+
+### Urutan eksekusi Gap #2 — DISEPAKATI Kyaru + Claude Code, 17 Jul 2026
+
+**`submit_attempt` fix DULUAN, RLS tabel per-paket NYUSUL.** Bukan urutan sembarang — alasan:
+
+- **Blast radius lebih gede**: RLS tabel yang bocor (poin 2 di atas) itu "orang liat konten
+  di luar paketnya" — nggak enak, tapi masih di dalam pagar (harus login, baca kolom yang
+  emang boleh dibaca). `submit_attempt` (poin 7) nembus pagar yang UDAH bener (column grant)
+  dan kena SEMUA user termasuk yang di dalam paketnya sendiri — integritas exam bolong dari
+  dalem, bukan cuma soal batas paket.
+- **Scriptable, nol UI**: nggak perlu exploit RLS, tinggal panggil RPC-nya langsung buat
+  `set_id` manapun — satu script bisa nyapu seluruh bank soal.
+- **Nol dependency ke keputusan `package_levels`** (#41 poin 3 — RLS tabel per-paket butuh
+  itu duluan sebagai prasyarat, `PACKAGE_LEVELS` sekarang cuma ada di JS, nol representasi
+  DB). Fix `submit_attempt` versi paling minimal (jangan pernah balikin `correct_answer`/
+  `explanation` asli lewat RPC) nggak butuh tau paket user itu apa — bisa jalan duluan,
+  independen.
+- **Lebih isolated buat diverifikasi**: satu function, satu `CREATE OR REPLACE`, gampang
+  dites terpisah (panggil sebelum/sesudah, cek `v_review` nggak lagi bawa jawaban asli).
+  RLS tabel per-paket itu proyek lebih gede (exempt anon word-of-day, tetep izinin COUNT
+  buat level locked biar #41 nggak regresi, handle histori mastery user yang levelnya
+  sekarang di luar paket) — resiko regresi lebih tinggi, pantas sesi sendiri.
+
+**Catatan**: benerin `submit_attempt` doang NGGAK nutup semua lubang — user tetep bisa baca
+TEKS soal (bukan jawabannya) di luar paketnya lewat `startAttempt(setId)` langsung (poin 2
+RLS tabel, jalur beda). Dua-duanya tetep harus dibenerin, cuma `submit_attempt` duluan.
+
+**Belum ditulis SQL fix apapun** — sesi ini scope-nya audit + dump doang, per instruksi
+eksplisit.
+
+Diputuskan Kyaru + Claude Code, 17 Jul 2026.
+
 Nothing else pending a decision right now.

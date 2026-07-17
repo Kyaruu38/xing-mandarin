@@ -1647,4 +1647,102 @@ terpisah.**
 
 Diputuskan Kyaru + Claude Code, 17 Jul 2026.
 
+## 45. `listeningAudioUrl`/`listeningImageUrl` crash pada `image_tf` di 10 set `H1XING001`-`H1XING010` — verdict: CODE issue, JANGAN DIKERJAIN SEKARANG
+
+Ditemuin pas verifikasi live bug ratchet-disabled (lihat sesi ini) — `submitAttempt(true)` di
+`H1XING001` sukses tapi `showResult()`/`renderReview()` MELEDAK:
+```
+TypeError: Cannot read properties of undefined (reading 'replace')
+  at Qt._getFinalPath ... at Qt.getPublicUrl ...
+  at listeningAudioUrl (index.html:4043) at renderAudioPlayer (index.html:4057)
+  at buildReviewTF (index.html:4202) ... at renderReview (index.html:4981) at showResult
+```
+Muncul lagi pas `renderAttemptQuestion()` (bukan cuma review) kena soal `image_tf` yang sama.
+
+**Sebab persis**: `renderImageTF()` (:4144-4153) dan `buildReviewTF()` (:4201-4217)
+**UNCONDITIONAL** manggil `renderAudioPlayer(p.audio_url)` di baris PERTAMA function-nya —
+nol cek apakah `p.audio_url` ada. `listeningAudioUrl()`/`listeningImageUrl()` (:4042-4047)
+manggil `sb.storage.from(...).getPublicUrl(path)` — kalau `path` `undefined`, supabase-js
+internal (`_getFinalPath`) coba `.replace()` di situ, throw.
+
+**Verdict, dicek langsung ke DB (bukan tebakan)**: `question_type='image_tf'` punya **DUA
+BENTUK PAYLOAD BEDA** tergantung asal datanya —
+- **`h1-listening-*`/`h2-listening-*`** (20 set, 150 baris): payload `{audio_url, image_url,
+  transcript}` — cocok sama yang dibutuhin `renderImageTF`/`buildReviewTF`. **Aman, nggak
+  crash.**
+- **`H1XING001` s/d `H1XING010`** (10 set, TEPAT 50 baris — SEMUA `image_tf` di set ini):
+  payload `{choices, image_svg, statement, instruction, statement_id, instruction_id}` — **NOL
+  `audio_url`, NOL `image_url`** (gambar-nya di key `image_svg`, kemungkinan inline SVG, bukan
+  path Supabase Storage). Ini dataset yang lebih baru (seri mock-exam `H{level}XING{seq}`) —
+  rendererernya nggak pernah di-update buat bentuk payload ini. **200 total baris `image_tf` di
+  seluruh tabel = 150+50, pas — nggak ada `image_tf` di tempat lain, jadi 10 set ini scope-nya
+  PERSIS dan LENGKAP, bukan sampling.**
+
+**Ini bukan cuma "review pecah"** — `renderImageTF()` dipanggil dari `renderAttemptQuestion()`
+juga (attempt LAGI JALAN, bukan cuma abis submit). Artinya siswa yang ngerjain salah satu dari
+10 set `H1XING00N` ini bisa **crash pas soal-nya sendiri lagi dijawab**, bukan cuma pas liat
+hasil — lebih parah dari yang kekira awalnya.
+
+**Kenapa CODE issue, bukan data issue**: data-nya nggak "kosong"/rusak — `image_svg` ADA dan
+keisi (bukan `null`), cuma field-nya beda nama dari yang dibaca renderer. Ini dua skema payload
+yang legit buat 2 generasi konten beda, dan renderer cuma pernah di-tulis buat skema yang lama.
+
+**Kenapa nggak dikerjain sekarang**: perlu keputusan desain (apakah `image_tf` di seri
+`H*XING*` emang sengaja audio-less + pakai `image_svg` inline sebagai standar baru, atau itu
+sendiri gap konten yang belum lengkap — dua-duanya nentuin bentuk fix beda: guard-doang vs
+render `image_svg` beneran). Di luar scope bug ratchet-disabled yang lagi dikerjain. **Kandidat
+follow-up sesi terpisah — 10 set (`H1XING001`-`010`) diblokir/nggak disaranin dipake buat demo
+sampai ini kelar.**
+
+Diputuskan Kyaru + Claude Code, 17 Jul 2026.
+
+## 46. `attemptSubmitBtn` ratchet — disabled selamanya abis 1 submit sukses, RESOLVED
+
+**Gejala**: klik "Retake test" abis submit sukses → tombol Submit di layar attempt pudar/nggak
+bisa dipencet. Awalnya dikira bug retake-spesifik, ternyata **session-wide**: SEMUA attempt
+berikutnya kena (retake ATAU fresh set dari Mock List), bukan cuma retake.
+
+**Akar masalah**: `attemptSubmitBtn.disabled` cuma disentuh 3 tempat di seluruh file —
+`= true` di awal `submitAttempt()` (:4705), `= false` di 2 cabang ERROR-nya doang
+(:4736 combined, :4793 single). **Nol reset di jalur SUKSES** — begitu satu submit berhasil,
+tombolnya mati permanen sampe reload halaman. Murni bug client-side, NOL hubungan ke fix
+`submit_attempt` SQL malem ini (#42-45) — pola exit-point-reset ini emang udah salah dari
+sebelum sesi ini mulai, ketauan sekarang cuma karena kebetulan lagi ngetes ulang jalur submit.
+
+**Fix — DONE, entry-point reset, bukan tambahan exit-point ke-4**: `$('attemptSubmitBtn').
+disabled = false;` ditambahin di AWAL `startAttempt()` (:4283-an) dan `startCombinedAttempt()`
+(:4328-an) — 2 baris doang, `submitAttempt()` nol disentuh. Alasan pilih entry-point ketimbang
+nambahin reset ke-4 di exit `submitAttempt()` (atau `finally` block): 2 fungsi ini KEBUKTI
+(grep, bukan asumsi) satu-satunya jalur yang nampilin `attemptCard` — reset di sini otomatis
+nutup SEMUA cara sebelumnya bisa gagal reset (sukses tanpa reset, error tak terduga, bahkan
+crash kayak #45), tanpa perlu tau/enumerate persis kenapa state sebelumnya kotor. `finally` di
+`submitAttempt()` ditolak eksplisit — kalau `submitAttempt()` crash (kayak #45), user udah
+pindah ke `resultCard` (bukan `attemptCard`), jadi reset tombol Submit di sana sia-sia; entry-
+point reset tetep nutup efek lanjutannya pas user Retake, `finally` enggak.
+
+**Verifikasi — live, login segar, satu tab, NOL reload sepanjang tes** (wajib, karena bug ini
+session-scoped — reload di tengah nyembunyiin gejalanya). **Catatan proses**: percobaan
+pertama verifikasi ternyata nge-test kode LAMA — browser nge-cache `index.html` (server statis
+lokal, nol cache-busting header), fresh reload biasa nggak narik file yang baru diedit. Ketauan
+karena `startAttempt.toString()` yang lagi jalan di tab nggak ngandung kode baru sama sekali.
+Dibenerin pake cache-busted URL (`?v=2`), dikonfirmasi kode baru beneran ke-load sebelum
+lanjut — dicatet biar sesi depan nggak kejebak hal yang sama kalau pake pola local-server yang
+sama.
+
+Sesudah itu, urutan lengkap **5 submit berturut-turut, nol reload, HSK2 Reading**
+(`H2XING002`/`H2XING003`, dipilih spesifik karena dikonfirmasi nol `image_tf` — hindarin #45):
+1. `H2XING002` submit pertama → sukses (`0/100`), `resultCard` muncul.
+2. Retake → `disabled:false` (BENAR, sebelumnya bakal `true`) → submit lagi → sukses.
+3. Balik Mock List → `H2XING003` (set BEDA) → `disabled:false` → submit → sukses.
+4. Retake `H2XING003` lagi → `disabled:false` → submit → sukses (submission ke-4 berturut,
+   nol reload — buktiin ratchet-nya beneran mati, bukan cuma mundur satu langkah).
+5. Ganti ke dark mode (di tengah sesi yang sama, nol reload) → Retake sekali lagi →
+   `disabled:false`, dikonfirmasi VISUAL juga (tombol gold penuh, bukan `opacity:.6` pudar) →
+   submit ke-5 → sukses.
+
+Console dibaca di tiap titik (awal, abis tiap submit, abis ganti theme) — **bersih total, nol
+error**, di semua 5 submission, light maupun dark.
+
+Diputuskan + diverifikasi Kyaru + Claude Code, 17 Jul 2026.
+
 Nothing else pending a decision right now.

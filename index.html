@@ -4280,6 +4280,14 @@
   let attemptLastReviewArr = [];             // cache reviewArr terakhir, buat re-render pas retry grading esai
 
   async function startAttempt(setId){
+    // Entry-point reset, not exit-point: submitAttempt() only re-enables this on its error
+    // branches (never on success), and there's no way to enumerate every way submitAttempt()
+    // could fail to reach one of those branches (see DECISIONS_NEEDED #46 for the ratchet bug
+    // this closes, and #45 for a concrete crash that proves the exit-point approach doesn't
+    // generalize). Every entry into the attempt screen goes through here or
+    // startCombinedAttempt() (confirmed -- only 2 places in this file remove('hidden') on
+    // attemptCard), so resetting here covers retake, Mock List, and any future entry path.
+    $('attemptSubmitBtn').disabled = false;
     const { data: setRow, error: setErr } = await sb
       .from('test_sets').select('set_id,hsk_level,section,title,time_limit_seconds,total_questions')
       .eq('set_id', setId).single();
@@ -4318,6 +4326,8 @@
   // Tab "Semua": gabungkan semua set yang berbagi kode dasar jadi satu attempt berkelanjutan.
   // Urutan section: listening -> reading -> writing (SECTION_ORDER), lalu urutan set, lalu order_index.
   async function startCombinedAttempt(code, groupSetsRaw){
+    // See startAttempt()'s identical line -- entry-point reset, DECISIONS_NEEDED #46.
+    $('attemptSubmitBtn').disabled = false;
     const groupSets = groupSetsRaw.slice().sort((a,b) => sectionRank(a.section) - sectionRank(b.section));
     const setIds = groupSets.map(s => s.set_id);
 

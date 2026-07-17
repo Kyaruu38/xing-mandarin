@@ -1,3 +1,125 @@
+# Handoff — session 12 (Gap #2 step 2 APPLIED to live + submit-button ratchet fix, #42-46)
+
+Scope: continuation of Gap #2 (server-side enforcement audit, #22/#41/#42) — this session took
+the RLS/GRANT/function snapshot from #42 and shipped the first real fix (`submit_attempt`'s
+`is_published` gate), then caught and fixed an unrelated pre-existing bug surfaced by testing
+that fix. Report-first at every step (plan → approve → SQL/code → verify → commit), same
+pattern as every prior session in this sequence.
+
+## `submit_attempt` is_published gate: DONE, APPROVED, VERIFIED LIVE, COMMITTED — `1500c94`
+
+Full writeup: DECISIONS_NEEDED #42 (audit + agreed fix order: `submit_attempt` before table
+RLS) → #43 (this fix, plus the essay-`total_questions` "fix" that was proposed, investigated,
+and REJECTED — would have broken the #9 scoring formula for mixed objective+essay sections;
+live behavior there was already correct, the OLD comment in `sql/03_submit_attempt_essay.sql`
+was wrong, not the code).
+
+**What shipped**: `sql/05_submit_attempt_gap2_fixes.sql` — one `CREATE OR REPLACE`, one real
+change: reject `p_set_id` that doesn't match a published `test_sets` row. Previously
+`submit_attempt` (SECURITY DEFINER) never checked `is_published` at all, meaning it could be
+called directly for a draft/unpublished set and its answer key harvested through the RPC even
+though the underlying `question_bank.answer`/`explanation` columns are correctly
+column-GRANT-protected from direct SELECT (confirmed in #42's dump). **Verified live**: before
+the fix, an unpublished set (`hsk6-reading-1`) returned `200` from the RPC; after, `400`
+(`"set not found or not published"`). Normal submissions on published sets unaffected.
+
+**Explicitly NOT done** (per #43): no throttle/rate-limit on repeated submissions (considered,
+rejected — `startCombinedAttempt()` calls this RPC 3x in seconds for a combined HSK3-6
+attempt, so any distinct-set-per-time-window threshold false-positives on a single legitimate
+combined attempt, and a patient script could still nibble under any threshold anyway). The
+underlying exam-integrity gap (server has no way to distinguish a genuine submission from a
+scripted empty one — the real fix needs a server-tracked attempt-session token, which needs new
+schema) is **accepted as open debt**, logged, with an explicit trigger: must be built before any
+non-insider paying user exists. RLS-by-package on `vocab`/`test_sets`/`question_bank` (the
+other half of Gap #2) is still not started — blocked on the `package_levels` source-of-truth
+decision from #41/#42, deliberately sequenced after this fix per #43's reasoning.
+
+## Submit-button ratchet bug: DONE, APPROVED, VERIFIED LIVE, COMMITTED
+
+Found while verifying the `is_published` fix above (user noticed "Retake test" left Submit
+permanently disabled) — audited first (no code), traced the real mechanism, then fixed.
+
+**Root cause** (DECISIONS_NEEDED #46): `attemptSubmitBtn.disabled` was only ever touched in 3
+places — set `true` at the start of `submitAttempt()`, reset `false` in its 2 error branches.
+**Zero reset on the success path.** Not a retake-specific bug — session-wide: once any
+submission succeeds, every subsequent attempt (retake OR a completely different fresh set from
+Mock List) inherits the stale `disabled=true`, since both paths call the same
+`startAttempt()`/`startCombinedAttempt()` and neither ever reset it. Confirmed via live console
+testing that "fresh start works" and "retake doesn't" was never a real behavioral difference —
+both are equally broken once triggered; the user's belief came from testing sequence, not code
+divergence. Pure client-side, zero relation to the `submit_attempt` SQL change.
+
+**Fix**: `$('attemptSubmitBtn').disabled = false;` added at the very start of both
+`startAttempt()` and `startCombinedAttempt()` — confirmed (grep) these are the only 2 places in
+the whole file that un-hide `attemptCard`, so this is a complete fix, not a partial one.
+Deliberately NOT a `finally` block in `submitAttempt()` (considered, rejected) — entry-point
+reset self-heals regardless of *why* the previous attempt didn't clean up (success without
+reset, RPC error, or an unrelated crash like #45 below), where a `finally` only guards
+`submitAttempt()`'s own execution and doesn't help once the user has already moved to
+`resultCard` and clicks Retake.
+
+**Verification caught a real process trap, logged in #46 so it doesn't repeat**: the first
+verification pass tested stale cached JS — the local static server has no cache-busting
+headers, so a normal reload didn't pick up the edited `index.html`, and the test would have
+falsely reported PASS against the old, still-broken code. Caught by checking
+`startAttempt.toString()` in the live tab before trusting any result. Fixed by forcing a
+cache-busted URL (`?v=2`) and re-confirming the new source was actually loaded before
+re-running verification. **Standing note for future sessions using this same local-server
+pattern**: always confirm the served code is current before trusting a verification result,
+same spirit as #38's "syntax check isn't verification" rule.
+
+**Verified live**: 5 submissions in a row, one tab, zero reload (deliberately — this bug is
+session-scoped, a reload would have hidden it): submit A → retake → submit → back to Mock List
+→ different set B → submit → retake B → submit → switch to dark mode (no reload) → retake →
+submit. `disabled` correctly `false` before every single submit, console clean throughout,
+light and dark both checked.
+
+## Logged, not fixed this session
+
+- **#44**: `submit_attempt`'s error path (`errSubmitFailedNamed`/`.replace()`) was never
+  exercised in production before this session's `is_published` fix made real errors possible —
+  surfaced a likely frontend crash (`TypeError: Cannot read properties of undefined (reading
+  'replace')`) on the combined-attempt error branch. Real scenario: admin unpublishes a set
+  while a student already has it open. Out of scope (frontend error-handling, not Gap #2/RLS),
+  needs its own diagnosis session.
+- **#45**: `listeningAudioUrl()`/`listeningImageUrl()` crash unconditionally when a question's
+  payload lacks `audio_url`/`image_url` — found live while investigating the ratchet bug.
+  Root-caused precisely (queried the DB directly, not guessed): `image_tf` questions have two
+  incompatible payload shapes in this data — the older `h1-listening-*`/`h2-listening-*` sets
+  (150 rows, has `audio_url`/`image_url`, renders fine) vs. the newer `H1XING001`-`H1XING010`
+  mock-exam sets (exactly 50 rows, ALL of them — uses `image_svg` inline instead, no audio at
+  all). `renderImageTF()`/`buildReviewTF()` unconditionally assume the older shape. Verdict:
+  **code issue** (renderer never updated for the newer payload shape), not missing data. Worse
+  than "review breaks" — `renderImageTF()` also runs during the live timed attempt, so a student
+  can crash mid-exam on any of these 10 sets. Flagged as blocking those 10 sets from demo use
+  until fixed. Needs a design decision first (is `image_svg`-no-audio the intended new standard,
+  or a content gap) before a fix shape can be chosen. Not started.
+
+## Commits this session
+
+- `1500c94` — `submit_attempt` is_published gate (`sql/05_submit_attempt_gap2_fixes.sql`,
+  DECISIONS_NEEDED #42/#43 corrections).
+- (this entry's commit) — submit-button ratchet fix (`index.html`), DECISIONS_NEEDED #44/#45/#46.
+
+**Sengaja TIDAK di-commit** (sama seperti semua sesi sebelumnya): `supabase/functions/
+grade-essay/index.ts` — perubahan uncommitted di file itu bukan dari sesi manapun di urutan
+ini, dibiarkan apa adanya.
+
+## Belum dikerjakan / kandidat follow-up
+
+- **#44** — frontend crash on `submit_attempt` error path, needs its own session.
+- **#45** — `image_tf` payload-shape crash on 10 `H1XING00N` sets, needs a design decision then
+  a fix, blocks those sets from demo use meanwhile.
+- **Gap #2 remainder** — RLS-by-package on `vocab`/`test_sets`/`question_bank`, blocked on
+  `package_levels` source-of-truth decision (#41/#42).
+- **Exam-integrity structural gap** (#43) — accepted debt, server-tracked attempt-session
+  needed before any non-insider paying user.
+- Carried over, unchanged: admin `service_role` GRANT gaps on 5/6 tables (#42 finding 10),
+  `handle_new_user`'s `profiles.package` NULL-by-construction (#42 finding 9), `rls_auto_enable`
+  implications for any future new table (#42 finding 8).
+
+---
+
 # Handoff — session 11 (1000-row PostgREST cap — dashboard/raport/Kamus/user_mastery, #41)
 
 Scope: user reported "Progress by Level" denominators wrong (HSK4 `404` instead of `598`, HSK5

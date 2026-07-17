@@ -1229,4 +1229,45 @@ Cuma nggak selamat dari refresh — dan itu konsisten, karena review-nya sendiri
 
 Diputuskan Kyaru + Claude Code, 17 Jul 2026.
 
+## 36. `.msg.lock` hardcodes `--gold`'s rgba expansion — small debt, not urgent
+
+Kamus's locked-level inline note (`browseLevelLockedMsg`, DECISIONS_NEEDED #22 wiring session)
+uses a new `.msg` modifier, `.msg.lock` (`index.html` ~line 205), styled navy-on-gold instead of
+`.err`'s red/warning language — this is an upsell message ("you don't own this yet"), not an
+error the user caused, so red was rejected. Value: `rgba(242,176,30,X)` in 3 places (background/
+border, light + dark) — this is `--gold` (`#F2B01E`) expanded to decimal, not an invented color.
+
+**Debt**: hardcoded literally, same as `.msg.err`/`.msg.ok` already are (neither has a shared
+`--danger-rgb`/`--ok-rgb` companion var either — this matches existing convention, not a new
+problem). Consequence: if `--gold` is ever retuned, these 3 `rgba()` values won't follow —
+silent drift, no error thrown. **Not worth fixing now** (only 3 usages, one component). Pay this
+if/when a `--gold-rgb` companion var gets introduced generally (mirroring the existing
+`--text-rgb`/`--muted-rgb` pattern) — at that point, swap these 3 to `rgba(var(--gold-rgb),X)` in
+the same pass rather than one-off.
+
+Diputuskan Kyaru + Claude Code, 17 Jul 2026.
+
+## 37. IA RESOLVED — Materials = hub, Kamus adalah anaknya (opsi (d) dari #23, konteks penuh di #22)
+
+Ditemukan sepanjang sesi wiring Vocab Deck/gating (#22): dua pintu masuk ke Kamus dengan label
+sama-sama "Materi"/"Materials" tapi tujuan beda (`navMateri` → langsung Kamus, `browseBtn` →
+hub) — IA pecah, versi kebalik dari temuan #23 ("three names, one screen"). Ini yang disebut
+Kyaru sebagai "#21" di sesi ini secara lisan; entri file yang cocok sebenarnya **#22** (hub
+build) dan **#23** (opsi (d): satu label nav konsisten) — dicatat di sini biar nggak nyasar
+kalau ada yang nyari "#21" nanti.
+
+**RESOLVED**: Materials = hub secara definitif. Kamus/`browseCard` bukan tujuan nav sendiri
+lagi, statusnya anak dari hub (dibuka lewat kartu Vocab Deck). Kedua pintu masuk (`navMateri`
+sidebar, `browseBtn` dashboard quick action) sekarang **sama-sama** → `openMaterialsHub()`,
+byte-identical, nol pengecualian.
+
+**Konsekuensi**: `openBrowse()` sekarang cuma punya satu caller nyata (`hubCardVocab`, selalu
+`origin:'hub'`) — `browseOrigin` praktis selalu `'hub'` sekarang. Cabang `'dash'` (fallback
+default kalau `openBrowse()` dipanggil tanpa argumen) **sengaja tidak dihapus** — disiapkan
+kalau nanti dashboard quick action dipisah lagi jadi tujuan sendiri (bukan lewat hub). Fix
+terkait (label tombol exit Kamus ngikut `browseOrigin`, bukan hardcode "Back to Dashboard") ada
+di komit yang sama.
+
+Diputuskan Kyaru + Claude Code, 17 Jul 2026.
+
 Nothing else pending a decision right now.

@@ -200,6 +200,17 @@
     [data-theme="dark"] .msg.err{ background:rgba(214,69,69,.15); color:#FF9C9C; border-color:rgba(214,69,69,.4); }
     .msg.err::before{ content:'⚠️'; flex-shrink:0; }
     .msg.ok{display:block; background:rgba(47,158,91,.08); color:var(--ok); border:1px solid rgba(47,158,91,.25)}
+    /* Locked-content note (DECISIONS_NEEDED #22) -- deliberately NOT .err: this isn't a mistake
+       the user made, it's an upsell ("you don't have this yet"), so no red/warning language.
+       rgba(242,176,30,X) below is --gold (#F2B01E) expanded to decimal, same technique .err/.ok
+       already use for their own rgba blends -- not a new color. KNOWN DEBT: hardcoded like
+       .err/.ok are, so if --gold is ever retuned these 3 values won't follow silently. Pay when/
+       if a --gold-rgb companion var gets introduced (mirrors --text-rgb/--muted-rgb's existing
+       pattern) -- not needed now, only 3 usages. Only browseLevelLockedMsg uses this modifier;
+       login's .msg stays .err/.ok only. */
+    .msg.lock{display:flex; align-items:flex-start; gap:8px; background:rgba(242,176,30,.14); color:var(--navy); border:1px solid rgba(242,176,30,.4);}
+    .msg.lock::before{ content:'🔒'; flex-shrink:0; }
+    [data-theme="dark"] .msg.lock{ background:rgba(242,176,30,.18); color:var(--gold); border-color:rgba(242,176,30,.45); }
     .foot{margin-top:22px; text-align:center; color:var(--muted); font-size:13px}
     .foot b{ color:var(--text); }
 
@@ -486,6 +497,14 @@
       box-shadow:0 2px 8px -4px rgba(var(--text-rgb),.15);
     }
     button.levelBtn.active{ background:var(--gold); color:var(--navy); box-shadow:none; }
+    /* Locked-visible (DECISIONS_NEEDED #22, resolved 2026-07-17): level exists and stays on
+       screen, just dimmed + non-loading. Not .disabled -- click must still fire so the
+       "contact admin" note (#browseLevelLockedMsg, .msg.lock -- reuses the .msg component's
+       shape/plumbing from the login screen but its own on-brand gold/navy modifier, not .err's
+       red/warning language -- this isn't a mistake the user made, it's an upsell. Also NOT a
+       native alert(): rejected, blocking/unstylable/shows the domain name on mobile) can show.
+       A real disabled attribute would swallow the click. */
+    button.levelBtn.locked{ opacity:.5; cursor:not-allowed; box-shadow:none; }
 
     /* session view, ported from .dc.html isPractice block (lines 185-229) */
     .deckHeader{ display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:12px; }
@@ -662,17 +681,21 @@
     .browseMeaning{flex:1; color:var(--text)}
     .browseCount{font-size:11px; color:var(--muted); text-align:center; margin:10px 0 0}
 
-    /* ============ MATERIALS HUB (new screen shell) ============
-       Port of .dc.html's isMaterials block (lines 264-300) + 06-materials.png -- shape only,
-       not wired to any nav yet (see DECISIONS_NEEDED #22, Kamus/browseCard stays the live
-       Materials screen for now). No progress numbers on any card (comp's 186/404, 7/10, 82%
-       are placeholder demo data, not real) -- cards without a real data source render with no
-       number at all, same no-fake-data rule as #14/#15/#21. Decorative cover badges (moon/
-       sparkle emoji, "HSK 4" pill) dropped -- inconsistent pattern in source, no clear meaning,
-       and the level pill specifically doubles as a fabricated-level-number problem same as the
-       subtitle below. Per-card level pill is a real candidate for the later locked-visible/
-       gating pass, not for this shell (#22, 2026-07-16). Subtitle's "for HSK 4" clause dropped
-       for the same reason -- no target_level wiring exists yet in this shell pass.
+    /* ============ MATERIALS HUB ============
+       Port of .dc.html's isMaterials block (lines 264-300) + 06-materials.png. Materials = hub,
+       Kamus is its child (DECISIONS_NEEDED #37, resolved 2026-07-17) -- BOTH the dashboard
+       "Materi" quick action and navMateri (sidebar) route here now, byte-identical
+       (navTo(openMaterialsHub)). Kamus/browseCard is no longer an independent nav destination,
+       only reachable via the Vocab Deck card below.
+       Only the Vocab Deck card is clickable (opens Kamus, gated -- see renderBrowseLevelPicker);
+       Grammar/Listening stay "Coming soon", Reading/Writing/Mock Paper are real <button>s with
+       no click handler yet (next sessions' scope). No progress numbers on any card (comp's
+       186/404, 7/10, 82% are placeholder demo data, not real) -- cards without a real data
+       source render with no number at all, same no-fake-data rule as #14/#15/#21. Decorative
+       cover badges (moon/sparkle emoji, "HSK 4" pill) dropped -- inconsistent pattern in
+       source, no clear meaning, and the level pill specifically doubles as a fabricated-level-
+       number problem same as the subtitle below. Subtitle's "for HSK 4" clause dropped for the
+       same reason -- no target_level wiring exists yet.
        Wrapper: .pageCard.materialsHub overrides to no background/border/shadow (mirrors
        .pageCard.dash) since hub content is white cards already -- a second wrapper card would
        be redundant, same contrast rule as dashboard/flashcard. Kamus's own .pageCard wrapper
@@ -719,18 +742,21 @@
     .hubCardBody{ padding:16px 18px; }
     .hubCardTitle{ font-size:15px; font-weight:800; color:var(--text); }
     .hubCardMeta{ margin-top:3px; font-size:12px; color:var(--muted); }
-    /* Reusable status slot -- SAME pill (position/shape/size) the later locked-visible pass
-       reuses for gated content, per DECISIONS_NEEDED #22 (2026-07-16): only the icon/text
-       inside changes ("Coming soon" now, a lock + package label later), never the slot itself.
-       Lives inside .hubCardCover (not .hubCardBody) so it reads as a status on the whole card,
-       not a line of descriptive text -- that's the exact problem this replaces. */
+    /* Reusable status slot -- currently only "Coming soon" (Grammar/Listening). Lives inside
+       .hubCardCover (not .hubCardBody) so it reads as a status on the whole card, not a line
+       of descriptive text -- that's the exact problem this replaces.
+       NOTE (2026-07-17): the Kamus level-picker's locked-visible state (DECISIONS_NEEDED #22)
+       did NOT reuse this pill -- .levelBtn is a small pill-shaped chip, not a card with a cover
+       image, so this component's absolute-positioned-over-an-image shape doesn't fit; see
+       button.levelBtn.locked instead. This pill is still the right one to reuse if a *hub card*
+       itself (not a level chip) ever needs a locked/gated status. */
     .hubStatusPill{
       position:absolute; top:12px; right:12px; display:inline-flex; align-items:center; gap:5px;
       background:rgba(255,255,255,.25); color:#fff; font-size:10px; font-weight:800;
       padding:4px 10px; border-radius:99px;
     }
     /* Light desaturate/dim on the cover only (not the whole card) for non-interactive status
-       states -- same trigger (.hubCard.comingSoon) the locked-visible pass reuses later. */
+       states. */
     .hubCard.comingSoon .hubCardCover{ filter:saturate(.6) brightness(.85); }
 
     /* mock test list */
@@ -1337,6 +1363,7 @@
         <p class="sub browseTitle" id="browseHeader">Kamus Kosakata</p>
 
         <div class="levelPicker" id="browseLevelPicker"></div>
+        <div id="browseLevelLockedMsg" class="msg"></div>
         <div class="browseSearchWrap">
           <span class="browseSearchIcon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
           <input id="browseSearch" class="browseSearchInput" type="text" placeholder="Cari hanzi, pinyin, atau arti..." />
@@ -1468,11 +1495,14 @@
         <div id="riwayatList"></div>
       </div>
 
-      <!-- ============ MATERIALS HUB (new screen shell -- not wired to nav yet, see
-           DECISIONS_NEEDED #22). Static markup + styling only, zero JS wiring: search input
-           and filter chips have no listeners, card buttons have no click handlers. Kamus
-           (browseCard) stays the live screen behind the Materials nav item until a later
-           session swaps them. ============ -->
+      <!-- ============ MATERIALS HUB (DECISIONS_NEEDED #22, wired 2026-07-17). Opened from the
+           dashboard "Materi" quick action. Vocab Deck card -> Kamus/browseCard (gated by
+           package, see renderBrowseLevelPicker). Search input and filter chips still have no
+           listeners; Grammar/Listening stay "Coming soon"; Reading/Writing/Mock Paper are real
+           <button>s with no click handler yet -- all out of scope for this session.
+           navMateri (sidebar) and the dashboard quick action BOTH route here now (DECISIONS_
+           NEEDED #37, 2026-07-17: Materials = hub, resolved) -- Kamus is a child screen, opened
+           only via the Vocab Deck card below, no longer its own nav destination. ============ -->
       <div id="materialsHubCard" class="pageCard materialsHub hidden">
         <p class="sub hubTitle" id="hubHeader">Materials</p>
         <p class="hubSubtitle" id="hubSubtitle">Everything you need — decks, grammar, drills &amp; mock papers.</p>
@@ -1483,11 +1513,11 @@
             <input type="text" class="hubSearchInput" id="hubSearch" placeholder="Search materials, words, grammar…" />
           </div>
           <div class="hubChipRow" id="hubChipRow">
-            <button type="button" class="hubChip active" data-filter="all">All</button>
-            <button type="button" class="hubChip" data-filter="vocab">Vocab</button>
-            <button type="button" class="hubChip" data-filter="grammar">Grammar</button>
-            <button type="button" class="hubChip" data-filter="listening">Listening</button>
-            <button type="button" class="hubChip" data-filter="mock">Mock</button>
+            <button type="button" class="hubChip active" data-filter="all" id="hubChipAll">All</button>
+            <button type="button" class="hubChip" data-filter="vocab" id="hubChipVocab">Vocab</button>
+            <button type="button" class="hubChip" data-filter="grammar" id="hubChipGrammar">Grammar</button>
+            <button type="button" class="hubChip" data-filter="listening" id="hubChipListening">Listening</button>
+            <button type="button" class="hubChip" data-filter="mock" id="hubChipMock">Mock</button>
           </div>
         </div>
 
@@ -1495,57 +1525,59 @@
           <button type="button" class="hubCard" id="hubCardVocab" data-card="vocab">
             <div class="hubCardCover vocab"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><rect x="3" y="4" width="14" height="16" rx="2"/><path d="M17 8h4v12H8"/></svg></div>
             <div class="hubCardBody">
-              <div class="hubCardTitle">Vocab Deck</div>
-              <div class="hubCardMeta">Flashcard deck, per level</div>
+              <div class="hubCardTitle" id="hubCardVocabTitle">Vocab Deck</div>
+              <div class="hubCardMeta" id="hubCardVocabMeta">Flashcard deck, per level</div>
             </div>
           </button>
 
           <div class="hubCard comingSoon" data-card="grammar">
             <div class="hubCardCover grammar">
               <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><rect x="4" y="4" width="16" height="11" rx="3"/><path d="M9 15 6 19v-4"/><path d="M7.5 8h9M7.5 11h6"/></svg>
-              <span class="hubStatusPill">Coming soon</span>
+              <span class="hubStatusPill" id="hubStatusGrammar">Coming soon</span>
             </div>
             <div class="hubCardBody">
-              <div class="hubCardTitle">Grammar</div>
-              <div class="hubCardMeta">Sentence patterns, per level</div>
+              <div class="hubCardTitle" id="hubCardGrammarTitle">Grammar</div>
+              <div class="hubCardMeta" id="hubCardGrammarMeta">Sentence patterns, per level</div>
             </div>
           </div>
 
           <div class="hubCard comingSoon" data-card="listening">
             <div class="hubCardCover listening">
               <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a9 9 0 0 1 0 14"/></svg>
-              <span class="hubStatusPill">Coming soon</span>
+              <span class="hubStatusPill" id="hubStatusListening">Coming soon</span>
             </div>
             <div class="hubCardBody">
-              <div class="hubCardTitle">Listening</div>
-              <div class="hubCardMeta">Audio drills, per level</div>
+              <div class="hubCardTitle" id="hubCardListeningTitle">Listening</div>
+              <div class="hubCardMeta" id="hubCardListeningMeta">Audio drills, per level</div>
             </div>
           </div>
 
           <button type="button" class="hubCard" id="hubCardReading" data-card="reading">
             <div class="hubCardCover reading"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><path d="M4 5.5A2 2 0 0 1 6 3.5h13v15H6a2 2 0 0 0-2 2z"/><path d="M8 5v14"/></svg></div>
             <div class="hubCardBody">
-              <div class="hubCardTitle">Reading</div>
-              <div class="hubCardMeta">Reading practice sets</div>
+              <div class="hubCardTitle" id="hubCardReadingTitle">Reading</div>
+              <div class="hubCardMeta" id="hubCardReadingMeta">Reading practice sets</div>
             </div>
           </button>
 
           <button type="button" class="hubCard" id="hubCardWriting" data-card="writing">
             <div class="hubCardCover writing"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
             <div class="hubCardBody">
-              <div class="hubCardTitle">Writing</div>
-              <div class="hubCardMeta">Free-write workspace</div>
+              <div class="hubCardTitle" id="hubCardWritingTitle">Writing</div>
+              <div class="hubCardMeta" id="hubCardWritingMeta">Free-write workspace</div>
             </div>
           </button>
 
           <button type="button" class="hubCard" id="hubCardMock" data-card="mock">
             <div class="hubCardCover mock"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><rect x="5" y="4" width="14" height="17" rx="2.2"/><path d="m9 12 2 2 4-4"/></svg></div>
             <div class="hubCardBody">
-              <div class="hubCardTitle">Mock Paper</div>
-              <div class="hubCardMeta">Full mock tests</div>
+              <div class="hubCardTitle" id="hubCardMockTitle">Mock Paper</div>
+              <div class="hubCardMeta" id="hubCardMockMeta">Full mock tests</div>
             </div>
           </button>
         </div>
+
+        <button type="button" id="hubExitBtn" class="practiceExit">Kembali ke Dashboard</button>
       </div>
 
       <!-- ============ ADMIN — USER MANAGEMENT (v1 + v1.5, DECISIONS_NEEDED #30/#31/#32).
@@ -1723,7 +1755,7 @@
           hi:'Halo', hiThere:'Hai', readyToday:'Siap belajar hari ini?', dueToday:'Due Hari Ini', streakDaysLabel:'Streak (hari)',
           wordsMastered:'Kata Dikuasai', mockTestsDone:'Mock Test Selesai', continuePractice:'Lanjutkan Latihan',
           dailyGoal:'Target Harian', progressByLevel:'Progres per Level', quickActions:'Aksi Cepat',
-          recentHistory:'Riwayat Terakhir', seeAll:'Lihat semua', dictionary:'Kamus', report:'Raport',
+          recentHistory:'Riwayat Terakhir', seeAll:'Lihat semua', report:'Raport',
           showPassword:'Tampilkan password', hidePassword:'Sembunyikan password',
           errEmptyFields:'Isi email dan password dulu.', errWrongCredentials:'Email atau password salah.',
           errProfileNotFound:'Profil tidak ditemukan. Hubungi admin.',
@@ -1742,10 +1774,20 @@
           intervalOneDay:'1 hari', intervalDays:'{n} hari',
           emptyNoDue:'Belum ada kartu due-review, dan semua kata populer di HSK {level} udah pernah kamu lihat. Coba lagi nanti atau pilih level lain.',
           sessionComplete:'Sesi selesai! {correct} / {total} kartu terjawab benar.',
-          backToDashboard:'Kembali ke Dashboard', weakestWords:'Kata Terlemah', mockTestHistory:'Riwayat Mock Test',
+          backToDashboard:'Kembali ke Dashboard', backToMateri:'Kembali ke Materi', weakestWords:'Kata Terlemah', mockTestHistory:'Riwayat Mock Test',
           comingSoon:'Konten segera hadir',
           raportHeader:'Raport Belajar', vocabDictionary:'Kamus Kosakata',
           searchPlaceholder:'Cari hanzi, pinyin, atau arti...', loadMore:'Muat Lebih Banyak',
+          hubSubtitle:'Semua yang kamu butuhin — deck kosakata, grammar, drill, dan paket mock test.',
+          hubSearchPlaceholder:'Cari materi, kata, grammar…',
+          hubChipAll:'Semua', hubChipVocab:'Kosakata', hubChipGrammar:'Grammar', hubChipListening:'Listening', hubChipMock:'Mock',
+          hubCardVocabTitle:'Deck Kosakata', hubCardVocabMeta:'Flashcard per level',
+          hubCardGrammarTitle:'Grammar', hubCardGrammarMeta:'Pola kalimat per level',
+          hubCardListeningTitle:'Listening', hubCardListeningMeta:'Latihan audio per level',
+          hubCardReadingTitle:'Reading', hubCardReadingMeta:'Paket latihan membaca',
+          hubCardWritingTitle:'Writing', hubCardWritingMeta:'Ruang latihan menulis bebas',
+          hubCardMockTitle:'Mock Paper', hubCardMockMeta:'Mock test lengkap',
+          errLevelLocked:'Level ini di luar paket kamu. Hubungi admin untuk upgrade paket.',
           pinyinLabel:'Pinyin', translationLabel:'Terjemahan',
           questionProgress:'Soal {current} / {total}', prevBtn:'‹ Sebelumnya', nextBtn:'Berikutnya ›',
           questionNavigator:'Navigator soal', legendAnswered:'Terjawab', legendCurrent:'Sekarang',
@@ -1806,7 +1848,7 @@
           hi:'Hi', hiThere:'Hi there', readyToday:'Ready to study today?', dueToday:'Due Today', streakDaysLabel:'Streak (days)',
           wordsMastered:'Words Mastered', mockTestsDone:'Mock Tests Done', continuePractice:'Continue Practice',
           dailyGoal:'Daily Goal', progressByLevel:'Progress by Level', quickActions:'Quick Actions',
-          recentHistory:'Recent History', seeAll:'See all', dictionary:'Dictionary', report:'Report',
+          recentHistory:'Recent History', seeAll:'See all', report:'Report',
           showPassword:'Show password', hidePassword:'Hide password',
           errEmptyFields:'Please enter your email and password.', errWrongCredentials:'Incorrect email or password.',
           errProfileNotFound:'Profile not found. Please contact admin.',
@@ -1825,10 +1867,20 @@
           intervalOneDay:'1 day', intervalDays:'{n} days',
           emptyNoDue:'No cards due for review, and you have already seen all the popular words for HSK {level}. Try again later or pick another level.',
           sessionComplete:'Session complete! {correct} / {total} cards answered correctly.',
-          backToDashboard:'Back to Dashboard', weakestWords:'Weakest Words', mockTestHistory:'Mock Test History',
+          backToDashboard:'Back to Dashboard', backToMateri:'Back to Materials', weakestWords:'Weakest Words', mockTestHistory:'Mock Test History',
           comingSoon:'Content coming soon',
           raportHeader:'Learning Report', vocabDictionary:'Vocabulary Dictionary',
           searchPlaceholder:'Search hanzi, pinyin, or meaning...', loadMore:'Load More',
+          hubSubtitle:'Everything you need — decks, grammar, drills & mock papers.',
+          hubSearchPlaceholder:'Search materials, words, grammar…',
+          hubChipAll:'All', hubChipVocab:'Vocab', hubChipGrammar:'Grammar', hubChipListening:'Listening', hubChipMock:'Mock',
+          hubCardVocabTitle:'Vocab Deck', hubCardVocabMeta:'Flashcard deck, per level',
+          hubCardGrammarTitle:'Grammar', hubCardGrammarMeta:'Sentence patterns, per level',
+          hubCardListeningTitle:'Listening', hubCardListeningMeta:'Audio drills, per level',
+          hubCardReadingTitle:'Reading', hubCardReadingMeta:'Reading practice sets',
+          hubCardWritingTitle:'Writing', hubCardWritingMeta:'Free-write workspace',
+          hubCardMockTitle:'Mock Paper', hubCardMockMeta:'Full mock tests',
+          errLevelLocked:'This level isn\'t included in your package. Please contact admin to upgrade.',
           pinyinLabel:'Pinyin', translationLabel:'Translation',
           questionProgress:'Question {current} / {total}', prevBtn:'‹ Previous', nextBtn:'Next ›',
           questionNavigator:'Question navigator', legendAnswered:'Answered', legendCurrent:'Current',
@@ -1889,7 +1941,7 @@
           hi:'你好', hiThere:'你好', readyToday:'今天准备好了吗？', dueToday:'今日待复习', streakDaysLabel:'连续天数',
           wordsMastered:'已掌握词汇', mockTestsDone:'已完成模拟', continuePractice:'继续练习',
           dailyGoal:'每日目标', progressByLevel:'各级进度', quickActions:'快捷操作',
-          recentHistory:'最近记录', seeAll:'查看全部', dictionary:'词典', report:'成绩单',
+          recentHistory:'最近记录', seeAll:'查看全部', report:'成绩单',
           showPassword:'显示密码', hidePassword:'隐藏密码',
           errEmptyFields:'请输入邮箱和密码', errWrongCredentials:'邮箱或密码错误',
           errProfileNotFound:'未找到账号资料，请联系管理员',
@@ -1908,10 +1960,20 @@
           intervalOneDay:'1 天', intervalDays:'{n} 天',
           emptyNoDue:'暂无待复习卡片，HSK {level} 常用词你都学过了。请稍后再试或选择其他等级',
           sessionComplete:'本次学习完成！{correct} / {total} 张卡片回答正确',
-          backToDashboard:'返回主页', weakestWords:'最薄弱词汇', mockTestHistory:'模拟考试记录',
+          backToDashboard:'返回主页', backToMateri:'返回学习资料', weakestWords:'最薄弱词汇', mockTestHistory:'模拟考试记录',
           comingSoon:'内容即将上线',
           raportHeader:'学习报告', vocabDictionary:'词汇词典',
           searchPlaceholder:'搜索汉字、拼音或释义...', loadMore:'加载更多',
+          hubSubtitle:'你需要的一切——词汇卡组、语法、听力练习和模拟试卷。',
+          hubSearchPlaceholder:'搜索学习资料、单词、语法…',
+          hubChipAll:'全部', hubChipVocab:'词汇', hubChipGrammar:'语法', hubChipListening:'听力', hubChipMock:'模拟',
+          hubCardVocabTitle:'词汇卡组', hubCardVocabMeta:'按级别分类的记忆卡组',
+          hubCardGrammarTitle:'语法', hubCardGrammarMeta:'按级别分类的句型',
+          hubCardListeningTitle:'听力', hubCardListeningMeta:'按级别分类的听力练习',
+          hubCardReadingTitle:'阅读', hubCardReadingMeta:'阅读练习题集',
+          hubCardWritingTitle:'写作', hubCardWritingMeta:'自由写作练习区',
+          hubCardMockTitle:'模拟试卷', hubCardMockMeta:'完整模拟考试',
+          errLevelLocked:'该级别不在您的套餐内，请联系管理员升级套餐。',
           pinyinLabel:'拼音', translationLabel:'翻译',
           questionProgress:'第 {current} / {total} 题', prevBtn:'‹ 上一题', nextBtn:'下一题 ›',
           questionNavigator:'题目导航', legendAnswered:'已作答', legendCurrent:'当前',
@@ -2035,7 +2097,7 @@
     $('sectionTitleProgress').textContent = t('progressByLevel');
     $('sectionTitleQuickActions').textContent = t('quickActions');
     $('quickTileMockTestLabel').textContent = t('mockTest');
-    $('quickTileDictLabel').textContent = t('dictionary');
+    $('quickTileDictLabel').textContent = t('materi');
     $('quickTileReportLabel').textContent = t('report');
     $('sectionTitleRecentHistory').textContent = t('recentHistory');
     $('dashSeeAllHistory').textContent = t('seeAll') + ' →';
@@ -2067,7 +2129,31 @@
     $('browseHeader').textContent = t('vocabDictionary');
     $('browseSearch').placeholder = t('searchPlaceholder');
     $('browseMoreBtn').textContent = t('loadMore');
-    $('browseExitBtn').textContent = t('backToDashboard');
+    renderBrowseExitLabel();
+
+    $('hubHeader').textContent = t('materi');
+    $('hubSubtitle').textContent = t('hubSubtitle');
+    $('hubSearch').placeholder = t('hubSearchPlaceholder');
+    $('hubChipAll').textContent = t('hubChipAll');
+    $('hubChipVocab').textContent = t('hubChipVocab');
+    $('hubChipGrammar').textContent = t('hubChipGrammar');
+    $('hubChipListening').textContent = t('hubChipListening');
+    $('hubChipMock').textContent = t('hubChipMock');
+    $('hubCardVocabTitle').textContent = t('hubCardVocabTitle');
+    $('hubCardVocabMeta').textContent = t('hubCardVocabMeta');
+    $('hubStatusGrammar').textContent = t('comingSoon');
+    $('hubCardGrammarTitle').textContent = t('hubCardGrammarTitle');
+    $('hubCardGrammarMeta').textContent = t('hubCardGrammarMeta');
+    $('hubStatusListening').textContent = t('comingSoon');
+    $('hubCardListeningTitle').textContent = t('hubCardListeningTitle');
+    $('hubCardListeningMeta').textContent = t('hubCardListeningMeta');
+    $('hubCardReadingTitle').textContent = t('hubCardReadingTitle');
+    $('hubCardReadingMeta').textContent = t('hubCardReadingMeta');
+    $('hubCardWritingTitle').textContent = t('hubCardWritingTitle');
+    $('hubCardWritingMeta').textContent = t('hubCardWritingMeta');
+    $('hubCardMockTitle').textContent = t('hubCardMockTitle');
+    $('hubCardMockMeta').textContent = t('hubCardMockMeta');
+    $('hubExitBtn').textContent = t('backToDashboard');
 
     $('mockListExitBtn').textContent = t('backToDashboard');
 
@@ -3021,43 +3107,112 @@
   let browseFiltered = [];
   let browseShown = 0;
   const BROWSE_PAGE_SIZE = 50;
+  // Which screen opened Kamus -- 'hub' (Materials hub's Vocab Deck card) or 'dash' (direct,
+  // bypassing the hub). closeBrowse() returns to whichever one it was, per DECISIONS_NEEDED #22.
+  // As of #21's resolution (2026-07-17, Materials = hub, Kamus is its child) BOTH nav entry
+  // points -- navMateri and the dashboard quick action -- route through openMaterialsHub()
+  // first, so the only remaining caller of openBrowse() is hubCardVocab's click (always passes
+  // 'hub'). The 'dash' branch/default is intentionally NOT removed -- kept for if a direct entry
+  // point gets reintroduced later (e.g. the dashboard quick action getting its own destination
+  // again). Defaults to 'dash' if openBrowse() is ever called with no/other arg.
 
   const DIACRITIC_RANGE = new RegExp('[' + String.fromCharCode(0x0300) + '-' + String.fromCharCode(0x036f) + ']', 'g');
   function stripDiacritics(s){
     return (s||'').normalize('NFD').replace(DIACRITIC_RANGE,'').toLowerCase();
   }
 
-  function openBrowse(){
+  function openBrowse(origin){
+    browseOrigin = origin === 'hub' ? 'hub' : 'dash';
     setActiveNav('materi');
-    $('dashCard').classList.add('hidden');
+    hideAllPages();
     $('browseCard').classList.remove('hidden');
     $('browseSearch').value = '';
+    renderBrowseExitLabel();
     renderBrowseLevelPicker();
   }
 
+  // Exit label must follow browseOrigin (DECISIONS_NEEDED #21/#22, fixed 2026-07-17) -- a
+  // static "Back to Dashboard" was wrong when closeBrowse() actually lands on the hub. Called
+  // from openBrowse() (origin just changed) and from applyStaticI18n() (language just changed,
+  // origin didn't) so both cases stay correct.
+  function renderBrowseExitLabel(){
+    $('browseExitBtn').textContent = t(browseOrigin === 'hub' ? 'backToMateri' : 'backToDashboard');
+  }
+
   function closeBrowse(){
+    hideBrowseLockedMsg();
+    if(browseOrigin === 'hub'){
+      navTo(openMaterialsHub);
+      return;
+    }
     setActiveNav('beranda');
-    $('browseCard').classList.add('hidden');
+    hideAllPages();
     $('dashCard').classList.remove('hidden');
   }
 
+  function openMaterialsHub(){
+    setActiveNav('materi');
+    hideAllPages();
+    $('materialsHubCard').classList.remove('hidden');
+  }
+
+  function closeMaterialsHub(){
+    setActiveNav('beranda');
+    hideAllPages();
+    $('dashCard').classList.remove('hidden');
+  }
+
+  // Hides the locked-level inline note (.msg.lock -- reuses the .msg component's shape from the
+  // login screen with its own on-brand modifier, not a new toast system -- see DECISIONS_NEEDED
+  // #22). Called whenever the note shouldn't persist: picker re-render, an unlocked level gets
+  // picked, or Kamus is left.
+  function hideBrowseLockedMsg(){
+    const el = $('browseLevelLockedMsg');
+    el.className = 'msg';
+    el.textContent = '';
+  }
+
+  // Renders all 6 HSK levels always (locked-visible, DECISIONS_NEEDED #22) -- levels outside
+  // userPackageLevels stay on screen so the user can see what exists, but get a dimmed/locked
+  // state instead of a click handler that loads data. No vocab fetch ever fires for a locked
+  // level (loadBrowseLevel is only wired to the unlocked branch below).
   function renderBrowseLevelPicker(){
-    const defaultLevel = currentProfile?.target_level || 1;
     const wrap = $('browseLevelPicker');
     wrap.innerHTML = '';
+    hideBrowseLockedMsg();
+    const hasAnyAllowed = userPackageLevels.length > 0;
+    const defaultLevel = hasAnyAllowed
+      ? ((currentProfile?.target_level && isLevelAllowed(currentProfile.target_level)) ? currentProfile.target_level : userPackageLevels[0])
+      : null;
     for(let lv=1; lv<=6; lv++){
+      const locked = !isLevelAllowed(lv);
       const b = document.createElement('button');
       b.type = 'button';
-      b.className = 'levelBtn' + (lv===defaultLevel ? ' active' : '');
-      b.textContent = 'HSK ' + lv;
-      b.addEventListener('click', ()=>{
-        [...wrap.children].forEach(c=>c.classList.remove('active'));
-        b.classList.add('active');
-        loadBrowseLevel(lv);
-      });
+      b.className = 'levelBtn' + (!locked && lv===defaultLevel ? ' active' : '') + (locked ? ' locked' : '');
+      b.textContent = (locked ? '🔒 ' : '') + 'HSK ' + lv;
+      if(locked){
+        b.addEventListener('click', ()=>{
+          const el = $('browseLevelLockedMsg');
+          el.textContent = t('errLevelLocked');
+          el.className = 'msg lock';
+        });
+      } else {
+        b.addEventListener('click', ()=>{
+          hideBrowseLockedMsg();
+          [...wrap.children].forEach(c=>c.classList.remove('active'));
+          b.classList.add('active');
+          loadBrowseLevel(lv);
+        });
+      }
       wrap.appendChild(b);
     }
-    loadBrowseLevel(defaultLevel);
+    if(hasAnyAllowed){
+      loadBrowseLevel(defaultLevel);
+    } else {
+      $('browseList').innerHTML = `<p class="emptyState">${t('comingSoon')}</p>`;
+      $('browseCount').textContent = '';
+      $('browseMoreBtn').classList.add('hidden');
+    }
   }
 
   async function loadBrowseLevel(level){
@@ -4853,8 +5008,10 @@
   });
   $('raportBtn').addEventListener('click', openRaport);
   $('raportExitBtn').addEventListener('click', closeRaport);
-  $('browseBtn').addEventListener('click', openBrowse);
+  $('browseBtn').addEventListener('click', ()=> navTo(openMaterialsHub));
   $('browseExitBtn').addEventListener('click', closeBrowse);
+  $('hubExitBtn').addEventListener('click', closeMaterialsHub);
+  $('hubCardVocab').addEventListener('click', ()=> navTo(()=> openBrowse('hub')));
   $('browseSearch').addEventListener('input', applyBrowseFilter);
   $('browseMoreBtn').addEventListener('click', renderBrowseChunk);
   $('adminExitBtn').addEventListener('click', closeAdmin);
@@ -4944,7 +5101,7 @@
 
   $('navBeranda').addEventListener('click', ()=> navTo(goBerandaContent));
   $('navLatihan').addEventListener('click', ()=> navTo(openMockList));
-  $('navMateri').addEventListener('click', ()=> navTo(openBrowse));
+  $('navMateri').addEventListener('click', ()=> navTo(openMaterialsHub));
   $('navProgres').addEventListener('click', ()=> navTo(openRaport));
   $('navRiwayat').addEventListener('click', ()=> navTo(openRiwayat));
   $('navAdmin').addEventListener('click', ()=> navTo(openAdmin));

@@ -1,3 +1,64 @@
+# Handoff — session 9 (Kamus → Vocab Deck hub + gating, #22/#37)
+
+Scope: **Kamus pindah ke Materials hub sebagai Vocab Deck + level gating** (Gap #1 dari #22).
+Report-first (git pull → baca #21/#22/#23 + HANDOFF sesi 8 → lapor rencana + 4 opsi terbuka →
+tunggu approve) sebelum implementasi, sama pola kayak sesi-sesi sebelumnya.
+
+## Kamus → Vocab Deck + gating: DONE, APPROVED, COMMITTED — `15c245e`
+
+Full decision writeup: DECISIONS_NEEDED #22 (hub keputusan lama) → #36 (`.msg.lock` rgba debt) →
+#37 (IA resolved: Materials = hub, Kamus jadi anak).
+
+**Yang jadi**:
+- Kamus (`browseCard`) bukan tujuan nav sendiri lagi — dibuka lewat kartu Vocab Deck di dalam
+  `materialsHubCard`. `navMateri` (sidebar) dan `browseBtn` (dashboard quick action) dua-duanya
+  sekarang → `openMaterialsHub()`, byte-identical.
+- `renderBrowseLevelPicker()` render semua 6 level HSK selalu — level di luar
+  `userPackageLevels` tampil locked-visible (dim + 🔒), bukan disembunyiin. **Gap #1 (#22) LUNAS**:
+  nol fetch `vocab` buat level locked, diverifikasi langsung lewat network tab, bukan cuma
+  keliatan gembok doang.
+- Klik level locked → inline note (`.msg.lock`, modifier baru turunan `--navy`/`--gold` existing,
+  zero hex baru, override dark mode sendiri) — bukan `alert()` (ditolak: blocking, gak bisa
+  distyle, munculin nama domain di mobile), bukan `.msg.err` (ditolak: merah = "kamu salah",
+  padahal ini pesan dagang bukan error).
+- Semua teks hub (judul, subtitle, chip, judul+meta kartu, coming-soon pill) masuk sistem `t()`
+  ID/EN/ZH — debt i18n dari sesi shell dibayar penuh.
+- Tombol exit Kamus ngikut `browseOrigin` (`backToMateri` vs `backToDashboard`) — sebelumnya
+  hardcode satu string yang boong pas masuk lewat hub.
+
+**Diverifikasi live** (akun disposable `claudecodelivetest@gmail.com`, paket `hsk_1_4`), light +
+dark, ID + EN, per checklist: hub buka dari kedua entry point, Vocab Deck → Kamus IA utuh, level
+5/6 locked + toast/inline-note + zero network fetch, exit balik ke asal (hub vs dashboard) benar,
+bahasa switch ikut ganti semua teks.
+
+**Belum dibayar, dicatat eksplisit — Gap #2 (#22), SECURITY DEBT**: enforcement paket 100%
+client-side. `vocab` RLS masih terbuka buat semua `authenticated` user tanpa filter package;
+`startAttempt()`/`startCombinedAttempt()` juga belum re-check paket di server. Acceptable
+**hanya** selama user cuma masuk lewat admin (bukan self-serve publik) — **WAJIB dibayar (RLS
+by package) SEBELUM paket dijual komersial.** Belum disentuh sesi ini (di luar scope, butuh
+sesi/keputusan sendiri).
+
+**Debt kecil tercatat, bukan diutangin secara diam-diam**: #36 (`.msg.lock` hardcode 3 nilai
+`rgba(242,176,30,X)` — kalau `--gold` di-tuning ntar, drift senyap; bayar kalau/pas bikin
+`--gold-rgb` companion var, sama pola `--text-rgb`/`--muted-rgb` yang udah ada).
+
+## Commit sesi ini
+
+- **`15c245e`** — `index.html` (fitur) + `DECISIONS_NEEDED.md` (#36, #37).
+
+**Sengaja TIDAK di-commit** (sama seperti sesi-sesi sebelumnya): `supabase/functions/grade-essay/
+index.ts` — perubahan uncommitted di file itu bukan dari sesi ini, dibiarkan apa adanya.
+
+## Belum dikerjakan / kandidat follow-up
+
+- **Gap #2 (#22) — RLS by package** — prioritas tinggi, wajib sebelum jual paket komersial.
+- 5 kartu hub lain (Grammar/Listening/Reading/Writing/Mock Paper) belum di-wire — sesi terpisah.
+- `.msg.lock` rgba hardcode (#36) — bayar kalau `--gold-rgb` companion var dibikin.
+- Balik `admin-users` Edge Function ke `SUPABASE_SECRET_KEYS` sekarang grant DB udah benar (#34).
+- Must-change-password flag / invite-email buat admin v1.5's create-user (#31).
+
+---
+
 # Handoff — session 8 (session guard bug, #33)
 
 Scope: **cuma §33** — bug session guard yang ditemukan sampingan pas verifikasi admin v1.5

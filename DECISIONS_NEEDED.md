@@ -1053,30 +1053,84 @@ status `ACTIVE`). Diverifikasi dari 2 arah:
 project live) **belum diverifikasi** — sengaja ditunda, Kyaru yang akan test end-to-end lewat
 browser sendiri (bukan Claude, biar tidak ada auth user tidak sengaja tercipta dari sesi testing).
 
-## 33. BUG — session guard's `signOut()` kills the session that just won, not just the old one
+## 33. BUG — session guard's `signOut()` kills the session that just won, not just the old one — RESOLVED
 
 Ditemukan saat verifikasi admin v1.5 (`createUser` gagal "Invalid session" padahal baru login).
 
-`forceLogout()` (`index.html:2330-2338`) manggil `sb.auth.signOut()` tanpa `scope` arg — default
-supabase-js adalah `'global'`, yang mencabut **semua sesi user itu di semua device**, bukan cuma
-sesi yang manggil `forceLogout()`. Single-device enforcement maunya: login di device B nendang
-device A (device lama). Yang beneran kejadian: login di device B nendang device A **DAN**
-device B ikut mati juga — karena device A yang kalah klaim tetap jalanin `forceLogout()` →
-`signOut()` global → server cabut sesi device B (yang justru baru menang) bareng sesi device A.
-UI device B tidak sadar (state lokal — `currentUser`/tampilan login — tidak disentuh, karena
-listener `watchSession` di device B sendiri tidak pernah mismatch), sampai ada request yang
-divalidasi server (contoh nyata: `admin-users` Edge Function-nya `auth.getUser()`) baru ketauan
-sesinya udah dicabut.
+**Root cause**: `forceLogout()` manggil `sb.auth.signOut()` tanpa `scope` arg — default supabase-js
+adalah `'global'`, yang mencabut **semua sesi user itu di semua device**, bukan cuma sesi yang
+manggil `forceLogout()`. Single-device enforcement maunya: login di device B nendang device A
+(device lama). Yang beneran kejadian: login di device B nendang device A **DAN** device B ikut
+mati juga — karena device A yang kalah klaim tetap jalanin `forceLogout()` → `signOut()` global →
+server cabut sesi device B (yang justru baru menang) bareng sesi device A. UI device B tidak sadar
+sampai ada request yang divalidasi server (`admin-users`'s `auth.getUser()`) baru ketauan sesinya
+udah dicabut.
 
-**Ini bug, bukan fitur jalan sesuai desain** — dampak nyata ke user biasa: ganti device/browser
-bisa bikin login sebelumnya ikut mati tanpa alasan jelas ke user itu sendiri, bukan cuma
-device lama yang seharusnya ke-invalidate.
+**Konteks penting — kenapa `active_session_id` bukan lapisan redundan**: dicek ke Supabase
+Dashboard, `SESSIONS_SINGLE_PER_USER` **OFF dan tidak bisa dinyalain** — fitur itu cuma tersedia
+di Pro plan ke atas, project ini di Free plan. Artinya mekanisme custom `active_session_id` +
+`claim_session` **satu-satunya** cara enforce single-device di project ini, bukan lapisan
+tambahan di atas fitur native GoTrue. Ini juga berarti kondisi persis yang dibutuhkan bug
+`supabase/auth#2036` ("Multi-Session Authentication Bug: Local Logout Invalidates All Sessions",
+butuh `SESSIONS_SINGLE_PER_USER=false`) **match state project ini** — risiko itu nyata, bukan
+teoretis, makanya opsi fix diverifikasi empiris dulu sebelum dipasang (lihat di bawah).
 
-**Fix kandidat**: `sb.auth.signOut({ scope: 'local' })` di `forceLogout()` — hanya mencabut sesi
-device yang manggil, bukan semua device. **Belum dikerjakan** — perlu sesi tersendiri +
-verifikasi (dampak ke seluruh alur single-device enforcement, bukan perubahan sepele), sengaja
-tidak dikerjakan sambil verifikasi admin v1.5 supaya nggak nyampur dua perubahan berbeda scope.
-Ditemukan saat verifikasi admin v1.5, 17 Jul 2026.
+**Opsi dipertimbangkan** (3 dibandingkan trade-off-nya sebelum milih, bukan langsung pilih satu):
+1. Device yang KALAH (A) `signOut({scope:'local'})` pas ketendang — reaktif, tapi bergantung tab A
+   nyala+connect ke realtime pas ditendang. Kalau A offline pas B login, sesi A tetap valid
+   sampai expired natural — bolong nyata, bukan cuma soal scope.
+2. Device yang MENANG (B) `signOut({scope:'others'})` pas klaim — proaktif, nggak bergantung A
+   hidup/mati sama sekali. Risiko: apakah kena bug `#2036` juga (nggak ada laporan konkret buat
+   scope `others` spesifik, cuma buat `local`).
+3. Kombinasi: (2) jadi sumber enforcement, (1) LEPAS bagian `signOut()`-nya, disisain cuma buat UX
+   (pesan + bersih state lokal) — nutup bug kill-the-winner **dan** gap A-offline sekaligus.
+
+**Tes empiris dijalanin sebelum implementasi** (bukan asumsi dari dokumentasi) — 2 browser
+context terpisah, `sb.auth.signInWithPassword()` dipanggil langsung dari console (skip
+`claim_session` sama sekali, biar yang ketes murni perilaku Supabase Auth, bukan mekanisme app),
+verifikasi pakai `getUser()` + query nyata (bukan cuma state UI):
+
+```
+B (yang nendang) — SELAMAT:
+  B signOut(others): null
+  B getUser AFTER kick: 35a2edff-8cb1-4ad0-9a87-85bfeae639d8  null
+
+A (yang ketendang) — MATI DI SERVER:
+  GET /auth/v1/user → 403 (Forbidden)
+  A getUser AFTER B kicked others: undefined
+  AuthSessionMissingError: Auth session missing!
+```
+
+403 dari server terhadap token A yang masih utuh di localStorage (halaman A nggak pernah
+di-reload) = pencabutan beneran di server, bukan cuma state lokal ilang. `#2036` **tidak
+terpicu** meskipun `SESSIONS_SINGLE_PER_USER=false` match kondisi laporan bug-nya — kesimpulan:
+`scope:'others'` aman dipakai di project ini, khusus buat kasus ini (belum tentu generalize ke
+semua kondisi Supabase lain, tapi cukup buat keputusan ini).
+
+**Fix diimplementasikan** (opsi 4/kombinasi, RESOLVED):
+- `doLogin()` — persis setelah `claim_session` sukses, panggil `sb.auth.signOut({scope:'others'})`.
+  Ini jadi **sumber enforcement**, bukan lagi device yang kalah bunuh diri sendiri.
+- `watchSession()`'s realtime handler + `boot()`'s stale-session check — **tidak manggil
+  `signOut()` lagi sama sekali**. Diganti fungsi baru `localLogout()`: bersih-bersih state lokal
+  + tampilin pesan "logged in elsewhere", karena sesinya udah dicabut di server oleh device
+  pemenang. Ini nutup bug §33 **dan** gap "device lama offline pas ditendang" sekaligus (opsi 1
+  murni nggak nutup gap itu).
+- 3 titik `gateReason` (`loadProfile`, `doLogin`, `boot` — subscription expired/lewat tanggal,
+  account-level, **tetap sengaja global**: kalau langganan abis, wajar user itu ke-logout di
+  semua device) — `forceLogout(reason, 'global')` **eksplisit**, bukan lagi kebetulan dari
+  argumen kosong. `forceLogout()` sekarang terima `scope` opsional; dipanggil tanpa argumen kedua
+  (titik-titik yang sengaja tidak disentuh: `logoutBtn`, profil gagal di-fetch, `claim_session`
+  RPC gagal) tetap persis perilaku lama (`sb.auth.signOut()` tanpa arg = default `'global'`
+  library, byte-identical, nol regresi).
+- **Error handling `signOut(others)` gagal setelah `claim_session` sukses**: best-effort,
+  `console.error` jelas + login tetap lanjut (nggak ada cara rollback `claim_session` yang
+  bersih). Risiko sisa: kalau device lama JUGA kebetulan offline pas kick ini gagal, sesinya
+  tetap hidup sampai expired natural — sama seperti kondisi sebelum fix ini, cuma di skenario
+  ganda (kick gagal + device lama offline) yang lebih sempit. Diterima sebagai risiko sisa,
+  bukan dikerjain retry/rollback (scope creep untuk kasus yang sangat jarang), keputusan Kyaru
+  17 Jul 2026.
+
+Ditemukan & diselesaikan Kyaru + Claude Code, 17 Jul 2026.
 
 ## 34. Root cause "permission denied for table profiles" — RESOLVED, GRANT-level, bukan soal key sama sekali
 

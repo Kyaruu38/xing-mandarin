@@ -2314,6 +2314,12 @@
   }
 
   /* ---------- dengerin perebutan sesi (realtime) ---------- */
+  // DECISIONS_NEEDED #33 -- device INI kalah klaim. Sesinya SUDAH dicabut di server
+  // oleh device yang baru login (lihat doLogin()'s signOut({scope:'others'})) --
+  // di sini cuma bersih-bersih state lokal + kasih tau user, TIDAK manggil
+  // signOut() lagi. Itu akar bug lama: device yang kalah manggil signOut() tanpa
+  // scope (default 'global') buat dirinya sendiri, yang ikut nyabut sesi device
+  // yang justru baru menang.
   function watchSession(userId){
     if(watchChannel) sb.removeChannel(watchChannel);
     watchChannel = sb.channel('profile-watch')
@@ -2322,20 +2328,41 @@
         payload => {
           const mine = localStorage.getItem(SESSION_KEY);
           if(payload.new.active_session_id !== mine){
-            forceLogout(t('errLoggedInElsewhere'));
+            localLogout(t('errLoggedInElsewhere'));
           }
         })
       .subscribe();
   }
 
-  /* ---------- keluar paksa ---------- */
-  async function forceLogout(reason){
+  // Bersih-bersih state lokal doang -- dipakai saat device ini KETAHUAN kalah klaim
+  // sesi (realtime di watchSession(), atau ketauan pas boot() reload), bukan saat
+  // ada error/gerbang. Sengaja TIDAK manggil sb.auth.signOut() -- sesi device ini
+  // sudah dicabut di server oleh device pemenang (signOut({scope:'others'}) di
+  // doLogin()), manggil signOut() lagi di sini cuma bakal ulang bug §33 (default
+  // scope 'global' ikut nyabut sesi device yang menang).
+  function localLogout(reason){
     stopAttemptTimer();
     if(heartbeat){ clearInterval(heartbeat); heartbeat=null; }
     if(watchChannel){ sb.removeChannel(watchChannel); watchChannel=null; }
     currentUser = null; currentProfile = null;
     localStorage.removeItem(SESSION_KEY);
-    await sb.auth.signOut();
+    showLogin(reason || null, 'err');
+  }
+
+  /* ---------- keluar paksa (error/gerbang/logout manual -- BUKAN kalah klaim sesi,
+     lihat localLogout() di atas buat itu) ---------- */
+  // scope opsional -- default persis perilaku lama (sb.auth.signOut() tanpa arg =
+  // 'global') buat titik yang sengaja tidak diubah. Titik gerbang langganan
+  // (gateReason) manggil scope:'global' EKSPLISIT (DECISIONS_NEEDED #33) -- perilaku
+  // sama, niatnya sekarang kebaca di kode, bukan kebetulan dari argumen kosong.
+  async function forceLogout(reason, scope){
+    stopAttemptTimer();
+    if(heartbeat){ clearInterval(heartbeat); heartbeat=null; }
+    if(watchChannel){ sb.removeChannel(watchChannel); watchChannel=null; }
+    currentUser = null; currentProfile = null;
+    localStorage.removeItem(SESSION_KEY);
+    if(scope) await sb.auth.signOut({ scope });
+    else await sb.auth.signOut();
     showLogin(reason || null, 'err');
   }
 
@@ -2346,7 +2373,7 @@
     if(error || !profile){ await forceLogout(t('errProfileNotFound')); return; }
 
     const blocked = gateReason(profile);
-    if(blocked){ await forceLogout(blocked); return; }
+    if(blocked){ await forceLogout(blocked, 'global'); return; }
 
     currentUser = userId; currentProfile = profile;
     renderDash(profile);
@@ -2377,13 +2404,31 @@
     const { data:profile } = await sb.from('profiles').select('*').eq('id', userId).single();
     if(!profile){ await forceLogout(t('errProfileNotFound')); return; }
     const blocked = gateReason(profile);
-    if(blocked){ await forceLogout(blocked); return; }
+    if(blocked){ await forceLogout(blocked, 'global'); return; }
 
-    // klaim sesi baru → ini yang nendang device lama
+    // klaim sesi baru
     const sid = genUUID();
     const { error:rpcErr } = await sb.rpc('claim_session', { p_session_id: sid, p_device_label: deviceLabel() });
     if(rpcErr){ await forceLogout(t('errSessionStartFailed')); return; }
     localStorage.setItem(SESSION_KEY, sid);
+
+    // DECISIONS_NEEDED #33 -- device INI (yang baru login/menang klaim) yang aktif
+    // nendang device lama, bukan device lama yang bunuh diri sendiri pas ketauan
+    // ketendang (itu bug lama: signOut() scope default 'global' dari device yang
+    // kalah ikut nyabut sesi device yang menang). Diverifikasi aman dari
+    // supabase/auth#2036 (kondisi SESSIONS_SINGLE_PER_USER=false, persis state
+    // project ini di Free plan) lewat tes empiris 2-browser sebelum dipasang di sini.
+    //
+    // Best-effort: kalau ini gagal (network hiccup dsb.), device lama TIDAK
+    // ke-revoke di server -- tapi claim_session sudah commit, tidak ada cara
+    // rollback yang bersih, jadi login device ini tetap lanjut. Dicatat jelas ke
+    // console, bukan didiamkan (keputusan Kyaru, 17 Jul 2026) -- risiko sisa: kalau
+    // device lama juga kebetulan offline pas ini gagal, sesinya tetap hidup sampai
+    // expired natural, sama seperti kondisi sebelum fix ini di skenario itu spesifik.
+    const { error: kickErr } = await sb.auth.signOut({ scope: 'others' });
+    if(kickErr){
+      console.error('signOut(others) gagal setelah claim_session -- sesi device lain (kalau ada) mungkin masih hidup:', kickErr);
+    }
 
     await loadProfile(userId);
   }
@@ -2400,11 +2445,14 @@
     if(!profile){ await forceLogout(t('errProfileNotFound')); return; }
 
     const blocked = gateReason(profile);
-    if(blocked){ await forceLogout(blocked); return; }
+    if(blocked){ await forceLogout(blocked, 'global'); return; }
 
-    // kalau sesi di server beda dari punya device ini → device ini udah kalah
+    // kalau sesi di server beda dari punya device ini → device ini udah kalah klaim
+    // (di device lain, lewat doLogin()'s signOut({scope:'others'}), yang juga udah
+    // nyabut sesi device ini di server -- di sini cuma bersih-bersih state lokal,
+    // lihat localLogout()/DECISIONS_NEEDED #33).
     if(!storedSid || profile.active_session_id !== storedSid){
-      await forceLogout(t('errSessionTakenOver'));
+      localLogout(t('errSessionTakenOver'));
       return;
     }
     await loadProfile(userId);

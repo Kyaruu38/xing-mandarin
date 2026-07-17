@@ -3733,6 +3733,7 @@
   // exit to the dashboard today (same label/target) -- kept as a distinct value anyway per explicit
   // instruction, in case either ever needs its own exit destination later.
   let mockOrigin = 'dash';
+  let browseOrigin = 'dash'; // was never declared anywhere -- ReferenceError on renderDash -> applyStaticI18n -> renderBrowseExitLabel at login
 
   function sectionRank(section){
     return SECTION_ORDER[section] ?? 99;

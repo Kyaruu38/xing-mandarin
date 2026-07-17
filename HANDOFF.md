@@ -1,3 +1,99 @@
+# Handoff — session 6 (admin panel v1, user management)
+
+Scope: **Admin Panel v1 — user management**, client-side only (anon key, zero Edge Functions).
+Comp: Admin_Panel PNG (6 screens, light+dark) + schema facts verified directly against Supabase
+by the user (not inferred). Pre-implementation audit already existed in DECISIONS_NEEDED #30
+from a prior session; this session resolved the remaining open points (email handling,
+`display_name` NULL rendering, modal component, package-dropdown completeness, self-demotion
+guard) before writing any code, per explicit "lapor dulu, jangan ngoding" instruction.
+
+## Admin panel v1: DONE, APPROVED, COMMITTED — `b7739f0`
+
+Full decision writeup: DECISIONS_NEEDED #31 (6 entries — email, `display_name` NULL, modal
+shell, package dropdown, self-demotion guard, `target_level` NULL).
+
+**What shipped**:
+- Sidebar nav — "ADMIN" group + "User Management" item, hidden unless `profile.role==='admin'`
+  (toggled in `renderDash()`). Existing sidebar (`.sbThemeToggle`/`.sbLangBtn`) untouched, no
+  new toggle added, per #30.
+- User list (`adminCard`) — search by `display_name`, filter by package (options built off
+  `Object.keys(PACKAGE_LEVELS)`, never a separate hardcoded list — see corruption-risk note
+  below) and status. Row: name (or NULL placeholder, see below), package badge, target_level,
+  status pill (reuses `.resultBadge` pass/fail pill recipe), subscription_end. Click row → Edit
+  modal. **No email column** — `auth.users` isn't reachable from the anon key/PostgREST;
+  getting it needs `service_role` + `supabase.auth.admin.*`, deferred to v1.5 alongside
+  create-user (same Edge Function, one build).
+- Edit modal — `display_name`, package, target_level, status, subscription_end, role. Save =
+  direct `profiles` UPDATE under RLS `is_admin()`, no Edge Function needed for any of these.
+- Deactivate — `status='expired'`, confirm dialog via the new modal shell. The only destructive
+  action in v1 (no RLS DELETE policy exists + FK CASCADE to `user_mastery`/`test_attempts`/etc.
+  would permanently wipe a user's learning history — "Delete permanently" was cut in #30).
+- **New modal shell** (`#modalOverlay`/`#modalPanel`) — codebase previously only had native
+  `confirm()`. Overlay + panel + close (X/backdrop/Esc) + basic Tab-cycle focus trap, light+dark.
+  Reused verbatim by Edit User and Deactivate confirm; intended for Create user in v1.5 too — no
+  second modal component, no animation, no stacking, no generic design system.
+
+**2 corruption-class bugs caught and fixed before commit** (both same shape: a `<select>` with
+no explicit option for a real/possible DB value silently shows the first option as
+browser-default-selected, so an admin who saves without touching that field silently overwrites
+real data):
+1. **Package dropdown** — `PACKAGE_LEVELS` has 6 keys (`hsk_1_4`/`hsk_5`/`hsk_6`/`vip` +
+   `business`/`convo`, the last two content-empty "coming soon" tiers). A dropdown built off
+   only 4 known-content keys would silently corrupt any `business`/`convo` user's package on
+   Save. Fixed: dropdown options generated from `Object.keys(PACKAGE_LEVELS)` directly (single
+   source of truth, can't drift), `business`/`convo` labeled honestly ("... (belum ada
+   konten)"), and any DB value that still doesn't match any key is shown literally with a ⚠
+   warning instead of falling back silently — caught by the user's own review before any code
+   was written (see DECISIONS_NEEDED #31).
+2. **`target_level` NULL** — same shape, caught by Claude during self-verification (screenshot
+   testing against a synthetic NULL-`target_level` fixture), not by user report. Fixed with an
+   explicit `"— Not set —"` option + save handler sending `target_level: null` instead of
+   `Number('')`. Logged as a general pattern in DECISIONS_NEEDED #31: any dropdown representing
+   a nullable/open-ended DB column needs an explicit "empty/unknown" option, never rely on
+   browser default-select.
+
+**Verification — 2 rounds, both required before commit** (per this project's standing
+verify-before-commit rule):
+1. **Claude, local static server + synthetic fixture** (same technique as every prior session —
+   `currentUser`/`currentProfile`/`adminCache` pushed via console, bypassing Supabase auth
+   entirely): confirmed nav visibility gating, NULL-name placeholder + UUID sub-id, unknown
+   package literal-value warning, self-demotion guard (role `<select>` disabled + hint on own
+   row), Deactivate confirm → Cancel returns to Edit modal, modal close via X/backdrop/Esc, both
+   themes. This is where the `target_level` NULL bug above was caught and fixed.
+2. **User, real Supabase login in their own browser** (fixture data was never proof RLS or the
+   write path actually worked): nav ADMIN visible for `role='admin'` ✅, list of real users
+   loads (RLS `is_admin()` SELECT confirmed live) ✅, Edit + Save writes to `profiles`
+   (`display_name` NULL → "Wilbert", confirmed in Table Editor) ✅, self-demotion guard ✅,
+   Deactivate ✅ **plus the full loop**: deactivated account's next login attempt correctly
+   blocked by the existing `gateReason()` "subscription has ended" gate, then reactivating
+   (`expired`→`active`) let that account log in again ✅. Modal Esc/X/backdrop ✅.
+
+**Post-push production check** (`https://xingmandarin.com`, no login — Claude has no admin
+credentials and does not enter passwords regardless, per standing policy): page loads clean, 0
+console errors on load, login screen renders correctly in both themes. This confirms the deploy
+itself is healthy; it is **not** a substitute for the logged-in verification above, which the
+user already completed in their own browser before this commit landed.
+
+## Not built this session (v1.5, explicit scope cut per #30)
+
+- **Create user** — needs a `service_role` Edge Function (`supabase.auth.admin.createUser` or
+  equivalent), gated by `is_admin()`.
+- **Email column** — same Edge Function as create-user (`auth.admin.listUsers`/`getUserById`),
+  nebeng di function yang sama, satu pekerjaan sekali jalan (per #31's reasoning: building a
+  throwaway Edge Function just for email now would pay the full infra cost — service_role
+  secret, `is_admin()` gate, CORS, deploy — for a feature that's getting rebuilt with
+  create-user anyway).
+- **Delete permanent** — cut permanently, not deferred (no RLS DELETE policy, FK CASCADE would
+  wipe learning history — see #30).
+- Analytics/billing/content management — untouched, out of scope.
+
+## Commit this session
+
+- **`b7739f0`** — Add admin panel v1 (user management): `index.html` (admin nav, list, modal
+  shell, Edit modal, Deactivate) + `DECISIONS_NEEDED.md` (#31, 6 entries).
+
+---
+
 # Handoff — session 5 (dark mode sweep, continuation after /clear)
 
 Scope this session: **dark mode**, the last item in the fixed restyle sequence. Mid-session,

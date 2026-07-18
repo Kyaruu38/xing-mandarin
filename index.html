@@ -4167,9 +4167,11 @@
      payload.image_options dari bucket listening-images, dua-duanya public)
      ========================================================== */
   function listeningAudioUrl(path){
+    if(!path) return null;
     return sb.storage.from('listening-audio').getPublicUrl(path).data.publicUrl;
   }
   function listeningImageUrl(path){
+    if(!path) return null;
     return sb.storage.from('listening-images').getPublicUrl(path).data.publicUrl;
   }
 
@@ -4181,6 +4183,7 @@
   }
 
   function renderAudioPlayer(path){
+    if(!path) return '';
     const url = listeningAudioUrl(path);
     return `<div class="audioPlayer" data-src="${url}">
       <button type="button" class="audioPlayBtn" aria-label="Putar audio">▶</button>
@@ -4270,7 +4273,11 @@
 
   function renderImageTF(p, answer){
     let html = renderAudioPlayer(p.audio_url);
-    html += `<div class="listeningImageWrap"><img class="listeningImage" src="${listeningImageUrl(p.image_url)}" alt="" /></div>`;
+    if(p.image_url){
+      html += `<div class="listeningImageWrap"><img class="listeningImage" src="${listeningImageUrl(p.image_url)}" alt="" /></div>`;
+    } else if(p.image_svg){
+      html += `<div class="listeningImageWrap">${p.image_svg}</div>`;
+    }
     if(p.statement){
       html += `<div class="qStem">${hanziPinyinHtml(p.statement)}</div>`;
       if(attemptShowTranslation && p.statement_id) html += `<div class="qStemTrans">${p.statement_id}</div>`;
@@ -4329,6 +4336,8 @@
     let html = renderAudioPlayer(p.audio_url);
     if(isImage && p.image_url){
       html += `<div class="listeningImageWrap"><img class="listeningImage" src="${listeningImageUrl(p.image_url)}" alt="" /></div>`;
+    } else if(isImage && p.image_svg){
+      html += `<div class="listeningImageWrap">${p.image_svg}</div>`;
     }
     if(p.statement){
       html += `<div class="reviewStem">${p.statement}</div>`;

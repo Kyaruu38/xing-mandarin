@@ -1668,7 +1668,7 @@ terpisah.**
 
 Diputuskan Kyaru + Claude Code, 17 Jul 2026.
 
-## 45. `listeningAudioUrl`/`listeningImageUrl` crash pada `image_tf` di 10 set `H1XING001`-`H1XING010` — verdict: CODE issue, JANGAN DIKERJAIN SEKARANG
+## 45. `listeningAudioUrl`/`listeningImageUrl` crash pada `image_tf` di 10 set `H1XING001`-`H1XING010` — verdict: CODE issue, **PRIORITAS 1, KONFIRMASI RUSAK DI LIVE** — RESOLVED, 18 Jul 2026
 
 Ditemuin pas verifikasi live bug ratchet-disabled (lihat sesi ini) — `submitAttempt(true)` di
 `H1XING001` sukses tapi `showResult()`/`renderReview()` MELEDAK:
@@ -1708,14 +1708,82 @@ hasil — lebih parah dari yang kekira awalnya.
 keisi (bukan `null`), cuma field-nya beda nama dari yang dibaca renderer. Ini dua skema payload
 yang legit buat 2 generasi konten beda, dan renderer cuma pernah di-tulis buat skema yang lama.
 
-**Kenapa nggak dikerjain sekarang**: perlu keputusan desain (apakah `image_tf` di seri
-`H*XING*` emang sengaja audio-less + pakai `image_svg` inline sebagai standar baru, atau itu
-sendiri gap konten yang belum lengkap — dua-duanya nentuin bentuk fix beda: guard-doang vs
-render `image_svg` beneran). Di luar scope bug ratchet-disabled yang lagi dikerjain. **Kandidat
-follow-up sesi terpisah — 10 set (`H1XING001`-`010`) diblokir/nggak disaranin dipake buat demo
-sampai ini kelar.**
+**Kenapa nggak dikerjain sekarang (revisi — dinaikin ke PRIORITAS 1, bukan lagi "kandidat
+follow-up")**: perlu keputusan desain (apakah `image_tf` di seri `H*XING*` emang sengaja
+audio-less + pakai `image_svg` inline sebagai standar baru, atau itu sendiri gap konten yang
+belum lengkap — dua-duanya nentuin bentuk fix beda: guard-doang vs render `image_svg`
+beneran). Itu masih perlu diputusin sebelum FIX ditulis — tapi urgensinya udah beda kelas dari
+awal ditulis.
 
-Diputuskan Kyaru + Claude Code, 17 Jul 2026.
+### KONFIRMASI RUSAK DI LIVE, 18 Jul 2026 — bukan lagi cuma teori dari test harness
+
+**SQL Editor (Kyaru, bypass RLS)**: `H1XING001`-`H1XING010` — **`is_published=TRUE` SEMUA**,
+masing-masing 5 baris `image_tf` pake `image_svg` = **50 soal rusak DI PRODUCTION**, bukan
+draft/unpublished yang bisa ditunda.
+
+**Bukti nyata bukan simulasi**: attempt beneran malem ini di `H1XING004` — console nunjukin
+PERSIS error yang sama:
+```
+TypeError: Cannot read properties of undefined (reading 'replace')
+```
+di layar hasil, render Question 1 MELEDAK. Ini KEJADIAN NYATA, bukan efek RPC `400` dari fix
+#43 (`is_published` gate) — jalur error yang beda sama sekali, dikonfirmasi terpisah.
+
+**Kenapa naik ke Prioritas 1**: HSK1 = level pemula, populasi user PALING BANYAK dari 6 level.
+5 dari 10 set `H1XING00N` (yang punya `image_tf`) crash di attempt ATAU review — bukan edge
+case, bukan skenario aneh, ini jalur normal user paling umum ngerjain mock test HSK1. **Fix
+harus ditulis SEBELUM sesi konten/fitur baru manapun** — audit desain (guard vs render
+`image_svg`) masih perlu diputusin, tapi keputusan itu sendiri sekarang prioritas tinggi,
+bukan nunggu antrian. **Belum ditulis kodenya — direncanain besok.**
+
+**Line number referensi ter-update** (bergeser dari draft awal karena edit mobile fase 1 sesi
+lalu): `listeningAudioUrl`/`listeningImageUrl` :4169/:4173, `renderAudioPlayer` :4183,
+`renderImageTF` :4271-4280, `buildReviewTF` :4328-4344 (dipake bareng `listening_tf`+
+`image_tf`). Semua 7 titik pemanggil `renderAudioPlayer`/`listeningAudioUrl` udah dipetain
+lengkap di audit ini — lihat percakapan sesi buat tabel lengkapnya kalau perlu.
+
+Diputuskan Kyaru + Claude Code, 17-18 Jul 2026.
+
+### FIX — DONE, APPROVED, VERIFIED LIVE, 18 Jul 2026
+
+Keputusan poin 3 (guard vs render `image_svg` beneran): **render beneran**, bukan guard-doang —
+guard-doang bikin 50 soal `H1XING00N` jadi teks+True/False tanpa gambar sama sekali, padahal
+`image_tf` = 看图判断对错 (soal GAMBAR) — nggak mungkin dijawab bener tanpa liat gambarnya. Itu
+dianggap "rusak yang diem", lebih parah dari crash karena user cuma ngerasa bego, bukan liat
+error.
+
+**Kode, 3 titik guard + 2 titik render `image_svg`** (`index.html`):
+- `listeningAudioUrl(path)`/`listeningImageUrl(path)` — `if(!path) return null;` sebelum
+  `getPublicUrl`. Nutup KEDUA fungsi (bukan cuma audio kayak draft awal) — `listeningImageUrl`
+  ternyata punya lubang identik, kalau cuma audio yang di-guard, crash cuma pindah baris ke
+  `listeningImageUrl(p.image_url)` persis di baris berikutnya (skema baru juga NOL `image_url`).
+- `renderAudioPlayer(path)` — `if(!path) return '';` — audio player disembunyiin TOTAL buat
+  soal yang emang nggak ada audionya (reading section), bukan fallback player kosong.
+- `renderImageTF`/`buildReviewTF` — ditambahin cabang `else if(p.image_svg){ ...div... }`,
+  URUTAN `image_url` dicek DULUAN (150 baris lama nol perubahan perilaku), `image_svg` fallback
+  kalau `image_url` kosong. `renderImageTF` juga dapet guard `if(p.image_url)` yang sebelumnya
+  cuma ada di `buildReviewTF` (asimetri pre-existing, ketauan pas nulis fix ini).
+
+**Verifikasi — login segar, `H1XING001`, akun `claudecodelivetest@gmail.com`, sesuai aturan #38**:
+- Attempt Q21 (skema baru, `image_svg` gelas air): render bersih, nol audio player, nol console
+  error.
+- Submit (`submitAttempt(true)`, native `confirm()` dialog bikin CDP freeze — bukan bug, cuma
+  automation quirk, dikonfirmasi via bypass) → review: **40/40 soal muncul, nggak mati di
+  Question 1**. 5 soal skema baru (Q21-25: gelas air/kucing/jam/apel/buku) semua render SVG-nya.
+- **Kontrol, 150 baris lama nol regresi**: Q1-4 (skema lama, `image_url`+`audio_url`) masih pakai
+  `<img>`, audio player masih ada DAN **beneran bisa diputer** (dicek langsung, progress
+  `0:00→0:03`, bukan cuma elemen-nya ada).
+- Console bersih di setiap langkah (attempt, submit, review).
+- Dark mode: Q21/Q22 SVG tetap kontras (card putih di atas background gelap), nol regresi visual.
+- Mobile 390px (iframe same-origin, teknik dari HANDOFF sesi 13 karena `resize_window` inert):
+  login ulang, bottom-nav → Mock Test → HSK1 → H1XING001 → Retry, Q21 render benar, submit →
+  review 40/40 blocks, console bersih.
+
+**Temuan sampingan selama verifikasi, DINAIKIN jadi #49** (bukan bagian dari fix ini): Q25
+(`H1XING001`) — `statement` "他在看电视" (nonton TV) tapi `image_svg`-nya render BUKU. Bukan
+render bug (kode-nya bener, nampilin apa yang ada di data) — ini **data quality issue**, di luar
+batasan "jangan ubah data/payload" sesi ini. Lihat #49 buat detail lengkap + kenapa ini
+PRIORITAS TINGGI, bukan cuma dicatet doang.
 
 ## 46. `attemptSubmitBtn` ratchet — disabled selamanya abis 1 submit sukses, RESOLVED
 
@@ -1823,7 +1891,7 @@ backlog, bukan "sekali muncul terus ilang."
 
 Diputuskan Kyaru + Claude Code, 17 Jul 2026.
 
-## 48. HSK 6 listening — verdict FINAL (a): konten LENGKAP, kerjaan = publish bukan generate, 2 blocker + bom waktu grouping title-vs-set_id — JANGAN DIKERJAIN SEKARANG
+## 48. HSK 6 listening — verdict FINAL (a): konten LENGKAP, kerjaan = publish bukan generate, 1 blocker (bukan 2 — #45 dicoret) + bom waktu grouping title-vs-set_id — JANGAN DIKERJAIN SEKARANG
 
 Audit diminta karena kontradiksi kelihatan: `H6XING001` combined cuma nunjukin "Reading +
 Writing", padahal level lain (mis. `H4XING001`) nunjukin listening+reading+writing, dan Mock
@@ -1856,21 +1924,38 @@ digenerate dari nol** — koreksi total dari dugaan awal "proyek 500 soal + audi
 `8c1da2b` ("feat: listening_mc_stmt renderer (HSK6 听力 第一部分)"), commit misterius dari sesi
 CC paralel yang udah dicatet di #39 (dua sesi Claude Code kepentok nulis `index.html` yang
 sama, satu sesi commit snapshot working-tree yang kecampur). Jadi: **konten ada, renderer ada
-— murni soal publish, ketahan 2 blocker:**
+— murni soal publish.**
 
-1. **#45 (crash `listeningAudioUrl()`/`listeningImageUrl()`) — PRASYARAT WAJIB, bukan antrian
-   terpisah.** Kalau di-publish sekarang dan ada payload yang field audio-nya kosong/nggak
-   sesuai bentuk yang renderer harapin, user ngerjain → submit → layar review MELEDAK (`Cannot
-   read properties of undefined (reading 'replace')`) — persis mekanisme #45 yang udah kebukti
-   di 10 set `H1XING001-010`. Publish HSK6 listening SEBELUM #45 beres = nambah 500 soal baru
-   ke tempat yang bisa crash, bukan cuma masalah 10 set lama.
-2. **Alasan `is_published=false`-nya belum jelas** — 500 soal nggak bikin sendiri, jadi ada
-   keputusan sengaja nahan publish. Dugaan kuat: audio belum siap (belum di-generate/di-upload
-   ke Storage) — cocok sama pola #45 (payload nggak punya `audio_url`/`image_url` yang valid).
-   **Kyaru lagi cek payload-nya langsung buat mastiin** — belum final, jangan diasumsikan.
+### #45 DICORET sebagai blocker HSK6 — audit lanjutan (18 Jul) nunjukin beda tipe soal, beda jalur render
 
-**Belum dimulai apapun** — nunggu #45 kelar (prasyarat keras) DAN kejelasan soal blocker
-audio (poin 2) sebelum publish.
+Awalnya #45 ditulis jadi prasyarat wajib di sini. **Dikoreksi** setelah audit lengkap
+(dipaginate bener, bukan kena cap 1000-row kayak insiden #41) ngecek `audio_url` per
+`question_type` di SEMUA baris yang bisa dicek:
+
+| Tipe | Total | Punya `audio_url` | Nggak punya |
+|---|---|---|---|
+| `listening_tf` | 200 | 200 | 0 |
+| `listening_mc` | 1200 | **1200** | **0** |
+| `image_mc` | 300 | 300 | 0 |
+| `image_tf` | 200 | 150 | 50 (CUMA `H1XING001`-`010`, section READING, bukan listening) |
+
+`listening_mc` — tipe yang sama yang dipake HSK6 listening — **NOL pengecualian, 1200/1200**.
+#45 itu masalah SATU tipe spesifik (`image_tf`) yang punya 2 bentuk payload beda tergantung
+generasi konten, kena di 10 set `H1XING00N` **section reading**, bukan listening sama sekali.
+Jalur render HSK6 listening (`renderListeningMC`/`buildReviewListeningMC`) konsisten sama
+1200 baris `listening_mc` lain yang kebukti nol masalah — **beda kode, beda data, beda
+section dari yang #45 rusakin**.
+
+**Blocker HSK6 listening sekarang tinggal SATU**:
+
+1. **File MP3 di Supabase Storage** — `audio_url` di payload BENER ADA (dikonfirmasi Kyaru
+   lewat SQL Editor), tapi field ada ≠ file-nya beneran ke-upload di path itu. Perlu dicek
+   `getPublicUrl()` buat path-path itu beneran resolve ke file yang exist, bukan cuma string
+   path yang bener bentuknya. **Belum dicek** — kandidat kerjaan besok.
+
+**Belum dimulai apapun** — tinggal nunggu kejelasan file MP3 (poin di atas) sebelum publish.
+#45 tetep PRIORITAS 1 (lihat entry #45 sendiri) tapi **independen dari HSK6 listening** — dua
+antrian terpisah sekarang, bukan satu prasyarat-mengunci-yang-lain.
 
 ### BOM WAKTU tersembunyi — grouping combined jalan KARENA KEBETULAN, bukan by design
 
@@ -1912,5 +1997,44 @@ vs (c) belum diambil, dan (a)/(b) dua-duanya nyentuh area yang lebih luas dari s
 listening yang lagi diaudit.
 
 Diputuskan Kyaru + Claude Code, 17 Jul 2026.
+
+## 49. `image_tf` skema baru (10 set `H1XING001`-`H1XING010`) — SVG salah sama statement-nya, verdict: KEMUNGKINAN pola svg↔statement mismatch, PRIORITAS TINGGI, BELUM DIAUDIT
+
+Ketemu SAMPINGAN pas verifikasi fix #45 (render crash) — Question 25 (`H1XING001`, `image_tf`
+skema baru): `statement` = "他在看电视" ("Dia sedang nonton TV"), tapi `image_svg`-nya render
+gambar **buku**, bukan TV. Diverifikasi visual langsung di browser (screenshot), bukan tebakan
+dari baca data mentah.
+
+**Kenapa ini bukan cosmetic**: `image_tf` = 看图判断对错 ("lihat gambar, tentukan benar/salah") —
+gambar ITU SENDIRI bagian dari soal, bukan dekorasi. Kalau `image_svg` nggak cocok sama
+`statement`, kunci jawaban yang "benar" secara logis (gambar vs pernyataan) jadi nggak jelas
+mana yang dianggap sumber kebenaran sama grader — siswa yang jawab sesuai apa yang dia LIAT
+(buku) bisa aja disalahin kalau `answer` di DB ngikut asumsi `statement` (TV), atau sebaliknya.
+**Belum dicek `answer` field-nya buat soal ini** — baru ketauan gambar-nya salah, belum
+ditelusurin dampak ke kunci jawaban.
+
+**Kenapa dicurigai POLA, bukan 1 soal doang**: kecurigaan awal (belum diverifikasi) — kemungkinan
+ada script/lib generate (`svg_lib.py` atau semacamnya, disebut user, belum dikonfirmasi
+namanya persis) yang matching SVG ke statement secara programatik/otomatis, dan matching-nya
+bisa salah di lebih dari satu tempat. Scope potensial: **50 soal `image_tf` skema baru, 10 set,
+SEMUA `is_published=TRUE`, semua HSK 1** — level pemula, populasi user terbesar dari 6 level
+(sama alasan #45 dinaikin ke Prioritas 1).
+
+**Preseden linguistik dari sesi audit HSK6 listening (#48)**: "jumlah soal bener ≠ format bener"
+(jumlah baris cocok bukan bukti kontennya lengkap/benar). Temuan ini versi ketiga dari pola yang
+sama: **"render bener ≠ isi bener"** — #45 buktiin renderer-nya sekarang jalan tanpa crash, tapi
+itu nggak otomatis berarti apa yang dirender itu KONTEN YANG BENAR. Dua lapis masalah berbeda,
+dua fix berbeda, jangan dianggap kelar cuma karena satu udah RESOLVED.
+
+**JANGAN DIKERJAIN SEKARANG** — butuh audit sesi terpisah:
+1. Cek seluruh 50 baris `image_tf` skema baru (10 set): `statement` vs `image_svg` vs `answer`,
+   satu-satu, bukan sampling — buktiin ini pola atau cuma Q25 yang kena.
+2. Kalau pola konfirmed: telusurin sumber generatornya (kalau ada script terpisah kayak
+   `svg_lib.py`) buat ngerti KENAPA matching-nya salah, sebelum mutusin fix-nya regenerate vs
+   perbaikan manual per-baris.
+3. Ini masalah DATA, bukan kode — beda kelas dari #45 (yang itu genuinely kode belum di-update
+   buat skema baru). Jangan campur perbaikannya jadi satu sesi/commit sama fix kode manapun.
+
+Diputuskan Kyaru + Claude Code, 18 Jul 2026.
 
 Nothing else pending a decision right now.

@@ -1,3 +1,71 @@
+# Handoff — session 14 (#45 image_tf crash fix RESOLVED, #49 logged)
+
+Scope: **#45 doang** — `image_tf` crash di 10 set `H1XING001`-`H1XING010` (Prioritas 1, konfirmasi
+rusak di live sesi lalu). Report-first (baca #45+#38+HANDOFF → lapor rencana + 4 poin jawaban →
+tunggu approve) sebelum implementasi, sama pola kayak sesi-sesi sebelumnya.
+
+## #45 fix: DONE, APPROVED, VERIFIED LIVE, COMMITTED
+
+Full decision writeup: DECISIONS_NEEDED #45 (RESOLVED, resolution section ditambahin di bawah
+entry aslinya).
+
+**Root cause**: `renderImageTF()`/`buildReviewTF()` manggil `renderAudioPlayer(p.audio_url)`
+unconditional, yang manggil `listeningAudioUrl(path)` → `getPublicUrl(path)` — kalau `path`
+`undefined` (skema baru `image_tf`, 50 baris di 10 set `H1XING00N`, NOL `audio_url`/`image_url`,
+gambar-nya di `image_svg` inline), supabase-js internal `.replace()` di situ throw. Crash-nya
+kena attempt LAGI JALAN maupun review, bukan cuma review.
+
+**Fix, 5 titik kode** (`index.html`): `listeningAudioUrl`/`listeningImageUrl` di-guard
+(`if(!path) return null`) — KEDUANYA, bukan cuma audio (kalau cuma audio, crash pindah baris ke
+`listeningImageUrl` karena skema baru juga NOL `image_url`). `renderAudioPlayer` di-guard return
+`''` kalau `path` falsy — audio player disembunyiin total buat soal reading section yang emang
+nggak ada audionya. `renderImageTF`/`buildReviewTF` dapet cabang render `image_svg` BENERAN
+(bukan guard-doang) kalau `image_url` kosong — keputusan eksplisit Kyaru: `image_tf` = 看图判断对错
+(soal gambar), guard-doang bikin 50 soal itu jadi teks tanpa gambar = nggak mungkin dijawab
+bener, "rusak yang diem" lebih parah dari crash. `renderImageTF` juga dapet guard `image_url`
+yang sebelumnya cuma ada di `buildReviewTF` (asimetri pre-existing, ketauan pas nulis fix ini).
+
+**Verifikasi — login segar, akun `claudecodelivetest@gmail.com`, aturan #38 penuh**: `H1XING001`
+attempt Q21 (skema baru) render bersih nol audio player nol error → submit paksa (native
+`confirm()` dialog bikin CDP freeze sekali, dikonfirmasi cuma automation quirk bukan bug, di-
+bypass pake `submitAttempt(true)` dari console) → review **40/40 soal muncul, nggak mati di
+Question 1**, 5 soal skema baru (Q21-25) semua render SVG-nya. **Kontrol 150 baris lama**: Q1-4
+skema lama masih `<img>`, audio player masih ADA dan BENERAN BISA DIPUTER (progress `0:00→0:03`
+dicek langsung) — nol regresi. Console bersih tiap langkah. Dark mode dicek (Q21/Q22 SVG tetep
+kontras). Mobile 390px dicek (iframe same-origin, teknik HANDOFF sesi 13 karena `resize_window`
+inert) — bottom-nav → Mock Test → HSK1 → Retry → Q21 benar → submit → review 40/40, console
+bersih.
+
+## Temuan sampingan, DINAIKIN jadi #49 — image_svg salah sama statement-nya, PRIORITAS TINGGI
+
+Ketemu pas verifikasi #45 (bukan bagian dari fix ini): `H1XING001` Q25 — `statement` "他在看电视"
+(nonton TV) tapi `image_svg`-nya render **buku**. Ini bukan render bug (renderer-nya bener,
+nampilin apa yang ada di data) — **data quality issue**, di luar batasan "jangan ubah data" sesi
+ini. Dicurigai POLA (bukan 1 soal doang) — scope potensial 50 soal, 10 set, semua published,
+semua HSK1 (level pemula, populasi user terbesar). Preseden dari audit HSK6 listening (#48):
+"jumlah soal bener ≠ format bener" — ini versi ketiga, "render bener ≠ isi bener". **JANGAN
+DIKERJAIN SESI INI** — butuh audit sesi terpisah (full writeup di DECISIONS_NEEDED #49).
+
+## Commit sesi ini
+
+- (commit sesi ini) — `index.html` (fix #45), `DECISIONS_NEEDED.md` (#45 RESOLVED + resolution
+  section, #49 baru), `HANDOFF.md` (entry ini).
+
+**Sengaja TIDAK di-commit** (sama seperti semua sesi sebelumnya): `supabase/functions/
+grade-essay/index.ts` — perubahan uncommitted di file itu bukan dari sesi manapun di urutan ini,
+dibiarkan apa adanya.
+
+## Belum dikerjakan / kandidat follow-up
+
+- **#49** — `image_svg`/`statement` mismatch di `image_tf` skema baru, PRIORITAS TINGGI, butuh
+  audit sesi terpisah sebelum fix ditulis.
+- **#47** — `watchSession()`'s unparameterized filter string, masih butuh repro realistis.
+- **Gap #2 remainder** — RLS-by-package, masih blocked di `package_levels` source-of-truth.
+- **HSK6 listening publish** (#48) — 1 blocker tersisa (verifikasi file MP3 beneran ke-upload di
+  Storage), independen dari #45/#49.
+
+---
+
 # Handoff — session 13 (Mobile fase 1 — bottom nav + header + login port, #47 logged)
 
 Scope: app had zero mobile breakpoint handling beyond a partial icon-shrink at 760px that

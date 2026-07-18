@@ -104,7 +104,7 @@ Options for user to decide, not to be implemented without sign-off:
 - **(c)** Use a radical field (would need to check if one exists in the `vocab` schema)
 - **(d)** Leave the redundant duplicate as-is
 
-## 8. Mock test navigator legend "Flagged" — dead state, same class as #6 — OPEN, product decision
+## 8. Mock test navigator legend "Flagged" — dead state, same class as #6 — RESOLVED, 19 Jul 2026
 
 Ported the 4-swatch legend (Answered/Current/Flagged/Empty) verbatim from `.dc.html`'s
 `isTest` block (literal colors from the `tile()` helper, lines 380-393) as part of the mock
@@ -115,11 +115,35 @@ would flag a question either (the `qNav` demo array just hardcodes 2 of 95 cells
 permanently advertises a color that can never appear. Same category of issue as #6 (dead
 speaker button) — a visible affordance/explanation for something inert.
 
-Options for user to decide, not to be implemented without sign-off:
-- **(a)** Hide the "Flagged" legend entry until a real flag feature exists
-- **(b)** Build the feature — some way to flag a question (right-click / long-press on a
-  grid cell), source gives no interaction spec for this, would need its own design decision
-- **(c)** Leave it as-is (harmless, just permanently unused)
+### FIX — DONE, APPROVED, VERIFIED, 19 Jul 2026 — opsi (b), fitur beneran dibangun
+
+**Audit pre-implementasi**: dikonfirmasi cuma lapisan presentasi yang ada (CSS `.gridBtn.flagged`
++ `.legendSwatch.flagged` + legend markup + i18n `legendFlagged` 3 bahasa) — nol state variable,
+nol handler, sama persis catatan di atas. Nol resiko dobel-bangun.
+
+**Implementasi, ~25 baris `index.html`**: `flaggedQuestions` (`Set`), sibling `attemptAnswers` —
+reset di 2 titik yang sama (`startAttempt()`/`startCombinedAttempt()`). Toggle chip baru (reuse
+`.toggleChip` apa adanya), ditaro di `.attemptNav` di antara Prev/Next (aksi per-soal, bukan
+setting tampilan global kayak Pinyin/Translation). Checked-state di-recompute tiap
+`renderAttemptNav()` dari `flaggedQuestions.has(q.id)`, pola sama kayak tombol TF/MC baca
+`attemptAnswers[q.id]`. Grid dapet 1 cabang `' flagged'` tambahan.
+
+**Keputusan desain (Kyaru)**: flag JANGAN override current — diimplementasi sebagai dot coral
+kecil via `::after` (position:relative di `.gridBtn`, dot absolute di pojok), bukan
+`background`/`color`, jadi nggak nabrak cascade sama `.current`/`.answered`. Current tetep gold
+penuh + dot flagged kebaca bareng.
+
+**Persist**: ikut `attemptAnswers` (in-memory doang, ilang pas refresh) — konsisten, bukan
+regresi (attemptAnswers sendiri emang belum persist, #35). **Nol sentuh** `submit_attempt`,
+`gatherAttemptAnswers`, review screen — flag murni client-side visual, RPC nggak pernah tau.
+
+**Acceptance test, localhost, 5/5 lolos**: flag soal → dot muncul di navigator; buka soal itu →
+current (gold) DAN flagged (dot) bareng; unflag → dot ilang; submit dengan 1 flag aktif → skor
+5/200 (1/40 bener) — matematis persis buat 1 jawaban bener, **flag nol pengaruh ke angka**,
+dikonfirmasi eksplisit (`flaggedQuestions.size` masih 1 pas `submitAttempt(true)` dipanggil);
+console bersih di semua langkah.
+
+Diputuskan Kyaru + Claude Code, 19 Jul 2026.
 
 ---
 
@@ -2393,5 +2417,26 @@ nyata sejak renderer-nya ditulis — WAJIB dites manual (bukan cuma lolos gerban
 dianggap aman. Lihat antrian di HANDOFF.md buat urutan tes-nya.
 
 Diputuskan Kyaru + Claude Code, 18 Jul 2026.
+
+## 56. Konvensi `reading_mc` dipakai sebagai wadah TF-teks (判断对错), `image_tf` cuma buat TF-bergambar — SENGAJA, JANGAN migrasi
+
+Dicatet Kyaru (bukan temuan audit) — HSK2 reading Part 3: soal 判断对错 (benar/salah) **tanpa
+gambar** dibangun pakai `question_type='reading_mc'` (2 pilihan tetap 对/错, `choices[].hanzi`),
+BUKAN `image_tf`. `image_tf` khusus dipakai buat 看图判断对错 (TF **dengan** gambar). Ini konvensi
+konten yang disengaja, **70 soal konsisten**, bukan salah kategorisasi.
+
+**Konsekuensi buat sesi depan**: statistik/analitik/filter "by `question_type`" bakal ngitung
+TF-teks ini sebagai `reading_mc` biasa (soal pilihan ganda), BUKAN sebagai TF, walau secara UX
+tampilannya 2-tombol 对/错 sama persis kayak `image_tf`/`listening_tf`. Kalau nanti ada kerjaan
+yang butuh "semua soal TF" (bukan "semua soal reading_mc"), filter `question_type='image_tf' OR
+question_type='listening_tf'` **BAKAL NGELEWATIN 70 soal ini** — filter yang bener butuh cek pola
+`choices` (2 pilihan, `hanzi` isinya persis 对/错) di dalam `reading_mc`, bukan cuma nama tipe.
+
+**JANGAN migrasi ke `image_tf`/tipe baru** — 70 soal ini jalan sempurna lewat `renderChoiceList()`
+(dispatcher `reading_mc` yang udah ada), nol bug, nol renderer gap. Migrasi cuma bakal nambah
+resiko (kelas #45/#50) buat nutup gap yang sebenernya nggak ada gap fungsional — cuma gap
+semantik di NAMA tipe, yang udah didokumentasiin di sini biar nggak ke-anggep bug lagi.
+
+Dicatet Kyaru, 19 Jul 2026.
 
 Nothing else pending a decision right now.

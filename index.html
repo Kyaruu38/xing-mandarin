@@ -892,8 +892,9 @@
     .segmentItem.picked .segmentBadge{background:linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#241a08; border-color:transparent}
     .segmentHanzi{font-family:var(--hanzi-font); font-size:15px}
     .segmentTrans{color:var(--muted); font-size:12px; margin-left:auto; text-align:right}
-    .attemptNav{display:flex; gap:12px; margin-top:18px}
+    .attemptNav{display:flex; align-items:center; gap:12px; margin-top:18px}
     .navBtn{margin-top:0; flex:1; height:50px; border-radius:14px; font-size:14px; cursor:pointer}
+    .attemptFlagChip{margin-top:0; flex-shrink:0; white-space:nowrap}
     .navBtn.navPrev{border:1.5px solid rgba(var(--text-rgb),.12); background:var(--panel); color:rgba(var(--text-rgb),.5); font-weight:700}
     .navBtn.navNext{border:none; background:#1C2A5E; color:#fff; font-weight:800; box-shadow:0 12px 22px -12px rgba(var(--text-rgb),.7)}
     .navBtn:disabled{opacity:.4; cursor:not-allowed}
@@ -903,10 +904,12 @@
     /* real <button> now (was a div -- no keyboard access), so every property the global
        button{} rule sets must be reset explicitly here, not just the visually-obvious ones --
        margin-top:22px and padding:13px would otherwise blow up a 40px grid cell. */
-    .gridBtn{width:auto; margin-top:0; padding:0; height:40px; border:none; border-radius:11px; font-size:13px; font-weight:700; font-family:inherit; display:flex; align-items:center; justify-content:center; cursor:pointer; background:var(--track); color:rgba(var(--text-rgb),.55)}
+    .gridBtn{width:auto; margin-top:0; padding:0; height:40px; border:none; border-radius:11px; font-size:13px; font-weight:700; font-family:inherit; display:flex; align-items:center; justify-content:center; cursor:pointer; background:var(--track); color:rgba(var(--text-rgb),.55); position:relative}
     .gridBtn.answered{background:var(--text); color:var(--panel)}
     .gridBtn.current{background:var(--gold); color:#1C2A5E; box-shadow:0 6px 14px -6px rgba(242,176,30,.9)}
-    .gridBtn.flagged{background:rgba(232,111,82,.18); color:#E86F52; border:1.5px solid rgba(232,111,82,.55)}
+    /* Flag = small corner dot via ::after, NEVER touches background/color -- so it layers on
+       top of .answered/.current instead of overriding them (Kyaru's call, DECISIONS_NEEDED #8). */
+    .gridBtn.flagged::after{content:''; position:absolute; top:-3px; right:-3px; width:9px; height:9px; border-radius:50%; background:#E86F52; border:1.5px solid var(--panel)}
     .attemptFilledCount{font-size:12.5px; color:rgba(var(--text-rgb),.55); font-weight:700}
     .attemptFilledCount.done{color:var(--ok)}
     .questionLegend{margin-top:14px; display:flex; gap:16px; flex-wrap:wrap; font-size:11.5px; color:rgba(var(--text-rgb),.55); font-weight:600}
@@ -1534,6 +1537,7 @@
 
         <div class="attemptNav">
           <button id="attemptPrevBtn" class="navBtn navPrev">‹ Sebelumnya</button>
+          <label class="toggleChip attemptFlagChip" for="attemptFlagToggle"><input type="checkbox" class="toggleChipInput" id="attemptFlagToggle" /><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#F2B01E" stroke-width="3.2"><path d="M20 6 9 17l-5-5"/></svg><span id="attemptFlagLabel">Flagged</span></label>
           <button id="attemptNextBtn" class="navBtn navNext">Berikutnya ›</button>
         </div>
 
@@ -2349,6 +2353,7 @@
     $('legendAnswered').textContent = t('legendAnswered');
     $('legendCurrent').textContent = t('legendCurrent');
     $('legendFlagged').textContent = t('legendFlagged');
+    $('attemptFlagLabel').textContent = t('legendFlagged');
     $('legendEmpty').textContent = t('legendEmpty');
     $('attemptSubmitBtn').textContent = t('submitBtn');
     $('attemptExitBtn').textContent = t('exitCancel');
@@ -4445,6 +4450,10 @@
   let attemptSet = null;
   let attemptQuestions = [];
   let attemptAnswers = {};
+  // Client-side only, mirrors attemptAnswers' lifecycle (reset at the same 2 entry points,
+  // never persisted, never sent to submit_attempt -- purely a "mark to revisit" scratch note,
+  // RPC has no concept of it. DECISIONS_NEEDED #8.
+  let flaggedQuestions = new Set();
   let attemptIndex = 0;
   let attemptDeadline = null;
   let attemptTimerInterval = null;
@@ -4481,6 +4490,7 @@
     attemptSet = setRow;
     attemptQuestions = qRows;
     attemptAnswers = {};
+    flaggedQuestions = new Set();
     attemptIndex = 0;
     attemptShowPinyin = false;
     attemptShowTranslation = false;
@@ -4550,6 +4560,7 @@
     };
     attemptQuestions = qRows;
     attemptAnswers = {};
+    flaggedQuestions = new Set();
     attemptIndex = 0;
     attemptShowPinyin = false;
     attemptShowTranslation = false;
@@ -4836,6 +4847,13 @@
     $('attemptProgressFill').style.width = (((attemptIndex + 1) / attemptQuestions.length) * 100) + '%';
     $('attemptPrevBtn').disabled = attemptIndex === 0;
     $('attemptNextBtn').disabled = attemptIndex === attemptQuestions.length - 1;
+    // Flag is per-question (unlike Pinyin/Translation's global toggles) -- checked-state has
+    // to be recomputed every render from flaggedQuestions, same pattern as .tfBtn/.choiceItem
+    // reading their "active" state from attemptAnswers[q.id] each render.
+    const curQ = attemptQuestions[attemptIndex];
+    const isFlagged = !!(curQ && flaggedQuestions.has(curQ.id));
+    $('attemptFlagToggle').checked = isFlagged;
+    $('attemptFlagToggle').closest('.toggleChip').classList.toggle('active', isFlagged);
   }
 
   function renderQuestionGrid(){
@@ -4847,7 +4865,7 @@
       if(answered) filled++;
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'gridBtn' + (answered ? ' answered' : '') + (i === attemptIndex ? ' current' : '');
+      btn.className = 'gridBtn' + (answered ? ' answered' : '') + (i === attemptIndex ? ' current' : '') + (flaggedQuestions.has(q.id) ? ' flagged' : '');
       btn.textContent = i + 1;
       btn.addEventListener('click', () => goToAttemptQuestion(i));
       wrap.appendChild(btn);
@@ -5365,6 +5383,16 @@
   });
   $('togglePinyin').addEventListener('change', e=>{ attemptShowPinyin = e.target.checked; e.target.closest('.toggleChip').classList.toggle('active', attemptShowPinyin); renderAttemptQuestion(); });
   $('toggleTranslation').addEventListener('change', e=>{ attemptShowTranslation = e.target.checked; e.target.closest('.toggleChip').classList.toggle('active', attemptShowTranslation); renderAttemptQuestion(); });
+  // Flag toggle: client-side only (Set of question ids), never touches attemptAnswers/
+  // gatherAttemptAnswers/submit_attempt -- DECISIONS_NEEDED #8. Only the grid + this chip's
+  // own active-state need a refresh, not the whole question body -- no renderAttemptQuestion().
+  $('attemptFlagToggle').addEventListener('change', e=>{
+    const q = attemptQuestions[attemptIndex];
+    if(!q) return;
+    if(e.target.checked) flaggedQuestions.add(q.id); else flaggedQuestions.delete(q.id);
+    e.target.closest('.toggleChip').classList.toggle('active', e.target.checked);
+    renderQuestionGrid();
+  });
   $('attemptPrevBtn').addEventListener('click', ()=> goToAttemptQuestion(attemptIndex - 1));
   $('attemptNextBtn').addEventListener('click', ()=> goToAttemptQuestion(attemptIndex + 1));
   $('attemptSubmitBtn').addEventListener('click', ()=> submitAttempt(false));

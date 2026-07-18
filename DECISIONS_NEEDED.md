@@ -1318,8 +1318,24 @@ beneran.
    biasa bisa akses", yang itu justru pertanyaan yang tepat buat akun non-admin), **minta user
    jalanin query lewat SQL Editor** (jalan sebagai `postgres`, bypass RLS) alih-alih nyimpulin
    dari hasil yang ke-filter.
+5. **(Ditambahin 18 Jul 2026, koreksi metode dari poin 4 di atas)** Poin 4 ("minta user jalanin
+   SQL Editor") itu **cuma bener kalau Claude beneran nggak punya akses lain**. Faktanya:
+   `SUPABASE_KEY` di environment sesi ini **role-nya `service_role`** (dicek dari payload JWT-nya
+   langsung — bukan `anon`), yang artinya **bypass RLS SEPENUHNYA**, sama kayak SQL Editor.
+   Insiden #48 (verdict awal (c) "HSK6 listening data nggak ada" SALAH) sebenarnya **bukan
+   keterbatasan akses** — key yang bisa liat semua baris udah ada di environment dari awal,
+   cuma nggak kepake pas audit itu. Itu **kelalaian metode**, bukan RLS beneran ngeblokir.
+   **Aturan yang benar**: audit soal KEBERADAAN data **WAJIB pake `SUPABASE_KEY` (service_role)
+   lewat REST API langsung** (`$SUPABASE_URL/rest/v1/...` + header `apikey`/`Authorization:
+   Bearer $SUPABASE_KEY`) — BUKAN minta user jalanin SQL manual buat kasus yang Claude sendiri
+   bisa jawab. **Rule lama TETAP BERLAKU, nggak berubah**: ini cuma buat BACA (`GET`/`select`).
+   **Nol write** ke Supabase lewat jalur ini — `INSERT`/`UPDATE`/`DELETE`/`UPSERT` apapun tetep
+   harus lewat user (SQL Editor, tempel query dari Claude), sama kayak semua migrasi/fix data
+   sebelumnya. Kalau butuh verifikasi lewat aplikasi (bukan query mentah), tetep pake akun test
+   biasa (`authenticated`, bukan `service_role`) — biar hasil yang dicek representasi pengalaman
+   user asli, bukan pandangan admin-god-mode.
 
-Diputuskan Kyaru + Claude Code, 17 Jul 2026.
+Diputuskan Kyaru + Claude Code, 17-18 Jul 2026.
 
 ## 39. Commit `8c1da2b` nyampur kerjaan dua sesi — indikasi 2 sesi CC paralel di file yang sama
 
@@ -1998,7 +2014,7 @@ listening yang lagi diaudit.
 
 Diputuskan Kyaru + Claude Code, 17 Jul 2026.
 
-## 49. `image_tf` skema baru (10 set `H1XING001`-`H1XING010`) — SVG salah sama statement-nya, verdict: KEMUNGKINAN pola svg↔statement mismatch, PRIORITAS TINGGI, BELUM DIAUDIT
+## 49. `image_tf` skema baru (10 set `H1XING001`-`H1XING010`) — SVG salah sama statement-nya — AUDITED, **FALSE ALARM**, 18 Jul 2026
 
 Ketemu SAMPINGAN pas verifikasi fix #45 (render crash) — Question 25 (`H1XING001`, `image_tf`
 skema baru): `statement` = "他在看电视" ("Dia sedang nonton TV"), tapi `image_svg`-nya render
@@ -2034,6 +2050,250 @@ dua fix berbeda, jangan dianggap kelar cuma karena satu udah RESOLVED.
    perbaikan manual per-baris.
 3. Ini masalah DATA, bukan kode — beda kelas dari #45 (yang itu genuinely kode belum di-update
    buat skema baru). Jangan campur perbaikannya jadi satu sesi/commit sama fix kode manapun.
+
+Diputuskan Kyaru + Claude Code, 18 Jul 2026.
+
+### AUDIT HASIL — FALSE ALARM, ditutup 18 Jul 2026
+
+Audit penuh 50/50 baris (query lewat `SUPABASE_KEY` service_role, bukan RLS-terbatas), pakai
+`<title>` di dalam `image_svg` sebagai identitas objek. Hasil: **nol pengecualian di 50 baris**
+— kalau `svg_title` cocok makna sama `statement` → `answer` SELALU "A" (对/Benar). Kalau nggak
+cocok → `answer` SELALU "B" (错/Salah). Distribusi 30 True / 20 False (60/40), nggak degenerate.
+
+Q25 sendiri (svg=buku, statement="nonton TV", awalnya dicurigai): `answer.correct = "B"` (错) —
+**BENAR secara desain**. Gambar sengaja nggak cocok, jawaban yang benar memang "Salah", user
+yang jawab "Salah" dapet nilai bener.
+
+**Verdict: (a) — fitur yang salah dibaca, bukan bug.** `image_tf` = 看图判断对错 — mekanismenya
+MEMANG butuh sebagian soal punya gambar yang sengaja nggak cocok, biar user harus bisa DETEKSI
+ketidakcocokan (kalau semua gambar cocok, jawabannya selalu "Benar" dan soal jadi percuma).
+Kesalahan sesi lalu: liat Q25 mismatch, langsung asumsi data rusak, tanpa cek `answer` field
+dulu buat lihat apakah mismatch itu bagian dari desain soal.
+
+**`svg_lib.py`**: dicek 3 cara (file search, grep semua `.py` di repo, `git log --all` di semua
+commit/branch) — **nol jejak, di mana pun, kapan pun**. Kalau script generatornya beneran
+pernah ada, dia hidup di luar repo ini. Dicatet sebagai temuan sendiri, bukan diselidiki lebih
+lanjut (di luar scope).
+
+**Status**: ditutup sebagai false alarm, entry **DIBIARIN** (tidak dihapus) biar nggak
+dicurigain ulang tanpa alasan kalau ada yang nemu pola serupa nanti — tinggal rujuk ke sini.
+
+Diputuskan Kyaru + Claude Code, 18 Jul 2026.
+
+## 50. `image_match` (看图选择) — NOL RENDERER, 100 soal LIVE PUBLISHED, HSK1+HSK2 — RESOLVED, 18 Jul 2026
+
+Ditemuin lewat laporan langsung: `H1XING001` Reading Q6-10 cuma nampilin instruksi "看图选择"
+terus KOSONG — nol gambar, nol pilihan jawaban, soal nggak bisa dijawab. Awalnya dikira sodara
+#45 (renderer `image_mc` kelewat cabang `image_svg`) — **SALAH, beda kelas masalah**.
+
+**Root cause**: `question_type` soal ini `image_match`, BUKAN `image_mc`. Payload-nya:
+```json
+{
+  "prompt": "我很喜欢这只小猫。", "prompt_id": "...",
+  "instruction": "看图选择", "instruction_id": "...",
+  "image_choices": [
+    {"key":"A","svg":"<svg...><title>buku</title>...</svg>"},
+    {"key":"B","svg":"..."}, {"key":"C","svg":"..."},
+    {"key":"D","svg":"..."}, {"key":"E","svg":"..."}
+  ]
+}
+```
+`grep "image_match"` di seluruh `index.html` → **0 hasil**. Bukan payload-shape-mismatch di
+renderer yang udah ada (kelas #45) — **function-nya sendiri nggak pernah ditulis**, di attempt
+dispatcher (`renderAttemptQuestion()`, if/else-chain :4578-4627) maupun review dispatcher
+(`buildReviewHTML()`, :5156-5184). `qInstruction` (baris 4576) render UNCONDITIONAL sebelum
+chain-nya, itu sumber "看图选择" yang tetep nongol — abis itu nggak ada cabang yang match, `html`
+berenti di situ. **Nol crash** (nggak ada kode yang jalan buat nyoba baca field yang nggak ada,
+beda dari #45 yang genuinely throw) — cuma diem-diem kosong.
+
+**Blast radius, full sweep DB (5175 baris, paginated bener)**: **100 baris**, bukan 50 kayak
+laporan awal — `H1XING001`-`010` (HSK1, 50) **DAN** `H2XING001`-`010` (HSK2, 50), **20 set,
+SEMUA `is_published=true`, SEMUA reading section**. HSK1+HSK2 = dua level pemula terbesar.
+
+**Dampak nilai**: tiap set Reading HSK1/2 = 20 soal, 5 di antaranya (`image_match`) otomatis
+nggak kejawab (nol pilihan buat diklik) → **user Reading HSK1/HSK2 mentok maksimal 15/20
+SELAMANYA**, diem-diem, nol pesan error yang bilang kenapa. Ini integritas nilai, bukan cosmetic
+— beda dari #45 (yang crash, keliatan) ini malah senyap, mungkin lebih parah karena user nggak
+tau ada yang salah.
+
+### Investigasi pre-implementasi (audit, nol kode ditulis)
+
+**Soal 1 — bank gambar shared, dikonfirmasi 100%**: dicek program-matically, ke-20 set, **5 baris
+`image_match` per set punya `image_choices` yang PERSIS IDENTIK** (bukan sampling — literal
+string comparison tiap baris). Dan tiap gambar (A-E) dipakai sebagai jawaban benar TEPAT SEKALI
+per set (`sorted(answers) == ['A','B','C','D','E']`, semua 20 set match) — ini **format asli
+Hanban 看图选择 HSK1/2**: satu bank 5 gambar, 5 kalimat, pemetaan bijektif.
+
+**Rekomendasi UX — JANGAN bikin "render sekali, dipakai bareng"**: dicek preseden yang UDAH ADA
+di app — `reading_mc` (mis. `H6XING003` order_index 42 & 43) juga punya passage yang IDENTIK
+diulang di 2+ baris soal beruntun, dan app SEKARANG render passage itu ULANG di tiap soal (nol
+dedup, nol mekanisme "shared block"). Arsitektur `renderAttemptQuestion()` emang satu-soal-
+sekali-render, konsisten di semua 12 tipe yang udah ada. Bikin UI "bank gambar tampil sekali
+buat 5 soal" bakal jadi pola arsitektur baru yang nggak ada preseden-nya — rekomendasi: **ikutin
+pola existing, render 5-gambar bank itu ULANG di tiap 5 soal** (sama kayak reading_mc ngulang
+passage), bukan restrukturisasi ke grouped-view.
+
+**Soal 2 — reuse `.imageChoiceItem`, YA, styling zero-baru**: `.imageChoiceItem`/`.imageChoiceList`
+(dipake `image_mc` via `renderImageOptions()`) itu modifier di atas `.choiceItem`/`.choiceList`
+based (:881-887, base button/active-state generik dipakai 4+ renderer lain) — struktur visualnya
+(grid tile gambar, klik buat pilih, state aktif) PERSIS sama kebutuhan `image_match`. Beda cuma
+konten: `image_mc` pake `<img src="...">` (Storage path), `image_match` butuh svg inline
+(`<div class="imageChoiceImg">{svg}</div>`, sama pola kayak fix #45's `.listeningImageWrap`).
+**Satu potensi CSS tweak** (bukan CSS baru, penyesuaian): `.imageChoiceImg` sekarang nge-style
+tag `<img>` langsung (`width:100%; max-width:140px`) — kalau dipasang di `<div>` pembungkus svg,
+mungkin butuh baris tambahan `.imageChoiceImg svg{width:100%;height:auto;display:block}` biar
+svg-nya ngisi kotak yang sama persis kayak `<img>` biasanya ngisi. Rekomendasi: function baru
+`renderImageMatchOptions()`/`buildReviewImageMatchChoices()` (sibling dari
+`renderImageOptions()`/`buildReviewImageChoices()`, bukan nulis ulang yang lama) — array-based
+(`image_choices`) bukan dict-based (`image_options`), tapi reuse class CSS yang sama persis.
+
+**Soal 3 — review screen**: `p.prompt`/`p.prompt_id` itu field yang SAMA persis kayak yang udah
+dipake `sentence_match` (baris 4592-4595 attempt, 5168-5171 review) — reuse pola stem itu apa
+adanya, bukan nemuin field baru. Buat pilihan jawaban, `buildReviewImageChoices()` (:4363-4378,
+dict-based, `image_mc`) punya pola marking `isCorrect`/`isWrongPick` yang persis bisa
+di-adaptasi ke versi array-based buat `image_choices` — logic markingnya identik, cuma sumber
+datanya beda bentuk (array vs dict).
+
+**Soal 4 — `sentence_cloze`/`word_cloze` — DICATET, JANGAN DIKERJAIN**: ikut kena penyakit yang
+sama (nol renderer, grep 0 hasil di dispatcher), tapi keduanya cuma ada di `hsk6-reading-1`
+(judul `H6XING001 READING`), **`is_published=false`** — bom waktu dorman, bukan bug live. Udah
+jadi bagian dari blocker publish `hsk6-reading-1` yang dicatet #48 (HSK6 listening/reading belum
+di-publish) — nambah 2 item baru ke list blocker itu, bukan kerjaan terpisah. **Nggak disentuh
+sesi ini.**
+
+**Belum diimplementasi apapun** — ini laporan rencana, nunggu approve buat mulai nulis kode.
+
+Diputuskan Kyaru + Claude Code, 18 Jul 2026.
+
+## 51. POLA — konten generate duluan, renderer ketinggalan, 4x kejadian — bukan 4 bug, 1 penyakit
+
+Kejadian yang sama, 4 kali, beda tipe soal tiap kali:
+1. **HSK6 listening** (#48) — konten `listening_mc` lengkap, renderer-nya (`8c1da2b`) sempet
+   ketunda ke-publish gara-gara commit nyampur (#39), bukan renderer-nya sendiri yang kurang.
+2. **`image_tf` + `image_svg`** (#45) — renderer ADA tapi ditulis buat skema lama doang
+   (`audio_url`/`image_url`), skema baru (`image_svg`) nggak pernah di-tambahin pas konten baru
+   itu di-generate.
+3. **`image_match`** (#50) — konten di-generate LENGKAP (100 baris, 20 set, published), renderer
+   buat tipe ini **nggak pernah ditulis sama sekali**.
+4. **`sentence_cloze`/`word_cloze`** (ditemuin dalam audit #50) — sama kayak #3, konten ada
+   (`hsk6-reading-1`), renderer nol — untungnya masih `is_published=false`, ketauan sebelum
+   sempet live.
+
+**Ini bukan 4 bug independen** — polanya konsisten: proses generate konten (entah manual, AI-
+assisted, atau script) jalan LEBIH DULU dan LEBIH CEPAT dari proses nulis/update renderer di
+`index.html`. Setiap kali tipe soal baru (atau skema payload baru buat tipe lama) di-generate,
+ada jeda sebelum renderer-nya nyusul — dan kalau konten itu ke-publish di jeda itu, hasilnya
+soal yang nggak bisa dijawab (kelas #45/#50) atau bahkan crash (kelas #45 sebelum di-fix).
+
+**Aturan baru, berlaku semua sesi ke depan**: **sebelum publish set/konten apapun** (`UPDATE
+test_sets SET is_published=true` atau setara), **WAJIB cek**:
+1. `question_type` di baris-baris yang mau di-publish ada di dispatcher (`renderAttemptQuestion`
+   DAN `buildReviewHTML`) — grep nama tipe-nya, pastiin ada cabang yang match.
+2. Kalau tipe-nya udah punya cabang, cek juga BENTUK payload-nya (field apa yang ADA) cocok sama
+   yang dibaca renderer-nya — skema lama vs baru (kelas #45) nggak selalu ketauan dari sekadar
+   "tipe udah ada".
+
+Ini melengkapi 2 aturan verifikasi yang udah ada (#38: "syntax check ≠ verifikasi",
+"jumlah soal bener ≠ format bener") — versi keempat dari keluarga aturan yang sama:
+**"konten ada ≠ konten bisa dirender"**.
+
+Diputuskan Kyaru + Claude Code, 18 Jul 2026.
+
+### FIX — DONE, APPROVED, VERIFIED, 18 Jul 2026
+
+Implementasi persis sesuai rencana yang di-approve (poin 1-4 di atas), 5 titik di `index.html`:
+`renderImageMatchOptions()` (sibling `renderImageOptions()`, array-based `image_choices`, emit
+`class="choiceItem imageChoiceItem"` + `data-key` — delegated click handler yang udah ada
+`(~line 5339)` nangkep otomatis, NOL JS wiring baru), `buildReviewImageMatchChoices()` (sibling
+`buildReviewImageChoices()`, marking `isCorrect`/`isWrongPick` sama persis), 2 cabang dispatcher
+baru (`renderAttemptQuestion()` + `buildReviewHTML()`, pola `sentence_match` — `p.prompt`/
+`p.prompt_id`), 1 baris CSS (`.imageChoiceImg svg{width:100%;height:auto;display:block}`).
+**NOL perubahan SQL, NOL write ke Supabase** — sesuai batasan.
+
+**Acceptance test — 4 poin, dijalanin Claude Code, hasil per-soal (bukan angka agregat doang)**:
+- **Test A** (`H1XING001`, 20/20 benar): hasil 15/20. **Root-caused per soal**: Q1-5 (`image_tf`)
+  SEMUA "Incorrect" (bug lain, lihat #52 — BUKAN #50), Q6-10 (`image_match`, ini fix-nya) SEMUA
+  "Correct", Q11-20 SEMUA "Correct" (pre-existing, nol regresi). **#50 sendiri 5/5 benar** —
+  15/20 itu sinyal ada masalah LAIN nutupin hasil #50, bukan #50 gagal.
+- **Test B** (1 salah sengaja di `image_match`): pilihan salah (A) merah + label "Your answer",
+  jawaban benar (E) ijo + label "Correct answer" — persis diminta, dikonfirmasi screenshot.
+- **Test C** (console): bersih di semua run, nol error/exception.
+- **Test D** (`H2XING001`, sanity beda set): render RUSAK — nemuin #53 (SVG smart-quote
+  corruption, bug data terpisah). **Dikonfirmasi bukan kode #50**: `H2XING002` (bersih per scan
+  #53) render sempurna, grid rapi, 5 gambar utuh.
+
+**Verdict**: #50 verified benar secara independen (granular per-soal), 2 bug baru ketemu
+SAMPINGAN lewat acceptance test yang jalan sungguhan (terutama Test D) — dicatet terpisah di
+#52/#53, DILUAR scope commit #50.
+
+Diputuskan Kyaru + Claude Code, 18 Jul 2026.
+
+## 52. `image_tf` scoring — boolean vs string mismatch, 50 baris `H1XING001`-`010` — NOT FIXED, nunggu bentuk jawaban dari Kyaru
+
+Ketemu SAMPINGAN pas acceptance test #50 (Test A) — Q1-5 (`image_tf`, `H1XING001`) SEMUA
+"Incorrect" walau jawaban yang diklik genuinely benar (dicek manual, gambar cocok statement).
+
+**Root cause**: `renderTFButtons()` (dipake `listening_tf` + `image_tf`) SELALU ngirim jawaban
+sebagai **boolean** — `attemptAnswers[q.id] = { correct: tfEl.dataset.value === 'true' }`
+(`index.html` ~5335). Tapi kolom `answer` di DB buat 50 baris skema baru `image_tf`
+(`H1XING001`-`010`, sama scope #45) isinya **STRING** — `{"correct": "A"}`/`{"correct": "B"}`,
+bukan `{"correct": true}`/`{"correct": false}`. `submit_attempt`'s `v_ok := v_user_ans =
+r.answer` — JSONB `{"correct":true}` vs `{"correct":"A"}` **TIDAK PERNAH equal**, apapun yang
+diklik user. Review-nya juga ikut kena: `buildReviewTF()`'s `typeof correctAns?.correct ===
+'boolean' ? ... : '-'` nampilin dash karena "A" bukan boolean.
+
+**Beda dari #45**: #45 fix CRASH-nya (render), sukses — tapi verifikasi #45 cuma ngecek
+"nggak crash", nggak pernah ngecek "jawaban bener kehitung bener". Ini lapisan MASALAH BEDA di
+data yang SAMA (50 baris `H1XING00N` skema baru) — render sekarang bener, SCORING-nya yang
+salah.
+
+**Dampak**: SEMUA 50 soal `image_tf` skema baru nggak bisa dijawab bener SAMA SEKALI, apapun
+yang diklik user — permanen "Incorrect", sama kelas dampak kayak #50 (integritas nilai) tapi
+mekanismenya beda (tipe data salah, bukan renderer nggak ada).
+
+**JANGAN DIKERJAIN — nunggu Kyaru**: keputusan bentuk jawaban yang benar (samain DB ke boolean
+via SQL, atau samain frontend ke string) ada di tangan Kyaru, based on hasil query bentuk
+jawaban yang lagi dijalanin. **Claude nggak sentuh data ataupun kode buat ini sampai ada
+arahan.**
+
+Diputuskan Kyaru + Claude Code, 18 Jul 2026.
+
+## 53. SVG smart-quote corruption — 24 baris (`image_match` + `image_tf`), 5 set — SEDANG DIBERESIN KYARU LEWAT SQL, CLAUDE JANGAN SENTUH DATA
+
+Ketemu SAMPINGAN pas acceptance test #50 (Test D, sanity check `H2XING001`) — render RUSAK
+TOTAL: layout numpuk vertikal, 4 dari 5 gambar kosong. Investigasi DOM: satu `<button>` nyerap
+teks "ABCDE" gabung jadi satu, 4 elemen `<svg>` lain jadi sibling lepas di luar button (HTML
+parser gagal, bukan kode salah).
+
+**Root cause, dikonfirmasi di raw data**: attribute SVG-nya pakai **smart/curly quote**
+(`"`/`"`, U+201C/U+201D) bukan straight quote ASCII (`"`) — `role=\"img"` (curly di akhir),
+bukan `role=\"img\"`. Browser HTML parser nyari straight-quote penutup buat attribute value,
+ketemu curly quote yang nggak match → attribute value "bocor" ke karakter berikutnya → seluruh
+struktur elemen korup. Kemungkinan besar dari proses generate konten yang lewatin
+"smart quotes" auto-convert (word processor atau text pipeline), ngerusak sebagian batch doang.
+
+**Scope, full scan (bukan sampling)**:
+- `image_match` (`image_choices[].svg`): **20/100 baris kena** — `H1XING007`(5), `H1XING008`(5),
+  `H1XING009`(5), `H2XING001`(5).
+- `image_tf` (`image_svg`): **4/200 baris kena** — 1 baris masing-masing di `H1XING006`/`007`/
+  `008`/`010`.
+
+**Dikonfirmasi BUKAN bug kode**: `H2XING002` (bersih per scan) render sempurna — grid rapi, 5
+gambar utuh, sama function (`renderImageMatchOptions()`) yang dipake `H2XING001` yang rusak.
+
+**Query buat verifikasi/fix (Kyaru, SQL Editor)** — cari baris yang kena:
+```sql
+select set_id, order_index, question_type
+from question_bank
+where question_type in ('image_match','image_tf')
+  and (
+    payload::text like '%' || chr(8220) || '%' or
+    payload::text like '%' || chr(8221) || '%'
+  );
+```
+
+**STATUS**: Kyaru lagi beresin lewat SQL langsung sekarang. **Claude JANGAN SENTUH DATA** —
+murni data-fix, di luar scope kode manapun.
 
 Diputuskan Kyaru + Claude Code, 18 Jul 2026.
 

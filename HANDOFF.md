@@ -1,8 +1,11 @@
-# Handoff — session 14 (#45 image_tf crash fix RESOLVED, #49 logged)
+# Handoff — session 14 (#45 RESOLVED, #49 false alarm, #50 RESOLVED, #52/#53 logged)
 
-Scope: **#45 doang** — `image_tf` crash di 10 set `H1XING001`-`H1XING010` (Prioritas 1, konfirmasi
-rusak di live sesi lalu). Report-first (baca #45+#38+HANDOFF → lapor rencana + 4 poin jawaban →
-tunggu approve) sebelum implementasi, sama pola kayak sesi-sesi sebelumnya.
+Scope: dimulai dari **#45 doang** (`image_tf` crash di 10 set `H1XING001`-`H1XING010`), tapi
+sesi ini berlanjut lewat rantai temuan sampingan — tiap temuan diaudit dulu (report-first,
+tunggu approve) sebelum dikerjain, sama pola kayak sesi-sesi sebelumnya: #45 fix → verifikasi
+nemuin #49 (dikira bug, ternyata false alarm setelah diaudit) → audit #50 (`image_match` nol
+renderer, PRIORITAS 1 beneran) → fix #50 → acceptance test #50 nemuin 2 bug BARU (#52, #53),
+dua-duanya di luar scope #50 sendiri, dicatet terpisah bukan dikerjain.
 
 ## #45 fix: DONE, APPROVED, VERIFIED LIVE, COMMITTED
 
@@ -36,20 +39,76 @@ kontras). Mobile 390px dicek (iframe same-origin, teknik HANDOFF sesi 13 karena 
 inert) — bottom-nav → Mock Test → HSK1 → Retry → Q21 benar → submit → review 40/40, console
 bersih.
 
-## Temuan sampingan, DINAIKIN jadi #49 — image_svg salah sama statement-nya, PRIORITAS TINGGI
+## #49 — DIAUDIT, FALSE ALARM (bukan bug)
 
-Ketemu pas verifikasi #45 (bukan bagian dari fix ini): `H1XING001` Q25 — `statement` "他在看电视"
-(nonton TV) tapi `image_svg`-nya render **buku**. Ini bukan render bug (renderer-nya bener,
-nampilin apa yang ada di data) — **data quality issue**, di luar batasan "jangan ubah data" sesi
-ini. Dicurigai POLA (bukan 1 soal doang) — scope potensial 50 soal, 10 set, semua published,
-semua HSK1 (level pemula, populasi user terbesar). Preseden dari audit HSK6 listening (#48):
-"jumlah soal bener ≠ format bener" — ini versi ketiga, "render bener ≠ isi bener". **JANGAN
-DIKERJAIN SESI INI** — butuh audit sesi terpisah (full writeup di DECISIONS_NEEDED #49).
+Temuan awal (`H1XING001` Q25: `statement` "他在看电视" tapi `image_svg`-nya "buku") dikira pola
+data-korup. Audit penuh 50/50 baris (`svg_title` vs `statement` vs `answer`, service_role key,
+bukan RLS-terbatas) — **nol pengecualian**: kalau gambar cocok statement → `answer`="A" (对)
+SELALU; kalau nggak cocok → `answer`="B" (错) SELALU, 30/20 distribusi. Verdict: `image_tf` =
+看图判断对错, mekanismenya MEMANG butuh sebagian gambar sengaja salah biar soal ada gunanya.
+Q25 sendiri BENAR by design. Entry #49 di-DOWNGRADE jadi "audited, false alarm", DIBIARIN
+(bukan dihapus) biar nggak dicurigain ulang tanpa alasan.
+
+## #50 — `image_match` nol renderer: DONE, APPROVED, VERIFIED, COMMITTED
+
+Full writeup: DECISIONS_NEEDED #50 (RESOLVED). Bug BERBEDA dari #45 — `question_type` = 
+`image_match` (看图选择, bukan `image_mc`), **nol renderer sama sekali** (grep "image_match" di
+`index.html` = 0 hasil) di `renderAttemptQuestion()` MAUPUN `buildReviewHTML()`. Scope: **100
+baris, 20 set (`H1XING001-010` + `H2XING001-010`), SEMUA published, HSK1+HSK2** — user Reading
+level pemula mentok 15/20 selamanya, diem-diem, nol error.
+
+**Audit pre-implementasi** (sebelum kode ditulis, pake service_role key REST API langsung —
+bukan minta Kyaru jalanin SQL, lihat update #38 poin 5): bedah `submit_attempt` RPC penuh — nol
+CASE per-tipe kecuali `essay`, `image_match` lewat jalur generik `v_ok := v_user_ans = r.answer`
+yang OTOMATIS BENER begitu payload jawaban cocok bentuk — **RPC nol perlu diubah**. Bank 5-gambar
+dikonfirmasi identik persis di semua 5 baris per set (bukan sampling) — format asli Hanban
+看图选择, bukan bug. Sweep 15 tipe soal se-DB (5175 baris, paginated bener) vs dispatcher — cuma
+`image_match` yang bolong di antara konten published, nol tipe ke-13 tersembunyi.
+
+**Fix, 5 titik `index.html`**: `renderImageMatchOptions()` (sibling `renderImageOptions()`,
+array `image_choices` bukan dict `image_options`, emit class yang sama biar delegated click
+handler yang udah ada nangkep otomatis — nol JS wiring baru), `buildReviewImageMatchChoices()`
+(sibling, marking logic sama), 2 cabang dispatcher (pola `sentence_match` — `p.prompt`/
+`p.prompt_id`), 1 baris CSS svg-sizing. **Render ulang bank di tiap soal** (bukan grouped-view)
+— preseden `reading_mc` (`H6XING003` #42/#43, passage identik diulang di soal beruntun) udah
+buktiin app ini emang gitu polanya, nggak perlu restrukturisasi. Nol perubahan SQL.
+
+**Acceptance test, 4 poin (Test A-D), root-caused PER SOAL bukan angka agregat doang**: Test A
+(`H1XING001`, target 20/20) → hasil 15/20, tapi Q6-10 (`image_match`) **5/5 Correct** — 15/20-nya
+gara-gara Q1-5 (`image_tf`, bug LAIN, lihat #52) bukan #50. Test B (1 salah sengaja) → merah/ijo
+marking persis bener, screenshot. Test C (console) → bersih semua run. Test D (`H2XING001`,
+sanity beda set) → render RUSAK, tapi ketauan itu bug data terpisah (#53) — dikonfirmasi
+`H2XING002` (bersih) render sempurna pake function yang SAMA. **Approved buat commit** oleh
+Kyaru based on bukti granular ini, meski angka literal (20/20) nggak ketemu — karena akar
+masalahnya udah dipisah jelas dari #50 sendiri.
+
+## #52 — `image_tf` scoring boolean-vs-string mismatch — DITEMUKAN, BELUM DIFIX, nunggu Kyaru
+
+Ketemu SAMPINGAN di acceptance test #50 (Test A). `renderTFButtons()` selalu kirim jawaban
+boolean, tapi `answer` kolom 50 baris `image_tf` skema baru (`H1XING001`-`010`, sama scope #45)
+isinya STRING (`{"correct":"A"}`). JSONB equality di `submit_attempt` nggak pernah match →
+SEMUA 50 soal itu permanen "Incorrect" apapun yang diklik. Beda lapisan dari #45 (yang itu
+render, ini scoring, di data yang SAMA). **Claude nggak sentuh** — nunggu Kyaru putusin bentuk
+jawaban yang bener (DB ke boolean vs frontend ke string) based on hasil query yang lagi
+dijalanin Kyaru. Full writeup: DECISIONS_NEEDED #52.
+
+## #53 — SVG smart-quote corruption, 24 baris, 5 set — SEDANG DIBERESIN KYARU LEWAT SQL
+
+Ketemu SAMPINGAN di acceptance test #50 (Test D). Attribute SVG di sebagian baris pakai
+smart/curly quote (`"`/`"` U+201C/8221) bukan straight quote — bikin HTML parser browser
+korup strukturnya (bukan crash, tapi layout numpuk + gambar ilang). Scan penuh: 20/100 baris
+`image_match` (`H1XING007`/`008`/`009`, `H2XING001`) + 4/200 baris `image_tf` (`H1XING006`/
+`007`/`008`/`010`) kena. Dikonfirmasi BUKAN bug kode — `H2XING002` (bersih) render sempurna pake
+renderer yang sama persis yang dipake `H2XING001` (rusak). **Kyaru lagi beresin lewat SQL
+langsung** — Claude JANGAN SENTUH DATA. Query identifikasi baris kena ada di DECISIONS_NEEDED
+#53.
 
 ## Commit sesi ini
 
-- (commit sesi ini) — `index.html` (fix #45), `DECISIONS_NEEDED.md` (#45 RESOLVED + resolution
-  section, #49 baru), `HANDOFF.md` (entry ini).
+- **(commit ini)** — `index.html` (fix #50 SAJA — #52/#53 di luar scope, sengaja nggak
+  disentuh), `DECISIONS_NEEDED.md` (#49 downgrade, #50 RESOLVED, #52 baru, #53 baru),
+  `HANDOFF.md` (entry ini).
+- (commit sebelumnya, sesi ini juga) — fix #45.
 
 **Sengaja TIDAK di-commit** (sama seperti semua sesi sebelumnya): `supabase/functions/
 grade-essay/index.ts` — perubahan uncommitted di file itu bukan dari sesi manapun di urutan ini,
@@ -57,12 +116,13 @@ dibiarkan apa adanya.
 
 ## Belum dikerjakan / kandidat follow-up
 
-- **#49** — `image_svg`/`statement` mismatch di `image_tf` skema baru, PRIORITAS TINGGI, butuh
-  audit sesi terpisah sebelum fix ditulis.
+- **#52** — `image_tf` scoring shape mismatch, BLOCKED nunggu keputusan Kyaru (bentuk jawaban
+  boolean vs string), jangan disentuh sebelum ada arahan.
+- **#53** — SVG smart-quote corruption, SEDANG dikerjain Kyaru langsung via SQL, jangan disentuh.
 - **#47** — `watchSession()`'s unparameterized filter string, masih butuh repro realistis.
 - **Gap #2 remainder** — RLS-by-package, masih blocked di `package_levels` source-of-truth.
 - **HSK6 listening publish** (#48) — 1 blocker tersisa (verifikasi file MP3 beneran ke-upload di
-  Storage), independen dari #45/#49.
+  Storage), independen dari #45/#49/#50/#52/#53.
 
 ---
 

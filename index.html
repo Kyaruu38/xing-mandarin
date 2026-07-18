@@ -1049,6 +1049,9 @@
       width:100%; max-width:140px; border-radius:10px; display:block;
       background:#FFFFFF; border:1px solid var(--line); padding:8px;
     }
+    /* image_match (#50): .imageChoiceImg wraps an inline <svg> instead of an <img> --
+       the svg itself needs explicit sizing to fill the box, same recipe as #45. */
+    .imageChoiceImg svg{ width:100%; height:auto; display:block; }
     .imageReviewChoice{ flex-direction:column; align-items:center; gap:6px; flex:1 1 30%; min-width:110px; }
 
     @media (max-width: 760px){
@@ -4332,6 +4335,23 @@
     return html;
   }
 
+  // image_match (看图选择, HSK1/2 reading) -- sibling of renderImageOptions() for the
+  // image_choices array shape ({key,svg} inline SVG, DECISIONS_NEEDED #50) instead of
+  // image_mc's image_options dict (Storage path). Emits the same choiceItem/imageChoiceItem
+  // classes + data-key so the existing delegated click handler (index.html ~5339) picks it
+  // up with zero new JS wiring -- same recipe as #45's image_svg branch.
+  function renderImageMatchOptions(choices, answer){
+    const selectedKey = answer?.correct;
+    const items = (choices||[]).map(c=>{
+      const active = c.key === selectedKey ? ' active' : '';
+      return `<button type="button" class="choiceItem imageChoiceItem${active}" data-key="${c.key}">
+        <span class="choiceKey">${c.key}</span>
+        <div class="imageChoiceImg">${c.svg}</div>
+      </button>`;
+    }).join('');
+    return `<div class="choiceList imageChoiceList">${items}</div>`;
+  }
+
   function buildReviewTF(p, userAns, correctAns, isImage){
     let html = renderAudioPlayer(p.audio_url);
     if(isImage && p.image_url){
@@ -4380,6 +4400,25 @@
       return `<div class="reviewChoice imageReviewChoice${cls}">
         <span class="reviewChoiceKey">${key}</span>
         <img class="imageChoiceImg" src="${listeningImageUrl(path)}" alt="Pilihan ${key}" />
+        <span class="reviewMark">${mark}</span>
+      </div>`;
+    }).join('');
+    return `<div class="reviewChoiceList imageChoiceList">${items}</div>`;
+  }
+
+  // image_match review -- array-based sibling of buildReviewImageChoices() (dict-based),
+  // same isCorrect/isWrongPick marking logic, adapted for the image_choices {key,svg} shape.
+  function buildReviewImageMatchChoices(choices, userAns, correctAns){
+    const userKey = userAns?.correct;
+    const correctKey = correctAns?.correct;
+    const items = (choices||[]).map(c=>{
+      let cls = '';
+      if(c.key === correctKey) cls += ' isCorrect';
+      if(c.key === userKey && userKey !== correctKey) cls += ' isWrongPick';
+      const mark = c.key === userKey ? t('yourAnswer') : (c.key === correctKey ? t('correctAnswerLabel') : '');
+      return `<div class="reviewChoice imageReviewChoice${cls}">
+        <span class="reviewChoiceKey">${c.key}</span>
+        <div class="imageChoiceImg">${c.svg}</div>
         <span class="reviewMark">${mark}</span>
       </div>`;
     }).join('');
@@ -4624,6 +4663,10 @@
       html += renderImageTF(p, answer);
     } else if(q.question_type === 'image_mc'){
       html += renderImageMC(p, answer);
+    } else if(q.question_type === 'image_match'){
+      html += `<div class="qStem">${hanziPinyinHtml(p.prompt)}</div>`;
+      if(attemptShowTranslation && p.prompt_id) html += `<div class="qStemTrans">${p.prompt_id}</div>`;
+      html += renderImageMatchOptions(p.image_choices, answer);
     }
 
     $('attemptBody').innerHTML = html;
@@ -5181,6 +5224,10 @@
       html += buildReviewListeningMC(p, item.user_answer, item.correct_answer);
     } else if(q.question_type === 'image_mc'){
       html += buildReviewImageMC(p, item.user_answer, item.correct_answer);
+    } else if(q.question_type === 'image_match'){
+      html += `<div class="reviewStem">${p.prompt}</div>`;
+      if(p.prompt_id) html += `<div class="reviewStemTrans">${p.prompt_id}</div>`;
+      html += buildReviewImageMatchChoices(p.image_choices, item.user_answer, item.correct_answer);
     }
 
     html += `<div class="reviewExplain"><span class="reviewExplainLabel">${t('explanationLabel')}</span>${item.explanation || '-'}</div>`;

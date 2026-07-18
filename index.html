@@ -1973,6 +1973,7 @@
           questionNavigator:'Navigator soal', legendAnswered:'Terjawab', legendCurrent:'Sekarang',
           legendFlagged:'Ditandai', legendEmpty:'Kosong',
           filledCount:'Terisi {filled}/{total}', submitBtn:'Submit', exitCancel:'Keluar (batal)',
+          modalOk:'OK', modalCancel:'Batal',
           exitAttemptConfirm:'Keluar sekarang? Progres jawaban bakal ilang (belum di-submit).',
           timeLabel:'Waktu', answerReview:'Review Jawaban', backToMockList:'Kembali ke Daftar Mock Test',
           accuracyLabel:'Akurasi',
@@ -2066,6 +2067,7 @@
           questionNavigator:'Question navigator', legendAnswered:'Answered', legendCurrent:'Current',
           legendFlagged:'Flagged', legendEmpty:'Empty',
           filledCount:'Filled {filled}/{total}', submitBtn:'Submit', exitCancel:'Exit (cancel)',
+          modalOk:'OK', modalCancel:'Cancel',
           exitAttemptConfirm:'Exit now? Your unsubmitted answers will be lost.',
           timeLabel:'Time', answerReview:'Answer Review', backToMockList:'Back to Mock Test List',
           accuracyLabel:'Accuracy',
@@ -2159,6 +2161,7 @@
           questionNavigator:'题目导航', legendAnswered:'已作答', legendCurrent:'当前',
           legendFlagged:'已标记', legendEmpty:'空白',
           filledCount:'已填 {filled}/{total}', submitBtn:'提交', exitCancel:'退出（取消）',
+          modalOk:'确定', modalCancel:'取消',
           exitAttemptConfirm:'现在退出？未提交的答案将会丢失',
           timeLabel:'用时', answerReview:'答案回顾', backToMockList:'返回模拟考试列表',
           accuracyLabel:'正确率',
@@ -2796,7 +2799,7 @@
         .eq('user_id', currentUser).eq('item_type', 'word')
         .order('item_key', { ascending:true })
         .range(from, to), VOCAB_BATCH_SIZE);
-    }catch(e){ alert(t('errFetchProgress') + ' ' + e.message); return; }
+    }catch(e){ showAlertModal(t('errFetchProgress') + ' ' + e.message); return; }
     const seenSet = new Set((seenRows||[]).map(r=>r.item_key));
 
     const { data: dueRows, error: dueErr } = await sb
@@ -2805,7 +2808,7 @@
       .lte('srs_due', todayStr())
       .order('srs_due', { ascending:true })
       .limit(DUE_LIMIT);
-    if(dueErr){ alert(t('errFetchDueCards') + ' ' + dueErr.message); return; }
+    if(dueErr){ showAlertModal(t('errFetchDueCards') + ' ' + dueErr.message); return; }
 
     let dueCards = [];
     if(dueRows && dueRows.length){
@@ -2813,7 +2816,7 @@
       const { data: dueVocab, error: dvErr } = await sb
         .from('vocab').select('hanzi,pinyin,meaning_en,meaning_id,pos')
         .in('hanzi', dueHanzi);
-      if(dvErr){ alert(t('errFetchCardDetail') + ' ' + dvErr.message); return; }
+      if(dvErr){ showAlertModal(t('errFetchCardDetail') + ' ' + dvErr.message); return; }
       const vocabMap = new Map((dueVocab||[]).map(v=>[v.hanzi, v]));
       dueCards = dueRows
         .map(r=>{
@@ -2829,7 +2832,7 @@
       .eq('hsk_level', level)
       .order('frequency', { ascending:true })
       .limit(NEW_CANDIDATE_LIMIT);
-    if(lvErr){ alert(t('errFetchNewWords') + ' ' + lvErr.message); return; }
+    if(lvErr){ showAlertModal(t('errFetchNewWords') + ' ' + lvErr.message); return; }
 
     const newCards = (levelVocab||[])
       .filter(v => !seenSet.has(v.hanzi))
@@ -2944,7 +2947,7 @@
       last_reviewed: next.last_reviewed
     }, { onConflict: 'user_id,item_key' });
 
-    if(error){ alert(t('errSaveProgress') + ' ' + error.message); return; }
+    if(error){ showAlertModal(t('errSaveProgress') + ' ' + error.message); return; }
 
     sessionIndex += 1;
     if(sessionIndex >= sessionQueue.length){
@@ -3040,7 +3043,7 @@
           .order('item_key', { ascending:true })
           .range(from, to), VOCAB_BATCH_SIZE)
       ]);
-    }catch(e){ alert(t('errFetchProgress') + ' ' + e.message); return; }
+    }catch(e){ showAlertModal(t('errFetchProgress') + ' ' + e.message); return; }
 
     const dueCount = mastery.filter(m => m.srs_due && m.srs_due <= todayStr()).length;
     $('rDue').textContent = dueCount;
@@ -3053,7 +3056,7 @@
       const masteryVocab = await fetchChunkedIn(mastery.map(m=>m.item_key), chunk=> sb
         .from('vocab').select('hanzi,hsk_level').in('hanzi', chunk));
       levelOf = new Map(masteryVocab.map(v=>[v.hanzi, v.hsk_level]));
-    }catch(e){ alert(t('errFetchVocab') + ' ' + e.message); return; }
+    }catch(e){ showAlertModal(t('errFetchVocab') + ' ' + e.message); return; }
 
     const seenPerLevel = {1:0,2:0,3:0,4:0,5:0,6:0};
     const masteredPerLevel = {1:0,2:0,3:0,4:0,5:0,6:0};
@@ -3100,7 +3103,7 @@
       const { data: weakVocab, error: wvErr } = await sb
         .from('vocab').select('hanzi,pinyin,meaning_en,meaning_id')
         .in('hanzi', weakHanzi);
-      if(wvErr){ alert(t('errFetchWeakWords') + ' ' + wvErr.message); return; }
+      if(wvErr){ showAlertModal(t('errFetchWeakWords') + ' ' + wvErr.message); return; }
       const vocabMap = new Map(weakVocab.map(v=>[v.hanzi, v]));
       weakSorted.forEach(m=>{
         const v = vocabMap.get(m.item_key);
@@ -3440,7 +3443,7 @@
         .eq('hsk_level', level)
         .order('frequency', { ascending:true })
         .range(from, to), VOCAB_BATCH_SIZE);
-    }catch(e){ alert(t('errFetchWordList') + ' ' + e.message); return; }
+    }catch(e){ showAlertModal(t('errFetchWordList') + ' ' + e.message); return; }
     browseCache = (data||[]).map(v => ({
       ...v,
       _search: stripDiacritics(v.hanzi + ' ' + v.pinyin + ' ' + v.meaning_en + ' ' + (v.meaning_id||''))
@@ -3486,6 +3489,11 @@
      these 2 call sites (+ Create user, v1.5), nothing more.
      ========================================================== */
   let modalPrevFocus = null;
+  // Set only while a showConfirmModal() Promise is outstanding -- lets closeModal() resolve it
+  // `false` when the modal's closed via Esc/backdrop/X (paths that don't know about the Promise
+  // at all, since they're wired once globally, not per-open-call). Null the rest of the time,
+  // so this is a no-op for every pre-existing openModal() usage (Edit user/Deactivate/Create).
+  let modalPendingResolve = null;
 
   function getModalFocusable(){
     return [...$('modalPanel').querySelectorAll('button, input, select, textarea, a[href]')]
@@ -3506,6 +3514,42 @@
     $('modalBody').innerHTML = '';
     if(modalPrevFocus && typeof modalPrevFocus.focus === 'function') modalPrevFocus.focus();
     modalPrevFocus = null;
+    if(modalPendingResolve){ const resolve = modalPendingResolve; modalPendingResolve = null; resolve(false); }
+  }
+
+  // Themed replacements for native alert()/confirm() -- DECISIONS_NEEDED (polish session, 19 Jul
+  // 2026). Reuse openModal()/closeModal() as-is, zero new component. showAlertModal is
+  // fire-and-forget (every call site already just bails right after via `return`, nothing
+  // downstream depends on dismiss timing). showConfirmModal resolves true/false via Promise --
+  // OK/Cancel resolve directly; Esc/backdrop/X fall through to closeModal()'s pending-resolve
+  // above so the Promise can never hang.
+  function showAlertModal(message, title){
+    openModal(title || '', `
+      <p>${message}</p>
+      <div class="modalActions">
+        <div class="modalActionsRight">
+          <button type="button" class="modalBtn primary" id="alertModalOkBtn">${t('modalOk')}</button>
+        </div>
+      </div>
+    `);
+    $('alertModalOkBtn').addEventListener('click', closeModal);
+  }
+
+  function showConfirmModal(message, title){
+    return new Promise(resolve => {
+      modalPendingResolve = resolve;
+      openModal(title || '', `
+        <p>${message}</p>
+        <div class="modalActions">
+          <div class="modalActionsRight">
+            <button type="button" class="modalBtn ghost" id="confirmModalCancelBtn">${t('modalCancel')}</button>
+            <button type="button" class="modalBtn primary" id="confirmModalOkBtn">${t('modalOk')}</button>
+          </div>
+        </div>
+      `);
+      $('confirmModalCancelBtn').addEventListener('click', closeModal);
+      $('confirmModalOkBtn').addEventListener('click', ()=>{ modalPendingResolve = null; closeModal(); resolve(true); });
+    });
   }
 
   $('modalOverlay').addEventListener('click', e=>{
@@ -3573,7 +3617,7 @@
     $('adminList').innerHTML = `<p class="emptyState">${t('loading')}</p>`;
     $('adminCount').textContent = '';
     const { data, error } = await sb.from('profiles').select('*').order('created_at', { ascending:false });
-    if(error){ alert('Gagal ambil daftar user: ' + error.message); return; }
+    if(error){ showAlertModal('Gagal ambil daftar user: ' + error.message); return; }
     adminCache = data || [];
     applyAdminFilter();
   }
@@ -3750,7 +3794,7 @@
     }
     const { error } = await sb.from('profiles').update(payload).eq('id', profile.id);
     btn.disabled = false;
-    if(error){ alert('Gagal menyimpan: ' + error.message); return; }
+    if(error){ showAlertModal('Gagal menyimpan: ' + error.message); return; }
     closeModal();
     loadAdminUsers();
   }
@@ -3776,7 +3820,7 @@
     const btn = $('deactivateConfirmBtn');
     btn.disabled = true;
     const { error } = await sb.from('profiles').update({ status:'expired' }).eq('id', profile.id);
-    if(error){ alert('Gagal menonaktifkan: ' + error.message); btn.disabled = false; return; }
+    if(error){ showAlertModal('Gagal menonaktifkan: ' + error.message); btn.disabled = false; return; }
     closeModal();
     loadAdminUsers();
   }
@@ -3901,7 +3945,7 @@
       // a default profiles row both exist (recoverable via Edit modal); admin must be told
       // explicitly, not left thinking the form's package/level/status settings applied.
       closeModal();
-      alert('User dibuat, TAPI setting paket/level/status gagal:\n' + result.error +
+      showAlertModal('User dibuat, TAPI setting paket/level/status gagal:\n' + result.error +
         '\n\nUser sudah muncul di list dengan setting default -- perbaiki lewat Edit modal.');
       loadAdminUsers();
       loadAdminEmails();
@@ -4085,7 +4129,7 @@
       .eq('is_published', true).eq('hsk_level', level).in('hsk_level', userPackageLevels);
     if(mockSection !== 'all') query = query.eq('section', mockSection);
     const { data: sets, error: setErr } = await query.order('title', { ascending:true });
-    if(setErr){ alert(t('errFetchMockList') + ' ' + setErr.message); return; }
+    if(setErr){ showAlertModal(t('errFetchMockList') + ' ' + setErr.message); return; }
     if(sets) sets.sort((a,b) => naturalCompare(a.title, b.title));
 
     if(!sets || sets.length === 0){
@@ -4099,7 +4143,7 @@
       .from('test_attempts').select('set_id,score,total_points,correct_count,total_questions,created_at')
       .eq('user_id', currentUser).in('set_id', setIds)
       .order('created_at', { ascending:false });
-    if(attErr){ alert(t('errFetchAttemptHistory') + ' ' + attErr.message); return; }
+    if(attErr){ showAlertModal(t('errFetchAttemptHistory') + ' ' + attErr.message); return; }
 
     const lastAttempt = new Map();
     (attempts||[]).forEach(a=>{ if(!lastAttempt.has(a.set_id)) lastAttempt.set(a.set_id, a); });
@@ -4475,15 +4519,15 @@
     const { data: setRow, error: setErr } = await sb
       .from('test_sets').select('set_id,hsk_level,section,title,time_limit_seconds,total_questions')
       .eq('set_id', setId).single();
-    if(setErr || !setRow){ alert(t('errFetchSet') + ' ' + (setErr?.message || t('notFound'))); return; }
+    if(setErr || !setRow){ showAlertModal(t('errFetchSet') + ' ' + (setErr?.message || t('notFound'))); return; }
 
     // PENTING: kolom answer/explanation TIDAK di-select — nggak di-grant ke murid.
     const { data: qRows, error: qErr } = await sb
       .from('question_bank').select('id,question_type,order_index,payload,points')
       .eq('set_id', setId)
       .order('order_index', { ascending:true });
-    if(qErr){ alert(t('errFetchQuestions') + ' ' + qErr.message); return; }
-    if(!qRows || qRows.length === 0){ alert(t('errSetNoQuestions')); return; }
+    if(qErr){ showAlertModal(t('errFetchQuestions') + ' ' + qErr.message); return; }
+    if(!qRows || qRows.length === 0){ showAlertModal(t('errSetNoQuestions')); return; }
 
     attemptGroupSets = null;
     attemptSectionBreaks = new Map();
@@ -4520,8 +4564,8 @@
     const { data: qRows, error: qErr } = await sb
       .from('question_bank').select('id,question_type,order_index,payload,points,set_id')
       .in('set_id', setIds);
-    if(qErr){ alert(t('errFetchQuestions') + ' ' + qErr.message); return; }
-    if(!qRows || qRows.length === 0){ alert(t('errSetNoQuestions')); return; }
+    if(qErr){ showAlertModal(t('errFetchQuestions') + ' ' + qErr.message); return; }
+    if(!qRows || qRows.length === 0){ showAlertModal(t('errSetNoQuestions')); return; }
 
     const sectionMap = new Map(groupSets.map(s => [s.set_id, s.section]));
     const setIndexMap = new Map(setIds.map((id, i) => [id, i]));
@@ -4905,7 +4949,7 @@
   async function submitAttempt(force){
     const unanswered = attemptQuestions.filter(q => !isQuestionAnswered(q)).length;
     if(!force && unanswered > 0){
-      const ok = confirm(t('confirmUnanswered').replace('{count}', unanswered));
+      const ok = await showConfirmModal(t('confirmUnanswered').replace('{count}', unanswered));
       if(!ok) return;
     }
     stopAttemptTimer();
@@ -4939,7 +4983,7 @@
           p_time_taken: timeTaken
         });
         if(error){
-          alert(t('errSubmitFailedNamed').replace('{title}', s.title) + ' ' + error.message);
+          showAlertModal(t('errSubmitFailedNamed').replace('{title}', s.title) + ' ' + error.message);
           $('attemptSubmitBtn').disabled = false;
           const remain = Math.max(0, Math.round((attemptDeadline - Date.now()) / 1000));
           if(remain > 0) startAttemptTimer(remain);
@@ -4996,7 +5040,7 @@
     });
 
     if(error){
-      alert(t('errSubmitFailed') + ' ' + error.message);
+      showAlertModal(t('errSubmitFailed') + ' ' + error.message);
       $('attemptSubmitBtn').disabled = false;
       const remain = Math.max(0, Math.round((attemptDeadline - Date.now()) / 1000));
       if(remain > 0) startAttemptTimer(remain);
@@ -5015,9 +5059,9 @@
     if(mockLevel) loadMockList(mockLevel);
   }
 
-  function exitAttempt(){
+  async function exitAttempt(){
     const answered = attemptQuestions.filter(isQuestionAnswered).length;
-    if(answered > 0 && !confirm(t('exitAttemptConfirm'))) return;
+    if(answered > 0 && !(await showConfirmModal(t('exitAttemptConfirm')))) return;
     closeAttempt();
   }
 

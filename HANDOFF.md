@@ -1,11 +1,14 @@
-# Handoff — session 14 (#45 RESOLVED, #49 false alarm, #50 RESOLVED, #52/#53 logged)
+# Handoff — session 14 (#45/#50/#52/#53 RESOLVED, #54 audited sehat, #55 gerbang formalized) — SESI PANJANG, DITUTUP 18 Jul 2026
 
 Scope: dimulai dari **#45 doang** (`image_tf` crash di 10 set `H1XING001`-`H1XING010`), tapi
-sesi ini berlanjut lewat rantai temuan sampingan — tiap temuan diaudit dulu (report-first,
-tunggu approve) sebelum dikerjain, sama pola kayak sesi-sesi sebelumnya: #45 fix → verifikasi
-nemuin #49 (dikira bug, ternyata false alarm setelah diaudit) → audit #50 (`image_match` nol
-renderer, PRIORITAS 1 beneran) → fix #50 → acceptance test #50 nemuin 2 bug BARU (#52, #53),
-dua-duanya di luar scope #50 sendiri, dicatet terpisah bukan dikerjain.
+sesi ini melar lewat rantai temuan sampingan yang jujur — tiap temuan diaudit dulu (report-first,
+tunggu approve) sebelum dikerjain, sama pola kayak sesi-sesi sebelumnya. Urutan penuh: #45 fix →
+verifikasi nemuin #49 (dikira bug, ternyata false alarm setelah diaudit) → audit #50
+(`image_match` nol renderer, PRIORITAS 1 beneran) → fix #50 → acceptance test #50 nemuin 2 bug
+BARU (#52 image_tf scoring, #53 SVG smart-quote), dua-duanya DILUAR scope #50 sendiri → Kyaru
+fix keduanya via SQL langsung → audit `ordering` (#54, diminta preventif) → acceptance test #50
+ULANG di LIVE, semua 4 test lolos → gerbang pre-publish diformalkan (#55) → sesi ditutup dengan
+antrian jelas buat besok. **Live sekarang di commit `47e7b3c`, sehat, terverifikasi.**
 
 ## #45 fix: DONE, APPROVED, VERIFIED LIVE, COMMITTED
 
@@ -73,56 +76,114 @@ handler yang udah ada nangkep otomatis — nol JS wiring baru), `buildReviewImag
 — preseden `reading_mc` (`H6XING003` #42/#43, passage identik diulang di soal beruntun) udah
 buktiin app ini emang gitu polanya, nggak perlu restrukturisasi. Nol perubahan SQL.
 
-**Acceptance test, 4 poin (Test A-D), root-caused PER SOAL bukan angka agregat doang**: Test A
-(`H1XING001`, target 20/20) → hasil 15/20, tapi Q6-10 (`image_match`) **5/5 Correct** — 15/20-nya
-gara-gara Q1-5 (`image_tf`, bug LAIN, lihat #52) bukan #50. Test B (1 salah sengaja) → merah/ijo
-marking persis bener, screenshot. Test C (console) → bersih semua run. Test D (`H2XING001`,
-sanity beda set) → render RUSAK, tapi ketauan itu bug data terpisah (#53) — dikonfirmasi
-`H2XING002` (bersih) render sempurna pake function yang SAMA. **Approved buat commit** oleh
-Kyaru based on bukti granular ini, meski angka literal (20/20) nggak ketemu — karena akar
-masalahnya udah dipisah jelas dari #50 sendiri.
+**Acceptance test putaran 1 (localhost, sebelum fix #52/#53), 4 poin, root-caused PER SOAL
+bukan angka agregat doang**: Test A (`H1XING001`, target 20/20) → hasil 15/20, tapi Q6-10
+(`image_match`) **5/5 Correct** — 15/20-nya gara-gara Q1-5 (`image_tf`, bug LAIN, jadi #52) bukan
+#50. Test B (1 salah sengaja) → merah/ijo marking persis bener. Test C (console) → bersih semua
+run. Test D (`H2XING001`, sanity beda set) → render RUSAK, tapi ketauan itu bug data terpisah
+(jadi #53) — dikonfirmasi `H2XING002` (bersih) render sempurna pake function yang SAMA.
+**Approved buat commit** oleh Kyaru based on bukti granular ini, meski angka literal (20/20)
+nggak ketemu — karena akar masalahnya udah dipisah jelas dari #50 sendiri. Commit: **`47e7b3c`**.
 
-## #52 — `image_tf` scoring boolean-vs-string mismatch — DITEMUKAN, BELUM DIFIX, nunggu Kyaru
+## #52 — `image_tf` scoring boolean-vs-string mismatch — RESOLVED
 
 Ketemu SAMPINGAN di acceptance test #50 (Test A). `renderTFButtons()` selalu kirim jawaban
 boolean, tapi `answer` kolom 50 baris `image_tf` skema baru (`H1XING001`-`010`, sama scope #45)
 isinya STRING (`{"correct":"A"}`). JSONB equality di `submit_attempt` nggak pernah match →
-SEMUA 50 soal itu permanen "Incorrect" apapun yang diklik. Beda lapisan dari #45 (yang itu
-render, ini scoring, di data yang SAMA). **Claude nggak sentuh** — nunggu Kyaru putusin bentuk
-jawaban yang bener (DB ke boolean vs frontend ke string) based on hasil query yang lagi
-dijalanin Kyaru. Full writeup: DECISIONS_NEEDED #52.
+SEMUA 50 soal itu permanen "Incorrect" apapun yang diklik. **Fix**: Kyaru update DB ke boolean
+via SQL (对=A=`true`, 错=B=`false`, dari payload `choices` sendiri) — **verified** 200/200 baris
+`image_tf` sekarang boolean, nol string tersisa. Full writeup: DECISIONS_NEEDED #52.
 
-## #53 — SVG smart-quote corruption, 24 baris, 5 set — SEDANG DIBERESIN KYARU LEWAT SQL
+## #53 — SVG smart-quote corruption, 24 baris, 5 set — RESOLVED
 
 Ketemu SAMPINGAN di acceptance test #50 (Test D). Attribute SVG di sebagian baris pakai
 smart/curly quote (`"`/`"` U+201C/8221) bukan straight quote — bikin HTML parser browser
-korup strukturnya (bukan crash, tapi layout numpuk + gambar ilang). Scan penuh: 20/100 baris
-`image_match` (`H1XING007`/`008`/`009`, `H2XING001`) + 4/200 baris `image_tf` (`H1XING006`/
-`007`/`008`/`010`) kena. Dikonfirmasi BUKAN bug kode — `H2XING002` (bersih) render sempurna pake
-renderer yang sama persis yang dipake `H2XING001` (rusak). **Kyaru lagi beresin lewat SQL
-langsung** — Claude JANGAN SENTUH DATA. Query identifikasi baris kena ada di DECISIONS_NEEDED
-#53.
+korup strukturnya. Scan penuh: 20/100 baris `image_match` + 4/200 baris `image_tf` kena, 5 set.
+**Fix**: Kyaru pake `translate()` karakter (bukan regex posisi-atribut — percobaan regex
+pertama balikin NOL baris, false negative, jebakan metodologi #38 versi baru) — **verified**
+0/0 tersisa. Full writeup: DECISIONS_NEEDED #53.
+
+## #54 — `ordering` (330 baris HSK4) — DIAUDIT PREVENTIF, SEHAT, bukan bug
+
+Diminta audit sebelum dianggap aman (kelas masalah #50/#52 udah 2x kejadian). `renderSegmentList()`
++ handler `.segmentItem` sendiri (bukan `.choiceItem`), shape `{order:[...]}` dikonfirmasi cocok
+ke DB (sample nyata), `submit_attempt` otomatis bener lewat jalur generik. **Verdict: SEHAT,
+nol tindakan lanjut.** Full writeup: DECISIONS_NEEDED #54.
+
+## Acceptance test putaran 2 — LIVE (xingmandarin.com), setelah #52/#53 fixed — SEMUA 4 LOLOS
+
+Login segar, incognito-equivalent, console dibaca tiap langkah, `47e7b3c` dikonfirmasi ter-deploy
+(cache-busted fetch, bukan cuma DOM check).
+
+- **Test A** (`H1XING001`, 20/20 bener) → **20/20, 100/100**. Q1-5 (`image_tf`) yang kemarin
+  merah semua sekarang IJO SEMUA — bukti langsung fix #52 kerja, bukan cuma query check.
+- **Test B** (`H1XING007`, set yang SVG-nya kena #53) → grid rapi, 5 gambar utuh, DOM bersih
+  (5 `<button>`, nol sibling `<svg>` lepas).
+- **Test C** (`H2XING001`, yang kemarin rusak TOTAL numpuk vertikal) → normal sempurna, sama
+  strukturnya kayak Test B.
+- **Test D** (`H4XING001`, blok `ordering` 10 soal, order_index 10-19) → **10/10 Correct**,
+  review nampilin kalimat lengkap tersusun + "Urutan benar: X→Y→Z" match persis. Nutup audit #54
+  dengan bukti data nyata.
+
+Console nol merah di semua run. Screenshot tersimpan (skor Test A, grid Test B/C, review Test D).
+
+## #55 — Gerbang pre-publish diformalkan (dari saran #51)
+
+Sebelum publish apapun: cek semua `question_type` di baris yang mau di-publish MINUS daftar
+putih tipe yang punya cabang di KEDUA dispatcher. Selisih harus kosong. **Batasan penting**:
+gerbang ini CUMA nangkep "renderer nggak ada" — BUTA sama "renderer ada tapi nol jam terbang"
+(kasus `listening_mc_stmt` persis). Full writeup + daftar putih: DECISIONS_NEEDED #55.
+
+## `H6XING001` LISTENING — LIVE, BELUM DITES (lihat antrian #1)
+
+Blocker file MP3 (#48) LUNAS — 10/10 path dicek HTTP HEAD, semua `200`/`audio/mpeg` beneran ada
+di Storage. Tapi `H6XING001` LISTENING sekarang `is_published=true` (50 soal, 15 di antaranya
+`listening_mc_stmt` — tipe yang lolos gerbang #55 tapi NOL JAM TERBANG terhadap data real sejak
+renderer-nya ditulis). **Live tapi belum divalidasi manual** — item pertama antrian besok.
 
 ## Commit sesi ini
 
-- **(commit ini)** — `index.html` (fix #50 SAJA — #52/#53 di luar scope, sengaja nggak
-  disentuh), `DECISIONS_NEEDED.md` (#49 downgrade, #50 RESOLVED, #52 baru, #53 baru),
-  `HANDOFF.md` (entry ini).
-- (commit sebelumnya, sesi ini juga) — fix #45.
+- **`47e7b3c`** — `index.html` (fix #50), `DECISIONS_NEEDED.md` (#49 downgrade, #50 RESOLVED,
+  #52/#53 baru), `HANDOFF.md`.
+- (commit sebelumnya, sesi ini juga) — `dde1d42` fix #45.
+- **(sesi ini, belum commit — cuma dokumentasi)** — `DECISIONS_NEEDED.md` (#52/#53 RESOLVED,
+  #54 baru, #55 baru, #48 update status `H6XING001`), `HANDOFF.md` (entry ini). #52/#53 sendiri
+  di-fix Kyaru langsung via SQL, nol kode Claude yang berubah buat itu.
 
 **Sengaja TIDAK di-commit** (sama seperti semua sesi sebelumnya): `supabase/functions/
 grade-essay/index.ts` — perubahan uncommitted di file itu bukan dari sesi manapun di urutan ini,
 dibiarkan apa adanya.
 
-## Belum dikerjakan / kandidat follow-up
+## ANTRIAN sesi berikutnya (urutan prioritas, dari Kyaru)
 
-- **#52** — `image_tf` scoring shape mismatch, BLOCKED nunggu keputusan Kyaru (bentuk jawaban
-  boolean vs string), jangan disentuh sebelum ada arahan.
-- **#53** — SVG smart-quote corruption, SEDANG dikerjain Kyaru langsung via SQL, jangan disentuh.
-- **#47** — `watchSession()`'s unparameterized filter string, masih butuh repro realistis.
-- **Gap #2 remainder** — RLS-by-package, masih blocked di `package_levels` source-of-truth.
-- **HSK6 listening publish** (#48) — 1 blocker tersisa (verifikasi file MP3 beneran ke-upload di
-  Storage), independen dari #45/#49/#50/#52/#53.
+1. **`H6XING001` LISTENING — LIVE TAPI BELUM DITES.** Kerjain soal 1-15 (`listening_mc_stmt`,
+   nol jam terbang, lihat #55). Mulus → flip 9 set sisa (`h6-listening-2..10`). Rusak → STOP,
+   cuma 1 set kena, belum nyebar.
+2. **#48 sisa** — 9 set listening HSK6 lainnya (audio 10/10 udah verified ADA di set pertama,
+   masih perlu proses publish + bom waktu grouping title-vs-set_id yang dicatet #48).
+3. **`explanation:""` kosong di 100 soal `image_match`** — antri konten, bukan blocker fungsi.
+4. **`GRANT SELECT ON test_attempts TO service_role`** (#34 lama) — CC ke-block akses baca
+   `test_attempts` tiap audit gara-gara ini (kejadian nyata sesi ini). Sekali di-grant, audit
+   masa depan nggak perlu muter lewat REST API tabel lain buat nebak.
+5. **Grammar** — satu-satunya gap konten yang beneran nggak ada (bukan renderer, bukan data
+   drift) — proyek konten baru, track terpisah (lihat #22 hub).
+6. **Audio pipeline** (#6, flashcard speaker button) — 4.991 kata HSK1-6, butuh keputusan
+   storage/voice sebelum mulai generate.
+7. **Mobile fase 2** — belum discope, kandidat dari sesi 13.
+8. **Akun Emilia belum dibikin** — 2 menit, item kecil yang ketunda.
+
+## ATURAN MAIN, berlaku semua sesi ke depan (rekap #38, DIPERKUAT hari ini)
+
+- Syntax check ≠ verifikasi. `returning` dari SQL ≠ hasil beneran benar — verifikasi WAJIB
+  **run ULANG query diagnosa yang sama**, harus keliatan angkanya BERUBAH (bukan cuma "query
+  jalan nol error").
+- Login segar wajib (incognito/hard refresh), console dibaca tiap langkah.
+- **Claude Code boleh pake `SUPABASE_KEY` (service_role) buat AUDIT keberadaan data — NOL
+  WRITE.** Kyaru yang nempel/jalanin SQL apapun yang nulis (`INSERT`/`UPDATE`/`DELETE`).
+- **Data mentah > kesimpulan** — nyelametin hari ini 2x (insiden #38 poin 4 HSK6 dulu, dan #53's
+  regex-nol-baris hari ini). Kalau hasil query bilang "nol"/"aman" tapi ada bukti lain yang
+  bilang sebaliknya, curigain METODE dulu sebelum percaya angkanya.
+- **Jangan jalanin 2 sesi Claude Code di file yang sama** (#39, masih berlaku).
 
 ---
 

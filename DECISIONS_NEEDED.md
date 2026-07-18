@@ -2014,6 +2014,26 @@ listening yang lagi diaudit.
 
 Diputuskan Kyaru + Claude Code, 17 Jul 2026.
 
+### UPDATE 18 Jul 2026 — blocker file MP3 LUNAS, `H6XING001` LISTENING udah di-flip published
+
+**Blocker (poin 1, file MP3 beneran ke-upload) — VERIFIED LUNAS**: 10 path (`p1q1-5`.mp3 +
+`p2q1-5`.mp3 dari `h6-listening-1`) dicek satu-satu via HTTP HEAD ke Storage public URL — 10/10
+`200`, `Content-Type: audio/mpeg`, ukuran file beda-beda (94-141KB, bukan halaman-error
+seragam), `ETag`/`Last-Modified` nyata. Bukan cuma pola nama path yang bener — filenya
+BENERAN ada.
+
+**`H6XING001` LISTENING sekarang `is_published=true`** (50 soal) — beda dari status pas audit
+ini ditulis (`is_published=false`). **INI RISIKO NYATA, bukan status netral**: 15 dari 50 soal
+di set ini adalah `listening_mc_stmt` — tipe yang renderer-nya ADA (lolos gerbang #55) tapi
+**NOL JAM TERBANG** terhadap data real sejak `8c1da2b` nulis renderernya (dulu selalu
+`is_published=false` di semua 10 set `h6-listening-N`, sampe entry ini di-update). Live sekarang
+TAPI BELUM PERNAH DITES manual. **WAJIB jadi item pertama sesi berikutnya** (lihat HANDOFF.md
+antrian #1) — kerjain soal 1-15 (`listening_mc_stmt`) di `H6XING001` dulu sebelum flip 9 set
+sisa (`h6-listening-2` s/d `-10`). Kalau mulus → lanjut flip sisanya. Kalau rusak → STOP, cuma
+1 set yang kena, belum nyebar.
+
+Diputuskan Kyaru + Claude Code, 18 Jul 2026.
+
 ## 49. `image_tf` skema baru (10 set `H1XING001`-`H1XING010`) — SVG salah sama statement-nya — AUDITED, **FALSE ALARM**, 18 Jul 2026
 
 Ketemu SAMPINGAN pas verifikasi fix #45 (render crash) — Question 25 (`H1XING001`, `image_tf`
@@ -2228,7 +2248,7 @@ SAMPINGAN lewat acceptance test yang jalan sungguhan (terutama Test D) — dicat
 
 Diputuskan Kyaru + Claude Code, 18 Jul 2026.
 
-## 52. `image_tf` scoring — boolean vs string mismatch, 50 baris `H1XING001`-`010` — NOT FIXED, nunggu bentuk jawaban dari Kyaru
+## 52. `image_tf` scoring — boolean vs string mismatch, 50 baris `H1XING001`-`010` — RESOLVED, 18 Jul 2026
 
 Ketemu SAMPINGAN pas acceptance test #50 (Test A) — Q1-5 (`image_tf`, `H1XING001`) SEMUA
 "Incorrect" walau jawaban yang diklik genuinely benar (dicek manual, gambar cocok statement).
@@ -2251,14 +2271,18 @@ salah.
 yang diklik user — permanen "Incorrect", sama kelas dampak kayak #50 (integritas nilai) tapi
 mekanismenya beda (tipe data salah, bukan renderer nggak ada).
 
-**JANGAN DIKERJAIN — nunggu Kyaru**: keputusan bentuk jawaban yang benar (samain DB ke boolean
-via SQL, atau samain frontend ke string) ada di tangan Kyaru, based on hasil query bentuk
-jawaban yang lagi dijalanin. **Claude nggak sentuh data ataupun kode buat ini sampai ada
-arahan.**
+**FIX — DONE by Kyaru via SQL, VERIFIED, 18 Jul 2026**: DB disamain ke boolean (bukan frontend
+ke string) — keputusan Kyaru based on payload `choices` sendiri (对=A=`true`, 错=B=`false`,
+mapping yang sama yang `renderTFButtons()` udah pakai dari awal). Ke-50 baris `image_tf` skema
+baru di-update: `{"correct":"A"}`→`{"correct":true}`, `{"correct":"B"}`→`{"correct":false}`.
+**Verified**: query ulang 200 baris `image_tf` total (150 lama + 50 baru), SEMUA `answer.correct`
+sekarang boolean, nol baris string tersisa. **Acceptance test #50 (live, 18 Jul)** re-run
+`H1XING001` full 20/20 — Q1-5 (`image_tf`) yang kemarin merah semua sekarang ijo semua,
+bukti nyata bukan cuma query check.
 
 Diputuskan Kyaru + Claude Code, 18 Jul 2026.
 
-## 53. SVG smart-quote corruption — 24 baris (`image_match` + `image_tf`), 5 set — SEDANG DIBERESIN KYARU LEWAT SQL, CLAUDE JANGAN SENTUH DATA
+## 53. SVG smart-quote corruption — 24 baris (`image_match` + `image_tf`), 5 set — RESOLVED, 18 Jul 2026
 
 Ketemu SAMPINGAN pas acceptance test #50 (Test D, sanity check `H2XING001`) — render RUSAK
 TOTAL: layout numpuk vertikal, 4 dari 5 gambar kosong. Investigasi DOM: satu `<button>` nyerap
@@ -2292,8 +2316,81 @@ where question_type in ('image_match','image_tf')
   );
 ```
 
-**STATUS**: Kyaru lagi beresin lewat SQL langsung sekarang. **Claude JANGAN SENTUH DATA** —
-murni data-fix, di luar scope kode manapun.
+**FIX — DONE by Kyaru via SQL, VERIFIED 0/0 tersisa, 18 Jul 2026**: dibenerin pake **`translate()`
+karakter langsung** (`chr(8220)`/`chr(8221)` → `"` ASCII), **BUKAN regex posisi-atribut**.
+
+**Jebakan metodologi ketemu di tengah jalan (contoh nyata #38 lagi)**: percobaan pertama pake
+regex yang nyari pola posisi spesifik (attribute value diapit quote) buat locate-and-replace —
+balikin **NOL baris kena**, padahal baris yang korup jelas ADA (udah dibuktiin visual di
+`H2XING001` sebelumnya). Regex posisi-nya salah asumsi bentuk string persis, jadi false negative
+— kalau berhenti di situ, kesimpulannya "nggak ada yang perlu difix" itu SALAH TOTAL. Ganti
+pendekatan ke `translate()` karakter-demi-karakter (nggak peduli posisi, langsung tukar tiap
+kemunculan `"`/`"` di manapun) — baru ketemu match yang bener, 24 baris. **Pelajaran sama persis
+#38**: hasil query/tool BUKAN otomatis bukti kebenaran — kalau hasilnya "nol" padahal ada bukti
+visual/independen yang bilang sebaliknya, curigain METODE-nya duluan, bukan langsung percaya
+angka nol itu.
+
+**Verifikasi**: query ulang pola `chr(8220)`/`chr(8221)` di `image_match`+`image_tf` payload →
+**0/0** tersisa. **Acceptance test #50 (live, 18 Jul)** re-run `H1XING007` (5 baris image_match
+kena) dan `H2XING001` (yang tadinya rusak total, numpuk vertikal) — dua-duanya render grid rapi
+5-gambar-utuh sekarang, screenshot dikonfirmasi.
+
+Diputuskan Kyaru + Claude Code, 18 Jul 2026.
+
+## 54. `ordering` (330 baris HSK4) — DIAUDIT, SEHAT, bukan bug
+
+Diminta audit spesifik karena kelas masalah yang sama (#50/#52) udah 2x kejadian di tipe soal
+lain — perlu mastiin `ordering` nggak ikut kena sebelum dianggap aman. **Catatan penomoran**:
+sempet disebut informal "#52" pas diminta (sebelum #52 formal di file ini kepake buat
+`image_tf` scoring) — entry resminya jadi #54 di sini, biar nggak nabrak nomor yang udah ada.
+
+**Renderer**: `renderSegmentList()` (:4693-4707), dipanggil dari `ordering` branch di
+`renderAttemptQuestion()`. Klik ditangani **handler sendiri** (delegated click, :5392-5402,
+keyed ke `.segmentItem` — CSS class beda, bukan `.choiceItem` yang dipake tipe lain), push/splice
+key ke array `attemptAnswers[q.id].order` sesuai urutan klik user.
+
+**Shape dikonfirmasi COCOK ke DB** (sample nyata `H4XING011` #11/#12: `answer:{"order":
+["B","A","C"]}`) — key `"order"`, array of string, urutan array = urutan user nyusun (bukan
+sorted/alphabetical). `submit_attempt`'s `v_ok := v_user_ans = r.answer` (JSONB equality
+penuh termasuk urutan elemen) otomatis bener buat bentuk ini — nol perubahan RPC diperlukan.
+
+**Review ADA cabangnya**: `buildReviewOrdering()` (:5269-5288) — describe urutan user vs benar
+(hanzi+pinyin+terjemahan), tandain "Correct order" cuma kalau mismatch.
+
+**Acceptance test #50's Test D (live, 18 Jul)** — `H4XING001`, blok penuh 10 soal `ordering`
+(order_index 10-19) dijawab manual (klik sesuai urutan semantik kalimat), submit: **10/10
+Correct**, review nampilin kalimat lengkap tersusun + "Urutan benar: X → Y → Z" match persis
+klik. **Nutup audit ini dengan bukti data nyata, bukan cuma baca kode.**
+
+**Verdict: SEHAT, nol tindakan lanjut.** 330 baris `ordering` published aman dari kelas bug
+#50/#52.
+
+Diputuskan Kyaru + Claude Code, 18 Jul 2026.
+
+## 55. Gerbang pre-publish (#51 diformalkan) — WAJIB run sebelum tiap publish, TAPI ada blind spot
+
+`#51` udah nyaranin aturan "cek dispatcher kenal tipe sebelum publish" — entry ini formalisasi
+konkretnya, plus satu batasan penting yang ketauan hari ini.
+
+**Gerbang**: sebelum publish set/konten apapun, jalanin — semua `question_type` di baris yang
+mau di-publish, dikurangi daftar putih tipe yang punya cabang di **KEDUA** dispatcher
+(`renderAttemptQuestion()` DAN `buildReviewHTML()`). Selisihnya harus KOSONG. Kalau nggak
+kosong = ada tipe yang bakal render blank/rusak begitu di-publish (kelas #50).
+
+Daftar putih saat ini (12 tipe): `char_input`, `error_sentence`, `essay`, `fill_blank`,
+`image_match`, `image_mc`, `image_tf`, `listening_mc`, `listening_mc_stmt`, `listening_tf`,
+`ordering`, `reading_mc`, `sentence_match`. **WAJIB di-update tiap renderer baru landing** —
+daftar ini bukan statis.
+
+**BATASAN, dicatet eksplisit biar nggak overconfidence**: gerbang ini **CUMA nangkep renderer
+YANG NGGAK ADA SAMA SEKALI**. Dia **BUTA** sama kasus `listening_mc_stmt` — renderer-nya ADA
+(masuk daftar putih, lolos gerbang), tapi **NOL JAM TERBANG** terhadap data nyata (150 baris,
+10 set, semua `is_published=false` sampai hari ini — lihat #48). Renderer yang "ada di kode"
+dan renderer yang "kebukti jalan pake data real" itu dua klaim beda — gerbang ini cuma
+mem-verifikasi klaim pertama. **Konsekuensi**: begitu `H6XING001` (atau set `h6-listening-N`
+manapun) di-flip `is_published=true`, itu jadi kali PERTAMA `listening_mc_stmt` kena traffic
+nyata sejak renderer-nya ditulis — WAJIB dites manual (bukan cuma lolos gerbang) sebelum
+dianggap aman. Lihat antrian di HANDOFF.md buat urutan tes-nya.
 
 Diputuskan Kyaru + Claude Code, 18 Jul 2026.
 

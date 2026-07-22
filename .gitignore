@@ -1,2 +1,7 @@
 # Design reference material — not part of the deployed app
 design_handoff_xing_mandarin/
+
+# Generated audio output (pinyin/sandhi TTS pipelines) — regenerated locally, never committed
+out/
+audio_out/
+__pycache__/

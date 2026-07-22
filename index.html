@@ -1234,6 +1234,40 @@
       border:1px solid var(--line); font-family:var(--hanzi-serif-font); font-size:22px; color:var(--text); cursor:pointer;
     }
     .radicalExampleChar:hover{ border-color:var(--gold); }
+
+    /* ============ PANDUAN PINYIN (chart + audio) ============ */
+    .pinyinChartScroll{ overflow-x:auto; max-height:60vh; overflow-y:auto; border:1px solid var(--line); border-radius:12px; }
+    .pinyinChartTable{ border-collapse:collapse; font-size:12.5px; white-space:nowrap; }
+    .pinyinChartTable th, .pinyinChartTable td{ border:1px solid var(--line); padding:0; text-align:center; }
+    .pinyinChartTable thead th{
+      position:sticky; top:0; background:var(--panel-2); color:var(--muted); font-weight:700;
+      padding:8px 10px; z-index:2;
+    }
+    .pinyinChartTable tbody th{
+      position:sticky; left:0; background:var(--panel-2); color:var(--text); font-weight:800;
+      padding:8px 12px; z-index:1;
+    }
+    .pinyinChartTable thead th:first-child{ z-index:3; left:0; position:sticky; }
+    .pinyinCell{
+      width:100%; height:100%; min-width:52px; padding:9px 6px; margin-top:0; background:transparent;
+      border:none; color:var(--text); font-weight:600; cursor:pointer;
+    }
+    .pinyinCell:hover, .pinyinCell.rowHi, .pinyinCell.colHi{ background:rgba(242,176,30,.16); } /* --gold expanded to decimal, same technique as .msg.lock above -- see its comment */
+    .pinyinCell.invalid{ color:rgba(var(--text-rgb),.18); cursor:default; }
+    .pinyinCell.invalid:hover{ background:transparent; }
+    .pinyinToneRow{ display:flex; gap:10px; justify-content:center; margin-top:6px; }
+    .pinyinToneBtn{
+      width:auto; margin-top:0; padding:14px 20px; border-radius:14px; background:var(--panel-2);
+      border:1px solid var(--line); color:var(--text); font-size:20px; font-weight:800; cursor:pointer;
+    }
+    .pinyinToneBtn:disabled{ opacity:.35; cursor:not-allowed; }
+    .pinyinToneBtn .toneSyl{ display:block; font-size:20px; }
+    .pinyinToneBtn .toneNote{ display:block; font-size:10px; color:var(--muted); font-weight:600; margin-top:4px; }
+    .pinyinBasicsContent{ font-size:13.5px; line-height:1.75; color:var(--text); }
+    .pinyinBasicsContent h4{ font-size:14px; margin:18px 0 6px; color:var(--gold); }
+    .pinyinBasicsContent h4:first-child{ margin-top:0; }
+    .pinyinBasicsContent p{ margin:0 0 8px; }
+    .pinyinBasicsContent ul{ margin:0 0 8px; padding-left:20px; }
   </style>
 </head>
 <body>
@@ -1594,6 +1628,27 @@
         <button id="radicalsExitBtn" class="practiceExit">Kembali ke Materi</button>
       </div>
 
+      <!-- ============ PANDUAN PINYIN ============ -->
+      <div id="pinyinGuideCard" class="pageCard browse hidden">
+        <p class="sub browseTitle" id="pinyinGuideHeader">Panduan Pinyin</p>
+
+        <div class="strokeTabs" id="pinyinTabs">
+          <button type="button" class="strokeTab active" data-tab="chart" id="pinyinTabChart"></button>
+          <button type="button" class="strokeTab" data-tab="basics" id="pinyinTabBasics"></button>
+        </div>
+
+        <div id="pinyinChartView">
+          <div class="pinyinChartScroll">
+            <table class="pinyinChartTable" id="pinyinChartTable"></table>
+          </div>
+        </div>
+        <div id="pinyinBasicsView" class="hidden">
+          <div class="pinyinBasicsContent" id="pinyinBasicsContent"></div>
+        </div>
+
+        <button id="pinyinGuideExitBtn" class="practiceExit">Kembali ke Materi</button>
+      </div>
+
       <!-- ============ STROKE PRACTICE (LATIHAN GORESAN) ============ -->
       <div id="strokePracticeCard" class="pageCard browse hidden">
         <p class="sub browseTitle" id="strokeHeader">Latihan Goresan</p>
@@ -1805,6 +1860,14 @@
             <div class="hubCardBody">
               <div class="hubCardTitle" id="hubCardRadicalsTitle">Radikal Dasar</div>
               <div class="hubCardMeta" id="hubCardRadicalsMeta">Kenalan sama komponen hanzi</div>
+            </div>
+          </button>
+
+          <button type="button" class="hubCard" id="hubCardPinyin" data-card="pinyin">
+            <div class="hubCardCover stroke"><span class="hubCardCoverGlyph">ā</span></div>
+            <div class="hubCardBody">
+              <div class="hubCardTitle" id="hubCardPinyinTitle">Panduan Pinyin</div>
+              <div class="hubCardMeta" id="hubCardPinyinMeta">Chart bunyi + latihan dengar</div>
             </div>
           </button>
 
@@ -2570,6 +2633,12 @@
     $('hubCardRadicalsMeta').textContent = t('hubCardRadicalsMeta');
     $('radicalsHeader').textContent = t('radicalsHeader');
     $('radicalsExitBtn').textContent = t('backToMateri');
+    $('hubCardPinyinTitle').textContent = t('hubCardPinyinTitle');
+    $('hubCardPinyinMeta').textContent = t('hubCardPinyinMeta');
+    $('pinyinGuideHeader').textContent = t('pinyinGuideHeader');
+    $('pinyinTabChart').textContent = t('pinyinTabChart');
+    $('pinyinTabBasics').textContent = t('pinyinTabBasics');
+    $('pinyinGuideExitBtn').textContent = t('backToMateri');
 
     renderMockExitLabel();
 
@@ -4333,6 +4402,187 @@
   }
 
   /* ==========================================================
+     PANDUAN PINYIN -- Fitur 3, batch prompt-pack.
+     Tabel suku kata (INITIAL_FINALS) adalah PORT PERSIS dari tools/generate_pinyin_audio.py --
+     kalau salah satu diubah, ubah yang satu lagi (nama file audio harus cocok dengan yang
+     digenerate). j/q/x sengaja pakai final 'u'/'ue'/'uan'/'un' polos (bukan 'v') -- konvensi
+     ejaan pinyin baku membuang umlaut sepenuhnya setelah j/q/x/y (ju bukan jü/jv), beda dari
+     n/l yang butuh pembeda nu/nü, lu/lü. Audio belum ada di storage (prefix pinyin/ belum
+     diupload) -- semua playback lewat audioExistsAndPlay(), tombol yang gagal exist-check
+     didisable + tooltip, TIDAK ada alert popup ataupun console error.
+     ========================================================== */
+  const PINYIN_INITIAL_FINALS = {
+    b:['a','o','ai','ei','ao','an','en','ang','eng','i','ie','iao','ian','in','ing','u'],
+    p:['a','o','ai','ei','ao','ou','an','en','ang','eng','i','ie','iao','ian','in','ing','u'],
+    m:['a','o','e','ai','ei','ao','ou','an','en','ang','eng','i','ie','iao','iu','ian','in','ing','u'],
+    f:['a','o','ei','ou','an','en','ang','eng','u'],
+    d:['a','e','ai','ei','ao','ou','an','en','ang','eng','ong','i','ie','iao','iu','ian','ing','u','ui','uo','uan','un'],
+    t:['a','e','ai','ao','ou','an','ang','eng','ong','i','ie','iao','ian','ing','u','ui','uo','uan','un'],
+    n:['a','e','ai','ei','ao','ou','an','en','ang','eng','ong','i','ia','ie','iao','iu','ian','in','iang','ing','u','uo','uan','un','v','ve'],
+    l:['a','e','ai','ei','ao','ou','an','ang','eng','ong','i','ia','ie','iao','iu','ian','in','iang','ing','u','uo','uan','un','v','ve'],
+    g:['a','e','ai','ei','ao','ou','an','en','ang','eng','ong','u','ua','uo','uai','ui','uan','un','uang'],
+    k:['a','e','ai','ei','ao','ou','an','en','ang','eng','ong','u','ua','uo','uai','ui','uan','un','uang'],
+    h:['a','e','ai','ei','ao','ou','an','en','ang','eng','ong','u','ua','uo','uai','ui','uan','un','uang'],
+    j:['i','ia','ie','iao','iu','ian','in','iang','ing','iong','u','ue','uan','un'],
+    q:['i','ia','ie','iao','iu','ian','in','iang','ing','iong','u','ue','uan','un'],
+    x:['i','ia','ie','iao','iu','ian','in','iang','ing','iong','u','ue','uan','un'],
+    zh:['a','e','i','ai','ei','ao','ou','an','en','ang','eng','ong','u','ua','uo','uai','ui','uan','un','uang'],
+    ch:['a','e','i','ai','ao','ou','an','en','ang','eng','ong','u','ua','uo','uai','ui','uan','un','uang'],
+    sh:['a','e','i','ai','ei','ao','ou','an','en','ang','eng','u','ua','uo','uai','ui','uan','un','uang'],
+    r:['e','i','ao','ou','an','en','ang','eng','ong','u','ua','uo','ui','uan','un'],
+    z:['a','e','i','ai','ei','ao','ou','an','en','ang','eng','ong','u','uo','ui','uan','un'],
+    c:['a','e','i','ai','ao','ou','an','en','ang','eng','ong','u','uo','ui','uan','un'],
+    s:['a','e','i','ai','ao','ou','an','en','ang','eng','ong','u','uo','ui','uan','un']
+  };
+  const PINYIN_ZERO_MAP = {
+    a:'a', o:'o', e:'e', ai:'ai', ei:'ei', ao:'ao', ou:'ou', an:'an', en:'en', ang:'ang', eng:'eng', er:'er',
+    i:'yi', ia:'ya', ie:'ye', iao:'yao', iu:'you', ian:'yan', in:'yin', iang:'yang', ing:'ying', iong:'yong',
+    u:'wu', ua:'wa', uo:'wo', uai:'wai', ui:'wei', uan:'wan', un:'wen', uang:'wang', ueng:'weng',
+    v:'yu', ve:'yue', van:'yuan', vn:'yun'
+  };
+  const PINYIN_ALL_FINALS = ['a','o','e','ai','ei','ao','ou','an','en','ang','eng','ong','er',
+    'i','ia','ie','iao','iu','ian','in','iang','ing','iong',
+    'u','ua','uo','uai','ui','uan','un','uang','ueng','v','ve','van','vn'];
+  const PINYIN_TONE_VOWELS = { a:'aāáǎà', o:'oōóǒò', e:'eēéěè', i:'iīíǐì', u:'uūúǔù', 'ü':'üǖǘǚǜ' };
+
+  function pinyinToneMark(sylV, tone){
+    const s = sylV.replace(/v/g, 'ü');
+    let idx;
+    if(s.includes('a')) idx = s.indexOf('a');
+    else if(s.includes('o')) idx = s.indexOf('o');
+    else if(s.includes('e')) idx = s.indexOf('e');
+    else if(s.includes('iu')) idx = s.indexOf('iu') + 1;
+    else if(s.includes('ui')) idx = s.indexOf('ui');
+    else{
+      idx = -1;
+      for(const v of ['ü','i','u']){ const p = s.lastIndexOf(v); if(p !== -1){ idx = p; break; } }
+      if(idx === -1) return s;
+    }
+    const base = s[idx];
+    const key = base === 'ü' ? 'ü' : base;
+    return s.slice(0, idx) + PINYIN_TONE_VOWELS[key][tone] + s.slice(idx+1);
+  }
+
+  function pinyinAudioUrl(sylV, tone){
+    return sb.storage.from('listening-audio').getPublicUrl(`pinyin/${sylV}${tone}.mp3`).data.publicUrl;
+  }
+
+  let pinyinChartBuilt = false;
+  let pinyinBasicsBuilt = false;
+
+  function openPinyinGuide(){
+    setActiveNav('materi');
+    hideAllPages();
+    $('pinyinGuideCard').classList.remove('hidden');
+    if(!pinyinChartBuilt){ renderPinyinChart(); pinyinChartBuilt = true; }
+  }
+  function closePinyinGuide(){ navTo(openMaterialsHub); }
+
+  function renderPinyinChart(){
+    const table = $('pinyinChartTable');
+    const initials = Object.keys(PINYIN_INITIAL_FINALS);
+    let thead = '<thead><tr><th></th>' + PINYIN_ALL_FINALS.map(f=>`<th data-col="${f}">${f.replace('v','ü')}</th>`).join('') + '</tr></thead>';
+    let rows = initials.map(ini=>{
+      const finals = PINYIN_INITIAL_FINALS[ini];
+      const cells = PINYIN_ALL_FINALS.map(f=>{
+        if(!finals.includes(f)) return `<td class="pinyinCellWrap"><button type="button" class="pinyinCell invalid" disabled>·</button></td>`;
+        const syl = ini + f;
+        return `<td class="pinyinCellWrap" data-col="${f}"><button type="button" class="pinyinCell" data-syl="${syl}">${syl.replace('v','ü')}</button></td>`;
+      }).join('');
+      return `<tr><th>${ini}</th>${cells}</tr>`;
+    });
+    // Zero-initial row -- ejaan spesial (y/w), bukan konsonan+final biasa.
+    const zeroCells = PINYIN_ALL_FINALS.map(f=>{
+      const syl = PINYIN_ZERO_MAP[f];
+      if(!syl) return `<td class="pinyinCellWrap"><button type="button" class="pinyinCell invalid" disabled>·</button></td>`;
+      return `<td class="pinyinCellWrap" data-col="${f}"><button type="button" class="pinyinCell" data-syl="${syl}">${syl}</button></td>`;
+    }).join('');
+    rows.push(`<tr><th>∅</th>${zeroCells}</tr>`);
+    table.innerHTML = thead + '<tbody>' + rows.join('') + '</tbody>';
+  }
+
+  $('pinyinChartTable') && $('pinyinChartTable').addEventListener('click', e=>{
+    const btn = e.target.closest('.pinyinCell');
+    if(!btn || btn.disabled) return;
+    openPinyinTonePopup(btn.dataset.syl);
+  });
+  $('pinyinChartTable') && $('pinyinChartTable').addEventListener('mouseover', e=>{
+    const td = e.target.closest('td[data-col]');
+    if(!td) return;
+    const col = td.dataset.col;
+    $('pinyinChartTable').querySelectorAll(`td[data-col="${col}"] .pinyinCell`).forEach(c=>c.classList.add('colHi'));
+  });
+  $('pinyinChartTable') && $('pinyinChartTable').addEventListener('mouseout', e=>{
+    $('pinyinChartTable').querySelectorAll('.colHi').forEach(c=>c.classList.remove('colHi'));
+  });
+
+  function openPinyinTonePopup(sylV){
+    const display = sylV.replace('v', 'ü');
+    const btnsHTML = [1,2,3,4].map(tone=>{
+      const marked = pinyinToneMark(sylV, tone);
+      return `<button type="button" class="pinyinToneBtn" data-syl="${sylV}" data-tone="${tone}">
+        <span class="toneSyl">${marked}</span><span class="toneNote">${t('pinyinAudioNotReady')}</span>
+      </button>`;
+    }).join('');
+    openModal(display, `<div class="pinyinToneRow">${btnsHTML}</div>`);
+    // toneNote starts hidden-by-default meaning ("tap to play"); only shown once a play attempt
+    // fails, so the "not ready" text isn't alarming a user who hasn't even tried yet.
+    $('modalBody').querySelectorAll('.toneNote').forEach(el => el.style.visibility = 'hidden');
+    $('modalBody').querySelectorAll('.pinyinToneBtn').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        const syl = btn.dataset.syl, tone = Number(btn.dataset.tone);
+        const url = pinyinAudioUrl(syl, tone);
+        const played = await audioExistsAndPlay(url);
+        if(!played){
+          btn.disabled = true;
+          btn.querySelector('.toneNote').style.visibility = 'visible';
+        }
+      });
+    });
+  }
+
+  const PINYIN_BASICS_HTML_ID = `
+    <h4>Inisial (声母)</h4>
+    <p>Inisial adalah bunyi konsonan di awal suku kata (mis. <b>b</b> di "bā"). Mandarin punya
+    23 inisial (termasuk "tanpa inisial" buat suku kata yang mulai dari vokal). Beberapa yang
+    sering ketuker pemula: <b>zh/ch/sh/r</b> (lidah digulung ke belakang, beda dari <b>z/c/s</b>
+    yang lidah rata di gigi depan), dan <b>j/q/x</b> (lidah nempel langit-langit, cuma muncul
+    sebelum final "i"/"ü").</p>
+    <h4>Final (韵母)</h4>
+    <p>Final adalah bunyi vokal (+ konsonan penutup opsional -n/-ng) setelah inisial. Ada final
+    tunggal (a, o, e, i, u, ü), final gabungan (ai, ei, ao, ou, dst), dan final ber-hidung
+    (an, en, ang, eng, ong).</p>
+    <h4>Nada (声调)</h4>
+    <p>4 nada + 1 nada netral. Nada 1 (ā) datar tinggi, nada 2 (á) naik, nada 3 (ǎ) turun-lalu-naik,
+    nada 4 (à) turun tajam. Nada beda, arti beda total — "mā" (妈, ibu) ≠ "mǎ" (马, kuda).</p>
+    <h4>Aturan ü</h4>
+    <p>Simbol <b>ü</b> (u dengan titik dua) cuma dipakai setelah <b>n</b> dan <b>l</b> (nǚ, lǜ)
+    karena di situ "u" biasa juga ada (nu ≠ nü, lu ≠ lü). Setelah <b>j/q/x/y</b>, umlaut-nya
+    dibuang total (ditulis "ju/que/xuan/yun", BUKAN "jü/qüe/xüan/yün") — karena j/q/x/y tidak
+    pernah punya bentuk "u" biasa yang bakal ketuker.</p>
+    <h4>Aturan yi/wu/yu</h4>
+    <p>Suku kata yang mulai dari vokal <b>i</b>, <b>u</b>, atau <b>ü</b> tanpa inisial ditulis
+    pakai awalan <b>y</b>/<b>w</b>, bukan vokalnya langsung: i → <b>yi</b>, ia → <b>ya</b>,
+    u → <b>wu</b>, uo → <b>wo</b>, ü → <b>yu</b>, üe → <b>yue</b>. Ini murni aturan EJAAN,
+    bukan bunyi tambahan — "yi" tetap dibaca "i".</p>
+  `;
+
+  function renderPinyinBasics(){
+    $('pinyinBasicsContent').innerHTML = PINYIN_BASICS_HTML_ID;
+  }
+
+  function switchPinyinTab(tab){
+    [...$('pinyinTabs').children].forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    $('pinyinChartView').classList.toggle('hidden', tab !== 'chart');
+    $('pinyinBasicsView').classList.toggle('hidden', tab !== 'basics');
+    if(tab === 'basics' && !pinyinBasicsBuilt){ renderPinyinBasics(); pinyinBasicsBuilt = true; }
+  }
+  $('pinyinTabs') && $('pinyinTabs').addEventListener('click', e=>{
+    const btn = e.target.closest('.strokeTab');
+    if(btn) switchPinyinTab(btn.dataset.tab);
+  });
+
+  /* ==========================================================
      ADMIN — USER MANAGEMENT (v1, DECISIONS_NEEDED #30/#31)
      Client-side only, anon key, zero Edge Functions -- RLS is_admin() covers every read/write
      this screen does. No email column (auth.users isn't reachable from the client; that needs
@@ -4989,6 +5239,22 @@
   function listeningImageUrl(path){
     if(!path) return null;
     return sb.storage.from('listening-images').getPublicUrl(path).data.publicUrl;
+  }
+
+  // Shared by Pinyin Guide / Tone Sandhi / Survival Kit / Tone Coach -- all of them play audio
+  // that doesn't exist in storage yet (pinyin/ and sandhi/ prefixes not uploaded, see
+  // RELEASE_CHECKLIST.md). A plain `new Audio(url).play()` against a 404 makes the BROWSER
+  // itself log a "Failed to load resource: 404" console entry, independent of any JS try/catch --
+  // that's a real console error this batch's "zero console error" rule can't allow. HEAD-checking
+  // existence via fetch() first avoids it entirely: a fetch() that resolves with !ok is a normal
+  // resolved promise, nothing the browser logs on its own.
+  async function audioExistsAndPlay(url){
+    try{
+      const res = await fetch(url, { method:'HEAD' });
+      if(!res.ok) return false;
+    }catch(e){ return false; }
+    new Audio(url).play().catch(()=>{});
+    return true;
   }
 
   function formatAudioTime(sec){
@@ -6182,6 +6448,8 @@
   $('hubCardMock').addEventListener('click', ()=> navTo(()=> openMockList('all','hub')));
   $('hubCardRadicals').addEventListener('click', ()=> navTo(openRadicals));
   $('radicalsExitBtn').addEventListener('click', closeRadicals);
+  $('hubCardPinyin').addEventListener('click', ()=> navTo(openPinyinGuide));
+  $('pinyinGuideExitBtn').addEventListener('click', closePinyinGuide);
   $('hubCardStroke').addEventListener('click', ()=> navTo(openStrokePractice));
   $('strokeExitBtn').addEventListener('click', closeStrokePractice);
   $('strokeMoreBtn').addEventListener('click', renderStrokeChunk);

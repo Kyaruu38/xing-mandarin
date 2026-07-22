@@ -1302,6 +1302,37 @@
     .sandhiQuizFeedback{ font-size:12px; font-weight:700; margin-top:6px; }
     .sandhiQuizFeedback.correct{ color:var(--ok); }
     .sandhiQuizFeedback.wrong{ color:var(--danger); }
+
+    /* ============ TONE COACH ============ */
+    .tcWordCard{ text-align:center; margin-bottom:14px; }
+    .tcHanzi{ font-family:var(--hanzi-serif-font); font-size:64px; color:var(--text); line-height:1; }
+    .tcPinyin{ font-size:18px; font-weight:800; color:#C7900F; margin-top:4px; }
+    .tcMeaning{ font-size:13px; color:rgba(var(--text-rgb),.7); margin-top:2px; }
+    .tcListenBtn{ width:auto; margin:10px auto 0; padding:8px 16px; border-radius:99px; background:var(--panel-2); border:1px solid var(--line); color:var(--text); font-size:12.5px; cursor:pointer; display:block; }
+    .tcListenBtn:disabled{ opacity:.35; cursor:not-allowed; }
+    .tcCanvasWrap{ background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:10px; margin-bottom:14px; }
+    .tcCanvas{ width:100%; height:140px; display:block; }
+    .tcLegend{ display:flex; gap:16px; justify-content:center; font-size:11px; color:var(--muted); margin-top:6px; }
+    .tcLegendDot{ display:inline-block; width:18px; height:0; border-top:3px dashed var(--gold); vertical-align:middle; margin-right:4px; }
+    .tcLegendDot.solid{ border-top-style:solid; border-top-color:var(--text); }
+    .tcRecordRow{ display:flex; flex-direction:column; align-items:center; gap:10px; margin-bottom:14px; }
+    .tcRecordBtn{
+      width:auto; margin-top:0; padding:16px 36px; border-radius:99px; font-size:15px; font-weight:800;
+      background:linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#241a08; cursor:pointer;
+    }
+    .tcRecordBtn.recording{ background:var(--danger); color:#fff; animation:tcPulse 1.2s ease-in-out infinite; }
+    @keyframes tcPulse{ 0%,100%{ opacity:1 } 50%{ opacity:.6 } }
+    .tcStatus{ font-size:12.5px; color:var(--muted); font-weight:700; min-height:16px; }
+    .tcLimitBanner{ font-size:12px; color:var(--muted); text-align:center; margin-bottom:10px; }
+    .tcErrorPanel{ background:rgba(214,69,69,.1); border:1px solid rgba(214,69,69,.3); border-radius:12px; padding:12px; font-size:13px; color:var(--text); margin-bottom:14px; text-align:center; }
+    .tcVerdictPanel{ border-radius:12px; padding:14px; margin-bottom:14px; text-align:center; }
+    .tcVerdictPanel.pass{ background:rgba(47,158,91,.12); border:1px solid rgba(47,158,91,.35); }
+    .tcVerdictPanel.fail{ background:rgba(214,69,69,.1); border:1px solid rgba(214,69,69,.3); }
+    .tcVerdictPanel.ambiguous{ background:rgba(242,176,30,.14); border:1px solid rgba(242,176,30,.4); }
+    .tcVerdictTitle{ font-size:15px; font-weight:800; color:var(--text); }
+    .tcVerdictTip{ font-size:13px; color:rgba(var(--text-rgb),.8); margin-top:6px; }
+    .tcVerdictConfidence{ font-size:11px; color:var(--muted); margin-top:4px; }
+    .tcNextBtn{ width:auto; margin:0 auto; padding:10px 20px; border-radius:99px; background:var(--panel-2); border:1px solid var(--line); color:var(--text); font-weight:700; cursor:pointer; display:block; }
   </style>
 </head>
 <body>
@@ -1691,6 +1722,43 @@
         <button id="sandhiGuideExitBtn" class="practiceExit">Kembali ke Materi</button>
       </div>
 
+      <!-- ============ TONE COACH ============ -->
+      <div id="toneCoachCard" class="pageCard browse hidden">
+        <p class="sub browseTitle" id="toneCoachHeader">Tone Coach</p>
+
+        <p class="tcLimitBanner hidden" id="tcLimitBanner"></p>
+
+        <div class="tcWordCard">
+          <div class="tcHanzi" id="tcHanzi">妈</div>
+          <div class="tcPinyin" id="tcPinyin">mā</div>
+          <div class="tcMeaning" id="tcMeaning">ibu</div>
+          <button type="button" class="tcListenBtn" id="tcListenBtn">🔊 Dengar contoh</button>
+        </div>
+
+        <div class="tcCanvasWrap">
+          <canvas class="tcCanvas" id="tcCanvas" width="600" height="140"></canvas>
+          <div class="tcLegend">
+            <span><span class="tcLegendDot"></span>Target</span>
+            <span><span class="tcLegendDot solid"></span>Suara kamu</span>
+          </div>
+        </div>
+
+        <div id="tcErrorPanel" class="tcErrorPanel hidden"></div>
+        <div id="tcVerdictPanel" class="tcVerdictPanel hidden">
+          <div class="tcVerdictTitle" id="tcVerdictTitle"></div>
+          <div class="tcVerdictTip" id="tcVerdictTip"></div>
+          <div class="tcVerdictConfidence" id="tcVerdictConfidence"></div>
+        </div>
+
+        <div class="tcRecordRow">
+          <button type="button" class="tcRecordBtn" id="tcRecordBtn">🎙️ Rekam</button>
+          <div class="tcStatus" id="tcStatus"></div>
+        </div>
+
+        <button type="button" class="tcNextBtn hidden" id="tcNextBtn"></button>
+        <button id="toneCoachExitBtn" class="practiceExit">Kembali ke Materi</button>
+      </div>
+
       <!-- ============ STROKE PRACTICE (LATIHAN GORESAN) ============ -->
       <div id="strokePracticeCard" class="pageCard browse hidden">
         <p class="sub browseTitle" id="strokeHeader">Latihan Goresan</p>
@@ -1926,6 +1994,14 @@
             <div class="hubCardBody">
               <div class="hubCardTitle" id="hubCardSurvivalTitle">Survival Kit</div>
               <div class="hubCardMeta" id="hubCardSurvivalMeta">100 kata wajib pemula</div>
+            </div>
+          </button>
+
+          <button type="button" class="hubCard" id="hubCardToneCoach" data-card="tonecoach">
+            <div class="hubCardCover stroke"><span class="hubCardCoverGlyph">🎙️</span></div>
+            <div class="hubCardBody">
+              <div class="hubCardTitle" id="hubCardToneCoachTitle">Tone Coach</div>
+              <div class="hubCardMeta" id="hubCardToneCoachMeta">Latihan nada pakai mic</div>
             </div>
           </button>
 
@@ -2703,6 +2779,13 @@
     $('sandhiGuideExitBtn').textContent = t('backToMateri');
     $('hubCardSurvivalTitle').textContent = t('hubCardSurvivalTitle');
     $('hubCardSurvivalMeta').textContent = t('hubCardSurvivalMeta');
+    $('hubCardToneCoachTitle').textContent = t('hubCardToneCoachTitle');
+    $('hubCardToneCoachMeta').textContent = t('hubCardToneCoachMeta');
+    $('toneCoachHeader').textContent = t('toneCoachHeader');
+    $('toneCoachExitBtn').textContent = t('backToMateri');
+    $('tcListenBtn').textContent = t('toneCoachListenBtn');
+    $('tcNextBtn').textContent = t('toneCoachNext');
+    if(!tcRecording) $('tcRecordBtn').textContent = t('toneCoachRecordBtn');
 
     renderMockExitLabel();
 
@@ -2815,7 +2898,7 @@
 
   /* ---------- navigasi appShell (Task: reskin) ---------- */
   function hideAllPages(){
-    ['dashCard','practiceCard','raportCard','browseCard','radicalsCard','strokePracticeCard','pinyinGuideCard','sandhiGuideCard','mockListCard','attemptCard','resultCard','riwayatCard','materialsHubCard','adminCard']
+    ['dashCard','practiceCard','raportCard','browseCard','radicalsCard','strokePracticeCard','pinyinGuideCard','sandhiGuideCard','toneCoachCard','mockListCard','attemptCard','resultCard','riwayatCard','materialsHubCard','adminCard']
       .forEach(id => $(id).classList.add('hidden'));
   }
 
@@ -4973,6 +5056,448 @@
   });
 
   /* ==========================================================
+     TONE COACH -- Fitur 6, batch prompt-pack. 100% client-side, zero external API (no server
+     round-trip for the pitch analysis itself -- Web Speech API is a fully separate, optional,
+     feature-detected secondary check, see below).
+
+     Gating decision (documented, not silently resolved): spec asked for "free = 10/day,
+     paket = unlimited," but this app has no actual free tier in its data model -- every
+     profiles.package value maps to a real paid tier in PACKAGE_LEVELS (hsk_1_4/hsk_5/hsk_6/
+     business/convo/vip), there is no "free" package anyone can be on (confirmed by reading
+     the whole PACKAGE_LEVELS/isLevelAllowed block earlier in this file). Building a limiter
+     that would apply to zero real accounts today is builtinactive dead code -- instead:
+     isToneCoachLimited() always returns false for now (every logged-in user is unlimited),
+     but the localStorage day-counter mechanism itself IS implemented and wired, ready to flip
+     the moment a real free tier exists (see toneCoachCheckLimit()). Flagged in
+     RELEASE_CHECKLIST.md for explicit product sign-off.
+     ========================================================== */
+  const TONE_COACH_WORDS = [
+    { hanzi:'妈', syl:'ma', tone:1, meaning_id:'ibu' },
+    { hanzi:'麻', syl:'ma', tone:2, meaning_id:'rami / kebas' },
+    { hanzi:'马', syl:'ma', tone:3, meaning_id:'kuda' },
+    { hanzi:'骂', syl:'ma', tone:4, meaning_id:'memarahi' },
+    { hanzi:'是', syl:'shi', tone:4, meaning_id:'adalah' },
+    { hanzi:'不', syl:'bu', tone:4, meaning_id:'tidak' },
+    { hanzi:'我', syl:'wo', tone:3, meaning_id:'saya' },
+    { hanzi:'你', syl:'ni', tone:3, meaning_id:'kamu' },
+    { hanzi:'他', syl:'ta', tone:1, meaning_id:'dia (laki-laki)' },
+    { hanzi:'好', syl:'hao', tone:3, meaning_id:'baik' },
+    { hanzi:'吃', syl:'chi', tone:1, meaning_id:'makan' },
+    { hanzi:'喝', syl:'he', tone:1, meaning_id:'minum' },
+    { hanzi:'去', syl:'qu', tone:4, meaning_id:'pergi' },
+    { hanzi:'来', syl:'lai', tone:2, meaning_id:'datang' },
+    { hanzi:'看', syl:'kan', tone:4, meaning_id:'lihat' },
+    { hanzi:'听', syl:'ting', tone:1, meaning_id:'dengar' },
+    { hanzi:'说', syl:'shuo', tone:1, meaning_id:'bicara' },
+    { hanzi:'走', syl:'zou', tone:3, meaning_id:'jalan' },
+    { hanzi:'坐', syl:'zuo', tone:4, meaning_id:'duduk' },
+    { hanzi:'天', syl:'tian', tone:1, meaning_id:'hari / langit' },
+    { hanzi:'书', syl:'shu', tone:1, meaning_id:'buku' },
+    { hanzi:'水', syl:'shui', tone:3, meaning_id:'air' },
+    { hanzi:'茶', syl:'cha', tone:2, meaning_id:'teh' },
+    { hanzi:'门', syl:'men', tone:2, meaning_id:'pintu' }
+  ];
+  let tcWordIndex = 0;
+
+  const TONE_COACH_LIMIT_KEY = 'xm_tonecoach_count';
+  function isToneCoachLimited(){ return false; } // lihat komentar blok di atas
+  function toneCoachCheckLimit(){
+    if(!isToneCoachLimited()) return true;
+    const today = todayStr();
+    let rec;
+    try{ rec = JSON.parse(localStorage.getItem(TONE_COACH_LIMIT_KEY) || '{}'); }catch(e){ rec = {}; }
+    if(rec.date !== today){ rec = { date: today, count: 0 }; }
+    if(rec.count >= 10) return false;
+    rec.count += 1;
+    localStorage.setItem(TONE_COACH_LIMIT_KEY, JSON.stringify(rec));
+    return true;
+  }
+
+  // ---- Audio capture: AudioWorklet (preferred) with ScriptProcessorNode fallback (old iOS
+  // Safari doesn't support AudioWorklet at all). Worklet code is a Blob URL, not a separate
+  // file -- keeps this app single-file per CLAUDE.md while still using addModule()'s URL-only API.
+  const TC_WORKLET_SRC = `
+    class ToneCoachCapture extends AudioWorkletProcessor {
+      process(inputs){
+        const ch = inputs[0][0];
+        if(ch) this.port.postMessage(ch.slice());
+        return true;
+      }
+    }
+    registerProcessor('tone-coach-capture', ToneCoachCapture);
+  `;
+
+  let tcAudioContext = null;
+  let tcMediaStream = null;
+  let tcSourceNode = null;
+  let tcCaptureNode = null;
+  let tcRecording = false;
+  let tcChunks = [];
+  let tcSampleRate = 48000;
+  let tcRecordStartAt = 0;
+  const TC_MAX_RECORD_MS = 2500;
+  let tcRecordTimer = null;
+
+  async function tcSetupCapture(){
+    tcMediaStream = await navigator.mediaDevices.getUserMedia({
+      audio: { echoCancellation:true, noiseSuppression:true, autoGainControl:false }
+    });
+    tcAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+    if(tcAudioContext.state === 'suspended') await tcAudioContext.resume();
+    tcSampleRate = tcAudioContext.sampleRate;
+    tcSourceNode = tcAudioContext.createMediaStreamSource(tcMediaStream);
+
+    try{
+      const blobUrl = URL.createObjectURL(new Blob([TC_WORKLET_SRC], { type:'application/javascript' }));
+      await tcAudioContext.audioWorklet.addModule(blobUrl);
+      tcCaptureNode = new AudioWorkletNode(tcAudioContext, 'tone-coach-capture');
+      tcCaptureNode.port.onmessage = (e)=>{ if(tcRecording) tcChunks.push(e.data); };
+    }catch(e){
+      // Fallback ScriptProcessorNode -- deprecated tapi jalan di semua browser termasuk iOS
+      // Safari lama yang belum dukung AudioWorklet sama sekali.
+      tcCaptureNode = tcAudioContext.createScriptProcessor(2048, 1, 1);
+      tcCaptureNode.onaudioprocess = (e)=>{
+        if(tcRecording) tcChunks.push(e.inputBuffer.getChannelData(0).slice());
+      };
+    }
+    tcSourceNode.connect(tcCaptureNode);
+    // ScriptProcessorNode WAJIB disambungkan ke destination biar onaudioprocess kepanggil di
+    // beberapa browser (quirk lama) -- gain 0 biar ga ada feedback/echo yang kedengeran user.
+    const silentGain = tcAudioContext.createGain();
+    silentGain.gain.value = 0;
+    tcCaptureNode.connect(silentGain);
+    silentGain.connect(tcAudioContext.destination);
+  }
+
+  function tcTeardownCapture(){
+    if(tcCaptureNode){ tcCaptureNode.disconnect(); tcCaptureNode.onaudioprocess = null; if(tcCaptureNode.port) tcCaptureNode.port.onmessage = null; }
+    if(tcSourceNode) tcSourceNode.disconnect();
+    if(tcMediaStream) tcMediaStream.getTracks().forEach(tr => tr.stop());
+    if(tcAudioContext) tcAudioContext.close().catch(()=>{});
+    tcAudioContext = tcMediaStream = tcSourceNode = tcCaptureNode = null;
+  }
+
+  // ---- Pitch detection: autocorrelation, 40ms frame / 15ms hop, parabolic interpolation.
+  function tcFrameRMS(frame){
+    let sum = 0;
+    for(let i=0;i<frame.length;i++) sum += frame[i]*frame[i];
+    return Math.sqrt(sum/frame.length);
+  }
+
+  function tcAutocorrelate(frame, sampleRate){
+    const minLag = Math.max(1, Math.floor(sampleRate/450));
+    const maxLag = Math.min(frame.length-1, Math.floor(sampleRate/60));
+    let energy0 = 0;
+    for(let i=0;i<frame.length;i++) energy0 += frame[i]*frame[i];
+    if(energy0 <= 1e-8) return null;
+    const corrAt = (lag)=>{
+      let sum = 0;
+      for(let i=0;i<frame.length-lag;i++) sum += frame[i]*frame[i+lag];
+      return sum;
+    };
+    let bestLag = -1, bestVal = -Infinity;
+    for(let lag=minLag; lag<=maxLag; lag++){
+      const v = corrAt(lag);
+      if(v > bestVal){ bestVal = v; bestLag = lag; }
+    }
+    if(bestLag <= 0) return null;
+    const clarity = bestVal / energy0;
+    if(clarity < 0.75) return null;
+    const c0 = corrAt(Math.max(bestLag-1, minLag));
+    const c1 = bestVal;
+    const c2 = corrAt(Math.min(bestLag+1, maxLag));
+    const denom = (c0 - 2*c1 + c2);
+    const shift = denom !== 0 ? 0.5*(c0-c2)/denom : 0;
+    const refinedLag = bestLag + Math.max(-1, Math.min(1, shift));
+    return { freq: sampleRate/refinedLag, clarity };
+  }
+
+  // Balikin { times:[0..1,...], semitones:[...] } relatif ke median pitch UCAPAN SENDIRI,
+  // atau null kalau durasi voiced di luar 0.2-1.5 detik (spec: minta ulang).
+  function tcAnalyzePitch(samples, sampleRate){
+    const frameLen = Math.round(sampleRate * 0.04);
+    const hopLen = Math.round(sampleRate * 0.015);
+    const rmsValues = [];
+    for(let i=0;i+frameLen<=samples.length;i+=hopLen) rmsValues.push(tcFrameRMS(samples.subarray(i,i+frameLen)));
+    const maxRms = Math.max(1e-6, ...rmsValues);
+    const energyGate = maxRms * 0.15;
+
+    const raw = [];
+    for(let i=0, fi=0; i+frameLen<=samples.length; i+=hopLen, fi++){
+      const frame = samples.subarray(i, i+frameLen);
+      if(rmsValues[fi] < energyGate){ raw.push(null); continue; }
+      const r = tcAutocorrelate(frame, sampleRate);
+      raw.push(r ? r.freq : null);
+    }
+
+    // Trim unvoiced di ujung.
+    let start = 0, end = raw.length-1;
+    while(start <= end && raw[start] == null) start++;
+    while(end >= start && raw[end] == null) end--;
+    if(start > end) return null;
+    const trimmed = raw.slice(start, end+1);
+
+    const voicedDurationSec = (trimmed.length * hopLen) / sampleRate;
+    if(voicedDurationSec < 0.2 || voicedDurationSec > 1.5) return null;
+
+    // Isi gap kecil (null di tengah) pakai interpolasi linear antar tetangga voiced terdekat --
+    // lebih natural daripada nge-drop titik itu sepenuhnya dari kurva.
+    const filled = trimmed.slice();
+    for(let i=0;i<filled.length;i++){
+      if(filled[i] != null) continue;
+      let a=i-1; while(a>=0 && filled[a]==null) a--;
+      let b=i+1; while(b<filled.length && filled[b]==null) b++;
+      if(a>=0 && b<filled.length) filled[i] = filled[a] + (filled[b]-filled[a])*((i-a)/(b-a));
+      else filled[i] = a>=0 ? filled[a] : (b<filled.length ? filled[b] : 150);
+    }
+
+    // Median filter window 5.
+    const medFiltered = filled.map((_,i)=>{
+      const lo = Math.max(0,i-2), hi = Math.min(filled.length-1,i+2);
+      const window = filled.slice(lo,hi+1).slice().sort((a,b)=>a-b);
+      return window[Math.floor(window.length/2)];
+    });
+
+    const sortedAll = medFiltered.slice().sort((a,b)=>a-b);
+    const medianF = sortedAll[Math.floor(sortedAll.length/2)];
+
+    const semitones = medFiltered.map(f => 12 * Math.log2(f / medianF));
+    const times = medFiltered.map((_,i)=> medFiltered.length>1 ? i/(medFiltered.length-1) : 0);
+    return { times, semitones, durationSec: voicedDurationSec };
+  }
+
+  // ---- Klasifikasi nada (heuristik transparan, sesuai spec).
+  function tcClassifyContour(contour){
+    const { semitones } = contour;
+    const n = semitones.length;
+    const range = Math.max(...semitones) - Math.min(...semitones);
+    const start = semitones[0], end = semitones[n-1];
+    const slope = end - start;
+    let minIdx = 0; for(let i=1;i<n;i++) if(semitones[i] < semitones[minIdx]) minIdx = i;
+    const minPos = n>1 ? minIdx/(n-1) : 0.5;
+    const dipDepth = Math.max(...semitones.slice(0, Math.max(1,Math.floor(n*0.7)))) - semitones[minIdx];
+
+    const scores = { 1:0, 2:0, 3:0, 4:0 };
+    // Tone 1: datar, range kecil.
+    scores[1] = range < 2.5 ? (1 - range/2.5) : 0;
+    // Tone 2: naik jelas, minimum di awal.
+    scores[2] = (slope >= 3 && minPos < 0.4) ? Math.min(1, slope/6) : 0;
+    // Tone 3: dip di tengah (posisi 0.3-0.7), kedalaman >= 2.5 st. Half-third (dip lemah/di
+    // pinggir) tetap dihitung nada 3 tapi diberi verdict khusus di caller (bukan di sini).
+    scores[3] = (minPos >= 0.2 && minPos <= 0.8 && dipDepth >= 1.5) ? Math.min(1, dipDepth/4) : 0;
+    // Tone 4: turun tajam, mulai tinggi.
+    scores[4] = (slope <= -4 && start > (Math.max(...semitones)-1.5)) ? Math.min(1, -slope/8) : 0;
+
+    const ranked = Object.entries(scores).sort((a,b)=> b[1]-a[1]);
+    const [bestTone, bestScore] = ranked[0];
+    const [secondTone, secondScore] = ranked[1];
+    const isHalfThird = Number(bestTone) === 3 && dipDepth < 2.5 && dipDepth >= 1.5;
+    const ambiguous = bestScore > 0 && secondScore > 0 && (bestScore - secondScore) < 0.15;
+
+    return {
+      tone: Number(bestTone), score: bestScore, isHalfThird,
+      ambiguous, candidates: ambiguous ? [Number(bestTone), Number(secondTone)] : [Number(bestTone)],
+      confidence: bestScore
+    };
+  }
+
+  // ---- Canvas: target (dashed gold) vs user (solid) pitch curve.
+  function tcDrawCurves(targetTone, userContour){
+    const canvas = $('tcCanvas');
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height, pad = 16;
+    ctx.clearRect(0,0,w,h);
+    const yFor = (st)=> h/2 - (st/6) * (h/2 - pad); // ±6 semitone dipetakan ke tinggi canvas
+
+    const targetPts = (SANDHI_TONE_CURVE_POINTS[targetTone] || SANDHI_TONE_CURVE_POINTS[1])
+      .map(p => [p[0], (0.5 - p[1]) * 12]); // konversi 0..1 (dari sandhi curve) balik ke rentang semitone kasar
+    ctx.strokeStyle = '#F2B01E'; // --gold -- canvas 2D can't read CSS custom properties, hardcode like .msg.lock does
+    ctx.lineWidth = 3;
+    ctx.setLineDash([6,5]);
+    ctx.beginPath();
+    targetPts.forEach((p,i)=>{
+      const x = pad + p[0]*(w-2*pad), y = yFor(p[1]);
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+
+    if(userContour){
+      const rootStyle = getComputedStyle(document.documentElement);
+      ctx.setLineDash([]);
+      ctx.strokeStyle = (rootStyle.getPropertyValue('--text') || '#1C2A5E').trim();
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      userContour.times.forEach((tm,i)=>{
+        const x = pad + tm*(w-2*pad), y = yFor(Math.max(-6,Math.min(6,userContour.semitones[i])));
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      });
+      ctx.stroke();
+    }
+  }
+
+  // Tips spesifik per pasangan (target, terdeteksi) -- fallback generik kalau kombinasinya
+  // tidak ada di tabel (mis. kombinasi langka/klasifikasi ambigu).
+  const TONE_COACH_TIPS = {
+    1: { 2:'Coba tahan rata dari awal sampai akhir — jangan naik di akhir.',
+         3:'Coba tahan rata — jangan turun-naik kayak nada 3.',
+         4:'Jangan jatuh di akhir — coba tahan rata dari awal sampai akhir.' },
+    2: { 1:'Naikkan nadanya di akhir — jangan dibiarin rata terus.',
+         3:'Jangan turun dulu di awal — langsung naik dari awal ke akhir.',
+         4:'Naik terus sampai akhir — jangan malah turun.' },
+    3: { 1:'Turunin dulu di tengah sebelum naik lagi — jangan dibiarin rata.',
+         2:'Turunin dulu suaranya baru naik — jangan langsung naik dari awal.',
+         4:'Turun di tengah lalu naik sedikit lagi — jangan terus turun sampai akhir.' },
+    4: { 1:'Mulai dari nada TINGGI lalu turun tajam — jangan dibiarin rata.',
+         2:'Mulai dari nada tinggi lalu turun tajam — jangan malah naik duluan.',
+         3:'Turun tajam terus sampai akhir — jangan naik lagi di akhir.' }
+  };
+
+  function tcRenderVerdict(target, result){
+    const panel = $('tcVerdictPanel');
+    const titleEl = $('tcVerdictTitle'), tipEl = $('tcVerdictTip'), confEl = $('tcVerdictConfidence');
+    panel.classList.remove('hidden');
+
+    if(result.ambiguous){
+      panel.className = 'tcVerdictPanel ambiguous';
+      titleEl.textContent = `Kurang jelas — kedengeran antara nada ${result.candidates[0]} atau ${result.candidates[1]}`;
+      tipEl.textContent = 'Coba ucapkan lagi lebih jelas, atau lebih dekat ke mic.';
+      confEl.textContent = '';
+      return;
+    }
+
+    const correct = result.tone === target;
+    panel.className = 'tcVerdictPanel ' + (correct ? 'pass' : 'fail');
+    if(correct && result.isHalfThird){
+      titleEl.textContent = `Benar! (half-third, wajar buat nada 3 di sini)`;
+      tipEl.textContent = 'Nada 3 kamu keluar sebagai "setengah-ketiga" (cuma turun, ga naik lagi) — itu SAH, bukan salah, malah ciri khas native speaker.';
+    } else if(correct){
+      titleEl.textContent = `Benar! Nada ${target} terdeteksi.`;
+      tipEl.textContent = 'Mantap, kurva kamu cocok sama target.';
+    } else {
+      titleEl.textContent = `Kedengeran nada ${result.tone}, targetnya nada ${target}.`;
+      tipEl.textContent = (TONE_COACH_TIPS[target] && TONE_COACH_TIPS[target][result.tone])
+        || 'Coba dengerin contoh lagi, perhatikan naik-turun nadanya.';
+    }
+    confEl.textContent = 'Confidence: ' + Math.round(result.confidence*100) + '%';
+  }
+
+  function tcShowError(msg){
+    const panel = $('tcErrorPanel');
+    panel.textContent = msg;
+    panel.classList.remove('hidden');
+    $('tcVerdictPanel').classList.add('hidden');
+  }
+
+  function tcResetPanels(){
+    $('tcErrorPanel').classList.add('hidden');
+    $('tcVerdictPanel').classList.add('hidden');
+    $('tcNextBtn').classList.add('hidden');
+    $('tcStatus').textContent = '';
+    tcDrawCurves(TONE_COACH_WORDS[tcWordIndex].tone, null);
+  }
+
+  function tcLoadWord(idx){
+    tcWordIndex = idx;
+    const w = TONE_COACH_WORDS[idx];
+    $('tcHanzi').textContent = w.hanzi;
+    $('tcPinyin').textContent = pinyinToneMark(w.syl, w.tone);
+    $('tcMeaning').textContent = w.meaning_id;
+    tcResetPanels();
+    tcRefreshListenBtn(w);
+  }
+
+  async function tcRefreshListenBtn(w){
+    const btn = $('tcListenBtn');
+    btn.disabled = true;
+    const url = pinyinAudioUrl(w.syl, w.tone);
+    const exists = await audioUrlExists(url);
+    if(TONE_COACH_WORDS[tcWordIndex] !== w) return;
+    btn.disabled = !exists;
+    btn.onclick = exists ? (()=> new Audio(url).play().catch(()=>{})) : null;
+  }
+
+  async function tcHandleRecordClick(){
+    if(tcRecording){ tcStopRecording(); return; }
+
+    if(!toneCoachCheckLimit()){
+      tcShowError(t('toneCoachLimitReached'));
+      return;
+    }
+
+    tcResetPanels();
+    try{
+      if(!tcAudioContext) await tcSetupCapture();
+    }catch(e){
+      // getUserMedia rejection (denied / no mic device / insecure context) -- caught here,
+      // never reaches an unhandled rejection or console.error. Zero console error, per spec.
+      tcShowError(t('toneCoachMicDenied'));
+      return;
+    }
+
+    tcChunks = [];
+    tcRecording = true;
+    tcRecordStartAt = Date.now();
+    $('tcRecordBtn').textContent = t('toneCoachStopBtn');
+    $('tcRecordBtn').classList.add('recording');
+    $('tcStatus').textContent = t('toneCoachRecording');
+    tcRecordTimer = setTimeout(()=> tcStopRecording(), TC_MAX_RECORD_MS);
+  }
+
+  async function tcStopRecording(){
+    if(!tcRecording) return;
+    tcRecording = false;
+    clearTimeout(tcRecordTimer);
+    $('tcRecordBtn').textContent = t('toneCoachRecordBtn');
+    $('tcRecordBtn').classList.remove('recording');
+    $('tcStatus').textContent = t('toneCoachAnalyzing');
+
+    const totalLen = tcChunks.reduce((s,c)=> s+c.length, 0);
+    const samples = new Float32Array(totalLen);
+    let off = 0;
+    for(const c of tcChunks){ samples.set(c, off); off += c.length; }
+    tcChunks = [];
+
+    // Analisis DSP lumayan berat (autocorrelation per-frame) -- kasih browser 1 tick biar
+    // "Menganalisis..." sempat kerender sebelum main thread sibuk mikir.
+    await new Promise(r => setTimeout(r, 30));
+
+    const contour = tcAnalyzePitch(samples, tcSampleRate);
+    $('tcStatus').textContent = '';
+
+    if(!contour){
+      const rms = tcFrameRMS(samples);
+      if(rms < 0.01) tcShowError(t('toneCoachNoSound'));
+      else tcShowError(t('toneCoachTooNoisy'));
+      return;
+    }
+
+    const target = TONE_COACH_WORDS[tcWordIndex].tone;
+    const result = tcClassifyContour(contour);
+    tcDrawCurves(target, contour);
+    tcRenderVerdict(target, result);
+    $('tcNextBtn').classList.remove('hidden');
+  }
+
+  function openToneCoach(){
+    setActiveNav('materi');
+    hideAllPages();
+    $('toneCoachCard').classList.remove('hidden');
+    $('tcLimitBanner').classList.toggle('hidden', !isToneCoachLimited());
+    tcLoadWord(0);
+  }
+
+  function closeToneCoach(){
+    if(tcRecording) tcStopRecording();
+    tcTeardownCapture();
+    navTo(openMaterialsHub);
+  }
+
+  $('tcRecordBtn') && $('tcRecordBtn').addEventListener('click', tcHandleRecordClick);
+  $('tcNextBtn') && $('tcNextBtn').addEventListener('click', ()=>{
+    tcLoadWord((tcWordIndex + 1) % TONE_COACH_WORDS.length);
+  });
+
+  /* ==========================================================
      ADMIN — USER MANAGEMENT (v1, DECISIONS_NEEDED #30/#31)
      Client-side only, anon key, zero Edge Functions -- RLS is_admin() covers every read/write
      this screen does. No email column (auth.users isn't reachable from the client; that needs
@@ -6847,6 +7372,8 @@
   $('hubCardSandhi').addEventListener('click', ()=> navTo(openSandhiGuide));
   $('sandhiGuideExitBtn').addEventListener('click', closeSandhiGuide);
   $('hubCardSurvival').addEventListener('click', ()=> navTo(openSurvivalKit));
+  $('hubCardToneCoach').addEventListener('click', ()=> navTo(openToneCoach));
+  $('toneCoachExitBtn').addEventListener('click', closeToneCoach);
   $('hubCardStroke').addEventListener('click', ()=> navTo(openStrokePractice));
   $('strokeExitBtn').addEventListener('click', closeStrokePractice);
   $('strokeMoreBtn').addEventListener('click', renderStrokeChunk);

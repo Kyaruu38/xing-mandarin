@@ -1201,6 +1201,39 @@
     .strokeFallbackHanzi{ font-family:var(--hanzi-serif-font); font-size:64px; color:var(--text); line-height:1; }
     .strokeFallbackMsg{ font-size:12.5px; color:var(--muted); }
     .strokeList{ max-height:420px; overflow-y:auto; margin-top:10px; background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:4px 0; }
+
+    /* ============ RADIKAL DASAR (Hanzi Starter Kit) ============ */
+    .radicalToolbar{ display:flex; flex-direction:column; gap:10px; margin-bottom:12px; }
+    .radicalStrokeChips{ display:flex; gap:6px; flex-wrap:wrap; }
+    .radicalStrokeChip{
+      width:auto; margin-top:0; padding:6px 12px; border-radius:99px; background:var(--panel-2);
+      border:1px solid var(--line); color:var(--muted); font-weight:700; font-size:12.5px; cursor:pointer;
+    }
+    .radicalStrokeChip.active{ background:var(--gold); border-color:var(--gold); color:#241a08; }
+    .radicalGrid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(84px,1fr)); gap:10px; }
+    .radicalCard{
+      position:relative; background:var(--panel-2); border:1px solid var(--line); border-radius:12px;
+      padding:12px 6px 10px; text-align:center; cursor:pointer; margin-top:0;
+    }
+    .radicalCard:hover{ border-color:var(--gold); }
+    .radicalCardGlyph{ font-family:var(--hanzi-serif-font); font-size:28px; color:var(--text); line-height:1; }
+    .radicalCardPinyin{ font-size:10.5px; color:var(--gold); font-weight:700; margin-top:4px; }
+    .radicalCardCheck{
+      position:absolute; top:4px; right:6px; font-size:11px; color:var(--ok); display:none;
+    }
+    .radicalCard.opened .radicalCardCheck{ display:block; }
+    .radicalModalGlyph{ font-family:var(--hanzi-serif-font); font-size:56px; text-align:center; color:var(--text); margin-bottom:6px; }
+    .radicalModalMeta{ text-align:center; margin-bottom:14px; }
+    .radicalModalPinyin{ font-size:15px; font-weight:800; color:#C7900F; }
+    .radicalModalMeaning{ font-size:13px; color:rgba(var(--text-rgb),.7); margin-top:2px; }
+    .radicalVariantNote{ font-size:11.5px; color:var(--muted); text-align:center; margin-top:6px; }
+    .radicalExampleLabel{ font-size:12px; font-weight:700; color:var(--muted); margin:16px 0 8px; text-align:center; }
+    .radicalExampleRow{ display:flex; gap:10px; justify-content:center; }
+    .radicalExampleChar{
+      width:auto; margin-top:0; padding:10px 16px; border-radius:12px; background:var(--panel-2);
+      border:1px solid var(--line); font-family:var(--hanzi-serif-font); font-size:22px; color:var(--text); cursor:pointer;
+    }
+    .radicalExampleChar:hover{ border-color:var(--gold); }
   </style>
 </head>
 <body>
@@ -1544,6 +1577,23 @@
         <button id="browseExitBtn" class="practiceExit">Kembali ke Dashboard</button>
       </div>
 
+      <!-- ============ RADIKAL DASAR (HANZI STARTER KIT) ============ -->
+      <div id="radicalsCard" class="pageCard browse hidden">
+        <p class="sub browseTitle" id="radicalsHeader">Radikal Dasar</p>
+
+        <div class="radicalToolbar">
+          <div class="browseSearchWrap">
+            <span class="browseSearchIcon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+            <input id="radicalSearch" class="browseSearchInput" type="text" placeholder="Cari arti atau pinyin..." />
+          </div>
+          <div class="radicalStrokeChips" id="radicalStrokeChips"></div>
+        </div>
+
+        <div class="radicalGrid" id="radicalGrid"></div>
+        <p class="browseCount" id="radicalCount"></p>
+        <button id="radicalsExitBtn" class="practiceExit">Kembali ke Materi</button>
+      </div>
+
       <!-- ============ STROKE PRACTICE (LATIHAN GORESAN) ============ -->
       <div id="strokePracticeCard" class="pageCard browse hidden">
         <p class="sub browseTitle" id="strokeHeader">Latihan Goresan</p>
@@ -1747,6 +1797,14 @@
             <div class="hubCardBody">
               <div class="hubCardTitle" id="hubCardWritingTitle">Writing</div>
               <div class="hubCardMeta" id="hubCardWritingMeta">Free-write workspace</div>
+            </div>
+          </button>
+
+          <button type="button" class="hubCard" id="hubCardRadicals" data-card="radicals">
+            <div class="hubCardCover stroke"><span class="hubCardCoverGlyph">氵</span></div>
+            <div class="hubCardBody">
+              <div class="hubCardTitle" id="hubCardRadicalsTitle">Radikal Dasar</div>
+              <div class="hubCardMeta" id="hubCardRadicalsMeta">Kenalan sama komponen hanzi</div>
             </div>
           </button>
 
@@ -2090,7 +2148,32 @@
           strokeTabView:'Lihat', strokeTabTrace:'Jiplak', strokeTabTest:'Tes',
           strokeReplayBtn:'Putar Ulang', strokeNextCharBtn:'Karakter berikutnya ›',
           strokeMistakeLabel:'Kesalahan: {n}', strokeCompleteMsg:'Selesai! {n} kesalahan.',
-          strokeNoDataMsg:'Data goresan belum tersedia' },
+          strokeNoDataMsg:'Data goresan belum tersedia',
+          hubCardRadicalsTitle:'Radikal Dasar', hubCardRadicalsMeta:'Kenalan sama komponen hanzi',
+          radicalsHeader:'Radikal Dasar', radicalNotReady:'Data radikal belum tersedia',
+          radicalsUnit:'radikal', radicalVariantNote:'Animasi pakai bentuk induk: {parent}',
+          radicalExampleLabel:'Contoh karakter',
+          hubCardPinyinTitle:'Panduan Pinyin', hubCardPinyinMeta:'Chart bunyi + latihan dengar',
+          pinyinGuideHeader:'Panduan Pinyin', pinyinTabChart:'Chart', pinyinTabBasics:'Dasar',
+          pinyinAudioNotReady:'Audio belum tersedia', pinyinPickTone:'Pilih nada',
+          hubCardSandhiTitle:'Tone Sandhi', hubCardSandhiMeta:'Aturan perubahan nada',
+          sandhiGuideHeader:'Panduan Tone Sandhi', sandhiNaturalBtn:'🗣️ Ucapan asli',
+          sandhiDictBtn:'📖 Ejaan kamus', sandhiAudioNotReady:'Audio belum tersedia',
+          sandhiQuizTitle:'Kuis singkat', sandhiQuizCorrect:'Benar!', sandhiQuizWrong:'Coba lagi',
+          hubCardSurvivalTitle:'Survival Kit', hubCardSurvivalMeta:'100 kata wajib pemula',
+          survivalKitHeader:'Survival Kit', survivalNotReady:'Deck belum tersedia',
+          survivalCTANext:'Udah khatam? Lanjut simulasi HSK 1 →',
+          survivalThemeGreetings:'Sapaan & Sopan Santun', survivalThemeIntro:'Perkenalan Diri',
+          survivalThemeNumbers:'Angka', survivalThemeSurvival:'Situasi Darurat',
+          survivalThemeResponse:'Respon Percakapan',
+          hubCardToneCoachTitle:'Tone Coach', hubCardToneCoachMeta:'Latihan nada pakai mic',
+          toneCoachHeader:'Tone Coach', toneCoachRecordBtn:'🎙️ Rekam', toneCoachStopBtn:'⏹️ Berhenti',
+          toneCoachListenBtn:'🔊 Dengar contoh', toneCoachMicDenied:'Akses mikrofon ditolak. Aktifkan lewat pengaturan browser lalu muat ulang halaman.',
+          toneCoachNoSound:'Nggak kedengeran suaranya. Coba lebih deket ke mic.',
+          toneCoachTooNoisy:'Lingkungan terlalu berisik. Cari tempat yang lebih sepi lalu coba lagi.',
+          toneCoachLimitReached:'Batas 10 cek gratis hari ini sudah tercapai. Coba lagi besok, atau upgrade paket buat unlimited.',
+          toneCoachRecording:'Merekam...', toneCoachAnalyzing:'Menganalisis...',
+          toneCoachTryAgain:'Coba Lagi', toneCoachNext:'Kata berikutnya ›' },
     en: { beranda:'Home', latihan:'Practice & Test', latihanShort:'Practice', materi:'Materials', progres:'Progress', riwayat:'History',
           streak:'STREAK', hari:'days', keluar:'Log out', mulai:'Start', ulangi:'Retry',
           soal:'questions', menit:'minutes', terakhir:'Last:', benar:'Correct', mockTest:'Mock Test',
@@ -2190,7 +2273,32 @@
           strokeTabView:'View', strokeTabTrace:'Trace', strokeTabTest:'Test',
           strokeReplayBtn:'Replay', strokeNextCharBtn:'Next character ›',
           strokeMistakeLabel:'Mistakes: {n}', strokeCompleteMsg:'Done! {n} mistakes.',
-          strokeNoDataMsg:'Stroke data not available yet' },
+          strokeNoDataMsg:'Stroke data not available yet',
+          hubCardRadicalsTitle:'Basic Radicals', hubCardRadicalsMeta:'Learn hanzi building blocks',
+          radicalsHeader:'Basic Radicals', radicalNotReady:'Radical data not available yet',
+          radicalsUnit:'radicals', radicalVariantNote:'Animating the base form: {parent}',
+          radicalExampleLabel:'Example characters',
+          hubCardPinyinTitle:'Pinyin Guide', hubCardPinyinMeta:'Sound chart + listening drill',
+          pinyinGuideHeader:'Pinyin Guide', pinyinTabChart:'Chart', pinyinTabBasics:'Basics',
+          pinyinAudioNotReady:'Audio not available yet', pinyinPickTone:'Pick a tone',
+          hubCardSandhiTitle:'Tone Sandhi', hubCardSandhiMeta:'Tone-change rules',
+          sandhiGuideHeader:'Tone Sandhi Guide', sandhiNaturalBtn:'🗣️ Natural speech',
+          sandhiDictBtn:'📖 Dictionary spelling', sandhiAudioNotReady:'Audio not available yet',
+          sandhiQuizTitle:'Quick quiz', sandhiQuizCorrect:'Correct!', sandhiQuizWrong:'Try again',
+          hubCardSurvivalTitle:'Survival Kit', hubCardSurvivalMeta:'100 essential beginner words',
+          survivalKitHeader:'Survival Kit', survivalNotReady:'Deck not available yet',
+          survivalCTANext:'Finished the deck? Try an HSK 1 mock test →',
+          survivalThemeGreetings:'Greetings & Politeness', survivalThemeIntro:'Self Introduction',
+          survivalThemeNumbers:'Numbers', survivalThemeSurvival:'Survival Situations',
+          survivalThemeResponse:'Conversation Responses',
+          hubCardToneCoachTitle:'Tone Coach', hubCardToneCoachMeta:'Practice tones with your mic',
+          toneCoachHeader:'Tone Coach', toneCoachRecordBtn:'🎙️ Record', toneCoachStopBtn:'⏹️ Stop',
+          toneCoachListenBtn:'🔊 Listen to example', toneCoachMicDenied:'Microphone access denied. Enable it in your browser settings, then reload the page.',
+          toneCoachNoSound:'No sound detected. Try speaking closer to the mic.',
+          toneCoachTooNoisy:'Too much background noise. Find a quieter spot and try again.',
+          toneCoachLimitReached:'You’ve reached today’s 10 free checks. Try again tomorrow, or upgrade for unlimited.',
+          toneCoachRecording:'Recording...', toneCoachAnalyzing:'Analyzing...',
+          toneCoachTryAgain:'Try Again', toneCoachNext:'Next word ›' },
     zh: { beranda:'首页', latihan:'练习与测试', latihanShort:'练习', materi:'学习资料', progres:'学习进度', riwayat:'历史记录',
           streak:'连续天数', hari:'天', keluar:'退出', mulai:'开始', ulangi:'重做',
           soal:'题', menit:'分钟', terakhir:'上次：', benar:'正确', mockTest:'模拟考试',
@@ -2290,7 +2398,32 @@
           strokeTabView:'观看', strokeTabTrace:'描红', strokeTabTest:'测试',
           strokeReplayBtn:'重播', strokeNextCharBtn:'下一个字 ›',
           strokeMistakeLabel:'错误：{n}', strokeCompleteMsg:'完成！{n} 个错误。',
-          strokeNoDataMsg:'笔画数据暂不可用' }
+          strokeNoDataMsg:'笔画数据暂不可用',
+          hubCardRadicalsTitle:'基础部首', hubCardRadicalsMeta:'认识汉字的组成部分',
+          radicalsHeader:'基础部首', radicalNotReady:'部首数据暂不可用',
+          radicalsUnit:'个部首', radicalVariantNote:'动画使用本字：{parent}',
+          radicalExampleLabel:'例字',
+          hubCardPinyinTitle:'拼音指南', hubCardPinyinMeta:'发音表 + 听力练习',
+          pinyinGuideHeader:'拼音指南', pinyinTabChart:'表格', pinyinTabBasics:'基础',
+          pinyinAudioNotReady:'音频暂不可用', pinyinPickTone:'选择声调',
+          hubCardSandhiTitle:'变调规则', hubCardSandhiMeta:'声调变化规则',
+          sandhiGuideHeader:'变调指南', sandhiNaturalBtn:'🗣️ 自然发音',
+          sandhiDictBtn:'📖 词典拼读', sandhiAudioNotReady:'音频暂不可用',
+          sandhiQuizTitle:'小测验', sandhiQuizCorrect:'正确！', sandhiQuizWrong:'再试一次',
+          hubCardSurvivalTitle:'生存词汇', hubCardSurvivalMeta:'100个初学者必备词',
+          survivalKitHeader:'生存词汇', survivalNotReady:'词组暂不可用',
+          survivalCTANext:'学完了？试试HSK1模拟考 →',
+          survivalThemeGreetings:'问候与礼貌', survivalThemeIntro:'自我介绍',
+          survivalThemeNumbers:'数字', survivalThemeSurvival:'紧急情况',
+          survivalThemeResponse:'对话回应',
+          hubCardToneCoachTitle:'声调教练', hubCardToneCoachMeta:'用麦克风练习声调',
+          toneCoachHeader:'声调教练', toneCoachRecordBtn:'🎙️ 录音', toneCoachStopBtn:'⏹️ 停止',
+          toneCoachListenBtn:'🔊 听示范', toneCoachMicDenied:'麦克风权限被拒绝，请在浏览器设置中启用后刷新页面。',
+          toneCoachNoSound:'没有检测到声音，请靠近麦克风再试。',
+          toneCoachTooNoisy:'周围噪音太大，请找安静的地方再试。',
+          toneCoachLimitReached:'今日10次免费次数已用完，明天再来，或升级套餐无限使用。',
+          toneCoachRecording:'录音中...', toneCoachAnalyzing:'分析中...',
+          toneCoachTryAgain:'再试一次', toneCoachNext:'下一个词 ›' }
   };
   let currentLang = localStorage.getItem('xingLang') || 'en';
   if(!LANG[currentLang]) currentLang = 'en';
@@ -2433,6 +2566,10 @@
     $('strokeHeader').textContent = t('strokeHeader');
     $('strokeExitBtn').textContent = t('backToMateri');
     $('strokeMoreBtn').textContent = t('loadMore');
+    $('hubCardRadicalsTitle').textContent = t('hubCardRadicalsTitle');
+    $('hubCardRadicalsMeta').textContent = t('hubCardRadicalsMeta');
+    $('radicalsHeader').textContent = t('radicalsHeader');
+    $('radicalsExitBtn').textContent = t('backToMateri');
 
     renderMockExitLabel();
 
@@ -2545,7 +2682,7 @@
 
   /* ---------- navigasi appShell (Task: reskin) ---------- */
   function hideAllPages(){
-    ['dashCard','practiceCard','raportCard','browseCard','strokePracticeCard','mockListCard','attemptCard','resultCard','riwayatCard','materialsHubCard','adminCard']
+    ['dashCard','practiceCard','raportCard','browseCard','radicalsCard','strokePracticeCard','pinyinGuideCard','sandhiGuideCard','survivalKitCard','toneCoachCard','mockListCard','attemptCard','resultCard','riwayatCard','materialsHubCard','adminCard']
       .forEach(id => $(id).classList.add('hidden'));
   }
 
@@ -4013,6 +4150,186 @@
     strokeScreenShown += next.length;
     $('strokeCount').textContent = strokeScreenShown + ' / ' + strokeScreenCache.length + ' ' + t('wordsUnit');
     $('strokeMoreBtn').classList.toggle('hidden', strokeScreenShown >= strokeScreenCache.length);
+  }
+
+  /* ==========================================================
+     RADIKAL DASAR (Hanzi Starter Kit) -- Fitur 2, batch prompt-pack.
+     Reuses the stroke-practice modal building blocks (tianzigeSVG, loadHanziWriter,
+     HanziWriter.create in "view" animation mode) instead of duplicating them -- no second
+     Hanzi Writer loader. `radicals` table doesn't exist in the DB yet at build time (SQL in
+     sql/07_radicals.sql, not applied) -- loadRadicals() must degrade to a clean empty state on
+     that specific error (PostgREST 42P01/PGRST205 "relation does not exist"), not a popup alert,
+     per this batch's explicit "zero console error" requirement. Progress (opened radicals) is
+     localStorage-only, no server round-trip, no schema needed for it.
+     ========================================================== */
+  const RADICAL_VARIANT_PARENT = {
+    '亻':'人', '刂':'刀', '氵':'水', '忄':'心', '扌':'手', '犭':'犬', '礻':'示',
+    '衤':'衣', '钅':'金', '饣':'食', '纟':'糸', '辶':'辵', '艹':'艸', '讠':'言', '阝':'阜', '灬':'火'
+  };
+  const RADICAL_OPENED_KEY = 'xm_radicals_opened';
+
+  function getRadicalsOpened(){
+    try{ return new Set(JSON.parse(localStorage.getItem(RADICAL_OPENED_KEY) || '[]')); }
+    catch(e){ return new Set(); }
+  }
+  function markRadicalOpened(radical){
+    const s = getRadicalsOpened();
+    s.add(radical);
+    localStorage.setItem(RADICAL_OPENED_KEY, JSON.stringify([...s]));
+  }
+
+  let radicalsCache = [];
+  let radicalsFiltered = [];
+  let radicalStrokeFilter = 'all';
+
+  function openRadicals(){
+    setActiveNav('materi');
+    hideAllPages();
+    $('radicalsCard').classList.remove('hidden');
+    loadRadicals();
+  }
+  function closeRadicals(){ navTo(openMaterialsHub); }
+
+  async function loadRadicals(){
+    $('radicalGrid').innerHTML = `<p class="emptyState">${t('loading')}</p>`;
+    $('radicalCount').textContent = '';
+    $('radicalStrokeChips').innerHTML = '';
+    // {data,error} destructure on purpose (not the throwing fetchAllRanged helper) -- a missing
+    // table is an EXPECTED state right now, not an exceptional one, so it must not surface as a
+    // console error or an alert popup, just the empty-state message.
+    const { data, error } = await sb.from('radicals').select('*').order('sort_order', { ascending:true });
+    if(error){
+      radicalsCache = [];
+      $('radicalGrid').innerHTML = `<p class="emptyState">${t('radicalNotReady')}</p>`;
+      $('radicalCount').textContent = '';
+      return;
+    }
+    radicalsCache = data || [];
+    renderRadicalStrokeChips();
+    applyRadicalFilter();
+  }
+
+  function renderRadicalStrokeChips(){
+    const wrap = $('radicalStrokeChips');
+    wrap.innerHTML = '';
+    const counts = [...new Set(radicalsCache.map(r=>r.stroke_count))].sort((a,b)=>a-b);
+    const makeChip = (label, key)=>{
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'radicalStrokeChip' + (radicalStrokeFilter===key ? ' active' : '');
+      b.textContent = label;
+      b.addEventListener('click', ()=>{
+        radicalStrokeFilter = key;
+        [...wrap.children].forEach(c=>c.classList.remove('active'));
+        b.classList.add('active');
+        applyRadicalFilter();
+      });
+      return b;
+    };
+    wrap.appendChild(makeChip(t('hubChipAll'), 'all'));
+    counts.forEach(c => wrap.appendChild(makeChip(String(c), c)));
+  }
+
+  function applyRadicalFilter(){
+    const q = stripDiacritics($('radicalSearch').value.trim());
+    radicalsFiltered = radicalsCache.filter(r=>{
+      if(radicalStrokeFilter !== 'all' && r.stroke_count !== radicalStrokeFilter) return false;
+      if(!q) return true;
+      return stripDiacritics(r.pinyin + ' ' + r.meaning_id).includes(q);
+    });
+    renderRadicalGrid();
+  }
+
+  function renderRadicalGrid(){
+    const wrap = $('radicalGrid');
+    wrap.innerHTML = '';
+    if(radicalsFiltered.length === 0){
+      wrap.innerHTML = `<p class="emptyState">${t('emptyNoMatch')}</p>`;
+      $('radicalCount').textContent = '0 ' + t('radicalsUnit');
+      return;
+    }
+    const opened = getRadicalsOpened();
+    radicalsFiltered.forEach(r=>{
+      const card = document.createElement('div');
+      card.className = 'radicalCard' + (opened.has(r.radical) ? ' opened' : '');
+      card.innerHTML = `<span class="radicalCardCheck">✓</span>
+        <div class="radicalCardGlyph">${r.radical}</div>
+        <div class="radicalCardPinyin">${r.pinyin}</div>`;
+      card.addEventListener('click', ()=> openRadicalModal(r));
+      wrap.appendChild(card);
+    });
+    $('radicalCount').textContent = radicalsFiltered.length + ' ' + t('radicalsUnit');
+  }
+
+  $('radicalSearch') && $('radicalSearch').addEventListener('input', applyRadicalFilter);
+
+  function buildRadicalModalSkeleton(r){
+    const parent = RADICAL_VARIANT_PARENT[r.radical];
+    return `
+      <div class="radicalModalGlyph"><div class="strokeGridWrap" id="radicalGridWrap" style="margin:0 auto;"></div></div>
+      <div class="radicalModalMeta">
+        <div class="radicalModalPinyin">${r.pinyin}</div>
+        <div class="radicalModalMeaning">${escapeHTML(r.meaning_id)}</div>
+        ${parent ? `<div class="radicalVariantNote">${t('radicalVariantNote').replace('{parent}', parent)}</div>` : ''}
+      </div>
+      <div class="radicalExampleLabel">${t('radicalExampleLabel')}</div>
+      <div class="radicalExampleRow" id="radicalExampleRow"></div>
+    `;
+  }
+
+  async function openRadicalModal(r){
+    markRadicalOpened(r.radical);
+    const card = [...$('radicalGrid').children].find(c => c.querySelector('.radicalCardGlyph')?.textContent === r.radical);
+    if(card) card.classList.add('opened');
+
+    openModal(r.radical, buildRadicalModalSkeleton(r));
+
+    const exampleRow = $('radicalExampleRow');
+    (r.example_chars || []).forEach(ch=>{
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'radicalExampleChar';
+      b.textContent = ch;
+      b.addEventListener('click', ()=> openRadicalExampleStroke(ch));
+      exampleRow.appendChild(b);
+    });
+
+    const wrap = $('radicalGridWrap');
+    wrap.innerHTML = tianzigeSVG() + '<div class="strokeWriterTarget" id="radicalWriterTarget"></div>';
+    const animChar = RADICAL_VARIANT_PARENT[r.radical] || r.radical;
+    try{
+      await loadHanziWriter();
+    }catch(e){
+      wrap.innerHTML = `<div class="strokeFallback"><div class="strokeFallbackHanzi">${r.radical}</div><div class="strokeFallbackMsg">${t('strokeNoDataMsg')}</div></div>`;
+      return;
+    }
+    const target = $('radicalWriterTarget');
+    if(!target) return;
+    const rootStyle = getComputedStyle(document.documentElement);
+    try{
+      const writer = HanziWriter.create(target, animChar, {
+        width: 220, height: 220, padding: 12,
+        strokeColor: (rootStyle.getPropertyValue('--text') || '#1C2A5E').trim(),
+        outlineColor: (rootStyle.getPropertyValue('--line') || '#EEE7D4').trim(),
+        showOutline: true, showCharacter: true,
+        onLoadCharDataError: ()=>{
+          wrap.innerHTML = `<div class="strokeFallback"><div class="strokeFallbackHanzi">${r.radical}</div><div class="strokeFallbackMsg">${t('strokeNoDataMsg')}</div></div>`;
+        }
+      });
+      writer.animateCharacter();
+    }catch(e){
+      wrap.innerHTML = `<div class="strokeFallback"><div class="strokeFallbackHanzi">${r.radical}</div><div class="strokeFallbackMsg">${t('strokeNoDataMsg')}</div></div>`;
+    }
+  }
+
+  // Example chars come from `radicals.example_chars` (plain text[], no stored pinyin/meaning of
+  // their own) -- look them up in `vocab` so the reused stroke-practice modal has real pinyin/
+  // meaning to show; a char with no matching single-hanzi vocab row still opens the modal fine
+  // (openStrokeModal only strictly needs .hanzi), just with blank pinyin/meaning.
+  async function openRadicalExampleStroke(char){
+    const { data } = await sb.from('vocab').select('hanzi,pinyin,meaning_en,meaning_id').eq('hanzi', char).limit(1);
+    const v = (data && data[0]) || { hanzi: char, pinyin:'', meaning_en:'', meaning_id:'' };
+    openStrokeModal({ hanzi: v.hanzi, pinyin: v.pinyin, meaning: v.meaning_id || v.meaning_en }, currentProfile?.target_level || 1);
   }
 
   /* ==========================================================
@@ -5863,6 +6180,8 @@
   $('hubCardListening').addEventListener('click', ()=> navTo(()=> openMockList('listening','hub')));
   $('hubCardWriting').addEventListener('click', ()=> navTo(()=> openMockList('writing','hub')));
   $('hubCardMock').addEventListener('click', ()=> navTo(()=> openMockList('all','hub')));
+  $('hubCardRadicals').addEventListener('click', ()=> navTo(openRadicals));
+  $('radicalsExitBtn').addEventListener('click', closeRadicals);
   $('hubCardStroke').addEventListener('click', ()=> navTo(openStrokePractice));
   $('strokeExitBtn').addEventListener('click', closeStrokePractice);
   $('strokeMoreBtn').addEventListener('click', renderStrokeChunk);

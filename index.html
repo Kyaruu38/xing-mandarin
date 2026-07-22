@@ -1603,6 +1603,7 @@
 
         <div id="emptyView" class="hidden">
           <p class="emptyState" id="emptyMsg">—</p>
+          <button id="survivalCTABtn" class="practiceExit hidden"></button>
           <button id="practiceExitBtn3" class="practiceExit">Kembali ke Dashboard</button>
         </div>
       </div>
@@ -1917,6 +1918,14 @@
             <div class="hubCardBody">
               <div class="hubCardTitle" id="hubCardSandhiTitle">Tone Sandhi</div>
               <div class="hubCardMeta" id="hubCardSandhiMeta">Aturan perubahan nada</div>
+            </div>
+          </button>
+
+          <button type="button" class="hubCard" id="hubCardSurvival" data-card="survival">
+            <div class="hubCardCover stroke"><span class="hubCardCoverGlyph">你</span></div>
+            <div class="hubCardBody">
+              <div class="hubCardTitle" id="hubCardSurvivalTitle">Survival Kit</div>
+              <div class="hubCardMeta" id="hubCardSurvivalMeta">100 kata wajib pemula</div>
             </div>
           </button>
 
@@ -2692,6 +2701,8 @@
     $('hubCardSandhiMeta').textContent = t('hubCardSandhiMeta');
     $('sandhiGuideHeader').textContent = t('sandhiGuideHeader');
     $('sandhiGuideExitBtn').textContent = t('backToMateri');
+    $('hubCardSurvivalTitle').textContent = t('hubCardSurvivalTitle');
+    $('hubCardSurvivalMeta').textContent = t('hubCardSurvivalMeta');
 
     renderMockExitLabel();
 
@@ -3092,7 +3103,15 @@
      ========================================================== */
   function todayStr(){ return new Date().toISOString().slice(0,10); }
 
+  // practiceOrigin mirrors the mockOrigin/browseOrigin pattern (DECISIONS_NEEDED #22) -- lets
+  // backToDash() return to wherever practiceCard was opened FROM, since Fitur 5 (Survival Kit)
+  // reuses this exact same screen/session UI instead of duplicating it, but is opened from the
+  // Materials hub and should exit back there, not to the dashboard.
+  let practiceOrigin = 'dash';
+  let survivalModeActive = false;
+
   function openPractice(){
+    practiceOrigin = 'dash';
     setActiveNav('latihan');
     $('dashCard').classList.add('hidden');
     $('practiceCard').classList.remove('hidden');
@@ -3100,10 +3119,13 @@
     $('sessionView').classList.add('hidden');
     $('practiceCard').classList.remove('sessionActive');
     $('emptyView').classList.add('hidden');
+    $('survivalCTABtn').classList.add('hidden');
     renderLevelPicker();
   }
 
   function backToDash(){
+    survivalModeActive = false;
+    if(practiceOrigin === 'survival'){ navTo(openMaterialsHub); return; }
     setActiveNav('beranda');
     $('practiceCard').classList.add('hidden');
     $('dashCard').classList.remove('hidden');
@@ -3249,7 +3271,9 @@
     const card = sessionQueue[sessionIndex];
     $('sessionProgress').textContent = t('cardProgress').replace('{n}', sessionIndex+1).replace('{total}', sessionQueue.length);
     $('sessionProgressFill').style.width = (((sessionIndex+1) / sessionQueue.length) * 100) + '%';
-    $('cardBadge').textContent = 'HSK ' + practiceLevel + ' · ' + card.hanzi;
+    $('cardBadge').textContent = survivalModeActive
+      ? t(SURVIVAL_THEME_LABEL_KEY[card.beginner_theme] || 'hubCardSurvivalTitle')
+      : 'HSK ' + practiceLevel + ' · ' + card.hanzi;
     $('cardHanzi').textContent = card.hanzi;
     $('cardPinyin').textContent = card.pinyin;
     $('cardMeaning').innerHTML = (card.meaning_id || card.meaning_en) + (card.pos ? ' · <span class="pos">' + card.pos + '</span>' : '');
@@ -3259,6 +3283,27 @@
     $('cardMeaning').classList.add('hidden');
     $('revealBtn').classList.remove('hidden');
     $('gradeRow').classList.add('hidden');
+    if(survivalModeActive) refreshSurvivalCardAudio(card);
+  }
+
+  // Speaker button (#cardAudioBtn) is otherwise dead/unwired everywhere else in this app
+  // (DECISIONS_NEEDED #6 -- "no audio data source exists... do not implement without sign-off").
+  // Scoped ONLY to survivalModeActive here per this batch's explicit Fitur 5 instruction --
+  // does not resolve #6 for the regular flashcard flow, button stays inert there exactly as
+  // before. No audio has actually been generated for these 100 words in this batch (out of
+  // scope), so this always hides the button today -- wiring is forward-looking, matches spec
+  // ("file tak ada -> hide").
+  function survivalAudioSlug(pinyin){
+    return stripDiacritics(pinyin).toLowerCase().replace(/[^a-z]/g, '');
+  }
+  async function refreshSurvivalCardAudio(card){
+    const btn = $('cardAudioBtn');
+    btn.classList.add('hidden');
+    const url = sb.storage.from('listening-audio').getPublicUrl(`survival/${survivalAudioSlug(card.pinyin)}.mp3`).data.publicUrl;
+    const exists = await audioUrlExists(url);
+    if(sessionQueue[sessionIndex] !== card) return; // user already moved on, stale check
+    btn.classList.toggle('hidden', !exists);
+    btn.onclick = exists ? (()=> new Audio(url).play().catch(()=>{})) : null;
   }
 
   function revealCard(){
@@ -3302,6 +3347,9 @@
       $('practiceCard').classList.remove('sessionActive');
       $('emptyView').classList.remove('hidden');
       $('emptyMsg').textContent = t('sessionComplete').replace('{correct}', sessionStats.correct).replace('{total}', sessionStats.total);
+      const cta = $('survivalCTABtn');
+      cta.classList.toggle('hidden', !survivalModeActive);
+      if(survivalModeActive) cta.textContent = t('survivalCTANext');
       return;
     }
     renderCard();
@@ -4853,6 +4901,78 @@
   });
 
   /* ==========================================================
+     SURVIVAL KIT -- Fitur 5, batch prompt-pack.
+     Deliberately reuses practiceCard/renderCard()/gradeCard()/sm2Update() wholesale instead of
+     building a second flashcard screen -- same review UI, same user_mastery write path (item_key
+     = hanzi, works identically for a phrase like "你叫什么名字" as for a single-hanzi vocab
+     word). Two adaptations, both minimal: (1) practiceOrigin so backToDash() returns to the
+     Materials hub instead of the dashboard when entered from here (same pattern as
+     mockOrigin/browseOrigin elsewhere in this file); (2) survivalModeActive swaps the card
+     badge to a theme label instead of "HSK N", and swaps the end-of-deck screen's CTA.
+     vocab.beginner_kit/beginner_order/beginner_theme don't exist in the DB yet (sql/08 not
+     applied) -- startSurvivalSession() must degrade to a clean empty state on that, not a crash.
+     ========================================================== */
+  const SURVIVAL_THEME_LABEL_KEY = {
+    greetings: 'survivalThemeGreetings', self_intro: 'survivalThemeIntro',
+    numbers: 'survivalThemeNumbers', survival: 'survivalThemeSurvival', responses: 'survivalThemeResponse'
+  };
+
+  function openSurvivalKit(){
+    practiceOrigin = 'survival';
+    setActiveNav('materi');
+    $('dashCard').classList.add('hidden');
+    $('practiceCard').classList.remove('hidden');
+    $('levelPickerView').classList.add('hidden');
+    $('sessionView').classList.add('hidden');
+    $('emptyView').classList.add('hidden');
+    $('practiceCard').classList.remove('sessionActive');
+    startSurvivalSession();
+  }
+
+  async function startSurvivalSession(){
+    const { data, error } = await sb.from('vocab').select('hanzi,pinyin,meaning_en,meaning_id,beginner_theme')
+      .eq('beginner_kit', true).order('beginner_order', { ascending:true });
+    if(error){
+      // Kolom beginner_kit belum ada (sql/08_survival_kit.sql belum di-apply) -- degradasi ke
+      // empty-state bersih, BUKAN showAlertModal (itu alert popup, spec minta empty-state diam).
+      $('levelPickerView').classList.add('hidden');
+      $('sessionView').classList.add('hidden');
+      $('practiceCard').classList.remove('sessionActive');
+      $('emptyView').classList.remove('hidden');
+      $('survivalCTABtn').classList.add('hidden');
+      $('emptyMsg').textContent = t('survivalNotReady');
+      return;
+    }
+
+    survivalModeActive = true;
+    practiceLevel = 1;
+    sessionQueue = (data || []).map(v => ({ ...v, prev:null }));
+    sessionIndex = 0;
+    sessionStats = { correct:0, total:0 };
+    deckCounts = { new: sessionQueue.length, learning:0, review:0 };
+
+    if(sessionQueue.length === 0){
+      $('sessionView').classList.add('hidden');
+      $('practiceCard').classList.remove('sessionActive');
+      $('emptyView').classList.remove('hidden');
+      $('survivalCTABtn').classList.add('hidden');
+      $('emptyMsg').textContent = t('survivalNotReady');
+      return;
+    }
+
+    $('emptyView').classList.add('hidden');
+    $('sessionView').classList.remove('hidden');
+    $('practiceCard').classList.add('sessionActive');
+    $('sessionLevelLabel').textContent = t('survivalKitHeader');
+    renderDeckChips();
+    renderCard();
+  }
+
+  $('survivalCTABtn') && $('survivalCTABtn').addEventListener('click', ()=>{
+    navTo(()=> openMockList('all', 'hub'));
+  });
+
+  /* ==========================================================
      ADMIN — USER MANAGEMENT (v1, DECISIONS_NEEDED #30/#31)
      Client-side only, anon key, zero Edge Functions -- RLS is_admin() covers every read/write
      this screen does. No email column (auth.users isn't reachable from the client; that needs
@@ -5518,11 +5638,15 @@
   // that's a real console error this batch's "zero console error" rule can't allow. HEAD-checking
   // existence via fetch() first avoids it entirely: a fetch() that resolves with !ok is a normal
   // resolved promise, nothing the browser logs on its own.
-  async function audioExistsAndPlay(url){
+  async function audioUrlExists(url){
     try{
       const res = await fetch(url, { method:'HEAD' });
-      if(!res.ok) return false;
+      return res.ok;
     }catch(e){ return false; }
+  }
+  async function audioExistsAndPlay(url){
+    const exists = await audioUrlExists(url);
+    if(!exists) return false;
     new Audio(url).play().catch(()=>{});
     return true;
   }
@@ -6722,6 +6846,7 @@
   $('pinyinGuideExitBtn').addEventListener('click', closePinyinGuide);
   $('hubCardSandhi').addEventListener('click', ()=> navTo(openSandhiGuide));
   $('sandhiGuideExitBtn').addEventListener('click', closeSandhiGuide);
+  $('hubCardSurvival').addEventListener('click', ()=> navTo(openSurvivalKit));
   $('hubCardStroke').addEventListener('click', ()=> navTo(openStrokePractice));
   $('strokeExitBtn').addEventListener('click', closeStrokePractice);
   $('strokeMoreBtn').addEventListener('click', renderStrokeChunk);

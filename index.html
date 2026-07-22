@@ -605,6 +605,11 @@
       background:rgba(var(--text-rgb),.05); border:none; display:flex; align-items:center; justify-content:center;
       color:var(--text); cursor:pointer; margin-top:0; padding:0;
     }
+    .cardStrokeBtn{
+      position:absolute; top:20px; right:68px; width:38px; height:38px; border-radius:50%;
+      background:rgba(var(--text-rgb),.05); border:none; display:flex; align-items:center; justify-content:center;
+      color:var(--text); cursor:pointer; margin-top:0; padding:0; font-size:16px;
+    }
     .cardContent{ text-align:center; padding:64px 40px 40px; }
     .cardContent.flipped{ padding:52px 44px 40px; }
     .hanzi-big{ font-family:'Noto Serif SC',serif; font-weight:700; font-size:80px; line-height:1; color:var(--text); }
@@ -754,6 +759,11 @@
     .browsePinyin{width:76px; flex-shrink:0; color:var(--gold)}
     .browseMeaning{flex:1; color:var(--text)}
     .browseCount{font-size:11px; color:var(--muted); text-align:center; margin:10px 0 0}
+    .browseStrokeBtn{
+      flex-shrink:0; width:30px; height:30px; margin-top:0; padding:0; border-radius:50%; border:none;
+      background:rgba(var(--text-rgb),.06); color:var(--text); font-size:14px; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+    }
 
     /* ============ MATERIALS HUB ============
        Port of .dc.html's isMaterials block (lines 264-300) + 06-materials.png. Materials = hub,
@@ -813,6 +823,8 @@
     .hubCardCover.reading{ background:linear-gradient(140deg,#E86F52,#cf5238); }
     .hubCardCover.writing{ background:linear-gradient(140deg,#8A6BD1,#6f4fb5); }
     .hubCardCover.mock{ background:linear-gradient(140deg,#2b3c78,#16234E); }
+    .hubCardCover.stroke{ background:linear-gradient(140deg,#C24E72,#9E3A59); }
+    .hubCardCoverGlyph{ font-family:var(--hanzi-font); font-size:42px; font-weight:700; color:#fff; line-height:1; }
     .hubCardBody{ padding:16px 18px; }
     .hubCardTitle{ font-size:15px; font-weight:800; color:var(--text); }
     .hubCardMeta{ margin-top:3px; font-size:12px; color:var(--muted); }
@@ -1157,6 +1169,38 @@
     .modalBtn.ghost{ background:transparent; border:1px solid var(--line); color:var(--muted); font-weight:600; }
     .modalBtn.danger{ background:var(--danger); color:#fff; }
     .modalBtn.primary{ background:linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#241a08; }
+
+    /* ============ STROKE PRACTICE (Hanzi Writer modal) ============ */
+    .strokeMeta{ text-align:center; margin-bottom:10px; }
+    .strokePinyin{ font-size:16px; font-weight:800; color:#C7900F; }
+    .strokeMeaning{ font-size:13px; color:rgba(var(--text-rgb),.7); margin-top:2px; }
+    .strokeCharNav{ display:flex; align-items:center; justify-content:center; gap:14px; margin-bottom:10px; }
+    .strokeCharNavBtn{ width:auto; margin-top:0; padding:6px 12px; border-radius:10px; background:var(--panel-2); border:1px solid var(--line); color:var(--text); font-weight:700; cursor:pointer; }
+    .strokeCharNavBtn:disabled{ opacity:.35; cursor:not-allowed; }
+    .strokeCharNavLabel{ font-size:12.5px; font-weight:700; color:var(--muted); min-width:44px; text-align:center; }
+    .strokeTabs{ display:flex; gap:6px; background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:4px; margin-bottom:14px; }
+    .strokeTab{ flex:1; margin-top:0; padding:9px 4px; border-radius:9px; background:transparent; border:none; color:var(--muted); font-weight:700; font-size:12.5px; cursor:pointer; }
+    .strokeTab.active{ background:var(--panel); color:var(--text); box-shadow:var(--shadow-sm); }
+    .strokeTab.locked{ opacity:.55; }
+    .strokeGridWrap{
+      position:relative; width:min(72vw, 320px); height:min(72vw, 320px); margin:0 auto;
+      background:var(--panel-2); border:1px solid var(--line); border-radius:12px; overflow:hidden;
+      touch-action:none;
+    }
+    .strokeGridWrap.strokeFlashError{ animation:strokeFlash .4s ease; }
+    @keyframes strokeFlash{ 0%,100%{ background:var(--panel-2); } 40%{ background:rgba(214,69,69,.18); } }
+    .strokeWriterTarget{ position:absolute; inset:0; }
+    .strokeControls{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:14px; }
+    .strokeMistakeCount{ font-size:12.5px; font-weight:700; color:var(--muted); }
+    .strokeMistakeCount .n{ color:var(--danger); }
+    .strokeReplayBtn{ width:auto; margin-top:0; padding:9px 16px; border-radius:99px; background:var(--gold); color:var(--navy); font-weight:700; font-size:13px; cursor:pointer; }
+    .strokeCompletePanel{ margin-top:14px; text-align:center; }
+    .strokeCompleteMsg{ font-size:13.5px; font-weight:700; color:var(--text); margin-bottom:10px; }
+    .strokeCompleteBtns{ display:flex; gap:10px; justify-content:center; }
+    .strokeFallback{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:16px; text-align:center; }
+    .strokeFallbackHanzi{ font-family:var(--hanzi-serif-font); font-size:64px; color:var(--text); line-height:1; }
+    .strokeFallbackMsg{ font-size:12.5px; color:var(--muted); }
+    .strokeList{ max-height:420px; overflow-y:auto; margin-top:10px; background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:4px 0; }
   </style>
 </head>
 <body>
@@ -1435,6 +1479,7 @@
           </div>
           <div class="cardArea">
             <span class="cardBadge" id="cardBadge">—</span>
+            <button type="button" class="cardStrokeBtn" id="cardStrokeBtn" aria-label="Latihan Nulis">✍️</button>
             <button type="button" class="cardAudioBtn" id="cardAudioBtn" aria-label="Play audio"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a9 9 0 0 1 0 14"/></svg></button>
             <svg class="cardSparkle" width="14" height="14" viewBox="0 0 24 24" fill="rgba(242,176,30,.4)"><path d="M12 0c1 6 5 10 12 12-7 2-11 6-12 12-1-6-5-10-12-12 7-2 11-6 12-12z"/></svg>
             <div class="cardContent" id="cardContent">
@@ -1497,6 +1542,18 @@
         <p class="browseCount" id="browseCount"></p>
         <button id="browseMoreBtn" class="browseMoreBtn hidden">Muat Lebih Banyak</button>
         <button id="browseExitBtn" class="practiceExit">Kembali ke Dashboard</button>
+      </div>
+
+      <!-- ============ STROKE PRACTICE (LATIHAN GORESAN) ============ -->
+      <div id="strokePracticeCard" class="pageCard browse hidden">
+        <p class="sub browseTitle" id="strokeHeader">Latihan Goresan</p>
+
+        <div class="levelPicker" id="strokeLevelPicker"></div>
+
+        <div class="strokeList" id="strokeList"></div>
+        <p class="browseCount" id="strokeCount"></p>
+        <button id="strokeMoreBtn" class="browseMoreBtn hidden">Muat Lebih Banyak</button>
+        <button id="strokeExitBtn" class="practiceExit">Kembali ke Materi</button>
       </div>
 
       <!-- ============ MOCK TEST — LIST SET (LATIHAN & TES) ============ -->
@@ -1690,6 +1747,14 @@
             <div class="hubCardBody">
               <div class="hubCardTitle" id="hubCardWritingTitle">Writing</div>
               <div class="hubCardMeta" id="hubCardWritingMeta">Free-write workspace</div>
+            </div>
+          </button>
+
+          <button type="button" class="hubCard" id="hubCardStroke" data-card="stroke">
+            <div class="hubCardCover stroke"><span class="hubCardCoverGlyph">永</span></div>
+            <div class="hubCardBody">
+              <div class="hubCardTitle" id="hubCardStrokeTitle">Latihan Goresan</div>
+              <div class="hubCardMeta" id="hubCardStrokeMeta">Latihan urutan goresan hanzi</div>
             </div>
           </button>
 
@@ -2019,7 +2084,13 @@
           statusActive:'Aktif', roleAdmin:'Admin', genericStudent:'Murid',
           questionNumber:'Soal {n}', gradedByAI:'Dinilai AI', wrongLabel:'Salah', explanationLabel:'Penjelasan',
           wordOfDayLabel:'KATA HARI INI', yourPlanLabel:'Paket kamu',
-          continueSubtitle:'Lanjutin dari terakhir kamu berhenti — {n} kartu jatuh tempo hari ini' },
+          continueSubtitle:'Lanjutin dari terakhir kamu berhenti — {n} kartu jatuh tempo hari ini',
+          hubCardStrokeTitle:'Latihan Goresan', hubCardStrokeMeta:'Latihan urutan goresan hanzi',
+          strokeHeader:'Latihan Goresan', strokeWriteBtn:'✍️ Latihan Nulis',
+          strokeTabView:'Lihat', strokeTabTrace:'Jiplak', strokeTabTest:'Tes',
+          strokeReplayBtn:'Putar Ulang', strokeNextCharBtn:'Karakter berikutnya ›',
+          strokeMistakeLabel:'Kesalahan: {n}', strokeCompleteMsg:'Selesai! {n} kesalahan.',
+          strokeNoDataMsg:'Data goresan belum tersedia' },
     en: { beranda:'Home', latihan:'Practice & Test', latihanShort:'Practice', materi:'Materials', progres:'Progress', riwayat:'History',
           streak:'STREAK', hari:'days', keluar:'Log out', mulai:'Start', ulangi:'Retry',
           soal:'questions', menit:'minutes', terakhir:'Last:', benar:'Correct', mockTest:'Mock Test',
@@ -2113,7 +2184,13 @@
           statusActive:'Active', roleAdmin:'Admin', genericStudent:'Student',
           questionNumber:'Question {n}', gradedByAI:'Graded by AI', wrongLabel:'Incorrect', explanationLabel:'Explanation',
           wordOfDayLabel:'WORD OF THE DAY', yourPlanLabel:'Your plan',
-          continueSubtitle:'Pick up where you left off — {n} cards due today' },
+          continueSubtitle:'Pick up where you left off — {n} cards due today',
+          hubCardStrokeTitle:'Stroke Practice', hubCardStrokeMeta:'Practice hanzi stroke order',
+          strokeHeader:'Stroke Practice', strokeWriteBtn:'✍️ Practice Writing',
+          strokeTabView:'View', strokeTabTrace:'Trace', strokeTabTest:'Test',
+          strokeReplayBtn:'Replay', strokeNextCharBtn:'Next character ›',
+          strokeMistakeLabel:'Mistakes: {n}', strokeCompleteMsg:'Done! {n} mistakes.',
+          strokeNoDataMsg:'Stroke data not available yet' },
     zh: { beranda:'首页', latihan:'练习与测试', latihanShort:'练习', materi:'学习资料', progres:'学习进度', riwayat:'历史记录',
           streak:'连续天数', hari:'天', keluar:'退出', mulai:'开始', ulangi:'重做',
           soal:'题', menit:'分钟', terakhir:'上次：', benar:'正确', mockTest:'模拟考试',
@@ -2207,7 +2284,13 @@
           statusActive:'活跃', roleAdmin:'管理员', genericStudent:'学生',
           questionNumber:'第{n}题', gradedByAI:'AI 已评分', wrongLabel:'错误', explanationLabel:'解析',
           wordOfDayLabel:'每日一词', yourPlanLabel:'我的套餐',
-          continueSubtitle:'从上次的地方继续 —— 今天有 {n} 张卡到期' }
+          continueSubtitle:'从上次的地方继续 —— 今天有 {n} 张卡到期',
+          hubCardStrokeTitle:'笔画练习', hubCardStrokeMeta:'练习汉字笔画顺序',
+          strokeHeader:'笔画练习', strokeWriteBtn:'✍️ 练字',
+          strokeTabView:'观看', strokeTabTrace:'描红', strokeTabTest:'测试',
+          strokeReplayBtn:'重播', strokeNextCharBtn:'下一个字 ›',
+          strokeMistakeLabel:'错误：{n}', strokeCompleteMsg:'完成！{n} 个错误。',
+          strokeNoDataMsg:'笔画数据暂不可用' }
   };
   let currentLang = localStorage.getItem('xingLang') || 'en';
   if(!LANG[currentLang]) currentLang = 'en';
@@ -2344,7 +2427,12 @@
     $('hubCardWritingMeta').textContent = t('hubCardWritingMeta');
     $('hubCardMockTitle').textContent = t('hubCardMockTitle');
     $('hubCardMockMeta').textContent = t('hubCardMockMeta');
+    $('hubCardStrokeTitle').textContent = t('hubCardStrokeTitle');
+    $('hubCardStrokeMeta').textContent = t('hubCardStrokeMeta');
     $('hubExitBtn').textContent = t('backToDashboard');
+    $('strokeHeader').textContent = t('strokeHeader');
+    $('strokeExitBtn').textContent = t('backToMateri');
+    $('strokeMoreBtn').textContent = t('loadMore');
 
     renderMockExitLabel();
 
@@ -2457,7 +2545,7 @@
 
   /* ---------- navigasi appShell (Task: reskin) ---------- */
   function hideAllPages(){
-    ['dashCard','practiceCard','raportCard','browseCard','mockListCard','attemptCard','resultCard','riwayatCard','materialsHubCard','adminCard']
+    ['dashCard','practiceCard','raportCard','browseCard','strokePracticeCard','mockListCard','attemptCard','resultCard','riwayatCard','materialsHubCard','adminCard']
       .forEach(id => $(id).classList.add('hidden'));
   }
 
@@ -3515,6 +3603,7 @@
     if(modalPrevFocus && typeof modalPrevFocus.focus === 'function') modalPrevFocus.focus();
     modalPrevFocus = null;
     if(modalPendingResolve){ const resolve = modalPendingResolve; modalPendingResolve = null; resolve(false); }
+    cleanupStrokeModal();
   }
 
   // Themed replacements for native alert()/confirm() -- DECISIONS_NEEDED (polish session, 19 Jul
@@ -3567,6 +3656,364 @@
       else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
     }
   });
+
+  /* ==========================================================
+     STROKE PRACTICE (Latihan Goresan) -- Hanzi Writer, lazy-loaded.
+     Entry A: cardStrokeBtn on the flashcard (practiceCard) opens openStrokeModal() for the
+     card currently on screen. Entry B: strokePracticeCard is a standalone hub-only screen --
+     pick an HSK level, browse that level's vocab, tap a word to open the same modal. Both
+     entries share one modal built on the existing generic openModal()/closeModal() shell
+     (index.html "MODAL SHELL" above), same as Edit User/Deactivate/Create -- no second dialog
+     component.
+     LIHAT tab has NO gate at all, on either entry point (spec: "mode LIHAT gratis untuk
+     semua") -- that's why strokePracticeCard's level picker (renderStrokeLevelPicker) shows
+     all 6 HSK levels always-clickable, unlike renderBrowseLevelPicker/renderMockLevelPicker's
+     locked-visible pattern. TRACE/TES reuse isLevelAllowed() exactly, gating per-tab inside
+     the modal once a word is actually open (selectStrokeTab) -- from the flashcard entry this
+     rarely bites (practiceLevel is already package-filtered upstream by renderLevelPicker),
+     from the hub screen it's the only place a locked tab can actually show up.
+     ========================================================== */
+  const HANZI_WRITER_SRC = 'https://cdn.jsdelivr.net/npm/hanzi-writer@3/dist/hanzi-writer.min.js';
+  let hanziWriterLoadPromise = null;
+  function loadHanziWriter(){
+    if(window.HanziWriter) return Promise.resolve();
+    if(hanziWriterLoadPromise) return hanziWriterLoadPromise;
+    hanziWriterLoadPromise = new Promise((resolve, reject)=>{
+      const s = document.createElement('script');
+      s.src = HANZI_WRITER_SRC;
+      s.onload = () => resolve();
+      s.onerror = () => { hanziWriterLoadPromise = null; reject(new Error('Hanzi Writer failed to load')); };
+      document.head.appendChild(s);
+    });
+    return hanziWriterLoadPromise;
+  }
+
+  // 田字格 background, drawn behind the HanziWriter target div (which stays transparent) --
+  // style="" attrs, not stroke="var(...)" presentation attrs, since Safari doesn't reliably
+  // resolve CSS custom properties through SVG presentation attributes.
+  function tianzigeSVG(){
+    return `<svg viewBox="0 0 100 100" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%">
+      <rect x="1" y="1" width="98" height="98" fill="none" style="stroke:var(--line)" stroke-width="1.5"/>
+      <line x1="50" y1="0" x2="50" y2="100" style="stroke:var(--line)" stroke-width="1" stroke-dasharray="4 3"/>
+      <line x1="0" y1="50" x2="100" y2="50" style="stroke:var(--line)" stroke-width="1" stroke-dasharray="4 3"/>
+      <line x1="0" y1="0" x2="100" y2="100" style="stroke:var(--line)" stroke-width="1" stroke-dasharray="4 3"/>
+      <line x1="100" y1="0" x2="0" y2="100" style="stroke:var(--line)" stroke-width="1" stroke-dasharray="4 3"/>
+    </svg>`;
+  }
+
+  const STROKE_TABS = [
+    { key:'view',  id:'strokeTabView',  labelKey:'strokeTabView',  gated:false },
+    { key:'trace', id:'strokeTabTrace', labelKey:'strokeTabTrace', gated:true },
+    { key:'test',  id:'strokeTabTest',  labelKey:'strokeTabTest',  gated:true }
+  ];
+
+  let strokeCurrentChars = [];
+  let strokeCurrentIndex = 0;
+  let strokeCurrentWord = null;   // { hanzi, pinyin, meaning, level }
+  let strokeCurrentTab = 'view';  // 'view' | 'trace' | 'test'
+  let strokeWriterInstance = null;
+  let strokeMistakeCount = 0;
+  let strokeFlashTimer = null;
+  let strokeModalActive = false;
+  let strokeMountToken = 0; // bumped on every mount/close, guards against a stale async load finishing late
+
+  function buildStrokeModalSkeleton(){
+    return `
+      <div class="strokeMeta">
+        <div class="strokePinyin" id="strokeModalPinyin"></div>
+        <div class="strokeMeaning" id="strokeModalMeaning"></div>
+      </div>
+      <div class="strokeCharNav hidden" id="strokeCharNavRow">
+        <button type="button" class="strokeCharNavBtn" id="strokeCharPrevBtn" aria-label="Previous character">‹</button>
+        <span class="strokeCharNavLabel" id="strokeCharNavLabel">1 / 1</span>
+        <button type="button" class="strokeCharNavBtn" id="strokeCharNextBtn" aria-label="Next character">›</button>
+      </div>
+      <div class="strokeTabs" id="strokeTabs">
+        <button type="button" class="strokeTab" data-tab="view" id="strokeTabView"></button>
+        <button type="button" class="strokeTab" data-tab="trace" id="strokeTabTrace"></button>
+        <button type="button" class="strokeTab" data-tab="test" id="strokeTabTest"></button>
+      </div>
+      <div id="strokeLockedMsg" class="msg hidden"></div>
+      <div class="strokeGridWrap" id="strokeGridWrap"></div>
+      <div class="strokeControls">
+        <span class="strokeMistakeCount hidden" id="strokeMistakeCountEl"></span>
+        <button type="button" class="strokeReplayBtn hidden" id="strokeReplayBtn"></button>
+      </div>
+      <div class="strokeCompletePanel hidden" id="strokeCompletePanel">
+        <div class="strokeCompleteMsg" id="strokeCompleteMsg"></div>
+        <div class="strokeCompleteBtns">
+          <button type="button" class="modalBtn ghost" id="strokeRetryBtn"></button>
+          <button type="button" class="modalBtn primary hidden" id="strokeNextCharBtn"></button>
+        </div>
+      </div>
+    `;
+  }
+
+  function openStrokeModal(word, level){
+    strokeCurrentChars = Array.from(word.hanzi);
+    strokeCurrentIndex = 0;
+    strokeCurrentWord = { hanzi: word.hanzi, pinyin: word.pinyin, meaning: word.meaning, level };
+    strokeCurrentTab = 'view';
+    strokeModalActive = true;
+
+    openModal(word.hanzi, buildStrokeModalSkeleton());
+
+    $('strokeModalPinyin').textContent = strokeCurrentWord.pinyin;
+    $('strokeModalMeaning').textContent = strokeCurrentWord.meaning;
+    $('strokeReplayBtn').textContent = t('strokeReplayBtn');
+    $('strokeRetryBtn').textContent = t('ulangi');
+    $('strokeNextCharBtn').textContent = t('strokeNextCharBtn');
+    renderStrokeCharNav();
+    renderStrokeTabs();
+
+    $('strokeTabs').addEventListener('click', e=>{
+      const btn = e.target.closest('.strokeTab');
+      if(btn) selectStrokeTab(btn.dataset.tab);
+    });
+    $('strokeCharPrevBtn').addEventListener('click', ()=>{
+      if(strokeCurrentIndex > 0){ strokeCurrentIndex--; renderStrokeCharNav(); mountStrokeWriter(); }
+    });
+    $('strokeCharNextBtn').addEventListener('click', advanceStrokeChar);
+    $('strokeNextCharBtn').addEventListener('click', advanceStrokeChar);
+    $('strokeReplayBtn').addEventListener('click', mountStrokeWriter);
+    $('strokeRetryBtn').addEventListener('click', mountStrokeWriter);
+
+    mountStrokeWriter();
+  }
+
+  function advanceStrokeChar(){
+    if(strokeCurrentIndex < strokeCurrentChars.length - 1){
+      strokeCurrentIndex++;
+      renderStrokeCharNav();
+      mountStrokeWriter();
+    }
+  }
+
+  function renderStrokeCharNav(){
+    const row = $('strokeCharNavRow');
+    const multi = strokeCurrentChars.length > 1;
+    row.classList.toggle('hidden', !multi);
+    if(!multi) return;
+    $('strokeCharNavLabel').textContent = (strokeCurrentIndex+1) + ' / ' + strokeCurrentChars.length;
+    $('strokeCharPrevBtn').disabled = strokeCurrentIndex === 0;
+    $('strokeCharNextBtn').disabled = strokeCurrentIndex === strokeCurrentChars.length - 1;
+  }
+
+  function renderStrokeTabs(){
+    const locked = !isLevelAllowed(strokeCurrentWord.level);
+    STROKE_TABS.forEach(cfg=>{
+      const btn = $(cfg.id);
+      if(!btn) return;
+      const isLocked = cfg.gated && locked;
+      btn.textContent = (isLocked ? '🔒 ' : '') + t(cfg.labelKey);
+      btn.className = 'strokeTab' + (cfg.key === strokeCurrentTab ? ' active' : '') + (isLocked ? ' locked' : '');
+    });
+  }
+
+  function selectStrokeTab(tab){
+    if(tab !== strokeCurrentTab){
+      const cfg = STROKE_TABS.find(c => c.key === tab);
+      if(cfg && cfg.gated && !isLevelAllowed(strokeCurrentWord.level)){
+        const el = $('strokeLockedMsg');
+        el.textContent = t('errLevelLocked');
+        el.className = 'msg lock';
+        return;
+      }
+    }
+    $('strokeLockedMsg').className = 'msg hidden';
+    strokeCurrentTab = tab;
+    renderStrokeTabs();
+    mountStrokeWriter();
+  }
+
+  function updateStrokeMistakeCount(){
+    const el = $('strokeMistakeCountEl');
+    if(!el) return;
+    el.innerHTML = t('strokeMistakeLabel').replace('{n}', '<span class="n">' + strokeMistakeCount + '</span>');
+  }
+
+  function handleStrokeMistake(){
+    strokeMistakeCount++;
+    updateStrokeMistakeCount();
+    const wrap = $('strokeGridWrap');
+    if(!wrap) return;
+    wrap.classList.remove('strokeFlashError');
+    void wrap.offsetWidth; // restart the CSS animation on repeated mistakes
+    wrap.classList.add('strokeFlashError');
+    clearTimeout(strokeFlashTimer);
+    strokeFlashTimer = setTimeout(()=> wrap.classList.remove('strokeFlashError'), 400);
+  }
+
+  async function handleStrokeComplete(summaryData){
+    const mistakes = summaryData && typeof summaryData.totalMistakes === 'number' ? summaryData.totalMistakes : strokeMistakeCount;
+    const panel = $('strokeCompletePanel');
+    if(!panel) return; // modal already closed
+    $('strokeCompleteMsg').textContent = t('strokeCompleteMsg').replace('{n}', mistakes);
+    panel.classList.remove('hidden');
+    $('strokeNextCharBtn').classList.toggle('hidden', strokeCurrentIndex >= strokeCurrentChars.length - 1);
+
+    if(strokeCurrentTab === 'test'){
+      const { error } = await sb.from('stroke_progress').insert({
+        user_id: currentUser,
+        character: strokeCurrentChars[strokeCurrentIndex],
+        mistakes: mistakes
+      });
+      if(error){ showAlertModal(t('errSaveProgress') + ' ' + error.message); }
+    }
+  }
+
+  function renderStrokeFallback(){
+    const wrap = $('strokeGridWrap');
+    if(!wrap) return;
+    wrap.innerHTML = `<div class="strokeFallback">
+      <div class="strokeFallbackHanzi">${strokeCurrentChars[strokeCurrentIndex]}</div>
+      <div class="strokeFallbackMsg">${t('strokeNoDataMsg')}</div>
+    </div>`;
+    $('strokeReplayBtn').classList.add('hidden');
+    $('strokeMistakeCountEl').classList.add('hidden');
+  }
+
+  async function mountStrokeWriter(){
+    const token = ++strokeMountToken;
+    const wrap = $('strokeGridWrap');
+    if(!wrap) return;
+    const char = strokeCurrentChars[strokeCurrentIndex];
+
+    wrap.classList.remove('strokeFlashError');
+    wrap.innerHTML = tianzigeSVG() + '<div class="strokeWriterTarget" id="strokeWriterTarget"></div>';
+    $('strokeCompletePanel').classList.add('hidden');
+    $('strokeReplayBtn').classList.toggle('hidden', strokeCurrentTab !== 'view');
+    $('strokeMistakeCountEl').classList.toggle('hidden', strokeCurrentTab === 'view');
+    strokeMistakeCount = 0;
+    updateStrokeMistakeCount();
+
+    try{
+      await loadHanziWriter();
+    }catch(e){
+      if(token === strokeMountToken) renderStrokeFallback();
+      return;
+    }
+    if(token !== strokeMountToken || !strokeModalActive) return;
+    const target = $('strokeWriterTarget');
+    if(!target) return;
+
+    const size = Math.round(Math.min(window.innerWidth * 0.72, 320));
+    const rootStyle = getComputedStyle(document.documentElement);
+    const commonOpts = {
+      width: size, height: size, padding: 12,
+      strokeColor: (rootStyle.getPropertyValue('--text') || '#1C2A5E').trim(),
+      radicalColor: (rootStyle.getPropertyValue('--gold') || '#F2B01E').trim(),
+      outlineColor: (rootStyle.getPropertyValue('--line') || '#EEE7D4').trim(),
+      drawingWidth: 24,
+      onLoadCharDataError: ()=> { if(token === strokeMountToken) renderStrokeFallback(); }
+    };
+
+    try{
+      if(strokeCurrentTab === 'view'){
+        strokeWriterInstance = HanziWriter.create(target, char, { ...commonOpts, showOutline:true, showCharacter:true });
+        strokeWriterInstance.animateCharacter();
+      } else {
+        strokeWriterInstance = HanziWriter.create(target, char, {
+          ...commonOpts, showOutline: strokeCurrentTab === 'trace', showCharacter:false
+        });
+        strokeWriterInstance.quiz({
+          leniency: 1.2,
+          onMistake: handleStrokeMistake,
+          onComplete: handleStrokeComplete
+        });
+      }
+    }catch(e){
+      if(token === strokeMountToken) renderStrokeFallback();
+    }
+  }
+
+  function cleanupStrokeModal(){
+    if(!strokeModalActive) return;
+    strokeModalActive = false;
+    strokeMountToken++;
+    clearTimeout(strokeFlashTimer);
+    strokeWriterInstance = null;
+  }
+
+  /* ---- Entry B: standalone "Latihan Goresan" screen, hub-only ---- */
+  const STROKE_PAGE_SIZE = 50;
+  let strokeScreenLevel = null;
+  let strokeScreenCache = [];
+  let strokeScreenShown = 0;
+
+  function openStrokePractice(){
+    setActiveNav('materi');
+    hideAllPages();
+    $('strokePracticeCard').classList.remove('hidden');
+    renderStrokeLevelPicker();
+  }
+
+  function closeStrokePractice(){
+    navTo(openMaterialsHub);
+  }
+
+  // All 6 levels always unlocked (LIHAT is free for everyone, spec #10) -- deliberately NOT
+  // renderBrowseLevelPicker's locked-visible pattern. TRACE/TES still gate per word once the
+  // stroke modal is open (selectStrokeTab), same isLevelAllowed() check either way.
+  function renderStrokeLevelPicker(){
+    const wrap = $('strokeLevelPicker');
+    wrap.innerHTML = '';
+    const defaultLevel = (currentProfile?.target_level) || 1;
+    for(let lv=1; lv<=6; lv++){
+      const b = document.createElement('div');
+      b.className = 'levelBtn' + (lv === defaultLevel ? ' active' : '');
+      b.textContent = 'HSK ' + lv;
+      b.addEventListener('click', ()=>{
+        [...wrap.children].forEach(c=>c.classList.remove('active'));
+        b.classList.add('active');
+        loadStrokeLevel(lv);
+      });
+      wrap.appendChild(b);
+    }
+    loadStrokeLevel(defaultLevel);
+  }
+
+  async function loadStrokeLevel(level){
+    strokeScreenLevel = level;
+    $('strokeList').innerHTML = `<p class="emptyState">${t('loading')}</p>`;
+    $('strokeCount').textContent = '';
+    $('strokeMoreBtn').classList.add('hidden');
+    let data;
+    try{
+      data = await fetchAllRanged((from,to)=> sb
+        .from('vocab').select('hanzi,pinyin,meaning_en,meaning_id,frequency')
+        .eq('hsk_level', level)
+        .order('frequency', { ascending:true })
+        .range(from, to), VOCAB_BATCH_SIZE);
+    }catch(e){ showAlertModal(t('errFetchWordList') + ' ' + e.message); return; }
+    strokeScreenCache = data || [];
+    strokeScreenShown = 0;
+    $('strokeList').innerHTML = '';
+    renderStrokeChunk();
+  }
+
+  function renderStrokeChunk(){
+    const wrap = $('strokeList');
+    if(strokeScreenCache.length === 0){
+      wrap.innerHTML = `<p class="emptyState">${t('emptyNoMatch')}</p>`;
+      $('strokeCount').textContent = '0 ' + t('wordsUnit');
+      $('strokeMoreBtn').classList.add('hidden');
+      return;
+    }
+    const next = strokeScreenCache.slice(strokeScreenShown, strokeScreenShown + STROKE_PAGE_SIZE);
+    next.forEach(v=>{
+      const item = document.createElement('div');
+      item.className = 'browseItem';
+      item.innerHTML = `<span class="browseHanzi">${v.hanzi}</span>
+        <span class="browsePinyin">${v.pinyin}</span>
+        <span class="browseMeaning">${v.meaning_id || v.meaning_en}</span>
+        <button type="button" class="browseStrokeBtn" data-hanzi="${v.hanzi}" aria-label="${t('strokeWriteBtn')}">✍️</button>`;
+      wrap.appendChild(item);
+    });
+    strokeScreenShown += next.length;
+    $('strokeCount').textContent = strokeScreenShown + ' / ' + strokeScreenCache.length + ' ' + t('wordsUnit');
+    $('strokeMoreBtn').classList.toggle('hidden', strokeScreenShown >= strokeScreenCache.length);
+  }
 
   /* ==========================================================
      ADMIN — USER MANAGEMENT (v1, DECISIONS_NEEDED #30/#31)
@@ -5416,6 +5863,21 @@
   $('hubCardListening').addEventListener('click', ()=> navTo(()=> openMockList('listening','hub')));
   $('hubCardWriting').addEventListener('click', ()=> navTo(()=> openMockList('writing','hub')));
   $('hubCardMock').addEventListener('click', ()=> navTo(()=> openMockList('all','hub')));
+  $('hubCardStroke').addEventListener('click', ()=> navTo(openStrokePractice));
+  $('strokeExitBtn').addEventListener('click', closeStrokePractice);
+  $('strokeMoreBtn').addEventListener('click', renderStrokeChunk);
+  $('strokeList').addEventListener('click', e=>{
+    const btn = e.target.closest('.browseStrokeBtn');
+    if(!btn) return;
+    const v = strokeScreenCache.find(w => w.hanzi === btn.dataset.hanzi);
+    if(!v) return;
+    openStrokeModal({ hanzi: v.hanzi, pinyin: v.pinyin, meaning: v.meaning_id || v.meaning_en }, strokeScreenLevel);
+  });
+  $('cardStrokeBtn').addEventListener('click', ()=>{
+    const card = sessionQueue[sessionIndex];
+    if(!card) return;
+    openStrokeModal({ hanzi: card.hanzi, pinyin: card.pinyin, meaning: card.meaning_id || card.meaning_en }, practiceLevel);
+  });
   $('mockList').addEventListener('click', e=>{
     const setBtn = e.target.closest('button[data-set]');
     if(setBtn){ startAttempt(setBtn.dataset.set); return; }

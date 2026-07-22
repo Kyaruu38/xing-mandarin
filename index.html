@@ -1268,6 +1268,40 @@
     .pinyinBasicsContent h4:first-child{ margin-top:0; }
     .pinyinBasicsContent p{ margin:0 0 8px; }
     .pinyinBasicsContent ul{ margin:0 0 8px; padding-left:20px; }
+
+    /* ============ TONE SANDHI GUIDE ============ */
+    .sandhiChapter{
+      background:var(--panel-2); border:1px solid var(--line); border-radius:14px;
+      padding:16px; margin-bottom:16px;
+    }
+    .sandhiChapterTitle{ font-size:14.5px; font-weight:800; color:var(--text); margin-bottom:8px; }
+    .sandhiExplanation{ font-size:13px; line-height:1.7; color:rgba(var(--text-rgb),.85); margin-bottom:12px; }
+    .sandhiCurveRow{ display:flex; gap:20px; align-items:center; justify-content:center; margin-bottom:14px; flex-wrap:wrap; }
+    .sandhiCurveBlock{ text-align:center; }
+    .sandhiCurveLabel{ font-size:11px; color:var(--muted); font-weight:700; margin-top:4px; }
+    .sandhiExampleGrid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:10px; margin-bottom:14px; }
+    .sandhiExampleCard{ background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:10px; text-align:center; }
+    .sandhiExampleHanzi{ font-family:var(--hanzi-serif-font); font-size:22px; color:var(--text); }
+    .sandhiExamplePinyin{ font-size:11.5px; color:var(--gold); font-weight:700; margin-top:2px; }
+    .sandhiExampleBtns{ display:flex; gap:6px; justify-content:center; margin-top:8px; }
+    .sandhiAudioBtn{
+      width:auto; margin-top:0; padding:6px 8px; border-radius:8px; background:var(--panel-2);
+      border:1px solid var(--line); color:var(--text); font-size:11px; cursor:pointer;
+    }
+    .sandhiAudioBtn:disabled{ opacity:.35; cursor:not-allowed; }
+    .sandhiQuizBlock{ background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:12px; }
+    .sandhiQuizTitle{ font-size:12.5px; font-weight:800; color:var(--muted); margin-bottom:8px; }
+    .sandhiQuizQ{ font-size:13px; font-weight:700; color:var(--text); margin:10px 0 6px; }
+    .sandhiQuizOptions{ display:flex; flex-direction:column; gap:6px; }
+    .sandhiQuizOption{
+      width:100%; margin-top:0; padding:9px 12px; border-radius:9px; background:var(--panel-2);
+      border:1px solid var(--line); color:var(--text); font-size:12.5px; text-align:left; cursor:pointer;
+    }
+    .sandhiQuizOption.correct{ background:rgba(47,158,91,.15); border-color:var(--ok); }
+    .sandhiQuizOption.wrong{ background:rgba(214,69,69,.12); border-color:var(--danger); }
+    .sandhiQuizFeedback{ font-size:12px; font-weight:700; margin-top:6px; }
+    .sandhiQuizFeedback.correct{ color:var(--ok); }
+    .sandhiQuizFeedback.wrong{ color:var(--danger); }
   </style>
 </head>
 <body>
@@ -1649,6 +1683,13 @@
         <button id="pinyinGuideExitBtn" class="practiceExit">Kembali ke Materi</button>
       </div>
 
+      <!-- ============ TONE SANDHI GUIDE ============ -->
+      <div id="sandhiGuideCard" class="pageCard browse hidden">
+        <p class="sub browseTitle" id="sandhiGuideHeader">Panduan Tone Sandhi</p>
+        <div id="sandhiChaptersWrap"></div>
+        <button id="sandhiGuideExitBtn" class="practiceExit">Kembali ke Materi</button>
+      </div>
+
       <!-- ============ STROKE PRACTICE (LATIHAN GORESAN) ============ -->
       <div id="strokePracticeCard" class="pageCard browse hidden">
         <p class="sub browseTitle" id="strokeHeader">Latihan Goresan</p>
@@ -1868,6 +1909,14 @@
             <div class="hubCardBody">
               <div class="hubCardTitle" id="hubCardPinyinTitle">Panduan Pinyin</div>
               <div class="hubCardMeta" id="hubCardPinyinMeta">Chart bunyi + latihan dengar</div>
+            </div>
+          </button>
+
+          <button type="button" class="hubCard" id="hubCardSandhi" data-card="sandhi">
+            <div class="hubCardCover stroke"><span class="hubCardCoverGlyph">ǎ</span></div>
+            <div class="hubCardBody">
+              <div class="hubCardTitle" id="hubCardSandhiTitle">Tone Sandhi</div>
+              <div class="hubCardMeta" id="hubCardSandhiMeta">Aturan perubahan nada</div>
             </div>
           </button>
 
@@ -2639,6 +2688,10 @@
     $('pinyinTabChart').textContent = t('pinyinTabChart');
     $('pinyinTabBasics').textContent = t('pinyinTabBasics');
     $('pinyinGuideExitBtn').textContent = t('backToMateri');
+    $('hubCardSandhiTitle').textContent = t('hubCardSandhiTitle');
+    $('hubCardSandhiMeta').textContent = t('hubCardSandhiMeta');
+    $('sandhiGuideHeader').textContent = t('sandhiGuideHeader');
+    $('sandhiGuideExitBtn').textContent = t('backToMateri');
 
     renderMockExitLabel();
 
@@ -4583,6 +4636,223 @@
   });
 
   /* ==========================================================
+     TONE SANDHI GUIDE -- Fitur 4, batch prompt-pack.
+     Reuses pinyinAudioUrl()/audioExistsAndPlay() from Fitur 3 for the "Ejaan kamus" (dictionary
+     spelling) button -- literally the same per-syllable files, just played at each syllable's
+     OWN citation tone (never sandhi-shifted), concatenated with a 120ms JS gap. "Ucapan asli"
+     (natural speech) is a separate audio set from tools/generate_sandhi_audio.py, bucket prefix
+     sandhi/, filename = pinyin slug (ASCII-safe, not hanzi -- see that script's own comment).
+     Neither audio set is uploaded yet -- every button here goes through the same
+     exists-before-play guard as Fitur 3, so a 404 never reaches the console.
+     ========================================================== */
+  const SANDHI_TONE_CURVE_POINTS = {
+    1: [[0,0.15],[1,0.15]],
+    2: [[0,0.75],[1,0.1]],
+    3: [[0,0.4],[0.5,0.9],[1,0.4]],
+    '3h': [[0,0.35],[1,0.85]], // half-third: cuma bagian turun, tanpa naik lagi
+    4: [[0,0.05],[1,0.85]]
+  };
+
+  function sandhiToneCurveSVG(tones, strokeColor){
+    const slotW = 56, h = 40, pad = 6;
+    const w = slotW * tones.length;
+    const paths = tones.map((tone, i)=>{
+      const pts = SANDHI_TONE_CURVE_POINTS[tone] || SANDHI_TONE_CURVE_POINTS[1];
+      const x0 = i*slotW + pad, x1 = (i+1)*slotW - pad, xr = x1 - x0;
+      const d = pts.map((p,j)=> (j===0?'M':'L') + (x0+p[0]*xr).toFixed(1) + ',' + (5+p[1]*30).toFixed(1)).join(' ');
+      return `<path d="${d}" fill="none" stroke="${strokeColor}" stroke-width="3" stroke-linecap="round"/>`;
+    }).join('');
+    return `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}">${paths}</svg>`;
+  }
+
+  const SANDHI_CHAPTERS = [
+    {
+      id:'a',
+      title:'1. Nada 3 + Nada 3 → Nada 2 + Nada 3',
+      dictTones:[3,3], spokenTones:[2,3],
+      explanation:'Kalau dua suku kata nada 3 ketemu berurutan, yang PERTAMA berubah jadi kedengeran kayak nada 2 -- ejaannya tetep ditulis nada 3, cuma cara bacanya yang berubah. "你好" tetep ditulis nǐhǎo, tapi dibaca níhǎo.',
+      examples:[
+        {slug:'nihao', hanzi:'你好', syls:[{s:'ni',t:3},{s:'hao',t:3}]},
+        {slug:'henhao', hanzi:'很好', syls:[{s:'hen',t:3},{s:'hao',t:3}]},
+        {slug:'laohu', hanzi:'老虎', syls:[{s:'lao',t:3},{s:'hu',t:3}]},
+        {slug:'meihao', hanzi:'美好', syls:[{s:'mei',t:3},{s:'hao',t:3}]},
+        {slug:'shoubiao', hanzi:'手表', syls:[{s:'shou',t:3},{s:'biao',t:3}]},
+        {slug:'yusan', hanzi:'雨伞', syls:[{s:'yu',t:3},{s:'san',t:3}]}
+      ],
+      quiz:[
+        { q:'"你好" (nǐhǎo) sebenernya dibaca dengan nada berapa di suku kata pertama?', options:['Nada 1','Nada 2','Nada 4'], correct:1 },
+        { q:'Aturan nada3+nada3 mengubah suku kata yang mana?', options:['Yang pertama','Yang kedua','Dua-duanya'], correct:0 },
+        { q:'Apakah EJAAN (tulisan pinyin) "nǐhǎo" ikut berubah jadi "níhǎo"?', options:['Ya, ejaan ikut berubah','Tidak, ejaan tetap nǐhǎo, cuma bacanya yang beda'], correct:1 }
+      ]
+    },
+    {
+      id:'b',
+      title:'2. 不 (bù) berubah jadi bú sebelum nada 4',
+      dictTones:[4], spokenTones:[2],
+      explanation:'不 dasarnya nada 4 (bù). Kalau ketemu suku kata nada 4 berikutnya, 不 berubah jadi nada 2 (bú) biar ga dua nada-4 numpuk. Sebelum nada 1/2/3, 不 tetap bù.',
+      examples:[
+        {slug:'budui', hanzi:'不对', syls:[{s:'bu',t:4},{s:'dui',t:4}]},
+        {slug:'bushi', hanzi:'不是', syls:[{s:'bu',t:4},{s:'shi',t:4}]},
+        {slug:'buqu', hanzi:'不去', syls:[{s:'bu',t:4},{s:'qu',t:4}]},
+        {slug:'buyao', hanzi:'不要', syls:[{s:'bu',t:4},{s:'yao',t:4}]},
+        {slug:'buting', hanzi:'不听', syls:[{s:'bu',t:4},{s:'ting',t:1}]},
+        {slug:'bunan', hanzi:'不难', syls:[{s:'bu',t:4},{s:'nan',t:2}]},
+        {slug:'buhao', hanzi:'不好', syls:[{s:'bu',t:4},{s:'hao',t:3}]},
+        {slug:'buyong', hanzi:'不用', syls:[{s:'bu',t:4},{s:'yong',t:4}]}
+      ],
+      quiz:[
+        { q:'不 berubah jadi nada 2 (bú) kalau kata setelahnya nada berapa?', options:['Nada 1','Nada 3','Nada 4'], correct:2 },
+        { q:'"不听" (bùtīng) -- apakah 不 di sini berubah jadi bú?', options:['Ya, karena 听 nada 4','Tidak, karena 听 nada 1, 不 tetap bù'], correct:1 },
+        { q:'"不好" (bùhǎo) dibaca dengan nada berapa di 不?', options:['bù (tetap, karena 好 nada 3)','bú (berubah)'], correct:0 }
+      ]
+    },
+    {
+      id:'c',
+      title:'3. 一 (yī) berubah jadi yí / yì tergantung kata setelahnya',
+      dictTones:[1], spokenTones:[2],
+      explanation:'一 dasarnya nada 1 (yī). Sebelum nada 4, berubah jadi nada 2 (yí) -- pola sama kayak 不. Sebelum nada 1/2/3, 一 berubah jadi nada 4 (yì). 一 cuma tetap yī kalau berdiri sendiri atau di angka urutan (第一).',
+      examples:[
+        {slug:'yiyang', hanzi:'一样', syls:[{s:'yi',t:1},{s:'yang',t:4}]},
+        {slug:'yici', hanzi:'一次', syls:[{s:'yi',t:1},{s:'ci',t:4}]},
+        {slug:'yiding', hanzi:'一定', syls:[{s:'yi',t:1},{s:'ding',t:4}]},
+        {slug:'yiban', hanzi:'一半', syls:[{s:'yi',t:1},{s:'ban',t:4}]},
+        {slug:'yiqi', hanzi:'一起', syls:[{s:'yi',t:1},{s:'qi',t:3}]},
+        {slug:'yitian', hanzi:'一天', syls:[{s:'yi',t:1},{s:'tian',t:1}]},
+        {slug:'yinian', hanzi:'一年', syls:[{s:'yi',t:1},{s:'nian',t:2}]},
+        {slug:'yizhi', hanzi:'一直', syls:[{s:'yi',t:1},{s:'zhi',t:2}]}
+      ],
+      quiz:[
+        { q:'"一样" (yīyàng) -- 一 dibaca dengan nada berapa?', options:['yī (tetap)','yí (nada 2)','yì (nada 4)'], correct:1 },
+        { q:'"一起" (yīqǐ) -- 起 nada 3, jadi 一 dibaca?', options:['yí','yì','yī'], correct:1 },
+        { q:'Kapan 一 TETAP dibaca yī (ga berubah)?', options:['Sebelum nada 4','Waktu berdiri sendiri / angka urutan (第一)','Sebelum nada 1'], correct:1 }
+      ]
+    },
+    {
+      id:'d',
+      title:'4. Half-third tone: nada 3 sebelum nada bukan-3',
+      dictTones:[3], spokenTones:['3h'],
+      explanation:'Nada 3 penuh itu turun-lalu-naik. Tapi kalau suku kata SETELAHNYA bukan nada 3, nada 3 ini cuma diucapkan bagian TURUNNYA doang (ga naik lagi) -- disebut "half-third" / setengah-ketiga. Ini beda dari aturan nada3+nada3 (yang malah jadi nada 2).',
+      examples:[
+        {slug:'henmang', hanzi:'很忙', syls:[{s:'hen',t:3},{s:'mang',t:2}]},
+        {slug:'haode', hanzi:'好的', syls:[{s:'hao',t:3},{s:'de',t:0}]},
+        {slug:'xiaoxin', hanzi:'小心', syls:[{s:'xiao',t:3},{s:'xin',t:1}]},
+        {slug:'keshi', hanzi:'可是', syls:[{s:'ke',t:3},{s:'shi',t:4}]},
+        {slug:'women', hanzi:'我们', syls:[{s:'wo',t:3},{s:'men',t:0}]},
+        {slug:'dasuan', hanzi:'打算', syls:[{s:'da',t:3},{s:'suan',t:4}]},
+        {slug:'xiezi', hanzi:'写字', syls:[{s:'xie',t:3},{s:'zi',t:4}]},
+        {slug:'xiangdao', hanzi:'想到', syls:[{s:'xiang',t:3},{s:'dao',t:4}]}
+      ],
+      quiz:[
+        { q:'"很忙" (hěnmáng) -- 很 diucapkan turun-naik penuh atau cuma turun (half-third)?', options:['Turun-naik penuh','Cuma bagian turun (half-third)'], correct:1 },
+        { q:'Half-third beda dari aturan nada3+nada3 karena...', options:['Suku kata setelahnya BUKAN nada 3','Suku kata setelahnya nada 3 juga'], correct:0 },
+        { q:'"我们" (wǒmen) -- 们 nada netral, jadi 我 diucapkan gimana?', options:['Nada 2 penuh','Half-third (cuma turun)'], correct:1 }
+      ]
+    }
+  ];
+
+  function sandhiAudioUrl(slug){
+    return sb.storage.from('listening-audio').getPublicUrl(`sandhi/${slug}_natural.mp3`).data.publicUrl;
+  }
+
+  async function playSandhiDictSpelling(btn, syls){
+    for(const syl of syls){
+      const url = pinyinAudioUrl(syl.s, syl.t);
+      const played = await audioExistsAndPlay(url);
+      if(!played){ btn.disabled = true; btn.title = t('sandhiAudioNotReady'); return; }
+      await new Promise(r => setTimeout(r, 120));
+    }
+  }
+
+  async function playSandhiNatural(btn, slug){
+    const played = await audioExistsAndPlay(sandhiAudioUrl(slug));
+    if(!played){ btn.disabled = true; btn.title = t('sandhiAudioNotReady'); }
+  }
+
+  function renderSandhiExample(ex){
+    const pinyinDisplay = ex.syls.map(s => pinyinToneMark(s.s, s.t || 1)).join(' ');
+    return `<div class="sandhiExampleCard">
+      <div class="sandhiExampleHanzi">${ex.hanzi}</div>
+      <div class="sandhiExamplePinyin">${pinyinDisplay}</div>
+      <div class="sandhiExampleBtns">
+        <button type="button" class="sandhiAudioBtn" data-kind="natural" data-slug="${ex.slug}">${t('sandhiNaturalBtn')}</button>
+        <button type="button" class="sandhiAudioBtn" data-kind="dict" data-slug="${ex.slug}">${t('sandhiDictBtn')}</button>
+      </div>
+    </div>`;
+  }
+
+  function renderSandhiQuiz(chapterId, quiz){
+    return `<div class="sandhiQuizBlock" data-chapter="${chapterId}">
+      <div class="sandhiQuizTitle">${t('sandhiQuizTitle')}</div>
+      ${quiz.map((item, qi)=>`
+        <div class="sandhiQuizItem" data-qi="${qi}">
+          <div class="sandhiQuizQ">${qi+1}. ${escapeHTML(item.q)}</div>
+          <div class="sandhiQuizOptions">
+            ${item.options.map((opt, oi)=>`<button type="button" class="sandhiQuizOption" data-oi="${oi}" data-correct="${item.correct}">${escapeHTML(opt)}</button>`).join('')}
+          </div>
+          <div class="sandhiQuizFeedback"></div>
+        </div>
+      `).join('')}
+    </div>`;
+  }
+
+  function renderSandhiChapters(){
+    const wrap = $('sandhiChaptersWrap');
+    wrap.innerHTML = SANDHI_CHAPTERS.map(ch => `
+      <div class="sandhiChapter" data-chapter="${ch.id}">
+        <div class="sandhiChapterTitle">${escapeHTML(ch.title)}</div>
+        <div class="sandhiExplanation">${escapeHTML(ch.explanation)}</div>
+        <div class="sandhiCurveRow">
+          <div class="sandhiCurveBlock">
+            ${sandhiToneCurveSVG(ch.dictTones, 'var(--muted)')}
+            <div class="sandhiCurveLabel">Ejaan (nada asli)</div>
+          </div>
+          <div class="sandhiCurveBlock">
+            ${sandhiToneCurveSVG(ch.spokenTones, '#F2B01E')}
+            <div class="sandhiCurveLabel">Diucapkan (sandhi)</div>
+          </div>
+        </div>
+        <div class="sandhiExampleGrid">${ch.examples.map(renderSandhiExample).join('')}</div>
+        ${renderSandhiQuiz(ch.id, ch.quiz)}
+      </div>
+    `).join('');
+  }
+
+  let sandhiChaptersBuilt = false;
+
+  function openSandhiGuide(){
+    setActiveNav('materi');
+    hideAllPages();
+    $('sandhiGuideCard').classList.remove('hidden');
+    if(!sandhiChaptersBuilt){ renderSandhiChapters(); sandhiChaptersBuilt = true; }
+  }
+  function closeSandhiGuide(){ navTo(openMaterialsHub); }
+
+  $('sandhiChaptersWrap') && $('sandhiChaptersWrap').addEventListener('click', e=>{
+    const audioBtn = e.target.closest('.sandhiAudioBtn');
+    if(audioBtn){
+      const chapter = SANDHI_CHAPTERS.find(c => audioBtn.closest('.sandhiChapter').dataset.chapter === c.id);
+      const ex = chapter.examples.find(x => x.slug === audioBtn.dataset.slug);
+      if(audioBtn.dataset.kind === 'natural') playSandhiNatural(audioBtn, ex.slug);
+      else playSandhiDictSpelling(audioBtn, ex.syls);
+      return;
+    }
+    const optBtn = e.target.closest('.sandhiQuizOption');
+    if(optBtn){
+      const item = optBtn.closest('.sandhiQuizItem');
+      const correct = Number(optBtn.dataset.correct);
+      const chosen = Number(optBtn.dataset.oi);
+      [...item.querySelectorAll('.sandhiQuizOption')].forEach((b,i)=>{
+        b.disabled = true;
+        if(i === correct) b.classList.add('correct');
+        else if(i === chosen) b.classList.add('wrong');
+      });
+      const fb = item.querySelector('.sandhiQuizFeedback');
+      fb.textContent = chosen === correct ? t('sandhiQuizCorrect') : t('sandhiQuizWrong');
+      fb.className = 'sandhiQuizFeedback ' + (chosen === correct ? 'correct' : 'wrong');
+    }
+  });
+
+  /* ==========================================================
      ADMIN — USER MANAGEMENT (v1, DECISIONS_NEEDED #30/#31)
      Client-side only, anon key, zero Edge Functions -- RLS is_admin() covers every read/write
      this screen does. No email column (auth.users isn't reachable from the client; that needs
@@ -6450,6 +6720,8 @@
   $('radicalsExitBtn').addEventListener('click', closeRadicals);
   $('hubCardPinyin').addEventListener('click', ()=> navTo(openPinyinGuide));
   $('pinyinGuideExitBtn').addEventListener('click', closePinyinGuide);
+  $('hubCardSandhi').addEventListener('click', ()=> navTo(openSandhiGuide));
+  $('sandhiGuideExitBtn').addEventListener('click', closeSandhiGuide);
   $('hubCardStroke').addEventListener('click', ()=> navTo(openStrokePractice));
   $('strokeExitBtn').addEventListener('click', closeStrokePractice);
   $('strokeMoreBtn').addEventListener('click', renderStrokeChunk);

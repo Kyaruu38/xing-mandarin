@@ -6,7 +6,7 @@
   <title>Xing Mandarin</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Baloo+2:wght@700&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Baloo+2:wght@700&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
   <style>
     /* Token <-> design_handoff_xing_mandarin README mapping, for future handoffs:
        --bg      = design --bg        (page background)
@@ -42,6 +42,7 @@
       --dv4-hairline:rgba(28,42,94,0);
       --dv4-shadow:0 22px 55px rgba(0,0,0,.42);
       --dv4-shadow-hover:0 30px 70px rgba(0,0,0,.5);
+      --dv4-mono:'IBM Plex Mono', monospace;
     }
     [data-theme="dark"]{
       --bg:#0F1A3D; --bg2:#16224C; --panel:#1C2B58; --panel-2:#141F45;
@@ -675,6 +676,49 @@
     /* gauge orbit dipindah ke Target Harian (bukan Streak lagi) -- lihat .dashV4-dailyGoalCard */
     .dashV4-dailyGoalCard{ display:flex; align-items:center; gap:18px; }
     .dashV4-dailyGoalText{ flex:1; min-width:0; }
+
+    /* ---- commit 1 (visual-parity): micro stars, eyebrow mono label, greeting hanzi, sidebar
+       hanzi nav -- semua scoped ke #dashCard / .sidebar, tidak menyentuh fungsi data. ---- */
+
+    /* micro stars -- 30 titik, di-generate SEKALI oleh JS (guard flag), scoped absolute di
+       dalam #dashCard (BUKAN fixed ke viewport). Default (light, :root) TIDAK dapat animation
+       sama sekali (bukan cuma opacity:0) supaya nggak perlu !important buat ngalahin animation. */
+    .dashV4-dots{ position:absolute; inset:0; z-index:0; overflow:hidden; pointer-events:none; }
+    .dashV4-dots span{
+      position:absolute; width:3px; height:3px; border-radius:50%;
+      background:var(--gold); box-shadow:0 0 6px rgba(242,205,126,.5);
+      opacity:0; transition:opacity .4s ease;
+    }
+    [data-theme="dark"] .dashV4-dots span{ animation:dashV4Twinkle 5s ease-in-out infinite; }
+    @keyframes dashV4Twinkle{ 0%,100%{ opacity:.28; } 50%{ opacity:.85; } }
+    @media (prefers-reduced-motion: reduce){ [data-theme="dark"] .dashV4-dots span{ animation:none; opacity:.5; } }
+
+    /* label mono uppercase, dipasang di atas card/section besar */
+    .dashV4-eyebrow{
+      font-family:var(--dv4-mono); font-size:9.5px; letter-spacing:.22em;
+      color:var(--muted); margin-bottom:8px;
+    }
+
+    /* greeting hanzi + pinyin kecil di atas (native <ruby>/<rb>/<rt>) */
+    .dashV4-greetRuby{ font-family:var(--hanzi-serif-font); font-weight:900; font-size:27px; }
+    .dashV4-greetRuby rb{
+      background:linear-gradient(115deg,#F09000,var(--gold) 60%,var(--gold-soft));
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+    }
+    .dashV4-greetRuby rt{ font-family:var(--dv4-mono); font-size:9px; letter-spacing:.2em; color:var(--muted); }
+
+    /* sidebar nav -- hanzi bulat 28x28, ganti ikon SVG (desktop sidebar SAJA, bottomNav/mobile
+       tidak disentuh -- di luar scope instruksi). Label teks di sebelahnya TETAP ada. */
+    .dashV4-navIco{
+      font-family:var(--hanzi-serif-font); font-weight:900; font-size:14px;
+      width:28px; height:28px; border-radius:50%; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+      background:rgba(var(--text-rgb),.09); color:var(--text);
+      transition:background .18s ease, color .18s ease;
+    }
+    .navItem.active .dashV4-navIco{
+      background:linear-gradient(135deg,var(--gold),var(--gold-soft)); color:#1C2A5E;
+    }
 
     /* practice / flashcard -- level picker & empty state have no design comp yet, left as-is */
     .practice{max-width:760px}
@@ -1613,11 +1657,11 @@
         </div>
       </div>
       <nav class="sidebarNav">
-        <div class="navItem active" id="navBeranda" data-page="beranda"><span class="navIcon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/></svg></span><span id="navLabelBeranda">Beranda</span></div>
-        <div class="navItem" id="navLatihan" data-page="latihan"><span class="navIcon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="4" width="14" height="17" rx="2.2"/><path d="m9 12 2 2 4-4"/></svg></span><span id="navLabelLatihan">Latihan & Tes</span></div>
-        <div class="navItem" id="navMateri" data-page="materi"><span class="navIcon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5.5A2 2 0 0 1 6 3.5h13v15H6a2 2 0 0 0-2 2z"/><path d="M8 5v14"/></svg></span><span id="navLabelMateri">Materi</span></div>
-        <div class="navItem" id="navProgres" data-page="progres"><span class="navIcon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V11"/><path d="M10 20V4"/><path d="M16 20v-6"/></svg></span><span id="navLabelProgres">Progres</span></div>
-        <div class="navItem" id="navRiwayat" data-page="riwayat"><span class="navIcon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5l3 2"/></svg></span><span id="navLabelRiwayat">Riwayat</span></div>
+        <div class="navItem active" id="navBeranda" data-page="beranda"><span class="dashV4-navIco">首</span><span id="navLabelBeranda">Beranda</span></div>
+        <div class="navItem" id="navLatihan" data-page="latihan"><span class="dashV4-navIco">考</span><span id="navLabelLatihan">Latihan & Tes</span></div>
+        <div class="navItem" id="navMateri" data-page="materi"><span class="dashV4-navIco">资</span><span id="navLabelMateri">Materi</span></div>
+        <div class="navItem" id="navProgres" data-page="progres"><span class="dashV4-navIco">析</span><span id="navLabelProgres">Progres</span></div>
+        <div class="navItem" id="navRiwayat" data-page="riwayat"><span class="dashV4-navIco">录</span><span id="navLabelRiwayat">Riwayat</span></div>
         <!-- Admin panel v1 (DECISIONS_NEEDED #30): existing sidebar as-is, no new toggle.
              Group + item hidden unless profile.role === 'admin' (see renderDash). -->
         <div class="navGroupLabel hidden" id="navGroupAdmin">Admin</div>
@@ -1653,14 +1697,15 @@
           <span class="dashV4-aur a1"></span>
           <span class="dashV4-aur a2"></span>
           <span class="dashV4-aur a3"></span>
+          <div class="dashV4-dots" id="dashV4Dots"></div>
         </div>
         <div class="dashV4-content">
 
         <div class="pageHeader">
           <img class="dashMascot" id="dashMascot" src="/assets/mascot-sit.png" alt="" />
           <div class="pageHeaderText">
-            <p class="hello" id="dGreetingNamed"><span id="dHello">Halo</span>, <b id="dName">—</b> <span>👋</span></p>
-            <p class="hello hidden" id="dGreetingFallback"><span id="dHelloThere">Hai</span> <span>👋</span></p>
+            <p class="hello" id="dGreetingNamed"><ruby class="dashV4-greetRuby dashV4-greetHz"><rb>早上好</rb><rt>ZǍOSHÀNG HǍO</rt></ruby><span>, </span><b id="dName">—</b><span>. 👋</span></p>
+            <p class="hello hidden" id="dGreetingFallback"><ruby class="dashV4-greetRuby dashV4-greetHz"><rb>早上好</rb><rt>ZǍOSHÀNG HǍO</rt></ruby><span> 👋</span></p>
             <p class="sub" id="dGreet">Siap belajar hari ini?</p>
           </div>
           <div class="planBlock">
@@ -1735,9 +1780,11 @@
           </div>
         </div>
 
+        <div class="dashV4-eyebrow" id="eyebrowProgress">PROGRES PER LEVEL</div>
         <p class="sectionTitle" id="sectionTitleProgress">Progres per Level</p>
         <div class="hskGrid" id="hskGrid"></div>
 
+        <div class="dashV4-eyebrow" id="eyebrowQuick">AKSI CEPAT</div>
         <p class="sectionTitle" id="sectionTitleQuickActions">Aksi Cepat</p>
         <div class="dashV4-tileRow">
           <button id="mockTestBtn" class="dashV4-tile" type="button"><span class="dashV4-tileIco test"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="4" width="14" height="17" rx="2.2"/><path d="m9 12 2 2 4-4"/></svg></span><span id="quickTileMockTestLabel">Mock Test</span></button>
@@ -1745,6 +1792,7 @@
           <button id="raportBtn" class="dashV4-tile" type="button"><span class="dashV4-tileIco report"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V11"/><path d="M10 20V4"/><path d="M16 20v-6"/></svg></span><span id="quickTileReportLabel">Raport</span></button>
         </div>
 
+        <div class="dashV4-eyebrow" id="eyebrowHistory">RIWAYAT SIMULASI</div>
         <div class="dashRecentHead"><p class="sectionTitle" id="sectionTitleRecentHistory" style="margin-bottom:0">Riwayat Terakhir</p><span class="linkBtn" id="dashSeeAllHistory">Lihat semua →</span></div>
         <div id="dashRecentHistory"></div>
 
@@ -2431,6 +2479,7 @@
           dailyGoal:'Target Harian', progressByLevel:'Progres per Level', quickActions:'Aksi Cepat',
           recentHistory:'Riwayat Terakhir', seeAll:'Lihat semua', report:'Raport',
           accountSection:'Akun', rowLabelTrack:'Track', rowLabelLevel:'Target Level', rowLabelStatus:'Status', rowLabelSub:'Langganan s/d',
+          eyebrowProgress:'PROGRES PER LEVEL', eyebrowQuick:'AKSI CEPAT', eyebrowHistory:'RIWAYAT SIMULASI',
           showPassword:'Tampilkan password', hidePassword:'Sembunyikan password',
           errEmptyFields:'Isi email dan password dulu.', errWrongCredentials:'Email atau password salah.',
           errProfileNotFound:'Profil tidak ditemukan. Hubungi admin.',
@@ -2557,6 +2606,7 @@
           dailyGoal:'Daily Goal', progressByLevel:'Progress by Level', quickActions:'Quick Actions',
           recentHistory:'Recent History', seeAll:'See all', report:'Report',
           accountSection:'Account', rowLabelTrack:'Track', rowLabelLevel:'Target Level', rowLabelStatus:'Status', rowLabelSub:'Subscription until',
+          eyebrowProgress:'PROGRESS BY LEVEL', eyebrowQuick:'QUICK ACTIONS', eyebrowHistory:'SIMULATION HISTORY',
           showPassword:'Show password', hidePassword:'Hide password',
           errEmptyFields:'Please enter your email and password.', errWrongCredentials:'Incorrect email or password.',
           errProfileNotFound:'Profile not found. Please contact admin.',
@@ -2683,6 +2733,7 @@
           dailyGoal:'每日目标', progressByLevel:'各级进度', quickActions:'快捷操作',
           recentHistory:'最近记录', seeAll:'查看全部', report:'成绩单',
           accountSection:'账户', rowLabelTrack:'方向', rowLabelLevel:'目标等级', rowLabelStatus:'状态', rowLabelSub:'订阅至',
+          eyebrowProgress:'各级进度', eyebrowQuick:'快捷操作', eyebrowHistory:'模拟记录',
           showPassword:'显示密码', hidePassword:'隐藏密码',
           errEmptyFields:'请输入邮箱和密码', errWrongCredentials:'邮箱或密码错误',
           errProfileNotFound:'未找到账号资料，请联系管理员',
@@ -2867,8 +2918,6 @@
     $('yourPlanLabel').textContent = t('yourPlanLabel');
     renderContinueSubtitle();
 
-    $('dHello').textContent = t('hi');
-    $('dHelloThere').textContent = t('hiThere');
     $('dGreet').textContent = t('readyToday');
     $('statLabelDue').textContent = t('dueToday');
     $('statLabelStreak').textContent = t('streakDaysLabel');
@@ -2888,6 +2937,9 @@
     $('rowLabelLevel').textContent = t('rowLabelLevel');
     $('rowLabelStatus').textContent = t('rowLabelStatus');
     $('rowLabelSub').textContent = t('rowLabelSub');
+    $('eyebrowProgress').textContent = t('eyebrowProgress');
+    $('eyebrowQuick').textContent = t('eyebrowQuick');
+    $('eyebrowHistory').textContent = t('eyebrowHistory');
 
     $('practiceLevelPrompt').textContent = t('practiceLevelPrompt');
     $('practiceExitBtn1').textContent = t('back');
@@ -7666,6 +7718,36 @@
   $('navRiwayat').addEventListener('click', ()=> navTo(openRiwayat));
   $('navAdmin').addEventListener('click', ()=> navTo(openAdmin));
   $('dashSeeAllHistory').addEventListener('click', ()=> navTo(openRiwayat));
+
+  /* ================================================================
+     DASHBOARD v4 (commit 1, visual-parity) -- micro stars, generate SEKALI aja.
+     Guard via dataset flag (eksplisit, sesuai instruksi) meski top-level init code
+     ini sendiri sudah cuma jalan sekali per page-load. Tidak menyentuh fungsi data. ================================================================ */
+  (function(){
+    const wrap = $('dashV4Dots');
+    if(!wrap || wrap.dataset.dv4Init) return;
+    wrap.dataset.dv4Init = '1';
+    for(let i = 0; i < 30; i++){
+      const sp = document.createElement('span');
+      sp.style.left = (Math.random() * 100) + '%';
+      sp.style.top = (Math.random() * 100) + '%';
+      sp.style.animationDelay = (Math.random() * 5) + 's';
+      wrap.appendChild(sp);
+    }
+  })();
+
+  /* ---------- greeting hanzi, dari jam LOKAL (bukan i18n -- hanzi/pinyin-nya sendiri
+     memang selalu tampil dalam bahasa Mandarin, sama seperti sumber mockup-nya, terlepas
+     dari pilihan bahasa UI). display_name TETAP diisi renderDash() (tidak disentuh),
+     kode ini cuma ganti isi <rb>/<rt> di elemen .dashV4-greetHz. ---------- */
+  (function(){
+    const h = new Date().getHours();
+    const g = h < 11 ? ['早上好', 'ZǍOSHÀNG HǍO']
+      : h < 17 ? ['中午好', 'ZHŌNGWǓ HǍO']
+      : ['晚上好', 'WǍNSHÀNG HǍO'];
+    document.querySelectorAll('.dashV4-greetHz rb').forEach(el => { el.textContent = g[0]; });
+    document.querySelectorAll('.dashV4-greetHz rt').forEach(el => { el.textContent = g[1]; });
+  })();
 
   /* ================================================================
      DASHBOARD v4 -- reveal animation buat .dashV4-card (opacity 0 -> .in).

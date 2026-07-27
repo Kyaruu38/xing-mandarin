@@ -201,6 +201,45 @@ toolbar atau HP asli), cek console (F12) bersih sepanjang interaksi.
 
 ---
 
+## (h) Security: submit_attempt entitlement leak — CLOSED
+
+**Bug**: `submit_attempt()` (SECURITY DEFINER) mengembalikan `answer`+`explanation`
+semua soal non-essay ke caller manapun lewat RPC, tanpa cek `package`/`subscription_end`
+sama sekali (ditemukan `sql/04_rls_snapshot.sql` §6, 2026-07-17). Authenticated user
+dari paket mana pun bisa panggil RPC ini langsung dengan `set_id` di luar entitlement-nya
+dan membaca kunci jawaban lengkap.
+
+**Fix**: `sql/09_submit_attempt_entitlement.sql` — nambah 2 lapis gate di awal fungsi,
+mirror persis `gateReason()` + `PACKAGE_LEVELS` yang sudah ada di `app/index.html`
+(gate langganan admin/expired/past-due, lalu gate level per package). Set di luar
+entitlement → `RAISE EXCEPTION` sebelum query `question_bank`, jadi kunci jawaban
+tidak pernah lolos ke response.
+
+**✅ SUDAH di-apply & diverifikasi manual** di SQL Editor project
+`xzgvhzmmqbijpbrhagjf` oleh Kyaru, tanggal 2026-07-27. Verifikasi:
+- User package `hsk_1_4` submit set `H5XING004` (HSK 5) → **ditolak**,
+  error `'level not included in package'`
+- User package `hsk_1_4` submit set `h1-listening-1` (HSK 1) → **berhasil**,
+  balik JSON review lengkap seperti biasa
+
+`sql/09_submit_attempt_entitlement.sql` sekarang berstatus **arsip/dokumentasi**
+(catatan definisi fungsi yang live di prod), **bukan** pending action lagi.
+
+**Sumber definisi fungsi**: basis awal dari snapshot `sql/04_rls_snapshot.sql` §6
+(2026-07-17), lalu disesuaikan 2 hal setelah dibandingkan dengan definisi live:
+timezone (`current_date` UTC → `(now() at time zone 'Asia/Jakarta')::date`, biar
+gate langganan tidak nge-blok user Indonesia 7 jam lebih awal dari seharusnya)
+dan teks pesan error (disamakan persis ke `'level not included in package'`).
+
+**Sisa masalah (belum ditambal, di luar scope fix ini)**: user tetap bisa menarik
+`correct_answer` untuk set yang MEMANG masuk paketnya sendiri, dengan cara panggil
+`submit_attempt` berulang kali pakai `p_answers` kosong/asal — fix ini cuma menutup
+kebocoran LINTAS-paket/lintas-level, bukan harvesting kunci jawaban dalam satu
+level yang sah diakses. Butuh keputusan produk terpisah (mis. rate-limit per
+set_id, atau pisahkan endpoint "practice/review" dari "scored attempt").
+
+---
+
 ## Catatan proses (bukan buat Anda eksekusi, cuma transparansi)
 
 Sempat ada regresi nyata: `hideAllPages()` rusak total (throw di SETIAP navigasi, termasuk

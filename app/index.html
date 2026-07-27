@@ -1796,15 +1796,13 @@
             </div>
           </div>
 
-          <div class="dashV4-gridFull">
+          <div class="dashV4-card dashV4-gridFull">
             <div class="dashV4-eyebrow" id="eyebrowProgress">PROGRES PER LEVEL</div>
-            <p class="sectionTitle" id="sectionTitleProgress">Progres per Level</p>
             <div class="hskGrid" id="hskGrid"></div>
           </div>
 
-          <div class="dashV4-gridHalf">
+          <div class="dashV4-card dashV4-gridHalf">
             <div class="dashV4-eyebrow" id="eyebrowQuick">AKSI CEPAT</div>
-            <p class="sectionTitle" id="sectionTitleQuickActions">Aksi Cepat</p>
             <div class="dashV4-tileRow">
               <button id="mockTestBtn" class="dashV4-tile" type="button"><span class="dashV4-tileIco test"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="4" width="14" height="17" rx="2.2"/><path d="m9 12 2 2 4-4"/></svg></span><span id="quickTileMockTestLabel">Mock Test</span></button>
               <button id="browseBtn" class="dashV4-tile" type="button"><span class="dashV4-tileIco dict"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5.5A2 2 0 0 1 6 3.5h13v15H6a2 2 0 0 0-2 2z"/><path d="M8 5v14"/></svg></span><span id="quickTileDictLabel">Kamus</span></button>
@@ -1812,20 +1810,20 @@
             </div>
           </div>
 
-          <div class="dashV4-gridHalf">
-            <div class="dashV4-eyebrow" id="eyebrowHistory">RIWAYAT SIMULASI</div>
-            <div class="dashRecentHead"><p class="sectionTitle" id="sectionTitleRecentHistory" style="margin-bottom:0">Riwayat Terakhir</p><span class="linkBtn" id="dashSeeAllHistory">Lihat semua →</span></div>
+          <div class="dashV4-card dashV4-gridHalf">
+            <div class="dashRecentHead" style="margin-top:0">
+              <div class="dashV4-eyebrow" id="eyebrowHistory" style="margin-bottom:0">RIWAYAT SIMULASI</div>
+              <span class="linkBtn" id="dashSeeAllHistory">Lihat semua →</span>
+            </div>
             <div id="dashRecentHistory"></div>
           </div>
 
-          <div class="dashV4-gridFull">
-            <p class="sectionTitle" id="sectionTitleAccount">Akun</p>
-            <div class="dashV4-card">
-              <div class="rowline"><span class="k" id="rowLabelTrack">Track</span><span class="v" id="dTrack">—</span></div>
-              <div class="rowline"><span class="k" id="rowLabelLevel">Target Level</span><span class="v" id="dLevel">—</span></div>
-              <div class="rowline"><span class="k" id="rowLabelStatus">Status</span><span class="pill on" id="dStatus">—</span></div>
-              <div class="rowline" style="border-bottom:none"><span class="k" id="rowLabelSub">Langganan s/d</span><span class="v" id="dSub">—</span></div>
-            </div>
+          <div class="dashV4-card dashV4-gridFull">
+            <div class="dashV4-eyebrow" id="eyebrowAccount">AKUN</div>
+            <div class="rowline"><span class="k" id="rowLabelTrack">Track</span><span class="v" id="dTrack">—</span></div>
+            <div class="rowline"><span class="k" id="rowLabelLevel">Target Level</span><span class="v" id="dLevel">—</span></div>
+            <div class="rowline"><span class="k" id="rowLabelStatus">Status</span><span class="pill on" id="dStatus">—</span></div>
+            <div class="rowline" style="border-bottom:none"><span class="k" id="rowLabelSub">Langganan s/d</span><span class="v" id="dSub">—</span></div>
           </div>
         </div>
 
@@ -2504,7 +2502,7 @@
           dailyGoal:'Target Harian', progressByLevel:'Progres per Level', quickActions:'Aksi Cepat',
           recentHistory:'Riwayat Terakhir', seeAll:'Lihat semua', report:'Raport',
           accountSection:'Akun', rowLabelTrack:'Track', rowLabelLevel:'Target Level', rowLabelStatus:'Status', rowLabelSub:'Langganan s/d',
-          eyebrowProgress:'PROGRES PER LEVEL', eyebrowQuick:'AKSI CEPAT', eyebrowHistory:'RIWAYAT SIMULASI',
+          eyebrowProgress:'PROGRES PER LEVEL', eyebrowQuick:'AKSI CEPAT', eyebrowHistory:'RIWAYAT SIMULASI', eyebrowAccount:'AKUN',
           showPassword:'Tampilkan password', hidePassword:'Sembunyikan password',
           errEmptyFields:'Isi email dan password dulu.', errWrongCredentials:'Email atau password salah.',
           errProfileNotFound:'Profil tidak ditemukan. Hubungi admin.',
@@ -2631,7 +2629,7 @@
           dailyGoal:'Daily Goal', progressByLevel:'Progress by Level', quickActions:'Quick Actions',
           recentHistory:'Recent History', seeAll:'See all', report:'Report',
           accountSection:'Account', rowLabelTrack:'Track', rowLabelLevel:'Target Level', rowLabelStatus:'Status', rowLabelSub:'Subscription until',
-          eyebrowProgress:'PROGRESS BY LEVEL', eyebrowQuick:'QUICK ACTIONS', eyebrowHistory:'SIMULATION HISTORY',
+          eyebrowProgress:'PROGRESS BY LEVEL', eyebrowQuick:'QUICK ACTIONS', eyebrowHistory:'SIMULATION HISTORY', eyebrowAccount:'ACCOUNT',
           showPassword:'Show password', hidePassword:'Hide password',
           errEmptyFields:'Please enter your email and password.', errWrongCredentials:'Incorrect email or password.',
           errProfileNotFound:'Profile not found. Please contact admin.',
@@ -2758,7 +2756,7 @@
           dailyGoal:'每日目标', progressByLevel:'各级进度', quickActions:'快捷操作',
           recentHistory:'最近记录', seeAll:'查看全部', report:'成绩单',
           accountSection:'账户', rowLabelTrack:'方向', rowLabelLevel:'目标等级', rowLabelStatus:'状态', rowLabelSub:'订阅至',
-          eyebrowProgress:'各级进度', eyebrowQuick:'快捷操作', eyebrowHistory:'模拟记录',
+          eyebrowProgress:'各级进度', eyebrowQuick:'快捷操作', eyebrowHistory:'模拟记录', eyebrowAccount:'账户',
           showPassword:'显示密码', hidePassword:'隐藏密码',
           errEmptyFields:'请输入邮箱和密码', errWrongCredentials:'邮箱或密码错误',
           errProfileNotFound:'未找到账号资料，请联系管理员',
@@ -2950,14 +2948,10 @@
     $('statLabelMockDone').textContent = t('mockTestsDone');
     $('continueCardLabel').textContent = t('continuePractice');
     $('dailyGoalLabel').textContent = t('dailyGoal');
-    $('sectionTitleProgress').textContent = t('progressByLevel');
-    $('sectionTitleQuickActions').textContent = t('quickActions');
     $('quickTileMockTestLabel').textContent = t('mockTest');
     $('quickTileDictLabel').textContent = t('materi');
     $('quickTileReportLabel').textContent = t('report');
-    $('sectionTitleRecentHistory').textContent = t('recentHistory');
     $('dashSeeAllHistory').textContent = t('seeAll') + ' →';
-    $('sectionTitleAccount').textContent = t('accountSection');
     $('rowLabelTrack').textContent = t('rowLabelTrack');
     $('rowLabelLevel').textContent = t('rowLabelLevel');
     $('rowLabelStatus').textContent = t('rowLabelStatus');
@@ -2965,6 +2959,7 @@
     $('eyebrowProgress').textContent = t('eyebrowProgress');
     $('eyebrowQuick').textContent = t('eyebrowQuick');
     $('eyebrowHistory').textContent = t('eyebrowHistory');
+    $('eyebrowAccount').textContent = t('eyebrowAccount');
 
     $('practiceLevelPrompt').textContent = t('practiceLevelPrompt');
     $('practiceExitBtn1').textContent = t('back');

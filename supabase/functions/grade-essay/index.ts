@@ -37,6 +37,13 @@ Deno.serve(async (req: Request) => {
   const json = (obj: unknown, status = 200) =>
     new Response(JSON.stringify(obj), { status, headers: { ...cors, "content-type": "application/json" } });
 
+  const MAX_LEN: Record<string, number> = {
+    scene_cn: 200, word: 100, article: 2000, student_text: 3000,
+    prompt: 1000, required_words: 500,
+  };
+  const inputLength = (val: unknown): number =>
+    Array.isArray(val) ? val.join("").length : String(val).length;
+
   try {
     const b = await req.json();
     const { hsk_level, task_type, prompt, required_words, word, article,
@@ -44,6 +51,13 @@ Deno.serve(async (req: Request) => {
 
     if (!student_text || !String(student_text).trim())
       return json({ error: "作答内容为空 / Jawaban kosong" }, 400);
+
+    for (const [key, max] of Object.entries(MAX_LEN)) {
+      const val = b[key];
+      if (val != null && inputLength(val) > max) {
+        return json({ error: `Input terlalu panjang: ${key} (maks ${max} karakter)` }, 400);
+      }
+    }
 
     const system = buildRubric(Number(hsk_level), String(task_type),
       { word, required_words, target_chars, min_chars, scene_cn });

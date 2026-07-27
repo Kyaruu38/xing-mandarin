@@ -5,3 +5,8 @@ design_handoff_xing_mandarin/
 out/
 audio_out/
 __pycache__/
+
+# Secrets / local Supabase CLI state
+.env
+.env.*
+supabase/.temp/

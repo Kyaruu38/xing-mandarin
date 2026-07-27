@@ -661,7 +661,6 @@
     .dashV4-tileIco.report{ background:rgba(91,147,214,.14); color:#5B93D6; }
 
     /* ---- commit 2 additions: compose commit-1 tokens into actual dashboard widgets ---- */
-    .dashV4-statGrid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin-top:22px; }
     .dashV4-statTop{ display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
     .dashV4-statNum{ font-size:30px; font-weight:800; line-height:1; color:var(--text); }
     .dashV4-statIcon{
@@ -718,6 +717,24 @@
     }
     .navItem.active .dashV4-navIco{
       background:linear-gradient(135deg,var(--gold),var(--gold-soft)); color:#1C2A5E;
+    }
+
+    /* ---- commit 2 (visual-parity): 12-kolom grid, scoped ke #dashCard. Tiap "kartu besar"
+       jadi 1 grid item lewat class dashV4-grid{Stat|Continue|Daily|Full|Half}. Tidak menyentuh
+       fungsi data -- restrukturisasi wrapper div doang, semua id tetap sama persis. ---- */
+    .dashV4-grid{ display:grid; grid-template-columns:repeat(12,1fr); gap:22px; margin-top:22px; }
+    .dashV4-gridStat{ grid-column:span 3; }
+    .dashV4-gridContinue{ grid-column:span 8; }
+    .dashV4-gridDaily{ grid-column:span 4; }
+    .dashV4-gridFull{ grid-column:span 12; }
+    .dashV4-gridHalf{ grid-column:span 6; }
+    @media (max-width:1160px){
+      .dashV4-gridStat{ grid-column:span 6; }
+      .dashV4-gridContinue, .dashV4-gridDaily, .dashV4-gridHalf{ grid-column:span 12; }
+    }
+    @media (max-width:760px){
+      .dashV4-grid{ gap:15px; }
+      .dashV4-gridStat, .dashV4-gridContinue, .dashV4-gridDaily, .dashV4-gridFull, .dashV4-gridHalf{ grid-column:span 12; }
     }
 
     /* practice / flashcard -- level picker & empty state have no design comp yet, left as-is */
@@ -1718,8 +1735,8 @@
           </div>
         </div>
 
-        <div class="dashV4-statGrid">
-          <div class="dashV4-card">
+        <div class="dashV4-grid">
+          <div class="dashV4-card dashV4-gridStat">
             <div class="dashV4-statTop">
               <span class="dashV4-statNum" id="dashDue">—</span>
               <span class="dashV4-statIcon due"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5l3 2"/></svg></span>
@@ -1727,7 +1744,7 @@
             <span class="dashV4-statLabel" id="statLabelDue">Due Hari Ini</span>
           </div>
 
-          <div class="dashV4-card">
+          <div class="dashV4-card dashV4-gridStat">
             <div class="dashV4-statTop">
               <span class="dashV4-statNum" id="dashStreak">—</span>
               <span class="dashV4-statIcon streak">🔥</span>
@@ -1735,7 +1752,7 @@
             <span class="dashV4-statLabel" id="statLabelStreak">Streak (hari)</span>
           </div>
 
-          <div class="dashV4-card">
+          <div class="dashV4-card dashV4-gridStat">
             <div class="dashV4-statTop">
               <span class="dashV4-statNum" id="dashMastered">—</span>
               <span class="dashV4-statIcon mastered"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6 9 17l-5-5"/></svg></span>
@@ -1743,65 +1760,73 @@
             <span class="dashV4-statLabel" id="statLabelMastered">Kata Dikuasai</span>
           </div>
 
-          <div class="dashV4-card">
+          <div class="dashV4-card dashV4-gridStat">
             <div class="dashV4-statTop">
               <span class="dashV4-statNum" id="dashMockDone">—</span>
               <span class="dashV4-statIcon mockdone"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="4" width="14" height="17" rx="2.2"/><path d="m9 12 2 2 4-4"/></svg></span>
             </div>
             <span class="dashV4-statLabel" id="statLabelMockDone">Mock Test Selesai</span>
           </div>
-        </div>
 
-        <button id="practiceBtn" class="continueCard" type="button">
-          <div class="continueMoonWrap"><div class="continueMoonGlow"></div><svg width="52" height="52" viewBox="0 0 52 52"><defs><mask id="continueMoonMask"><rect width="52" height="52" fill="#000"/><circle cx="26" cy="26" r="18" fill="#fff"/><circle cx="34" cy="20" r="15" fill="#000"/></mask></defs><circle cx="26" cy="26" r="18" fill="#F2B01E" mask="url(#continueMoonMask)"/></svg></div>
-          <span class="continueStar" style="top:30px; left:430px; width:4px; height:4px;"></span>
-          <span class="continueStar gold" style="top:70px; left:390px; width:3px; height:3px;"></span>
-          <svg class="continueSparkle" style="top:40px; left:520px;" width="13" height="13" viewBox="0 0 24 24" fill="#F7C64D"><path d="M12 0c1 6 5 10 12 12-7 2-11 6-12 12-1-6-5-10-12-12 7-2 11-6 12-12z"/></svg>
-          <div class="continueCardText">
-            <span class="continueCardLabel" id="continueCardLabel">Lanjutkan Latihan</span>
-            <span class="continueCardTitle">Flashcard & SRS · HSK <span id="dContinueLevel">1</span></span>
-            <span class="continueCardSubtitle" id="continueCardSubtitle">—</span>
+          <button id="practiceBtn" class="continueCard dashV4-gridContinue" type="button">
+            <div class="continueMoonWrap"><div class="continueMoonGlow"></div><svg width="52" height="52" viewBox="0 0 52 52"><defs><mask id="continueMoonMask"><rect width="52" height="52" fill="#000"/><circle cx="26" cy="26" r="18" fill="#fff"/><circle cx="34" cy="20" r="15" fill="#000"/></mask></defs><circle cx="26" cy="26" r="18" fill="#F2B01E" mask="url(#continueMoonMask)"/></svg></div>
+            <span class="continueStar" style="top:30px; left:430px; width:4px; height:4px;"></span>
+            <span class="continueStar gold" style="top:70px; left:390px; width:3px; height:3px;"></span>
+            <svg class="continueSparkle" style="top:40px; left:520px;" width="13" height="13" viewBox="0 0 24 24" fill="#F7C64D"><path d="M12 0c1 6 5 10 12 12-7 2-11 6-12 12-1-6-5-10-12-12 7-2 11-6 12-12z"/></svg>
+            <div class="continueCardText">
+              <span class="continueCardLabel" id="continueCardLabel">Lanjutkan Latihan</span>
+              <span class="continueCardTitle">Flashcard & SRS · HSK <span id="dContinueLevel">1</span></span>
+              <span class="continueCardSubtitle" id="continueCardSubtitle">—</span>
+            </div>
+            <span class="continueCardArrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="m13 6 6 6-6 6"/></svg></span>
+          </button>
+
+          <div class="dashV4-card dashV4-dailyGoalCard dashV4-gridDaily">
+            <div class="dashV4-orbitbox" style="width:76px; flex-shrink:0">
+              <svg viewBox="0 0 160 160">
+                <defs><linearGradient id="dv4Grad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F2B01E"/><stop offset="1" stop-color="#F7C657"/></linearGradient></defs>
+                <circle class="dashV4-o-track" cx="80" cy="80" r="68"/>
+                <circle class="dashV4-o-val" id="dashV4DailyRing" cx="80" cy="80" r="68" stroke="url(#dv4Grad)" stroke-dasharray="427.26" stroke-dashoffset="427.26"/>
+              </svg>
+              <div class="dashV4-o-center"><span class="big" id="dashV4DailyPct" style="font-size:17px">0%</span></div>
+            </div>
+            <div class="dashV4-dailyGoalText">
+              <div class="dailyGoalHead"><span id="dailyGoalLabel">Target Harian</span><span id="dashDailyLabel">0 / 20 kata direview hari ini</span></div>
+              <div class="dailyGoalTrack"><div class="dailyGoalFill" id="dashDailyFill"></div></div>
+            </div>
           </div>
-          <span class="continueCardArrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="m13 6 6 6-6 6"/></svg></span>
-        </button>
 
-        <div class="dashV4-card dashV4-dailyGoalCard" style="margin-top:16px">
-          <div class="dashV4-orbitbox" style="width:76px; flex-shrink:0">
-            <svg viewBox="0 0 160 160">
-              <defs><linearGradient id="dv4Grad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F2B01E"/><stop offset="1" stop-color="#F7C657"/></linearGradient></defs>
-              <circle class="dashV4-o-track" cx="80" cy="80" r="68"/>
-              <circle class="dashV4-o-val" id="dashV4DailyRing" cx="80" cy="80" r="68" stroke="url(#dv4Grad)" stroke-dasharray="427.26" stroke-dashoffset="427.26"/>
-            </svg>
-            <div class="dashV4-o-center"><span class="big" id="dashV4DailyPct" style="font-size:17px">0%</span></div>
+          <div class="dashV4-gridFull">
+            <div class="dashV4-eyebrow" id="eyebrowProgress">PROGRES PER LEVEL</div>
+            <p class="sectionTitle" id="sectionTitleProgress">Progres per Level</p>
+            <div class="hskGrid" id="hskGrid"></div>
           </div>
-          <div class="dashV4-dailyGoalText">
-            <div class="dailyGoalHead"><span id="dailyGoalLabel">Target Harian</span><span id="dashDailyLabel">0 / 20 kata direview hari ini</span></div>
-            <div class="dailyGoalTrack"><div class="dailyGoalFill" id="dashDailyFill"></div></div>
+
+          <div class="dashV4-gridHalf">
+            <div class="dashV4-eyebrow" id="eyebrowQuick">AKSI CEPAT</div>
+            <p class="sectionTitle" id="sectionTitleQuickActions">Aksi Cepat</p>
+            <div class="dashV4-tileRow">
+              <button id="mockTestBtn" class="dashV4-tile" type="button"><span class="dashV4-tileIco test"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="4" width="14" height="17" rx="2.2"/><path d="m9 12 2 2 4-4"/></svg></span><span id="quickTileMockTestLabel">Mock Test</span></button>
+              <button id="browseBtn" class="dashV4-tile" type="button"><span class="dashV4-tileIco dict"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5.5A2 2 0 0 1 6 3.5h13v15H6a2 2 0 0 0-2 2z"/><path d="M8 5v14"/></svg></span><span id="quickTileDictLabel">Kamus</span></button>
+              <button id="raportBtn" class="dashV4-tile" type="button"><span class="dashV4-tileIco report"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V11"/><path d="M10 20V4"/><path d="M16 20v-6"/></svg></span><span id="quickTileReportLabel">Raport</span></button>
+            </div>
           </div>
-        </div>
 
-        <div class="dashV4-eyebrow" id="eyebrowProgress">PROGRES PER LEVEL</div>
-        <p class="sectionTitle" id="sectionTitleProgress">Progres per Level</p>
-        <div class="hskGrid" id="hskGrid"></div>
+          <div class="dashV4-gridHalf">
+            <div class="dashV4-eyebrow" id="eyebrowHistory">RIWAYAT SIMULASI</div>
+            <div class="dashRecentHead"><p class="sectionTitle" id="sectionTitleRecentHistory" style="margin-bottom:0">Riwayat Terakhir</p><span class="linkBtn" id="dashSeeAllHistory">Lihat semua →</span></div>
+            <div id="dashRecentHistory"></div>
+          </div>
 
-        <div class="dashV4-eyebrow" id="eyebrowQuick">AKSI CEPAT</div>
-        <p class="sectionTitle" id="sectionTitleQuickActions">Aksi Cepat</p>
-        <div class="dashV4-tileRow">
-          <button id="mockTestBtn" class="dashV4-tile" type="button"><span class="dashV4-tileIco test"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="4" width="14" height="17" rx="2.2"/><path d="m9 12 2 2 4-4"/></svg></span><span id="quickTileMockTestLabel">Mock Test</span></button>
-          <button id="browseBtn" class="dashV4-tile" type="button"><span class="dashV4-tileIco dict"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5.5A2 2 0 0 1 6 3.5h13v15H6a2 2 0 0 0-2 2z"/><path d="M8 5v14"/></svg></span><span id="quickTileDictLabel">Kamus</span></button>
-          <button id="raportBtn" class="dashV4-tile" type="button"><span class="dashV4-tileIco report"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V11"/><path d="M10 20V4"/><path d="M16 20v-6"/></svg></span><span id="quickTileReportLabel">Raport</span></button>
-        </div>
-
-        <div class="dashV4-eyebrow" id="eyebrowHistory">RIWAYAT SIMULASI</div>
-        <div class="dashRecentHead"><p class="sectionTitle" id="sectionTitleRecentHistory" style="margin-bottom:0">Riwayat Terakhir</p><span class="linkBtn" id="dashSeeAllHistory">Lihat semua →</span></div>
-        <div id="dashRecentHistory"></div>
-
-        <p class="sectionTitle" id="sectionTitleAccount">Akun</p>
-        <div class="dashV4-card">
-          <div class="rowline"><span class="k" id="rowLabelTrack">Track</span><span class="v" id="dTrack">—</span></div>
-          <div class="rowline"><span class="k" id="rowLabelLevel">Target Level</span><span class="v" id="dLevel">—</span></div>
-          <div class="rowline"><span class="k" id="rowLabelStatus">Status</span><span class="pill on" id="dStatus">—</span></div>
-          <div class="rowline" style="border-bottom:none"><span class="k" id="rowLabelSub">Langganan s/d</span><span class="v" id="dSub">—</span></div>
+          <div class="dashV4-gridFull">
+            <p class="sectionTitle" id="sectionTitleAccount">Akun</p>
+            <div class="dashV4-card">
+              <div class="rowline"><span class="k" id="rowLabelTrack">Track</span><span class="v" id="dTrack">—</span></div>
+              <div class="rowline"><span class="k" id="rowLabelLevel">Target Level</span><span class="v" id="dLevel">—</span></div>
+              <div class="rowline"><span class="k" id="rowLabelStatus">Status</span><span class="pill on" id="dStatus">—</span></div>
+              <div class="rowline" style="border-bottom:none"><span class="k" id="rowLabelSub">Langganan s/d</span><span class="v" id="dSub">—</span></div>
+            </div>
+          </div>
         </div>
 
         </div>

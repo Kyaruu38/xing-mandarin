@@ -538,6 +538,93 @@
     .historyCardScore.listening{ color:#4A7CBE; background:rgba(91,147,214,.14); }
     .linkBtn:hover{ text-decoration:underline; }
 
+    /* ============================================================
+       DASHBOARD v4 — visual restyle, port dari incoming/dashboard.html.
+       Cuma 4 elemen yang diambil: aurora drift, glass card borderless,
+       gauge orbit, floating pill -- widget mockup yang butuh backend baru
+       (resume session, predicted score, skor per seksi, kata harian,
+       misi+XP) SENGAJA tidak diport. Semua class di sini prefix dashV4-
+       supaya tidak bentrok sama .statCard/.hskCard/dst lama (dibiarkan
+       ada, cuma tidak dipakai lagi di markup baru). renderDash/
+       loadBerandaExtras/dst TIDAK disentuh -- ini murni layer visual.
+
+       Dicek: mockup pakai backdrop-filter:blur(18px) di .side (236px
+       fixed, full height) dan .bottomNav -- resiko rendering di iOS
+       Safari kalau dipasang di elemen besar/full-height. TIDAK diport
+       di sini karena .side/.bottomNav bukan bagian dari 4 elemen di
+       atas. Sidebar & bottomNav app ini sendiri sudah solid
+       (background:var(--panel-2), baris ~270 & ~380), tanpa
+       backdrop-filter -- jadi tidak ada resiko baru maupun existing
+       yang perlu ditambal di scope kerja ini. */
+
+    /* ---- aurora drift -- di-scope ke #dashCard (position:relative),
+       BUKAN position:fixed ke viewport kayak mockup, biar tidak bocor
+       ke halaman lain pas dashCard hidden. Falloff pakai radial-gradient
+       polos, bukan backdrop-filter. ---- */
+    #dashCard{ position:relative; }
+    .dashV4-aurWrap{ position:absolute; inset:0; z-index:0; overflow:hidden; border-radius:var(--radius-lg); pointer-events:none; }
+    .dashV4-aur{ position:absolute; border-radius:50%; }
+    .dashV4-aur.a1{
+      width:44vw; max-width:520px; height:44vw; max-height:520px; left:-14%; top:-18%;
+      background:radial-gradient(circle, rgba(99,118,208,.14) 0%, rgba(99,118,208,.05) 40%, transparent 70%);
+      animation:dashV4Drift1 52s ease-in-out infinite;
+    }
+    .dashV4-aur.a2{
+      width:36vw; max-width:420px; height:36vw; max-height:420px; right:-10%; top:8%;
+      background:radial-gradient(circle, rgba(126,142,220,.1) 0%, rgba(126,142,220,.03) 40%, transparent 68%);
+      animation:dashV4Drift2 64s ease-in-out infinite;
+    }
+    [data-theme="light"] .dashV4-aur.a1{ background:radial-gradient(circle, rgba(140,196,240,.3) 0%, rgba(140,196,240,.1) 40%, transparent 70%); }
+    [data-theme="light"] .dashV4-aur.a2{ background:radial-gradient(circle, rgba(242,176,30,.16) 0%, rgba(242,176,30,.05) 40%, transparent 68%); }
+    @keyframes dashV4Drift1{ 50%{ transform:translate(6%,4%) scale(1.08); } }
+    @keyframes dashV4Drift2{ 50%{ transform:translate(-5%,6%) scale(1.1); } }
+    @media (prefers-reduced-motion: reduce){ .dashV4-aur{ animation:none !important; } }
+    .dashV4-content{ position:relative; z-index:1; }
+
+    /* ---- glass card, borderless (mockup .card) ---- */
+    .dashV4-card{
+      background:var(--panel); border-radius:var(--radius-lg); padding:24px;
+      box-shadow:var(--shadow-lg), inset 0 0 0 1px rgba(var(--text-rgb),.04);
+      position:relative; overflow:hidden;
+    }
+    .dashV4-cardEyebrow{
+      font-size:10.5px; font-weight:800; letter-spacing:.16em; text-transform:uppercase;
+      color:rgba(var(--text-rgb),.45); margin-bottom:14px;
+    }
+
+    /* ---- gauge orbit -- reuse pola ring yang SUDAH ADA di .hskRingProgress (keyframe
+       ringFill, custom property --off/--circ diisi inline style oleh JS render), cuma versi
+       lebih besar + breathing glow di belakang. TIDAK ada JS animasi baru/terpisah. ---- */
+    .dashV4-orbitbox{ position:relative; width:min(168px,100%); margin:0 auto; aspect-ratio:1; }
+    .dashV4-orbitbox::before{
+      content:''; position:absolute; inset:22%; border-radius:50%;
+      background:radial-gradient(circle, rgba(var(--text-rgb),.06), transparent 70%);
+      animation:dashV4Breath 4.5s ease-in-out infinite;
+    }
+    @keyframes dashV4Breath{ 0%,100%{ opacity:.5; transform:scale(.92); } 50%{ opacity:1; transform:scale(1.05); } }
+    @media (prefers-reduced-motion: reduce){ .dashV4-orbitbox::before{ animation:none !important; } }
+    .dashV4-orbitbox svg{ position:relative; width:100%; height:100%; transform:rotate(-90deg); display:block; }
+    .dashV4-o-track{ fill:none; stroke:var(--track); stroke-width:8; }
+    .dashV4-o-val{ fill:none; stroke:var(--gold); stroke-width:8; stroke-linecap:round; stroke-dashoffset:var(--off); animation:ringFill 1.1s ease-out both; }
+    .dashV4-o-center{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+    .dashV4-o-center .big{ font-family:var(--display-font); font-weight:700; font-size:34px; line-height:1; color:var(--text); }
+    .dashV4-o-center .of{ font-size:10.5px; color:rgba(var(--text-rgb),.5); margin-top:2px; }
+
+    /* ---- floating pill (mockup .tile) ---- */
+    .dashV4-tileRow{ display:flex; flex-wrap:wrap; gap:10px; }
+    .dashV4-tile{
+      border-radius:999px; min-height:52px; padding:9px 20px 9px 10px; display:flex; align-items:center; gap:11px;
+      background:var(--panel); box-shadow:var(--shadow-md), inset 0 0 0 1px rgba(var(--text-rgb),.04);
+      transition:transform .25s ease, box-shadow .25s ease; cursor:pointer; border:none; text-align:left;
+      flex:1 1 200px; width:auto;
+    }
+    .dashV4-tile:hover{ transform:translateY(-3px); box-shadow:var(--shadow-lg), inset 0 0 0 1px rgba(var(--text-rgb),.04); }
+    .dashV4-tileIco{
+      width:38px; height:38px; border-radius:50%; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .dashV4-tile span:last-child{ font-size:13px; font-weight:700; color:var(--text); }
+
     /* practice / flashcard -- level picker & empty state have no design comp yet, left as-is */
     .practice{max-width:760px}
     /* source's isPractice block (line 186) has no white card wrapper -- session content floats

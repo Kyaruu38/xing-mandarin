@@ -624,6 +624,24 @@
       display:flex; align-items:center; justify-content:center;
     }
     .dashV4-tile span:last-child{ font-size:13px; font-weight:700; color:var(--text); }
+    .dashV4-tileIco.test{ background:rgba(232,111,82,.14); color:#E86F52; }
+    .dashV4-tileIco.dict{ background:rgba(52,169,138,.14); color:#34A98A; }
+    .dashV4-tileIco.report{ background:rgba(91,147,214,.14); color:#5B93D6; }
+
+    /* ---- commit 2 additions: compose commit-1 tokens into actual dashboard widgets ---- */
+    .dashV4-statGrid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin-top:22px; }
+    .dashV4-statTop{ display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+    .dashV4-statNum{ font-size:30px; font-weight:800; line-height:1; color:var(--text); }
+    .dashV4-statIcon{
+      width:34px; height:34px; border-radius:11px; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .dashV4-statIcon.due{ background:rgba(232,111,82,.14); color:#E86F52; }
+    .dashV4-statIcon.mastered{ background:rgba(52,169,138,.14); color:#34A98A; }
+    .dashV4-statIcon.mockdone{ background:rgba(91,147,214,.14); color:#5B93D6; }
+    .dashV4-statLabel{ display:block; margin-top:10px; font-size:12px; font-weight:700; color:rgba(var(--text-rgb),.6); }
+    .dashV4-statGaugeCard{ display:flex; flex-direction:column; align-items:center; text-align:center; padding:16px; }
+    .dashV4-statGaugeCard .dashV4-statLabel{ margin-top:12px; }
 
     /* practice / flashcard -- level picker & empty state have no design comp yet, left as-is */
     .practice{max-width:760px}
@@ -1598,6 +1616,12 @@
 
       <!-- ============ DASHBOARD / BERANDA ============ -->
       <div id="dashCard" class="pageCard dash hidden">
+        <div class="dashV4-aurWrap" aria-hidden="true">
+          <span class="dashV4-aur a1"></span>
+          <span class="dashV4-aur a2"></span>
+        </div>
+        <div class="dashV4-content">
+
         <div class="pageHeader">
           <img class="dashMascot" id="dashMascot" src="/assets/mascot-sit.png" alt="" />
           <div class="pageHeaderText">
@@ -1615,22 +1639,40 @@
           </div>
         </div>
 
-        <div class="statGrid">
-          <div class="statCard due">
-            <div class="statCardTop"><span class="statCardNum" id="dashDue">—</span><span class="statCardIcon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5l3 2"/></svg></span></div>
-            <span class="statCardLabel" id="statLabelDue">Due Hari Ini</span>
+        <div class="dashV4-statGrid">
+          <div class="dashV4-card">
+            <div class="dashV4-statTop">
+              <span class="dashV4-statNum" id="dashDue">—</span>
+              <span class="dashV4-statIcon due"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5l3 2"/></svg></span>
+            </div>
+            <span class="dashV4-statLabel" id="statLabelDue">Due Hari Ini</span>
           </div>
-          <div class="statCard streak">
-            <div class="statCardTop"><span class="statCardNum" id="dashStreak">—</span><span class="statCardIcon">🔥</span></div>
-            <span class="statCardLabel" id="statLabelStreak">Streak (hari)</span>
+
+          <div class="dashV4-card dashV4-statGaugeCard">
+            <div class="dashV4-orbitbox" style="width:88px">
+              <svg viewBox="0 0 160 160"><circle class="dashV4-o-track" cx="80" cy="80" r="68"/></svg>
+              <div class="dashV4-o-center">
+                <span class="big" id="dashStreak" style="font-size:24px">—</span>
+                <span class="of">🔥</span>
+              </div>
+            </div>
+            <span class="dashV4-statLabel" id="statLabelStreak">Streak (hari)</span>
           </div>
-          <div class="statCard mastered">
-            <div class="statCardTop"><span class="statCardNum" id="dashMastered">—</span><span class="statCardIcon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6 9 17l-5-5"/></svg></span></div>
-            <span class="statCardLabel" id="statLabelMastered">Kata Dikuasai</span>
+
+          <div class="dashV4-card">
+            <div class="dashV4-statTop">
+              <span class="dashV4-statNum" id="dashMastered">—</span>
+              <span class="dashV4-statIcon mastered"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6 9 17l-5-5"/></svg></span>
+            </div>
+            <span class="dashV4-statLabel" id="statLabelMastered">Kata Dikuasai</span>
           </div>
-          <div class="statCard mockdone">
-            <div class="statCardTop"><span class="statCardNum" id="dashMockDone">—</span><span class="statCardIcon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="4" width="14" height="17" rx="2.2"/><path d="m9 12 2 2 4-4"/></svg></span></div>
-            <span class="statCardLabel" id="statLabelMockDone">Mock Test Selesai</span>
+
+          <div class="dashV4-card">
+            <div class="dashV4-statTop">
+              <span class="dashV4-statNum" id="dashMockDone">—</span>
+              <span class="dashV4-statIcon mockdone"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="4" width="14" height="17" rx="2.2"/><path d="m9 12 2 2 4-4"/></svg></span>
+            </div>
+            <span class="dashV4-statLabel" id="statLabelMockDone">Mock Test Selesai</span>
           </div>
         </div>
 
@@ -1647,7 +1689,7 @@
           <span class="continueCardArrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="m13 6 6 6-6 6"/></svg></span>
         </button>
 
-        <div class="dailyGoalCard">
+        <div class="dashV4-card" style="margin-top:16px">
           <div class="dailyGoalHead"><span id="dailyGoalLabel">Target Harian</span><span id="dashDailyLabel">0 / 20 kata direview hari ini</span></div>
           <div class="dailyGoalTrack"><div class="dailyGoalFill" id="dashDailyFill"></div></div>
         </div>
@@ -1656,20 +1698,24 @@
         <div class="hskGrid" id="hskGrid"></div>
 
         <p class="sectionTitle" id="sectionTitleQuickActions">Aksi Cepat</p>
-        <div class="quickGrid">
-          <button id="mockTestBtn" class="quickTile test" type="button"><span class="quickTileIcon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="4" width="14" height="17" rx="2.2"/><path d="m9 12 2 2 4-4"/></svg></span><span id="quickTileMockTestLabel">Mock Test</span></button>
-          <button id="browseBtn" class="quickTile dict" type="button"><span class="quickTileIcon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5.5A2 2 0 0 1 6 3.5h13v15H6a2 2 0 0 0-2 2z"/><path d="M8 5v14"/></svg></span><span id="quickTileDictLabel">Kamus</span></button>
-          <button id="raportBtn" class="quickTile report" type="button"><span class="quickTileIcon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V11"/><path d="M10 20V4"/><path d="M16 20v-6"/></svg></span><span id="quickTileReportLabel">Raport</span></button>
+        <div class="dashV4-tileRow">
+          <button id="mockTestBtn" class="dashV4-tile" type="button"><span class="dashV4-tileIco test"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="4" width="14" height="17" rx="2.2"/><path d="m9 12 2 2 4-4"/></svg></span><span id="quickTileMockTestLabel">Mock Test</span></button>
+          <button id="browseBtn" class="dashV4-tile" type="button"><span class="dashV4-tileIco dict"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5.5A2 2 0 0 1 6 3.5h13v15H6a2 2 0 0 0-2 2z"/><path d="M8 5v14"/></svg></span><span id="quickTileDictLabel">Kamus</span></button>
+          <button id="raportBtn" class="dashV4-tile" type="button"><span class="dashV4-tileIco report"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V11"/><path d="M10 20V4"/><path d="M16 20v-6"/></svg></span><span id="quickTileReportLabel">Raport</span></button>
         </div>
 
         <div class="dashRecentHead"><p class="sectionTitle" id="sectionTitleRecentHistory" style="margin-bottom:0">Riwayat Terakhir</p><span class="linkBtn" id="dashSeeAllHistory">Lihat semua →</span></div>
         <div id="dashRecentHistory"></div>
 
-        <p class="sectionTitle">Akun</p>
-        <div class="rowline"><span class="k">Track</span><span class="v" id="dTrack">—</span></div>
-        <div class="rowline"><span class="k">Target Level</span><span class="v" id="dLevel">—</span></div>
-        <div class="rowline"><span class="k">Status</span><span class="pill on" id="dStatus">—</span></div>
-        <div class="rowline"><span class="k">Langganan s/d</span><span class="v" id="dSub">—</span></div>
+        <p class="sectionTitle" id="sectionTitleAccount">Akun</p>
+        <div class="dashV4-card">
+          <div class="rowline"><span class="k" id="rowLabelTrack">Track</span><span class="v" id="dTrack">—</span></div>
+          <div class="rowline"><span class="k" id="rowLabelLevel">Target Level</span><span class="v" id="dLevel">—</span></div>
+          <div class="rowline"><span class="k" id="rowLabelStatus">Status</span><span class="pill on" id="dStatus">—</span></div>
+          <div class="rowline" style="border-bottom:none"><span class="k" id="rowLabelSub">Langganan s/d</span><span class="v" id="dSub">—</span></div>
+        </div>
+
+        </div>
       </div>
 
       <!-- ============ PRACTICE (FLASHCARD + SRS) ============ -->
@@ -2343,6 +2389,7 @@
           wordsMastered:'Kata Dikuasai', mockTestsDone:'Mock Test Selesai', continuePractice:'Lanjutkan Latihan',
           dailyGoal:'Target Harian', progressByLevel:'Progres per Level', quickActions:'Aksi Cepat',
           recentHistory:'Riwayat Terakhir', seeAll:'Lihat semua', report:'Raport',
+          accountSection:'Akun', rowLabelTrack:'Track', rowLabelLevel:'Target Level', rowLabelStatus:'Status', rowLabelSub:'Langganan s/d',
           showPassword:'Tampilkan password', hidePassword:'Sembunyikan password',
           errEmptyFields:'Isi email dan password dulu.', errWrongCredentials:'Email atau password salah.',
           errProfileNotFound:'Profil tidak ditemukan. Hubungi admin.',
@@ -2468,6 +2515,7 @@
           wordsMastered:'Words Mastered', mockTestsDone:'Mock Tests Done', continuePractice:'Continue Practice',
           dailyGoal:'Daily Goal', progressByLevel:'Progress by Level', quickActions:'Quick Actions',
           recentHistory:'Recent History', seeAll:'See all', report:'Report',
+          accountSection:'Account', rowLabelTrack:'Track', rowLabelLevel:'Target Level', rowLabelStatus:'Status', rowLabelSub:'Subscription until',
           showPassword:'Show password', hidePassword:'Hide password',
           errEmptyFields:'Please enter your email and password.', errWrongCredentials:'Incorrect email or password.',
           errProfileNotFound:'Profile not found. Please contact admin.',
@@ -2593,6 +2641,7 @@
           wordsMastered:'已掌握词汇', mockTestsDone:'已完成模拟', continuePractice:'继续练习',
           dailyGoal:'每日目标', progressByLevel:'各级进度', quickActions:'快捷操作',
           recentHistory:'最近记录', seeAll:'查看全部', report:'成绩单',
+          accountSection:'账户', rowLabelTrack:'方向', rowLabelLevel:'目标等级', rowLabelStatus:'状态', rowLabelSub:'订阅至',
           showPassword:'显示密码', hidePassword:'隐藏密码',
           errEmptyFields:'请输入邮箱和密码', errWrongCredentials:'邮箱或密码错误',
           errProfileNotFound:'未找到账号资料，请联系管理员',
@@ -2793,6 +2842,11 @@
     $('quickTileReportLabel').textContent = t('report');
     $('sectionTitleRecentHistory').textContent = t('recentHistory');
     $('dashSeeAllHistory').textContent = t('seeAll') + ' →';
+    $('sectionTitleAccount').textContent = t('accountSection');
+    $('rowLabelTrack').textContent = t('rowLabelTrack');
+    $('rowLabelLevel').textContent = t('rowLabelLevel');
+    $('rowLabelStatus').textContent = t('rowLabelStatus');
+    $('rowLabelSub').textContent = t('rowLabelSub');
 
     $('practiceLevelPrompt').textContent = t('practiceLevelPrompt');
     $('practiceExitBtn1').textContent = t('back');

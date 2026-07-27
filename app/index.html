@@ -602,10 +602,12 @@
     @media (prefers-reduced-motion: reduce){ .dashV4-aur{ animation:none !important; } }
     .dashV4-content{ position:relative; z-index:1; }
 
-    /* ---- glass card, borderless (mockup .card) -- background PAKAI --dv4-panel (translucent),
-       ini yang bikin efek glass -- --panel global TIDAK disentuh. ---- */
+    /* ---- glass card shell -- NILAI PERSIS dari incoming/dashboard.html .card (radius 28px,
+       padding 26px, shadow, hairline, mobile override 22px/24px) -- BUKAN disesuaikan ke markup
+       lama, sesuai instruksi "salin apa adanya". background PAKAI --dv4-panel (translucent) --
+       --panel global TIDAK disentuh. ---- */
     .dashV4-card{
-      background:var(--dv4-panel); border-radius:28px; padding:24px;
+      background:var(--dv4-panel); border-radius:28px; padding:26px;
       box-shadow:var(--dv4-shadow), inset 0 0 0 1px var(--dv4-hairline);
       position:relative; overflow:hidden;
       opacity:0; transform:translateY(16px) scale(.985);
@@ -614,33 +616,97 @@
     .dashV4-card.in{ opacity:1; transform:none; }
     .dashV4-card:hover{ transform:translateY(-5px); box-shadow:var(--dv4-shadow-hover), inset 0 0 0 1px var(--dv4-hairline); }
     .dashV4-card.in:hover{ transform:translateY(-5px); }
+    @media (max-width:760px){ .dashV4-card{ padding:22px; border-radius:24px; } }
     @media (prefers-reduced-motion: reduce){
       .dashV4-card{ opacity:1 !important; transform:none !important; transition:box-shadow .3s ease !important; }
     }
-    .dashV4-cardEyebrow{
-      font-size:10.5px; font-weight:800; letter-spacing:.16em; text-transform:uppercase;
-      color:rgba(var(--text-rgb),.45); margin-bottom:14px;
+    /* card-eyebrow -- NILAI PERSIS mockup: mono 9.5px, letter-spacing .22em */
+    .dashV4-eyebrow{
+      font-family:var(--dv4-mono); font-size:9.5px; letter-spacing:.22em;
+      color:var(--muted); margin-bottom:17px;
     }
 
-    /* ---- gauge orbit -- dipakai Target Harian (nilai REAL, lihat script). Track pakai ring
-       polos yang sudah ada polanya (breathing glow di belakang); arc (.dashV4-o-val) di-drive via
-       transition:stroke-dashoffset (BUKAN keyframe ringFill) karena nilainya bisa berubah lagi
-       setelah render pertama (reaktif ke data), beda dari hskRingProgress yang sekali render final. ---- */
+    /* micro stars -- NILAI PERSIS mockup (30 titik, top 0-72%, scale .6-1.7, delay 0-5s),
+       di-generate SEKALI oleh JS (guard flag), scoped absolute di #dashCard (bukan fixed).
+       Default (light) tidak dapat animation sama sekali (bukan cuma opacity:0). */
+    .dashV4-dots{ position:absolute; inset:0; z-index:0; overflow:hidden; pointer-events:none; }
+    .dashV4-dots span{
+      position:absolute; width:3px; height:3px; border-radius:50%;
+      background:var(--gold); box-shadow:0 0 6px rgba(242,205,126,.5);
+      opacity:0; transition:opacity .4s ease;
+    }
+    [data-theme="dark"] .dashV4-dots span{ animation:dashV4Twinkle 5s ease-in-out infinite; }
+    @keyframes dashV4Twinkle{ 0%,100%{ opacity:.28; } 50%{ opacity:.85; } }
+    @media (prefers-reduced-motion: reduce){ [data-theme="dark"] .dashV4-dots span{ animation:none; opacity:.5; } }
+
+    /* ---- RESUME hero -- dipakai buat "Lanjutkan Latihan" (Continue Practice prod) ---- */
+    .dashV4-resumeTop{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+    .dashV4-resumeTop h2{ font-family:var(--display-font); font-weight:700; font-size:23px; line-height:1.2; color:var(--text); }
+    .dashV4-resumeSub{ font-family:var(--dv4-mono); font-size:11px; color:var(--muted); margin-top:5px; letter-spacing:.06em; }
+    .dashV4-resumeActions{ display:flex; gap:12px; margin-top:20px; flex-wrap:wrap; }
+
+    /* ---- GAUGE orbit -- dipakai "Prediksi" (rata-rata 3 attempt terakhir, data yang SUDAH
+       dirender loadBerandaExtras() di #dashRecentHistory -- dibaca via observer, bukan query baru). ---- */
     .dashV4-orbitbox{ position:relative; width:min(168px,100%); margin:0 auto; aspect-ratio:1; }
     .dashV4-orbitbox::before{
-      content:''; position:absolute; inset:22%; border-radius:50%;
+      content:''; position:absolute; inset:24%; border-radius:50%;
       background:radial-gradient(circle, rgba(var(--text-rgb),.06), transparent 70%);
       animation:dashV4Breath 4.5s ease-in-out infinite;
     }
     @keyframes dashV4Breath{ 0%,100%{ opacity:.5; transform:scale(.92); } 50%{ opacity:1; transform:scale(1.05); } }
     @media (prefers-reduced-motion: reduce){ .dashV4-orbitbox::before{ animation:none !important; } }
-    .dashV4-orbitbox svg{ position:relative; width:100%; height:100%; transform:rotate(-90deg); display:block; }
-    .dashV4-o-track{ fill:none; stroke:var(--track); stroke-width:8; }
+    .dashV4-orbitbox svg{ position:relative; width:100%; height:100%; overflow:visible; transform:rotate(-90deg); display:block; }
+    .dashV4-o-track{ fill:none; stroke:var(--track); stroke-width:8; stroke-linecap:round; }
     .dashV4-o-val{ fill:none; stroke-width:8; stroke-linecap:round; transition:stroke-dashoffset 1s ease-out; }
     @media (prefers-reduced-motion: reduce){ .dashV4-o-val{ transition:none; } }
     .dashV4-o-center{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
-    .dashV4-o-center .big{ font-family:var(--display-font); font-weight:700; font-size:34px; line-height:1; color:var(--text); }
-    .dashV4-o-center .of{ font-size:10.5px; color:rgba(var(--text-rgb),.5); margin-top:2px; }
+    .dashV4-o-center .big{ font-family:var(--display-font); font-weight:700; font-size:34px; line-height:1; color:var(--text); font-variant-numeric:tabular-nums; }
+    .dashV4-o-center .of{ font-family:var(--dv4-mono); font-size:9.5px; color:var(--muted); letter-spacing:.08em; margin-top:2px; }
+    .dashV4-gaugeFoot{ margin-top:16px; font-size:12px; color:var(--muted); display:flex; flex-direction:column; gap:5px; text-align:center; }
+    .dashV4-seal{
+      position:absolute; top:18px; right:18px; width:48px; height:48px; background:var(--danger); border-radius:12px;
+      color:#FFF; display:flex; align-items:center; justify-content:center; font-family:var(--hanzi-serif-font);
+      font-weight:900; font-size:16px; box-shadow:0 10px 24px rgba(0,0,0,.25);
+      opacity:0; transform:scale(1.6) rotate(14deg); transition:opacity .3s, transform .3s;
+    }
+    .dashV4-seal.show{ opacity:1; transform:scale(1) rotate(8deg); }
+
+    /* ---- SKILL -- "Skor per Seksi" (agregat 3 attempt terakhir per section, sama sumber data
+       dengan gauge). Bar netral (--text-rgb) buat track, gold SOLID buat fill (bukan gold alpha). ---- */
+    .dashV4-skill{ margin-bottom:15px; }
+    .dashV4-skill:last-of-type{ margin-bottom:0; }
+    .dashV4-skillTop{ display:flex; align-items:baseline; justify-content:space-between; margin-bottom:7px; font-size:12.5px; font-weight:700; }
+    .dashV4-skillTop .v{ font-family:var(--dv4-mono); font-size:11.5px; color:var(--muted); font-weight:400; }
+    .dashV4-skillTop .v b{ color:var(--text); font-size:13px; }
+    .dashV4-skillBar{ height:7px; border-radius:99px; background:rgba(var(--text-rgb),.1); }
+    .dashV4-skillBar i{ display:block; height:100%; width:0; border-radius:99px; background:var(--gold); transition:width 1.1s cubic-bezier(.22,1,.36,1); }
+
+    /* ---- MISI HARI INI -- checklist mockup, isi Target Harian real, TANPA XP ---- */
+    .dashV4-missionHead{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px; }
+    .dashV4-missionHead b{ font-size:13px; font-weight:800; }
+    .dashV4-missionHead span{ font-family:var(--dv4-mono); font-size:10.5px; color:var(--muted); }
+    .dashV4-mission{
+      display:flex; align-items:center; gap:13px; min-height:48px; padding:9px 12px; border-radius:16px;
+      font-size:13.5px; font-weight:600;
+    }
+    .dashV4-mission .box{
+      width:24px; height:24px; border-radius:50%; flex-shrink:0; box-shadow:inset 0 0 0 1.6px var(--track);
+      display:flex; align-items:center; justify-content:center; font-size:11px; color:transparent;
+    }
+    .dashV4-mission.done .box{ background:var(--gold); box-shadow:none; color:#1C2A5E; }
+    .dashV4-mission.done .t{ opacity:.6; }
+
+    /* ---- KATA HARI INI -- 1 kata dari browseCache (kalau ada), deterministik per hari ---- */
+    .dashV4-wod{ display:flex; flex-direction:column; }
+    .dashV4-wodHz{ font-family:var(--hanzi-serif-font); font-weight:900; font-size:40px; line-height:1.15; }
+    .dashV4-wodHz rb{
+      background:linear-gradient(140deg,#F09000,var(--gold) 55%,var(--gold-soft));
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+    }
+    .dashV4-wodHz rt{ font-family:var(--dv4-mono); font-size:9.5px; letter-spacing:.18em; color:var(--muted); }
+    .dashV4-wodMean{ margin-top:10px; }
+    .dashV4-wodMean b{ display:block; font-size:14.5px; }
+    .dashV4-wodMean span{ font-size:12px; color:var(--muted); }
 
     /* ---- floating pill (mockup .tile) -- background PAKAI --dv4-panel juga ---- */
     .dashV4-tileRow{ display:flex; flex-wrap:wrap; gap:10px; }
@@ -660,7 +726,8 @@
     .dashV4-tileIco.dict{ background:rgba(52,169,138,.14); color:#34A98A; }
     .dashV4-tileIco.report{ background:rgba(91,147,214,.14); color:#5B93D6; }
 
-    /* ---- commit 2 additions: compose commit-1 tokens into actual dashboard widgets ---- */
+    /* ---- 4 stat card prod (Due/Streak/Mastered/MockDone) -- bahasa visual sama, widget ini
+       tidak ada padanan di mockup. ---- */
     .dashV4-statTop{ display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
     .dashV4-statNum{ font-size:30px; font-weight:800; line-height:1; color:var(--text); }
     .dashV4-statIcon{
@@ -672,30 +739,18 @@
     .dashV4-statIcon.mastered{ background:rgba(52,169,138,.14); color:#34A98A; }
     .dashV4-statIcon.mockdone{ background:rgba(91,147,214,.14); color:#5B93D6; }
     .dashV4-statLabel{ display:block; margin-top:10px; font-size:12px; font-weight:700; color:rgba(var(--text-rgb),.6); }
-    /* gauge orbit dipindah ke Target Harian (bukan Streak lagi) -- lihat .dashV4-dailyGoalCard */
-    .dashV4-dailyGoalCard{ display:flex; align-items:center; gap:18px; }
-    .dashV4-dailyGoalText{ flex:1; min-width:0; }
 
-    /* ---- commit 1 (visual-parity): micro stars, eyebrow mono label, greeting hanzi, sidebar
-       hanzi nav -- semua scoped ke #dashCard / .sidebar, tidak menyentuh fungsi data. ---- */
+    /* ---- empty state generik dalam card v4 (Prediksi/Skor Seksi/Kata Hari Ini kosong) ---- */
+    .dashV4-cardEmpty{ font-size:13px; color:rgba(var(--text-rgb),.5); text-align:center; padding:20px 0; }
 
-    /* micro stars -- 30 titik, di-generate SEKALI oleh JS (guard flag), scoped absolute di
-       dalam #dashCard (BUKAN fixed ke viewport). Default (light, :root) TIDAK dapat animation
-       sama sekali (bukan cuma opacity:0) supaya nggak perlu !important buat ngalahin animation. */
-    .dashV4-dots{ position:absolute; inset:0; z-index:0; overflow:hidden; pointer-events:none; }
-    .dashV4-dots span{
-      position:absolute; width:3px; height:3px; border-radius:50%;
-      background:var(--gold); box-shadow:0 0 6px rgba(242,205,126,.5);
-      opacity:0; transition:opacity .4s ease;
-    }
-    [data-theme="dark"] .dashV4-dots span{ animation:dashV4Twinkle 5s ease-in-out infinite; }
-    @keyframes dashV4Twinkle{ 0%,100%{ opacity:.28; } 50%{ opacity:.85; } }
-    @media (prefers-reduced-motion: reduce){ [data-theme="dark"] .dashV4-dots span{ animation:none; opacity:.5; } }
-
-    /* label mono uppercase, dipasang di atas card/section besar */
-    .dashV4-eyebrow{
-      font-family:var(--dv4-mono); font-size:9.5px; letter-spacing:.22em;
-      color:var(--muted); margin-bottom:8px;
+    /* ---- CTA kecil buat Resume card -- app/index.html tidak punya .btn/.btn-gold (itu
+       konvensi landing.html/mockup), jadi dibikin versi ringkas sendiri, NILAI dari mockup
+       .btn/.btn-gold. Gold gradient SOLID (2 warna gold opak), bukan fill transparan. ---- */
+    .dashV4-btnGold{
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      min-height:44px; padding:11px 22px; border-radius:999px; font-weight:700; font-size:13px;
+      background:linear-gradient(120deg,var(--gold),var(--gold-soft)); color:#1C2A5E;
+      box-shadow:0 8px 20px rgba(0,0,0,.18);
     }
 
     /* greeting hanzi + pinyin kecil di atas (native <ruby>/<rb>/<rt>) */
@@ -719,22 +774,25 @@
       background:linear-gradient(135deg,var(--gold),var(--gold-soft)); color:#1C2A5E;
     }
 
-    /* ---- commit 2 (visual-parity): 12-kolom grid, scoped ke #dashCard. Tiap "kartu besar"
-       jadi 1 grid item lewat class dashV4-grid{Stat|Continue|Daily|Full|Half}. Tidak menyentuh
-       fungsi data -- restrukturisasi wrapper div doang, semua id tetap sama persis. ---- */
+    /* ---- 12-kolom grid, scoped ke #dashCard, NILAI PERSIS mockup (repeat(12,1fr), gap 22px,
+       breakpoint 1160px/760px). Tiap "kartu besar" 1 grid item lewat class dashV4-grid{Stat|
+       Continue|Sm|Full|Half}. Desktop: tiap baris kelipatan 12 (8+4, 4+4+4, 12, 12, 3x4, 6+6).
+       Tablet: instruksi eksplisit "stat span 6, sisanya span 12" -- dipakai literal, override
+       breakpoint asli mockup punya gauge/skill/day/word (yang aslinya span 6 di tablet). Mobile:
+       semua span 12, sama seperti mockup (grid-template-columns collapse ke 1fr). ---- */
     .dashV4-grid{ display:grid; grid-template-columns:repeat(12,1fr); gap:22px; margin-top:22px; }
     .dashV4-gridStat{ grid-column:span 3; }
     .dashV4-gridContinue{ grid-column:span 8; }
-    .dashV4-gridDaily{ grid-column:span 4; }
+    .dashV4-gridSm{ grid-column:span 4; }
     .dashV4-gridFull{ grid-column:span 12; }
     .dashV4-gridHalf{ grid-column:span 6; }
     @media (max-width:1160px){
       .dashV4-gridStat{ grid-column:span 6; }
-      .dashV4-gridContinue, .dashV4-gridDaily, .dashV4-gridHalf{ grid-column:span 12; }
+      .dashV4-gridContinue, .dashV4-gridSm, .dashV4-gridFull, .dashV4-gridHalf{ grid-column:span 12; }
     }
     @media (max-width:760px){
-      .dashV4-grid{ gap:15px; }
-      .dashV4-gridStat, .dashV4-gridContinue, .dashV4-gridDaily, .dashV4-gridFull, .dashV4-gridHalf{ grid-column:span 12; }
+      .dashV4-grid{ grid-template-columns:1fr; gap:15px; }
+      .dashV4-gridStat, .dashV4-gridContinue, .dashV4-gridSm, .dashV4-gridFull, .dashV4-gridHalf{ grid-column:span 1; }
     }
 
     /* practice / flashcard -- level picker & empty state have no design comp yet, left as-is */
@@ -1736,6 +1794,83 @@
         </div>
 
         <div class="dashV4-grid">
+          <!-- ROW 1: Lanjutkan Latihan (mockup c-resume, repurpose ke Continue Practice prod) + Prediksi (mockup c-gauge, avg 3 attempt terakhir) -->
+          <button id="practiceBtn" class="dashV4-card dashV4-gridContinue" type="button" style="text-align:left; cursor:pointer;">
+            <div class="dashV4-eyebrow" id="eyebrowResume">LANJUTKAN LATIHAN</div>
+            <div class="dashV4-resumeTop">
+              <div>
+                <h2><span class="continueCardTitle">Flashcard & SRS · HSK <span id="dContinueLevel">1</span></span></h2>
+                <p class="dashV4-resumeSub" id="continueCardSubtitle">—</p>
+              </div>
+            </div>
+            <div class="dashV4-resumeActions">
+              <span class="dashV4-btnGold" id="continueCardLabel">Lanjutkan Latihan</span>
+            </div>
+          </button>
+
+          <div class="dashV4-card dashV4-gridSm" style="text-align:center">
+            <div class="dashV4-eyebrow" id="eyebrowGauge">PREDIKSI SKOR</div>
+            <div class="dashV4-orbitbox" id="dashV4GaugeBox">
+              <svg viewBox="0 0 200 200">
+                <defs><linearGradient id="dv4GaugeGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F2B01E"/><stop offset="1" stop-color="#F7C657"/></linearGradient></defs>
+                <circle class="dashV4-o-track" cx="100" cy="100" r="84"/>
+                <circle class="dashV4-o-val" id="dashV4GaugeRing" cx="100" cy="100" r="84" stroke="url(#dv4GaugeGrad)" stroke-dasharray="527.79" stroke-dashoffset="527.79"/>
+              </svg>
+              <div class="dashV4-o-center">
+                <span class="big" id="dashV4GaugeNum">—</span>
+                <span class="of">%</span>
+              </div>
+              <div class="dashV4-seal" id="dashV4Seal">及格</div>
+            </div>
+            <div class="dashV4-gaugeFoot" id="dashV4GaugeFoot">
+              <span id="gaugeAvgLabel">Rata-rata 3 simulasi terakhir</span>
+              <span id="gaugePassLine">Standar lulus: 60%</span>
+            </div>
+            <div class="dashV4-cardEmpty hidden" id="dashV4GaugeEmpty">Belum ada simulasi</div>
+          </div>
+
+          <!-- ROW 2: Skor per Seksi (mockup c-skill) + Misi Harian (mockup c-day, isi Daily Goal real) + Kata Hari Ini (mockup c-word, kondisional) -->
+          <div class="dashV4-card dashV4-gridSm">
+            <div class="dashV4-eyebrow" id="eyebrowSkill">SKOR PER SEKSI</div>
+            <div id="dashV4SkillBody">
+              <div class="dashV4-cardEmpty" id="dashV4SkillEmpty">Belum ada data skor per seksi</div>
+            </div>
+          </div>
+
+          <div class="dashV4-card dashV4-gridSm">
+            <div class="dashV4-eyebrow" id="eyebrowMissions">MISI HARI INI</div>
+            <div class="dashV4-missionHead"><b id="dailyGoalLabel">Target Harian</b><span id="dashDailyLabel">0 / 20 kata direview hari ini</span></div>
+            <button type="button" class="dashV4-mission" id="dashV4MissionItem">
+              <span class="box">✓</span><span class="t" id="dashV4MissionText">—</span>
+            </button>
+            <div class="dailyGoalTrack hidden"><div class="dailyGoalFill" id="dashDailyFill"></div></div>
+          </div>
+
+          <div class="dashV4-card dashV4-gridSm hidden" id="dashV4WordCard">
+            <div class="dashV4-eyebrow" id="eyebrowWord">KATA HARI INI</div>
+            <div class="dashV4-wod">
+              <div class="dashV4-wodHz"><ruby><rb id="dashV4WordHz">—</rb><rt id="dashV4WordPy">—</rt></ruby></div>
+              <div class="dashV4-wodMean"><b id="dashV4WordMean">—</b></div>
+            </div>
+          </div>
+
+          <!-- ROW 3: Materi & Latihan (mockup c-mat, Quick Actions prod sebagai floating pill) -->
+          <div class="dashV4-card dashV4-gridFull">
+            <div class="dashV4-eyebrow" id="eyebrowMat">MATERI & LATIHAN</div>
+            <div class="dashV4-tileRow">
+              <button id="mockTestBtn" class="dashV4-tile" type="button"><span class="dashV4-tileIco test"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="4" width="14" height="17" rx="2.2"/><path d="m9 12 2 2 4-4"/></svg></span><span id="quickTileMockTestLabel">Mock Test</span></button>
+              <button id="browseBtn" class="dashV4-tile" type="button"><span class="dashV4-tileIco dict"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5.5A2 2 0 0 1 6 3.5h13v15H6a2 2 0 0 0-2 2z"/><path d="M8 5v14"/></svg></span><span id="quickTileDictLabel">Kamus</span></button>
+              <button id="raportBtn" class="dashV4-tile" type="button"><span class="dashV4-tileIco report"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V11"/><path d="M10 20V4"/><path d="M16 20v-6"/></svg></span><span id="quickTileReportLabel">Raport</span></button>
+            </div>
+          </div>
+
+          <!-- ROW 4: hskGrid -- widget prod, tidak ada padanan mockup, bahasa visual sama (card+eyebrow) -->
+          <div class="dashV4-card dashV4-gridFull">
+            <div class="dashV4-eyebrow" id="eyebrowProgress">PROGRES PER LEVEL</div>
+            <div class="hskGrid" id="hskGrid"></div>
+          </div>
+
+          <!-- ROW 5: 4 stat prod -- tidak ada padanan mockup -->
           <div class="dashV4-card dashV4-gridStat">
             <div class="dashV4-statTop">
               <span class="dashV4-statNum" id="dashDue">—</span>
@@ -1768,48 +1903,7 @@
             <span class="dashV4-statLabel" id="statLabelMockDone">Mock Test Selesai</span>
           </div>
 
-          <button id="practiceBtn" class="continueCard dashV4-gridContinue" type="button">
-            <div class="continueMoonWrap"><div class="continueMoonGlow"></div><svg width="52" height="52" viewBox="0 0 52 52"><defs><mask id="continueMoonMask"><rect width="52" height="52" fill="#000"/><circle cx="26" cy="26" r="18" fill="#fff"/><circle cx="34" cy="20" r="15" fill="#000"/></mask></defs><circle cx="26" cy="26" r="18" fill="#F2B01E" mask="url(#continueMoonMask)"/></svg></div>
-            <span class="continueStar" style="top:30px; left:430px; width:4px; height:4px;"></span>
-            <span class="continueStar gold" style="top:70px; left:390px; width:3px; height:3px;"></span>
-            <svg class="continueSparkle" style="top:40px; left:520px;" width="13" height="13" viewBox="0 0 24 24" fill="#F7C64D"><path d="M12 0c1 6 5 10 12 12-7 2-11 6-12 12-1-6-5-10-12-12 7-2 11-6 12-12z"/></svg>
-            <div class="continueCardText">
-              <span class="continueCardLabel" id="continueCardLabel">Lanjutkan Latihan</span>
-              <span class="continueCardTitle">Flashcard & SRS · HSK <span id="dContinueLevel">1</span></span>
-              <span class="continueCardSubtitle" id="continueCardSubtitle">—</span>
-            </div>
-            <span class="continueCardArrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="m13 6 6 6-6 6"/></svg></span>
-          </button>
-
-          <div class="dashV4-card dashV4-dailyGoalCard dashV4-gridDaily">
-            <div class="dashV4-orbitbox" style="width:76px; flex-shrink:0">
-              <svg viewBox="0 0 160 160">
-                <defs><linearGradient id="dv4Grad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F2B01E"/><stop offset="1" stop-color="#F7C657"/></linearGradient></defs>
-                <circle class="dashV4-o-track" cx="80" cy="80" r="68"/>
-                <circle class="dashV4-o-val" id="dashV4DailyRing" cx="80" cy="80" r="68" stroke="url(#dv4Grad)" stroke-dasharray="427.26" stroke-dashoffset="427.26"/>
-              </svg>
-              <div class="dashV4-o-center"><span class="big" id="dashV4DailyPct" style="font-size:17px">0%</span></div>
-            </div>
-            <div class="dashV4-dailyGoalText">
-              <div class="dailyGoalHead"><span id="dailyGoalLabel">Target Harian</span><span id="dashDailyLabel">0 / 20 kata direview hari ini</span></div>
-              <div class="dailyGoalTrack"><div class="dailyGoalFill" id="dashDailyFill"></div></div>
-            </div>
-          </div>
-
-          <div class="dashV4-card dashV4-gridFull">
-            <div class="dashV4-eyebrow" id="eyebrowProgress">PROGRES PER LEVEL</div>
-            <div class="hskGrid" id="hskGrid"></div>
-          </div>
-
-          <div class="dashV4-card dashV4-gridHalf">
-            <div class="dashV4-eyebrow" id="eyebrowQuick">AKSI CEPAT</div>
-            <div class="dashV4-tileRow">
-              <button id="mockTestBtn" class="dashV4-tile" type="button"><span class="dashV4-tileIco test"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="4" width="14" height="17" rx="2.2"/><path d="m9 12 2 2 4-4"/></svg></span><span id="quickTileMockTestLabel">Mock Test</span></button>
-              <button id="browseBtn" class="dashV4-tile" type="button"><span class="dashV4-tileIco dict"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5.5A2 2 0 0 1 6 3.5h13v15H6a2 2 0 0 0-2 2z"/><path d="M8 5v14"/></svg></span><span id="quickTileDictLabel">Kamus</span></button>
-              <button id="raportBtn" class="dashV4-tile" type="button"><span class="dashV4-tileIco report"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V11"/><path d="M10 20V4"/><path d="M16 20v-6"/></svg></span><span id="quickTileReportLabel">Raport</span></button>
-            </div>
-          </div>
-
+          <!-- ROW 6: Riwayat simulasi + Rowline akun -- widget prod, tidak ada padanan mockup -->
           <div class="dashV4-card dashV4-gridHalf">
             <div class="dashRecentHead" style="margin-top:0">
               <div class="dashV4-eyebrow" id="eyebrowHistory" style="margin-bottom:0">RIWAYAT SIMULASI</div>
@@ -1818,7 +1912,7 @@
             <div id="dashRecentHistory"></div>
           </div>
 
-          <div class="dashV4-card dashV4-gridFull">
+          <div class="dashV4-card dashV4-gridHalf">
             <div class="dashV4-eyebrow" id="eyebrowAccount">AKUN</div>
             <div class="rowline"><span class="k" id="rowLabelTrack">Track</span><span class="v" id="dTrack">—</span></div>
             <div class="rowline"><span class="k" id="rowLabelLevel">Target Level</span><span class="v" id="dLevel">—</span></div>
@@ -2503,6 +2597,10 @@
           recentHistory:'Riwayat Terakhir', seeAll:'Lihat semua', report:'Raport',
           accountSection:'Akun', rowLabelTrack:'Track', rowLabelLevel:'Target Level', rowLabelStatus:'Status', rowLabelSub:'Langganan s/d',
           eyebrowProgress:'PROGRES PER LEVEL', eyebrowQuick:'AKSI CEPAT', eyebrowHistory:'RIWAYAT SIMULASI', eyebrowAccount:'AKUN',
+          eyebrowResume:'LANJUTKAN LATIHAN', eyebrowGauge:'PREDIKSI SKOR', eyebrowSkill:'SKOR PER SEKSI',
+          eyebrowMissions:'MISI HARI INI', eyebrowWord:'KATA HARI INI', eyebrowMat:'MATERI & LATIHAN',
+          gaugeAvgLabel:'Rata-rata 3 simulasi terakhir', gaugePassLine:'Standar lulus: 60%',
+          gaugeEmptyState:'Belum ada simulasi', skillEmptyState:'Belum ada data skor per seksi',
           showPassword:'Tampilkan password', hidePassword:'Sembunyikan password',
           errEmptyFields:'Isi email dan password dulu.', errWrongCredentials:'Email atau password salah.',
           errProfileNotFound:'Profil tidak ditemukan. Hubungi admin.',
@@ -2630,6 +2728,10 @@
           recentHistory:'Recent History', seeAll:'See all', report:'Report',
           accountSection:'Account', rowLabelTrack:'Track', rowLabelLevel:'Target Level', rowLabelStatus:'Status', rowLabelSub:'Subscription until',
           eyebrowProgress:'PROGRESS BY LEVEL', eyebrowQuick:'QUICK ACTIONS', eyebrowHistory:'SIMULATION HISTORY', eyebrowAccount:'ACCOUNT',
+          eyebrowResume:'CONTINUE PRACTICE', eyebrowGauge:'SCORE PREDICTION', eyebrowSkill:'SCORE BY SECTION',
+          eyebrowMissions:"TODAY'S MISSION", eyebrowWord:'WORD OF THE DAY', eyebrowMat:'MATERIALS & PRACTICE',
+          gaugeAvgLabel:'Average of last 3 simulations', gaugePassLine:'Passing standard: 60%',
+          gaugeEmptyState:'No simulations yet', skillEmptyState:'No section score data yet',
           showPassword:'Show password', hidePassword:'Hide password',
           errEmptyFields:'Please enter your email and password.', errWrongCredentials:'Incorrect email or password.',
           errProfileNotFound:'Profile not found. Please contact admin.',
@@ -2757,6 +2859,10 @@
           recentHistory:'最近记录', seeAll:'查看全部', report:'成绩单',
           accountSection:'账户', rowLabelTrack:'方向', rowLabelLevel:'目标等级', rowLabelStatus:'状态', rowLabelSub:'订阅至',
           eyebrowProgress:'各级进度', eyebrowQuick:'快捷操作', eyebrowHistory:'模拟记录', eyebrowAccount:'账户',
+          eyebrowResume:'继续练习', eyebrowGauge:'预测分数', eyebrowSkill:'分项得分',
+          eyebrowMissions:'今日任务', eyebrowWord:'每日一词', eyebrowMat:'材料与练习',
+          gaugeAvgLabel:'近3次模拟平均分', gaugePassLine:'及格标准：60%',
+          gaugeEmptyState:'还没有模拟考试', skillEmptyState:'还没有分项得分数据',
           showPassword:'显示密码', hidePassword:'隐藏密码',
           errEmptyFields:'请输入邮箱和密码', errWrongCredentials:'邮箱或密码错误',
           errProfileNotFound:'未找到账号资料，请联系管理员',
@@ -2957,9 +3063,16 @@
     $('rowLabelStatus').textContent = t('rowLabelStatus');
     $('rowLabelSub').textContent = t('rowLabelSub');
     $('eyebrowProgress').textContent = t('eyebrowProgress');
-    $('eyebrowQuick').textContent = t('eyebrowQuick');
     $('eyebrowHistory').textContent = t('eyebrowHistory');
     $('eyebrowAccount').textContent = t('eyebrowAccount');
+    $('eyebrowResume').textContent = t('eyebrowResume');
+    $('eyebrowGauge').textContent = t('eyebrowGauge');
+    $('eyebrowSkill').textContent = t('eyebrowSkill');
+    $('eyebrowMissions').textContent = t('eyebrowMissions');
+    $('eyebrowWord').textContent = t('eyebrowWord');
+    $('eyebrowMat').textContent = t('eyebrowMat');
+    $('gaugeAvgLabel').textContent = t('gaugeAvgLabel');
+    $('gaugePassLine').textContent = t('gaugePassLine');
 
     $('practiceLevelPrompt').textContent = t('practiceLevelPrompt');
     $('practiceExitBtn1').textContent = t('back');
@@ -7770,51 +7883,132 @@
   })();
 
   /* ================================================================
-     DASHBOARD v4 -- reveal animation buat .dashV4-card (opacity 0 -> .in).
-     WAJIB ADA FALLBACK: kartu yang gak pernah dapet class .in itu bug fatal
-     (konten hilang permanen), lebih parah dari animasi yang gak jalan. Timeout
-     800ms maksa SEMUA .dashV4-card ke .in, terlepas dari IntersectionObserver
-     ada/jalan/nggak. Tidak menyentuh fungsi data manapun -- murni observer DOM. ================================================================ */
+     DASHBOARD v4 (dashboard-rebuild) -- reveal animation, NILAI/MEKANISME PERSIS
+     incoming/dashboard.html (staggered setTimeout per index, skip stagger kalau
+     prefers-reduced-motion -- BUKAN IntersectionObserver seperti versi sebelumnya).
+     Tambahan WAJIB (instruksi eksplisit): timeout 800ms maksa SEMUA .dashV4-card
+     ke .in tanpa syarat, jaring pengaman kalau ada elemen kelewat. Tidak menyentuh
+     fungsi data manapun -- murni DOM. ================================================================ */
   (function(){
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const cards = document.querySelectorAll('.dashV4-card');
-    if(!cards.length) return;
-    let revealed = false;
-    function revealAll(){
-      if(revealed) return;
-      revealed = true;
-      cards.forEach(c => c.classList.add('in'));
-    }
-    if('IntersectionObserver' in window){
-      try{
-        const io = new IntersectionObserver((entries)=>{
-          entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('in'); });
-        }, { threshold: .08 });
-        cards.forEach(c => io.observe(c));
-      }catch(e){ revealAll(); }
-    } else {
-      revealAll();
-    }
-    setTimeout(revealAll, 800); // fallback wajib -- lihat komentar di atas
+    cards.forEach(function(c,i){
+      setTimeout(function(){ c.classList.add('in'); }, reduce ? 0 : 80*i);
+    });
+    setTimeout(function(){ cards.forEach(function(c){ c.classList.add('in'); }); }, 800);
   })();
 
-  /* ---------- DASHBOARD v4 -- gauge orbit Target Harian, nilai REAL -----------
-     TIDAK bikin query baru. Cuma "dengerin" (MutationObserver pasif) nilai yang
-     SUDAH dihitung & ditulis loadBerandaExtras() ke #dashDailyFill.style.width
-     (dailyPct). loadBerandaExtras() sendiri TIDAK dipanggil/diedit dari sini. ---------- */
+  /* ---------- Misi Harian -- checklist mockup, isi Target Harian real, TANPA XP. Baca ulang
+     textContent #dashDailyLabel yang SUDAH dirender loadBerandaExtras() (reuse langsung, DRY,
+     tidak recompute), plus observe #dashDailyFill.style.width buat nentuin status "done".
+     loadBerandaExtras() sendiri TIDAK disentuh/dipanggil dari sini. ---------- */
   (function(){
     const fillEl = $('dashDailyFill');
-    const ringEl = $('dashV4DailyRing');
-    const pctEl = $('dashV4DailyPct');
-    if(!fillEl || !ringEl || !pctEl) return;
-    const CIRC = 2 * Math.PI * 68;
+    const labelEl = $('dashDailyLabel');
+    const missionEl = $('dashV4MissionItem');
+    const textEl = $('dashV4MissionText');
+    if(!fillEl || !labelEl || !missionEl || !textEl) return;
     function reflect(){
       const pct = Math.min(100, Math.max(0, parseFloat(fillEl.style.width) || 0));
-      const off = CIRC * (1 - pct / 100);
-      ringEl.setAttribute('stroke-dashoffset', off.toFixed(2));
-      pctEl.textContent = Math.round(pct) + '%';
+      textEl.textContent = labelEl.textContent || '—';
+      missionEl.classList.toggle('done', pct >= 100);
     }
     reflect();
     new MutationObserver(reflect).observe(fillEl, { attributes:true, attributeFilter:['style'] });
+    new MutationObserver(reflect).observe(labelEl, { childList:true, characterData:true, subtree:true });
+  })();
+
+  /* ---------- Prediksi + Skor per Seksi -- agregat dari 3 attempt terakhir yang SUDAH
+     dirender loadBerandaExtras() ke #dashRecentHistory (.historyCard). TIDAK query baru --
+     baca ulang DOM yang sudah jadi (section dari class .historyCardIcon, skor dari textContent
+     .historyCardScore). loadBerandaExtras() sendiri TIDAK disentuh/dipanggil dari sini.
+     Standar lulus 60% = kriteria resmi HSK (jawaban benar >=60%), bukan angka fiktif. ---------- */
+  (function(){
+    const histEl = $('dashRecentHistory');
+    const gaugeBox = $('dashV4GaugeBox');
+    const gaugeFoot = $('dashV4GaugeFoot');
+    const gaugeNum = $('dashV4GaugeNum');
+    const gaugeRing = $('dashV4GaugeRing');
+    const gaugeSeal = $('dashV4Seal');
+    const gaugeEmpty = $('dashV4GaugeEmpty');
+    const skillBody = $('dashV4SkillBody');
+    const skillEmpty = $('dashV4SkillEmpty');
+    if(!histEl || !gaugeBox || !gaugeNum || !gaugeRing || !skillBody) return;
+    const CIRC = 2 * Math.PI * 84;
+    const PASS_LINE = 60;
+    const SECTIONS = ['listening','reading','writing'];
+
+    function render(){
+      const cards = histEl.querySelectorAll('.historyCard');
+      const pcts = [];
+      const bySection = {};
+      cards.forEach(function(card){
+        const scoreEl = card.querySelector('.historyCardScore');
+        const iconEl = card.querySelector('.historyCardIcon');
+        if(!scoreEl || !iconEl) return;
+        const pct = parseInt(scoreEl.textContent, 10);
+        if(isNaN(pct)) return;
+        pcts.push(pct);
+        const sec = [...iconEl.classList].find(c => SECTIONS.includes(c));
+        if(sec){ (bySection[sec] = bySection[sec] || []).push(pct); }
+      });
+
+      if(pcts.length === 0){
+        gaugeBox.classList.add('hidden');
+        if(gaugeFoot) gaugeFoot.classList.add('hidden');
+        if(gaugeSeal) gaugeSeal.classList.remove('show');
+        gaugeEmpty.classList.remove('hidden');
+      } else {
+        gaugeBox.classList.remove('hidden');
+        if(gaugeFoot) gaugeFoot.classList.remove('hidden');
+        gaugeEmpty.classList.add('hidden');
+        const avg = Math.round(pcts.reduce((a,b)=>a+b,0) / pcts.length);
+        gaugeNum.textContent = avg;
+        const off = CIRC * (1 - Math.min(100,avg) / 100);
+        gaugeRing.setAttribute('stroke-dashoffset', off.toFixed(2));
+        if(gaugeSeal) gaugeSeal.classList.toggle('show', avg >= PASS_LINE);
+      }
+
+      skillBody.innerHTML = '';
+      const sectionsWithData = SECTIONS.filter(s => bySection[s] && bySection[s].length);
+      if(sectionsWithData.length === 0){
+        skillBody.appendChild(skillEmpty);
+        skillEmpty.textContent = t('skillEmptyState');
+        skillEmpty.classList.remove('hidden');
+      } else {
+        sectionsWithData.forEach(function(sec){
+          const list = bySection[sec];
+          const avgSec = Math.round(list.reduce((a,b)=>a+b,0) / list.length);
+          const row = document.createElement('div');
+          row.className = 'dashV4-skill';
+          row.innerHTML = '<div class="dashV4-skillTop"><span>' + (SECTION_LABEL[sec] || sec) +
+            '</span><span class="v"><b>' + avgSec + '</b>%</span></div>' +
+            '<div class="dashV4-skillBar"><i style="width:' + avgSec + '%"></i></div>';
+          skillBody.appendChild(row);
+        });
+      }
+    }
+
+    render();
+    new MutationObserver(render).observe(histEl, { childList:true });
+  })();
+
+  /* ---------- Kata Hari Ini -- 1 kata dari browseCache KALAU SUDAH ke-load (user pernah buka
+     Kamus sesi ini sebelum dashboard render). browseCache variabel module-level yang SUDAH ADA,
+     BUKAN query baru. Dicek SEKALI (fresh dashboard load = browseCache kosong = card tetap
+     hidden, sesuai instruksi "kalau vocab belum ke-load, sembunyikan card"). Pilihan
+     deterministik per hari (epoch day index), bukan random tiap render. ---------- */
+  (function(){
+    const card = $('dashV4WordCard');
+    if(!card) return;
+    if(!Array.isArray(browseCache) || browseCache.length === 0) return;
+    const dayIndex = Math.floor(Date.now() / 86400000);
+    const word = browseCache[dayIndex % browseCache.length];
+    if(!word || !word.hanzi) return;
+    $('dashV4WordHz').textContent = word.hanzi;
+    $('dashV4WordPy').textContent = (word.pinyin || '').toUpperCase();
+    $('dashV4WordMean').textContent = word.meaning_id || word.meaning_en || '';
+    card.classList.remove('hidden');
   })();
 
   // Mobile bottom nav (fase 1) -- separate registrations, same target functions as the

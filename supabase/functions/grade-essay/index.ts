@@ -21,6 +21,9 @@ function buildRubric(level: number, task: string, extra: Record<string, unknown>
     crit = `任务类型：写一篇约 ${extra.min_chars ?? 80} 字的短文。检查：(1) 是否使用了全部指定词语（${words}）；(2) 字数是否达标；(3) 内容是否连贯、有条理；(4) 语法和词汇是否准确。`;
   } else if (task === "summary") {
     crit = `任务类型：缩写。学生需把原文缩写成约 ${extra.target_chars ?? 150} 字。检查：(1) 是否忠实复述原文主要内容；(2) 是否简洁、没有多余细节；(3) 语言是否通顺；(4) 缩写不应加入个人观点或评论，若加入则扣分。`;
+  } else if (task === "picture_essay") {
+    if (!extra.scene_cn) throw new Error("picture_essay 缺少 scene_cn，无法评分");
+    crit = `任务类型：看图作文。检查：(1) 内容是否符合图片描述的场景（场景：${extra.scene_cn}）；(2) 字数是否达到 ${extra.min_chars ?? 80} 字；(3) 语法是否正确；(4) 内容是否连贯。`;
   }
   return `${base}
 ${crit}
@@ -37,13 +40,13 @@ Deno.serve(async (req: Request) => {
   try {
     const b = await req.json();
     const { hsk_level, task_type, prompt, required_words, word, article,
-            target_chars, min_chars, student_text, question_id, set_id } = b;
+            target_chars, min_chars, scene_cn, student_text, question_id, set_id } = b;
 
     if (!student_text || !String(student_text).trim())
       return json({ error: "作答内容为空 / Jawaban kosong" }, 400);
 
     const system = buildRubric(Number(hsk_level), String(task_type),
-      { word, required_words, target_chars, min_chars });
+      { word, required_words, target_chars, min_chars, scene_cn });
 
     let userMsg = `【题目要求】\n${prompt ?? ""}\n`;
     if (word) userMsg += `【指定词语】${word}\n`;

@@ -289,15 +289,28 @@ h2 .hz-in{font-family:var(--f-hanzi);font-weight:900;color:var(--star-core)}
 .plan-seal{position:absolute;top:-15px;right:24px;background:var(--lucky);color:#FBF3DD;font-family:var(--f-hanzi);font-weight:900;font-size:12px;letter-spacing:.14em;padding:7px 13px;border-radius:10px;transform:rotate(4deg);box-shadow:inset 0 0 0 1.5px rgba(251,243,221,.4),0 8px 20px rgba(168,24,24,.3)}
 .plan-hz{font-family:var(--f-hanzi);font-weight:900;font-size:22px;margin-bottom:3px;background:linear-gradient(120deg,var(--tiger),var(--star-core));-webkit-background-clip:text;background-clip:text;color:transparent}
 .plan h3{font-size:15px;font-weight:800;margin-bottom:4px}
-.plan .for{font-size:13px;color:var(--muted);margin-bottom:22px;min-height:38px}
+/* dominan: nama kelas (bukan lagi "untuk siapa paket ini"), sengaja LEBIH BESAR dari .plan-hz/h3
+   (tier jadi label kecil, kelas jadi info utama) -- sesuai instruksi ganti fokus jualan. */
+.plan-class{font-family:var(--f-display);font-weight:800;font-size:24px;line-height:1.2;color:var(--text);margin:10px 0 16px}
 .price{font-family:var(--f-display);font-weight:700;font-size:33px;line-height:1;margin-bottom:3px}
 .price small{font-family:var(--f-mono);font-size:11px;color:var(--muted);font-weight:400}
-.plan ul{list-style:none;margin:24px 0 28px;display:flex;flex-direction:column;gap:12px;flex:1}
+/* harga normal dicoret, nilai PERSIS pola .prow .val .old di paket.html (font mono, muted,
+   line-through) -- reuse bahasa visual yang sudah ada di halaman pricelist, bukan bikin baru. */
+.price .old{display:inline-block;margin-left:8px;font-family:var(--f-mono);font-size:13px;font-weight:400;color:var(--muted);text-decoration:line-through;vertical-align:middle}
+/* meta (jumlah pertemuan + ukuran kelas) -- nilai PERSIS pola .pmeta .tag di paket.html. */
+.plan-meta{display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 4px}
+.plan-meta span{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.03em;color:var(--muted);background:var(--raise);border-radius:999px;padding:5px 10px}
+.plan ul{list-style:none;margin:20px 0 16px;display:flex;flex-direction:column;gap:12px;flex:1}
 .plan li{display:flex;gap:11px;font-size:14px;color:var(--muted);align-items:flex-start}
 .plan li::before{content:'✦';color:var(--gold);font-size:11px;transform:translateY(3px)}
 .plan li.no{opacity:.45}
 .plan li.no::before{content:'·';color:var(--muted)}
+.plan-note{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:18px;padding-top:14px;box-shadow:inset 0 1px 0 var(--line)}
 .plan .btn{width:100%}
+/* CTA "lihat semua paket" di bawah 3 kartu -- .sec-sub DIPAKAI ULANG (sudah ada, dipakai buat
+   sec-head subtitle di section lain), bukan class baru. */
+.plans-more{text-align:center;margin-top:34px}
+.plans-more .sec-sub{margin:12px auto 0;max-width:440px}
 
 /* ============ CTA & FOOTER ============ */
 .cta-sec{text-align:center;padding:120px 0 110px;position:relative;overflow:hidden}
@@ -573,45 +586,59 @@ footer{box-shadow:0 -1px 0 var(--line);padding:34px 0 max(34px,env(safe-area-ins
       <p class="sec-sub" data-i18n="priceSub">Biaya pendaftaran HSK tidak dapat dikembalikan. Pastikan kesiapanmu terukur sebelum mendaftar.</p>
     </div>
     <div class="plans">
+      <!-- harga & nama kelas TIDAK lewat t() (instruksi eksplisit) -- sumber: paket.html tab
+           "Kelas Grup", baris HSK 4 (promo Rp1.159.000, coret Rp1.360.000, 2x8 pertemuan, Kelas 3-5). -->
       <div class="plan reveal">
         <div class="plan-hz">星火</div><h3>Spark</h3>
-        <p class="for" data-i18n="p1for">Untuk mengenal format ujian</p>
-        <div class="price" data-i18n="free">Gratis</div>
+        <div class="plan-class">Kelas HSK 4</div>
+        <div class="price">Rp1.159.000<span class="old">Rp1.360.000</span></div>
+        <div class="plan-meta"><span data-i18n="clsMeetA">2×8 pertemuan</span><span data-i18n="clsSizeA">Kelas 3–5</span></div>
         <ul>
-          <li data-i18n="p1a">1 set simulasi, level bebas</li>
-          <li data-i18n="p1b">Skor listening &amp; reading</li>
-          <li data-i18n="p1c">Rapor ringkas</li>
-          <li class="no" data-i18n="p1d">Penilaian esai AI</li>
-          <li class="no" data-i18n="p1e">Semua set soal per level</li>
+          <li data-i18n="clsF1a">Kurikulum lengkap HSK 4</li>
+          <li data-i18n="clsF1b">Kelas kecil, maksimal 5 peserta</li>
+          <li data-i18n="clsF1c">2×8 pertemuan terjadwal</li>
+          <li data-i18n="clsF1d">Kuota terbatas per angkatan</li>
         </ul>
-        <a href="/app/" class="btn btn-soft" data-i18n="p1btn">Coba sekarang</a>
+        <p class="plan-note" data-i18n="planNote">Termasuk akses platform simulasi HSK selama masa kursus</p>
+        <a href="https://wa.me/6287886908357?text=Halo%20Xing%20Mandarin%2C%20saya%20tertarik%20Kelas%20HSK%204" target="_blank" rel="noopener" class="btn btn-soft" data-i18n="clsBtn">Tanya &amp; daftar</a>
       </div>
+      <!-- sumber: paket.html tab "Kelas Grup", baris HSK 5 (promo Rp1.159.000, coret
+           Rp1.360.000, 2x8 pertemuan, Kelas 3-5) -- angka SAMA PERSIS dengan HSK 4 di pricelist. -->
       <div class="plan hot reveal d1">
         <span class="plan-seal">推荐</span>
         <div class="plan-hz">新星</div><h3>Nova</h3>
-        <p class="for" data-i18n="p2for">Untuk kamu yang sudah memiliki jadwal ujian</p>
-        <div class="price">Rp149rb<small> <span data-i18n="perLevel">/ level</span></small></div>
+        <div class="plan-class">Kelas HSK 5</div>
+        <div class="price">Rp1.159.000<span class="old">Rp1.360.000</span></div>
+        <div class="plan-meta"><span data-i18n="clsMeetA">2×8 pertemuan</span><span data-i18n="clsSizeA">Kelas 3–5</span></div>
         <ul>
-          <li data-i18n="p2a">Semua set soal di level pilihanmu</li>
-          <li data-i18n="p2b">Penilaian esai AI tanpa batas</li>
-          <li data-i18n="p2c">Tone Coach &amp; latihan goresan</li>
-          <li data-i18n="p2d">Rapor analitik lengkap per seksi</li>
-          <li data-i18n="p2e">Akses hingga hari ujianmu</li>
+          <li data-i18n="clsF2a">Kurikulum lengkap HSK 5</li>
+          <li data-i18n="clsF2b">Kelas kecil, maksimal 5 peserta</li>
+          <li data-i18n="clsF2c">2×8 pertemuan terjadwal</li>
+          <li data-i18n="clsF2d">Kuota terbatas per angkatan</li>
         </ul>
-        <a href="/paket.html" class="btn btn-gold" data-i18n="p2btn">Pilih paket ini</a>
+        <p class="plan-note" data-i18n="planNote">Termasuk akses platform simulasi HSK selama masa kursus</p>
+        <a href="https://wa.me/6287886908357?text=Halo%20Xing%20Mandarin%2C%20saya%20tertarik%20Kelas%20HSK%205" target="_blank" rel="noopener" class="btn btn-gold" data-i18n="clsBtn">Tanya &amp; daftar</a>
       </div>
+      <!-- sumber: paket.html tab "Kelas Grup", baris Basic Business (promo Rp1.599.000, coret
+           Rp1.800.000, 3x8 pertemuan, Kelas 3-7). -->
       <div class="plan reveal d2">
         <div class="plan-hz">北极星</div><h3>Polaris</h3>
-        <p class="for" data-i18n="p3for">Akses penuh untuk perjalanan sampai HSK 6</p>
-        <div class="price">Rp399rb<small> <span data-i18n="allLevels">/ semua level</span></small></div>
+        <div class="plan-class">Kelas Basic Business</div>
+        <div class="price">Rp1.599.000<span class="old">Rp1.800.000</span></div>
+        <div class="plan-meta"><span data-i18n="clsMeetB">3×8 pertemuan</span><span data-i18n="clsSizeB">Kelas 3–7</span></div>
         <ul>
-          <li data-i18n="p3a">Akses HSK 1 sampai 6, semua set</li>
-          <li data-i18n="p3b">Semua fitur paket Nova</li>
-          <li data-i18n="p3c">4.991 kosakata + flashcard</li>
-          <li data-i18n="p3d">Akses fitur baru lebih awal</li>
+          <li data-i18n="clsF3a">Mandarin untuk dunia kerja</li>
+          <li data-i18n="clsF3b">Kelas kecil, maksimal 7 peserta</li>
+          <li data-i18n="clsF3c">3×8 pertemuan terjadwal</li>
+          <li data-i18n="clsF3d">Kuota terbatas per angkatan</li>
         </ul>
-        <a href="/paket.html" class="btn btn-soft" data-i18n="p3btn">Buka semua level</a>
+        <p class="plan-note" data-i18n="planNote">Termasuk akses platform simulasi HSK selama masa kursus</p>
+        <a href="https://wa.me/6287886908357?text=Halo%20Xing%20Mandarin%2C%20saya%20tertarik%20Kelas%20Basic%20Business" target="_blank" rel="noopener" class="btn btn-soft" data-i18n="clsBtn">Tanya &amp; daftar</a>
       </div>
+    </div>
+    <div class="plans-more reveal">
+      <a href="/paket.html" class="btn btn-gold" data-i18n="seeAllBtn">Lihat semua paket →</a>
+      <p class="sec-sub" data-i18n="seeAllSub">Grup, semi-privat, privat &amp; onsite — 10 kelas, 4 format belajar.</p>
     </div>
   </div>
 </section>
@@ -679,10 +706,12 @@ footer{box-shadow:0 -1px 0 var(--line);padding:34px 0 max(34px,env(safe-area-ins
       examPart:'BAGIAN 1', examQ:'Dengarkan dialog, lalu jawab:', examProg:'SOAL', examNext:'Soal berikutnya →',
       priceTag:'05 · PILIHAN PAKET', priceH2:'Berlatih dulu, sampai rapormu menunjukkan siap.',
       priceSub:'Biaya pendaftaran HSK tidak dapat dikembalikan. Pastikan kesiapanmu terukur sebelum mendaftar.',
-      free:'Gratis', perLevel:'/ level', allLevels:'/ semua level',
-      p1for:'Untuk mengenal format ujian', p1a:'1 set simulasi, level bebas', p1b:'Skor listening & reading', p1c:'Rapor ringkas', p1d:'Penilaian esai AI', p1e:'Semua set soal per level', p1btn:'Coba sekarang',
-      p2for:'Untuk kamu yang sudah memiliki jadwal ujian', p2a:'Semua set soal di level pilihanmu', p2b:'Penilaian esai AI tanpa batas', p2c:'Tone Coach & latihan goresan', p2d:'Rapor analitik lengkap per seksi', p2e:'Akses hingga hari ujianmu', p2btn:'Pilih paket ini',
-      p3for:'Akses penuh untuk perjalanan sampai HSK 6', p3a:'Akses HSK 1 sampai 6, semua set', p3b:'Semua fitur paket Nova', p3c:'4.991 kosakata + flashcard', p3d:'Akses fitur baru lebih awal', p3btn:'Buka semua level',
+      clsMeetA:'2×8 pertemuan', clsSizeA:'Kelas 3–5', clsMeetB:'3×8 pertemuan', clsSizeB:'Kelas 3–7',
+      clsF1a:'Kurikulum lengkap HSK 4', clsF1b:'Kelas kecil, maksimal 5 peserta', clsF1c:'2×8 pertemuan terjadwal', clsF1d:'Kuota terbatas per angkatan',
+      clsF2a:'Kurikulum lengkap HSK 5', clsF2b:'Kelas kecil, maksimal 5 peserta', clsF2c:'2×8 pertemuan terjadwal', clsF2d:'Kuota terbatas per angkatan',
+      clsF3a:'Mandarin untuk dunia kerja', clsF3b:'Kelas kecil, maksimal 7 peserta', clsF3c:'3×8 pertemuan terjadwal', clsF3d:'Kuota terbatas per angkatan',
+      planNote:'Termasuk akses platform simulasi HSK selama masa kursus', clsBtn:'Tanya & daftar',
+      seeAllBtn:'Lihat semua paket →', seeAllSub:'Grup, semi-privat, privat & onsite — 10 kelas, 4 format belajar.',
       ctaH2:'Mulai dari satu simulasi.', ctaSub:'Lima belas menit dari sekarang, kamu tahu persis harus mulai dari mana.',
       footContact:'Kontak'
     },
@@ -712,10 +741,12 @@ footer{box-shadow:0 -1px 0 var(--line);padding:34px 0 max(34px,env(safe-area-ins
       examPart:'PART 1', examQ:'Listen to the dialogue, then answer:', examProg:'QUESTION', examNext:'Next question →',
       priceTag:'05 · PLANS', priceH2:'Practice first, until your report says ready.',
       priceSub:'HSK registration fees are non-refundable. Make sure your readiness is measured before you register.',
-      free:'Free', perLevel:'/ level', allLevels:'/ all levels',
-      p1for:'To get to know the exam format', p1a:'1 simulation set, any level', p1b:'Listening & reading scores', p1c:'Summary report', p1d:'AI essay grading', p1e:'All sets per level', p1btn:'Try now',
-      p2for:'For learners with an exam date', p2a:'All question sets in your level', p2b:'Unlimited AI essay grading', p2c:'Tone Coach & stroke practice', p2d:'Full per-section analytics', p2e:'Access until your exam day', p2btn:'Choose this plan',
-      p3for:'Full access for the journey to HSK 6', p3a:'HSK 1 to 6, every set', p3b:'Everything in Nova', p3c:'4,991 vocabulary + flashcards', p3d:'Early access to new features', p3btn:'Unlock all levels',
+      clsMeetA:'2×8 sessions', clsSizeA:'Class of 3–5', clsMeetB:'3×8 sessions', clsSizeB:'Class of 3–7',
+      clsF1a:'Full HSK 4 curriculum', clsF1b:'Small class, max 5 students', clsF1c:'2×8 scheduled sessions', clsF1d:'Limited seats per batch',
+      clsF2a:'Full HSK 5 curriculum', clsF2b:'Small class, max 5 students', clsF2c:'2×8 scheduled sessions', clsF2d:'Limited seats per batch',
+      clsF3a:'Mandarin for the workplace', clsF3b:'Small class, max 7 students', clsF3c:'3×8 scheduled sessions', clsF3d:'Limited seats per batch',
+      planNote:'Includes access to the HSK simulation platform for the duration of the course', clsBtn:'Ask & register',
+      seeAllBtn:'See all packages →', seeAllSub:'Group, semi-private, private & onsite — 10 classes, 4 learning formats.',
       ctaH2:'Start with one simulation.', ctaSub:'Fifteen minutes from now, you will know exactly where to begin.',
       footContact:'Contact'
     },
@@ -745,10 +776,12 @@ footer{box-shadow:0 -1px 0 var(--line);padding:34px 0 max(34px,env(safe-area-ins
       examPart:'第一部分', examQ:'听对话，然后作答：', examProg:'题目', examNext:'下一题 →',
       priceTag:'05 · 套餐选择', priceH2:'先练习，直到成绩报告说你准备好了。',
       priceSub:'HSK 报名费不可退还。报名前，先确认你的准备程度。',
-      free:'免费', perLevel:'/ 等级', allLevels:'/ 全部等级',
-      p1for:'用于熟悉考试格式', p1a:'1 套模拟题，等级任选', p1b:'听力与阅读得分', p1c:'简要报告', p1d:'AI 作文批改', p1e:'该等级全部套题', p1btn:'立即体验',
-      p2for:'适合已确定考试日期的学员', p2a:'所选等级的全部套题', p2b:'AI 作文批改不限次数', p2c:'声调教练与笔顺练习', p2d:'完整分项分析报告', p2e:'使用权限至考试当天', p2btn:'选择此套餐',
-      p3for:'通往 HSK 6 的完整通行证', p3a:'HSK 1 至 6 全部套题', p3b:'包含新星套餐全部功能', p3c:'4,991 词汇 + 记忆卡', p3d:'新功能优先体验', p3btn:'解锁全部等级',
+      clsMeetA:'2×8次课', clsSizeA:'3–5人小班', clsMeetB:'3×8次课', clsSizeB:'3–7人小班',
+      clsF1a:'完整 HSK 4 课程', clsF1b:'小班教学，最多 5 人', clsF1c:'2×8 次排定课程', clsF1d:'每期名额有限',
+      clsF2a:'完整 HSK 5 课程', clsF2b:'小班教学，最多 5 人', clsF2c:'2×8 次排定课程', clsF2d:'每期名额有限',
+      clsF3a:'职场实用中文', clsF3b:'小班教学，最多 7 人', clsF3c:'3×8 次排定课程', clsF3d:'每期名额有限',
+      planNote:'课程期间包含 HSK 模拟测试平台使用权限', clsBtn:'咨询与报名',
+      seeAllBtn:'查看所有套餐 →', seeAllSub:'团体、半私人、一对一及上门授课——10 门课程，4 种学习方式。',
       ctaH2:'从一次模拟开始。', ctaSub:'十五分钟后，你就会清楚该从哪里开始。',
       footContact:'联系我们'
     }

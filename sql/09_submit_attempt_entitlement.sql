@@ -5,15 +5,13 @@
 -- Sisa (belum ditambal): user masih bisa narik correct_answer
 --    dalam paket sendiri dengan submit p_answers kosong.
 --
--- UPDATE 2026-07-28: mapping business/convo diubah dari "tidak ada level sama
--- sekali" (v_max_level=0, submit_attempt SELALU tolak set apa pun) jadi
--- business=HSK 1-5, convo=HSK 1-4 -- align sama pricelist (paket.html), yang
--- ternyata emang jual materi HSK buat 2 paket ini. BELUM ke-apply ke prod --
--- file ini harus di-paste MANUAL ke Supabase SQL Editor biar perubahan
--- v_max_level business/convo ini kepakai di database live. Perubahan
--- PACKAGE_LEVELS di frontend (app/index.html) TIDAK otomatis nyambung ke
--- fungsi server-side ini -- 2 tempat terpisah, harus disinkron manual tiap ada
--- perubahan kayak gini.
+-- UPDATE 2026-07-28 -- APPLIED & DIVERIFIKASI KE PROD (arsip, bukan pending
+-- action lagi): mapping business/convo diubah dari "tidak ada level sama
+-- sekali" jadi business=HSK 1-5, convo=HSK 1-4, align sama pricelist
+-- (paket.html). Sekaligus format entitlement-nya disinkronkan ke bentuk
+-- SUNGGUHAN yang dipakai prod: v_allowed int[] + `v_hsk_level = any(v_allowed)`
+-- -- BUKAN v_max_level integer tunggal (versi commit sebelumnya, sudah tidak
+-- akurat, jangan dipakai lagi). File ini sekarang PERSIS mirror definisi live.
 --
 -- Sumber: bukan hasil query live (Claude tidak punya akses SQL Editor, lihat
 -- sql/04_rls_snapshot.sql). Basis fungsi diambil dari snapshot live terakhir
@@ -24,11 +22,11 @@
 -- app/index.html supaya tidak ada logic baru yang bisa divergen dari frontend:
 --   1. gateReason(profile) -- admin selalu lolos; status='expired' -> tolak;
 --      subscription_end < hari ini -> tolak.
---   2. PACKAGE_LEVELS -- profiles.package menentukan level HSK maksimum yang
+--   2. PACKAGE_LEVELS -- profiles.package menentukan array level HSK yang
 --      boleh diakses (hsk_1_4=1..4, hsk_5=1..5, hsk_6/vip=1..6, business=1..5,
---      convo=1..4 [update 2026-07-28, lihat catatan di atas]). package
---      NULL/tidak dikenal fallback ke hsk_1_4, sama seperti userPackageLevels
---      fallback di frontend (baris ~2139 app/index.html).
+--      convo=1..4). package NULL/tidak dikenal fallback ke hsk_1_4, sama
+--      seperti userPackageLevels fallback di frontend (baris ~2139
+--      app/index.html).
 --
 -- Efek: kalau set_id yang diminta levelnya di luar entitlement caller, fungsi
 -- RAISE EXCEPTION sebelum sempat query question_bank -- jadi answer/explanation
@@ -46,8 +44,8 @@ declare
   v_status text;
   v_sub_end date;
   v_package text;
-  v_max_level int;
-  v_set_level int;
+  v_allowed int[];
+  v_hsk_level int;
   v_score int := 0;
   v_total_points int := 0;
   v_correct int := 0;
@@ -75,21 +73,21 @@ begin
 
     -- Lapis 2: gate level per package -- mirror PACKAGE_LEVELS. package NULL/tidak
     -- dikenal fallback ke hsk_1_4 (sama seperti frontend, bukan default deny).
-    v_max_level := case v_package
-      when 'hsk_1_4' then 4
-      when 'hsk_5'   then 5
-      when 'hsk_6'   then 6
-      when 'vip'     then 6
-      when 'business' then 5  -- update 2026-07-28: business HSK 1-5 (align pricelist)
-      when 'convo'    then 4  -- update 2026-07-28: convo HSK 1-4 (align pricelist)
-      else 4  -- fallback hsk_1_4, mirror `PACKAGE_LEVELS[profile.package] || PACKAGE_LEVELS.hsk_1_4`
+    v_allowed := case v_package
+      when 'hsk_1_4'  then array[1,2,3,4]
+      when 'hsk_5'    then array[1,2,3,4,5]
+      when 'hsk_6'    then array[1,2,3,4,5,6]
+      when 'vip'      then array[1,2,3,4,5,6]
+      when 'business' then array[1,2,3,4,5]
+      when 'convo'    then array[1,2,3,4]
+      else array[1,2,3,4]  -- fallback hsk_1_4, mirror `PACKAGE_LEVELS[profile.package] || PACKAGE_LEVELS.hsk_1_4`
     end;
 
-    select hsk_level into v_set_level from public.test_sets where set_id = p_set_id;
-    if v_set_level is null then
+    select hsk_level into v_hsk_level from public.test_sets where set_id = p_set_id;
+    if v_hsk_level is null then
       raise exception 'set not found';
     end if;
-    if v_max_level = 0 or v_set_level > v_max_level then
+    if not (v_hsk_level = any(v_allowed)) then
       raise exception 'level not included in package';
     end if;
   end if;

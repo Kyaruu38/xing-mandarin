@@ -1,0 +1,8 @@
+[
+  {"path": "concepts/dadianhua.jpg", "prompt": "one person holding a phone to their ear, clearly talking on the phone, side view, single person only"},
+  {"path": "concepts/xuexi.jpg", "prompt": "one single person sitting at a desk studying with an open book, only one person in frame"},
+  {"path": "concepts/zoulu.jpg", "prompt": "one single person walking forward, full body side view, only one person in frame"},
+  {"path": "concepts/maidongxi.jpg", "prompt": "one person at a store checkout counter paying and holding a shopping bag, shop shelves visible"},
+  {"path": "concepts/kanshu.jpg", "prompt": "one person sitting and reading an open book, focus on the person"},
+  {"path": "concepts/shu.jpg", "prompt": "a single closed book on a plain surface, no people"}
+]

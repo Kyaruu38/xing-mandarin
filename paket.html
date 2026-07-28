@@ -106,6 +106,7 @@ nav.scrolled{background:var(--nav-bg);backdrop-filter:blur(16px);box-shadow:0 1p
 .btn-soft{background:var(--panel);color:var(--text);box-shadow:inset 0 0 0 1.5px var(--line),var(--shadow-sm)}
 .btn-soft:hover{box-shadow:inset 0 0 0 1.5px var(--gold)}
 .btn-sm{min-height:42px;padding:9px 18px;font-size:13.5px}
+.nav-login-icon{display:none}
 
 
 
@@ -184,6 +185,21 @@ header.cat-hero{position:relative;padding:150px 0 40px;overflow:hidden;text-alig
   .tabs::-webkit-scrollbar{display:none}
   .tab{flex-shrink:0}
   .price-grid{grid-template-columns:1fr}
+  /* nav-links was never hidden on mobile here (unlike index.html), so logo+4 links+lang+theme
+     already overflowed the header by ~155px before any of this task's changes -- confirmed
+     empirically at 375px width. Without hiding it, the new Masuk button below would just be
+     pushed off-screen by that pre-existing overflow, same failure mode as the reported bug.
+     Mirrors index.html's own .nav-links{display:none} treatment. */
+  .nav-links{display:none}
+  .nav-inner{padding-left:12px;padding-right:14px;gap:8px}
+  /* Sign-in link, consistent with index.html's mobile fix -- icon-only circular button
+     (matches .tgl's compact style), text kept sr-only for accessibility. */
+  .nav-login{width:44px;height:44px;min-height:44px;padding:0;border-radius:50%;gap:0}
+  .nav-login-icon{display:block}
+  .nav-login-text{
+    position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+    overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
+  }
 }
 
 </style>
@@ -208,6 +224,10 @@ header.cat-hero{position:relative;padding:150px 0 40px;overflow:hidden;text-alig
         <button data-lang="id">ID</button><button data-lang="en">EN</button><button data-lang="zh">中</button>
       </div>
       <button class="tgl" id="themeTgl" aria-label="Theme">🌙</button>
+      <a href="/app/" class="btn btn-soft btn-sm nav-login">
+        <svg class="nav-login-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
+        <span class="nav-login-text" data-i18n="navLogin">Masuk</span>
+      </a>
     </div>
   </div>
 </nav>
@@ -616,7 +636,7 @@ header.cat-hero{position:relative;padding:150px 0 40px;overflow:hidden;text-alig
 <script>
 (function(){
   var LANG={
-    id:{brandTag:'星图 · KURSUS MANDARIN',navFeat:'Fitur',navPrice:'Kelas',navAll:'Semua Paket',navContact:'Kontak',
+    id:{brandTag:'星图 · KURSUS MANDARIN',navFeat:'Fitur',navPrice:'Kelas',navAll:'Semua Paket',navContact:'Kontak',navLogin:'Masuk',
       catEyebrow:'DAFTAR HARGA LENGKAP',catH1a:'Semua pilihan kelas,',catH1b:'satu tempat.',
       catSub:'Dari kelas grup hemat sampai privat fleksibel — pilih format yang paling cocok dengan tujuan, jadwal, dan gaya belajarmu.',
       catPromo:'Harga promo sedang berlangsung untuk pendaftaran paket',
@@ -630,7 +650,7 @@ header.cat-hero{position:relative;padding:150px 0 40px;overflow:hidden;text-alig
       noteTier:'Harga per pertemuan. Promo berlaku untuk paket bulanan 8× atau 12× pertemuan.',
       catCH:'Bingung pilih yang mana?',catCP:'Chat kami di WhatsApp — kami bantu carikan format kelas yang paling pas untukmu, gratis tanpa komitmen.',catCBtn:'Konsultasi via WhatsApp'
     },
-    en:{brandTag:'星图 · MANDARIN COURSE',navFeat:'Features',navPrice:'Classes',navAll:'All Packages',navContact:'Contact',
+    en:{brandTag:'星图 · MANDARIN COURSE',navFeat:'Features',navPrice:'Classes',navAll:'All Packages',navContact:'Contact',navLogin:'Sign in',
       catEyebrow:'FULL PRICE LIST',catH1a:'Every class option,',catH1b:'in one place.',
       catSub:'From budget-friendly group classes to flexible private lessons — pick the format that fits your goals, schedule, and learning style.',
       catPromo:'Promo pricing is currently available for package enrollment',
@@ -644,7 +664,7 @@ header.cat-hero{position:relative;padding:150px 0 40px;overflow:hidden;text-alig
       noteTier:'Prices are per session. Promo applies to monthly packages of 8× or 12× sessions.',
       catCH:'Not sure which to pick?',catCP:'Chat with us on WhatsApp — we will help you find the class format that fits you best, free with no commitment.',catCBtn:'Consult via WhatsApp'
     },
-    zh:{brandTag:'星图 · 中文课程',navFeat:'功能',navPrice:'课程',navAll:'全部套餐',navContact:'联系',
+    zh:{brandTag:'星图 · 中文课程',navFeat:'功能',navPrice:'课程',navAll:'全部套餐',navContact:'联系',navLogin:'登录',
       catEyebrow:'完整价格表',catH1a:'所有课程选择，',catH1b:'尽在一处。',
       catSub:'从超值团体课到灵活的一对一私教——选择最适合你目标、时间和学习方式的形式。',
       catPromo:'套餐报名正在享受促销价',

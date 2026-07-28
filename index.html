@@ -104,6 +104,7 @@ nav.scrolled{background:var(--nav-bg);backdrop-filter:blur(16px);box-shadow:0 1p
 .btn-soft{background:var(--panel);color:var(--text);box-shadow:inset 0 0 0 1.5px var(--line),var(--shadow-sm)}
 .btn-soft:hover{box-shadow:inset 0 0 0 1.5px var(--gold)}
 .btn-sm{min-height:42px;padding:9px 18px;font-size:13.5px}
+.nav-login-icon{display:none}
 
 /* ============ HERO ============ */
 header{position:relative;padding:150px 0 90px;overflow:hidden}
@@ -344,6 +345,22 @@ footer{box-shadow:0 -1px 0 var(--line);padding:34px 0 max(34px,env(safe-area-ins
 @media(max-width:760px){
   .nav-links{display:none}
   .nav-cta{display:none}
+  /* Sign-in link was sharing .nav-cta with "Coba Gratis" and got hidden by the rule above too --
+     no other way to reach /app/ on mobile (bug report: header only showed logo/lang/theme).
+     Own class so it survives, just shrunk to fit -- min-height:44px keeps it a valid touch
+     target even though .btn-sm's own min-height (42px) would fall just under that. */
+  .nav-inner{padding-left:12px;padding-right:14px;gap:8px}
+  /* Icon-only circular button on mobile (matches .tgl's existing compact style right next to
+     it) instead of shrunk text -- "Sign in" at any font small enough to fit wrapped to 2 lines
+     inside the available width, which looked broken. Text stays in the DOM for screen readers
+     (sr-only technique, same one already used for the login screen's mobile field labels) --
+     nothing is removed from accessibility, just hidden visually. */
+  .nav-login{width:44px;height:44px;min-height:44px;padding:0;border-radius:50%;gap:0}
+  .nav-login-icon{display:block}
+  .nav-login-text{
+    position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+    overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
+  }
   header{padding:118px 0 72px}
   .hero-ctas .btn{flex:1;min-width:0}
   .hero-stats{display:grid;grid-template-columns:1fr 1fr;gap:20px}
@@ -401,7 +418,10 @@ footer{box-shadow:0 -1px 0 var(--line);padding:34px 0 max(34px,env(safe-area-ins
         <button data-lang="id">ID</button><button data-lang="en">EN</button><button data-lang="zh">中</button>
       </div>
       <button class="tgl" id="themeTgl" aria-label="Theme">🌙</button>
-      <a href="/app/" class="btn btn-soft btn-sm nav-cta" data-i18n="navLogin">Masuk</a>
+      <a href="/app/" class="btn btn-soft btn-sm nav-login">
+        <svg class="nav-login-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
+        <span class="nav-login-text" data-i18n="navLogin">Masuk</span>
+      </a>
       <a href="#harga" class="btn btn-gold btn-sm nav-cta" data-i18n="navCta">Coba Gratis</a>
     </div>
   </div>

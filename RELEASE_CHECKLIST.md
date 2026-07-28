@@ -240,6 +240,48 @@ set_id, atau pisahkan endpoint "practice/review" dari "scored attempt").
 
 ---
 
+## (i) Listening audio — gender salah di 160 soal — APPLIED, 2 PENDING cleanup
+
+**Bug**: pola soal `listening_mc` dengan `transcript[0]`=speaker A ("你...?")
+dan `transcript[1]`=speaker B jawab. Voice mapping (`audio_pipeline.py` /
+`tools/generate_listening_audio.py`) tetapkan A=suara perempuan, B=suara
+laki-laki. `payload.question` nanya soal B tapi salah nyebut "女的" — harusnya
+"男的". HSK 2 tidak kena karena pola dialognya kebalik (B nanya duluan), jadi
+tidak match filter. Detail lengkap + query: `sql/10_fix_listening_gender.sql`.
+
+**Kenapa audio ikut wajib diregenerate, bukan cuma teks**: baris "Q" di
+transcript ikut di-render jadi audio, dan `payload.hide_question === true` di
+soal-soal ini bikin `app/index.html` (`renderListeningMC`/
+`buildReviewListeningMC`) TIDAK menampilkan teks pertanyaan ke murid sama
+sekali (baik saat ngerjain maupun saat review) — murid cuma dengar dari
+audio. Ganti teks payload doang akan bikin narator audio masih bilang 女的
+sementara pilihan jawaban yang benar 男的.
+
+**✅ SUDAH di-apply & diverifikasi ke prod, 2026-07-28**:
+- `UPDATE 160` baris (`h1`=14, `h3`=60, `h4`=34, `h5`=52), query verifikasi
+  ulang (filter sama dengan backup) balik **0 baris**.
+- Audio 147 file unik (dari 160 baris, 13 audio_url dipakai >1 soal)
+  diregenerate via `scripts/regen_fixed_audio.py` — **147/147 berhasil, 0
+  gagal**. Reuse `render()`/`VOICE`/`RATE`/`GAP_MS` langsung dari
+  `audio_pipeline.py` biar identik dengan klip tetangga yang tidak ikut
+  diregen.
+- Run tanpa `--keep`, jadi tidak ada salinan mp3 lokal — jejak audio baru
+  cuma ada di Supabase Storage (`listening-audio`) prod.
+
+**⏳ PENDING #1 — hapus `question_bank_bak_20260728` setelah QA konfirmasi.**
+Tabel ini `select * from question_bank` — salinan LENGKAP 160 baris termasuk
+kolom `answer` (kunci jawaban), sudah di-`grant select ... to service_role`.
+Bukan tabel yang ke-cover RLS `question_bank` biasa — jangan dibiarkan lama.
+`drop table public.question_bank_bak_20260728;` setelah pending #2 selesai.
+
+**⏳ PENDING #2 — verifikasi dengar oleh tim konten.** Putar beberapa dari 147
+klip langsung di app (bukan cuma percaya log "upload sukses"), terutama yang
+`audio_url`-nya dipakai >1 soal. CDN/browser cache bisa bikin klip lama
+(versi 女的) masih kedengeran beberapa jam meski file di Storage sudah
+ketimpa.
+
+---
+
 ## Catatan proses (bukan buat Anda eksekusi, cuma transparansi)
 
 Sempat ada regresi nyata: `hideAllPages()` rusak total (throw di SETIAP navigasi, termasuk

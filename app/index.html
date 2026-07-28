@@ -1829,6 +1829,266 @@
     .tcVerdictTip{ font-size:13px; color:rgba(var(--text-rgb),.8); margin-top:6px; }
     .tcVerdictConfidence{ font-size:11px; color:var(--muted); margin-top:4px; }
     .tcNextBtn{ width:auto; margin:0 auto; padding:10px 20px; border-radius:99px; background:var(--panel-2); border:1px solid var(--line); color:var(--text); font-weight:700; cursor:pointer; display:block; }
+
+    /* ==========================================================
+       GRAMMAR (TATA BAHASA) -- port dari incoming/grammar.html.
+       Token --gr-*: dipakai KHUSUS buat nilai yang beda dari token app yang sudah ada (instruksi
+       eksplisit "jangan disesuaikan ke token app kalau beda"). Kalau nilai mockup PERSIS SAMA
+       dengan token app yang sudah ada di kedua tema (dark & light), var app dipakai langsung
+       (var(--bg), var(--dv4-panel), var(--muted), var(--gold), var(--gold-soft), var(--navy),
+       var(--display-font), var(--hanzi-serif-font), var(--dv4-mono)) -- itu BUKAN "disesuaikan",
+       itu sudah identik dari sononya. Sisanya (paper/tan/ink/seal/star-core/dll, semua grammar-
+       specific, gak ada padanan di app) dapet token --gr- baru dengan nilai PERSIS mockup.
+       ========================================================== */
+    :root{
+      --gr-pill:rgba(18,24,49,.95); --gr-hairline:rgba(255,255,255,.05);
+      --gr-raise:rgba(147,155,182,.12); --gr-track:rgba(147,155,182,.16);
+      --gr-text:#EEF0F8; --gr-text-rgb:238,240,248;
+      --gr-tiger:#F09000; --gr-seal:#D6332F; --gr-star-core:#FFF3D2;
+      --gr-paper:#FBF4E4; --gr-paper2:#FFFDF6; --gr-ink:#2B3559; --gr-ink2:#7A7160;
+      --gr-tan:#F0E3C8; --gr-tan2:#E6D6B4;
+      --gr-shadow:0 22px 55px rgba(0,0,0,.42);
+      --gr-pop:cubic-bezier(.34,1.56,.64,1); --gr-ease:cubic-bezier(.22,1,.36,1);
+      --gr-c1a:#2FA37B; --gr-c1b:#48D1A0; --gr-c2a:#4A86D8; --gr-c2b:#63ABF5;
+      --gr-c3a:#E0713F; --gr-c3b:#FA9A5E; --gr-c4a:#8B6FD4; --gr-c4b:#AC8DF5;
+    }
+    [data-theme="light"]{
+      --gr-pill:#FFFFFF; --gr-hairline:rgba(28,42,94,.07);
+      --gr-raise:rgba(28,42,94,.06); --gr-track:#EADFC4;
+      --gr-text:#1C2A5E; --gr-text-rgb:28,42,94;
+      /* kertas jadi lebih terang dari shell (bukan lebih hangat kayak dark) -- biar tetap "ngambang" */
+      --gr-paper:#FFFDF7; --gr-paper2:#FFFFFF; --gr-ink:#1C2A5E;
+      --gr-tan:#F5EAD3; --gr-tan2:#E4D3AE;
+      --gr-shadow:0 18px 44px rgba(31,42,80,.13);
+    }
+    /* .pageCard base (max-width:720px;margin:0 auto;padding:32px) DIHAPUS SEPENUHNYA, sama pola
+       .pageCard.dash -- konten buku/kertas butuh lebar sendiri, bukan kotak generik. */
+    .pageCard.grammar{ background:none; border:none; box-shadow:none; padding:0; max-width:none; margin:0; position:relative; }
+    .gr-skyWrap{ position:absolute; inset:0; z-index:0; overflow:hidden; pointer-events:none; border-radius:28px; }
+    .gr-content{ position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:6px 4px 60px; }
+    /* bintang malam -- scoped ke #grammarCard (BUKAN global), 55 titik PERSIS nilai mockup.
+       Dashboard sudah punya .dashV4-dots sendiri, scoped ke #dashCard -- ini kopi terpisah
+       buat halaman ini (instruksi eksplisit: kalau scoped, bikin versi scoped, jangan duplikat
+       yang global karena TIDAK ADA yang global di app ini). */
+    .gr-dots{ position:absolute; inset:0; z-index:0; pointer-events:none; }
+    .gr-dots span{
+      position:absolute; width:3px; height:3px; border-radius:50%;
+      background:var(--gr-star-core); box-shadow:0 0 6px rgba(242,205,126,.5);
+      opacity:0; transition:opacity .4s ease;
+    }
+    [data-theme="dark"] .gr-dots span{ animation:grTwinkle 5s ease-in-out infinite; }
+    @keyframes grTwinkle{ 0%,100%{ opacity:.26; } 50%{ opacity:.8; } }
+    /* awan siang -- nilai posisi/durasi PERSIS mockup (6 awan, array [top,dur,w,h]), bentuk 3-ellipse
+       solid (TIDAK pakai blur, sama alasan kayak dashboard). */
+    .gr-sky{ position:absolute; inset:0; z-index:0; pointer-events:none; opacity:0; transition:opacity .5s; }
+    [data-theme="light"] .gr-sky{ opacity:1; }
+    .gr-cloud{ position:absolute; opacity:.85; }
+    .gr-cloud svg{ display:block; }
+    @keyframes grDrift{ from{ transform:translateX(-12vw); } to{ transform:translateX(112vw); } }
+    @media (prefers-reduced-motion: reduce){ .gr-dots span, .gr-cloud{ animation:none !important; } }
+
+    .gr-crumb{ font-family:var(--dv4-mono); font-size:9.5px; letter-spacing:.2em; color:var(--muted); margin-bottom:14px; }
+    .gr-crumb b{ color:var(--gold); font-weight:500; }
+    .gr-h1{ font-family:var(--display-font); font-weight:800; font-size:38px; margin:0; letter-spacing:-.015em; color:var(--text); }
+    .gr-h1 em{ font-style:normal; color:var(--gold); }
+    .gr-lead{ color:var(--muted); font-size:14px; margin:10px 0 0; max-width:58ch; line-height:1.65; }
+
+    .gr-hero{
+      display:flex; align-items:center; gap:20px; margin-top:22px; padding:20px 24px; border-radius:26px;
+      background:var(--dv4-panel); box-shadow:var(--gr-shadow), inset 0 0 0 1px var(--gr-hairline);
+    }
+    .gr-hero .gr-bub{
+      position:relative; background:var(--gr-raise); border-radius:20px; padding:15px 19px;
+      font-size:14px; line-height:1.65; color:rgba(var(--text-rgb),.9); flex:1; border:none; box-shadow:none;
+    }
+    .gr-hero .gr-bub::before{
+      content:''; position:absolute; left:-7px; top:22px; width:15px; height:15px;
+      background:var(--gr-raise); transform:rotate(45deg); border-radius:3px;
+    }
+    .gr-masc{
+      width:82px; height:82px; flex:0 0 auto; border-radius:50%; object-fit:cover; background:var(--gr-raise);
+      animation:grBob 3.4s ease-in-out infinite;
+    }
+    .gr-mascFb{
+      width:82px; height:82px; flex:0 0 auto; border-radius:50%; display:grid; place-items:center;
+      font-family:var(--hanzi-serif-font); font-weight:900; font-size:34px; color:var(--navy);
+      background:linear-gradient(140deg,var(--gold),var(--gr-tiger)); animation:grBob 3.4s ease-in-out infinite;
+    }
+    @keyframes grBob{ 0%,100%{ transform:translateY(0) rotate(-1.5deg); } 50%{ transform:translateY(-7px) rotate(1.5deg); } }
+
+    .gr-shelf{ display:grid; grid-template-columns:repeat(auto-fit,minmax(218px,1fr)); gap:20px; margin:26px 0 6px; }
+    .gr-book{
+      position:relative; border:none; cursor:pointer; text-align:left; padding:0; border-radius:26px;
+      overflow:hidden; font-family:inherit; color:inherit; box-shadow:var(--gr-shadow); width:100%; margin-top:0;
+      transition:transform .4s var(--gr-pop), box-shadow .35s;
+    }
+    .gr-book:nth-child(odd){ transform:rotate(-.8deg); }
+    .gr-book:nth-child(even){ transform:rotate(.7deg); }
+    .gr-book:hover{ transform:translateY(-9px) rotate(0) scale(1.025); box-shadow:0 34px 70px rgba(0,0,0,.5); }
+    .gr-book .top{ height:142px; position:relative; display:grid; place-items:center; overflow:hidden; }
+    .gr-doodle{ position:absolute; inset:0; opacity:.5; width:100%; height:100%; }
+    .gr-book .glyph{
+      font-family:var(--hanzi-serif-font); font-weight:900; font-size:66px; color:#fff;
+      text-shadow:0 8px 24px rgba(0,0,0,.28); position:relative; transition:transform .4s var(--gr-pop);
+    }
+    .gr-book:hover .glyph{ transform:scale(1.12) rotate(-5deg); }
+    .gr-lvtag{
+      position:absolute; top:13px; left:14px; font-family:var(--dv4-mono); font-size:9px; letter-spacing:.18em;
+      color:rgba(255,255,255,.9); background:rgba(0,0,0,.22); padding:5px 10px; border-radius:99px;
+    }
+    .gr-book .bot{ background:var(--dv4-panel); padding:16px 18px 18px; box-shadow:inset 0 0 0 1px var(--gr-hairline); }
+    .gr-book .bot b{ font-family:var(--display-font); font-size:19px; font-weight:700; display:block; color:var(--text); }
+    .gr-book .bot small{ color:var(--muted); font-size:11.5px; display:block; margin-top:1px; }
+    .gr-stones{ display:flex; gap:4px; flex-wrap:wrap; margin-top:12px; }
+    .gr-stone{ width:11px; height:11px; border-radius:50%; background:var(--gr-track); transition:.3s var(--gr-pop); }
+    .gr-stone.on{ background:linear-gradient(140deg,var(--gold),var(--gold-soft)); box-shadow:0 0 9px rgba(242,176,30,.5); }
+    .gr-book .pct{ font-family:var(--dv4-mono); font-size:9px; color:var(--muted); margin-top:9px; display:block; }
+
+    .gr-tools{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin:24px 0 18px; }
+    .gr-btn{
+      cursor:pointer; border:none; font-family:inherit; font-weight:700; font-size:13px; padding:12px 20px;
+      border-radius:999px; transition:transform .28s var(--gr-pop), box-shadow .28s; width:auto; margin-top:0;
+    }
+    .gr-btn.gold{
+      color:var(--navy); background:linear-gradient(140deg,var(--gold),var(--gold-soft));
+      box-shadow:0 4px 0 #C98F0F, 0 10px 24px rgba(242,176,30,.3);
+    }
+    .gr-btn.paperbtn{ color:var(--gr-ink); background:var(--gr-paper2); box-shadow:0 3px 0 var(--gr-tan2); }
+    .gr-btn.ghost{ color:var(--muted); background:var(--gr-pill); box-shadow:inset 0 0 0 1px var(--gr-hairline); }
+    [data-theme="light"] .gr-btn.ghost{ box-shadow:0 3px 0 var(--gr-track); }
+    .gr-btn:hover:not(:disabled){ transform:translateY(-4px) scale(1.03); }
+    .gr-btn:disabled{ opacity:.35; cursor:default; }
+    .gr-search{ flex:1; min-width:200px; position:relative; }
+    .gr-search input{
+      width:100%; padding:12px 16px 12px 38px; border-radius:999px; border:none; background:var(--gr-pill);
+      box-shadow:inset 0 0 0 1px var(--gr-hairline); color:var(--text); font-family:inherit; font-size:13px; outline:none;
+    }
+    [data-theme="light"] .gr-search input{ background:#FFF; box-shadow:0 3px 0 var(--gr-track); }
+    .gr-search input::placeholder{ color:var(--muted); }
+    .gr-search input:focus{ box-shadow:inset 0 0 0 1px rgba(242,176,30,.45); }
+    .gr-mag{ position:absolute; left:15px; top:50%; transform:translateY(-50%); color:var(--muted); }
+
+    .gr-chaps{ display:grid; grid-template-columns:repeat(auto-fill,minmax(266px,1fr)); gap:17px; }
+    .gr-chap{
+      position:relative; border:none; cursor:pointer; text-align:left; font-family:inherit; color:inherit;
+      background:var(--dv4-panel); border-radius:24px; padding:20px; overflow:hidden; width:100%; margin-top:0;
+      box-shadow:var(--gr-shadow), inset 0 0 0 1px var(--gr-hairline); transition:transform .38s var(--gr-pop), box-shadow .3s;
+    }
+    .gr-chap:hover{ transform:translateY(-7px) rotate(-.7deg); box-shadow:0 32px 66px rgba(0,0,0,.5), inset 0 0 0 1px rgba(242,176,30,.24); }
+    .gr-ribbon{ position:absolute; top:0; left:0; width:5px; height:100%; }
+    .gr-chap .no{ font-family:var(--dv4-mono); font-size:9.5px; letter-spacing:.18em; color:var(--muted); }
+    .gr-chap .hz{ font-family:var(--hanzi-serif-font); font-weight:900; font-size:28px; margin-top:7px; line-height:1.15; color:var(--text); }
+    .gr-chap .py{ font-family:var(--dv4-mono); font-size:10px; color:var(--muted); margin-top:4px; }
+    .gr-chap .ds{
+      font-size:12.5px; color:rgba(var(--text-rgb),.66); margin-top:10px; line-height:1.55;
+      display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+    }
+    .gr-seal{
+      position:absolute; top:14px; right:14px; width:46px; height:46px; border-radius:11px; background:var(--gr-seal);
+      color:#fff; font-family:var(--hanzi-serif-font); font-weight:900; font-size:20px; display:grid; place-items:center;
+      transform:rotate(-13deg) scale(0); opacity:0; box-shadow:0 6px 18px rgba(214,51,47,.4);
+      transition:.45s var(--gr-pop); line-height:1;
+    }
+    .gr-chap.done .gr-seal{ transform:rotate(-13deg) scale(1); opacity:.96; }
+    .gr-chap.done .hz{ opacity:.55; }
+    .gr-seal.big{ width:64px; height:64px; font-size:28px; border-radius:15px; top:20px; right:22px; }
+    .gr-empty{ padding:34px 4px; color:var(--muted); font-size:13px; }
+
+    /* ---- HALAMAN = KERTAS ---- */
+    .gr-page{ border-radius:32px; overflow:hidden; max-width:960px; box-shadow:0 30px 70px rgba(0,0,0,.5); animation:grFlip .5s var(--gr-pop); }
+    [data-theme="light"] .gr-page{ box-shadow:0 26px 60px rgba(31,42,80,.18); }
+    @keyframes grFlip{ from{ opacity:0; transform:translateY(22px) rotateX(6deg); } to{ opacity:1; transform:none; } }
+    .gr-pTop{ padding:32px 34px 30px; position:relative; overflow:hidden; }
+    .gr-pTop .in{ position:relative; }
+    .gr-pNo{ font-family:var(--dv4-mono); font-size:9.5px; letter-spacing:.2em; color:rgba(255,255,255,.8); }
+    .gr-pHz{ font-family:var(--hanzi-serif-font); font-weight:900; font-size:56px; line-height:1.05; margin-top:9px; color:#fff; text-shadow:0 8px 26px rgba(0,0,0,.28); }
+    .gr-pPy{ font-family:var(--dv4-mono); font-size:12px; letter-spacing:.15em; color:rgba(255,255,255,.85); margin-top:8px; }
+
+    .gr-paper{
+      position:relative; background:var(--gr-paper); color:var(--gr-ink); padding:34px 34px 34px;
+      background-image:repeating-linear-gradient(180deg, transparent 0 33px, rgba(43,53,89,.045) 33px 34px);
+    }
+    [data-theme="light"] .gr-paper{ background-image:repeating-linear-gradient(180deg, transparent 0 33px, rgba(28,42,94,.05) 33px 34px); }
+    .gr-tape{
+      position:absolute; top:-12px; left:50%; width:118px; height:26px; transform:translateX(-50%) rotate(-1.6deg);
+      background:linear-gradient(180deg, rgba(242,176,30,.55), rgba(247,198,87,.42));
+      box-shadow:0 2px 6px rgba(0,0,0,.12); border-radius:2px;
+    }
+    .gr-talk{ display:flex; gap:16px; align-items:flex-start; }
+    .gr-bub{
+      position:relative; background:var(--gr-paper2); border-radius:22px; padding:18px 21px; font-size:14.5px;
+      line-height:1.8; color:var(--gr-ink); flex:1; box-shadow:0 4px 0 var(--gr-tan2), 0 10px 22px rgba(43,53,89,.08);
+      border:1.5px solid var(--gr-tan2);
+    }
+    .gr-bub::before{
+      content:''; position:absolute; left:-8px; top:26px; width:15px; height:15px; background:var(--gr-paper2);
+      transform:rotate(45deg); border-left:1.5px solid var(--gr-tan2); border-bottom:1.5px solid var(--gr-tan2);
+    }
+    .gr-bub .say{ color:var(--gr-ink2); font-size:13px; display:block; margin-top:11px; }
+    .gr-lab{ font-family:var(--display-font); font-weight:800; font-size:19px; margin:32px 0 15px; display:flex; align-items:center; gap:10px; color:var(--gr-ink); }
+    .gr-lab .gr-pin{
+      width:24px; height:24px; border-radius:50%; background:linear-gradient(140deg,var(--gold),var(--gold-soft));
+      display:grid; place-items:center; font-size:12px; color:#fff; box-shadow:0 3px 8px rgba(242,176,30,.4);
+    }
+    .gr-lab small{ font-family:var(--dv4-mono); font-size:9px; letter-spacing:.2em; color:var(--gr-ink2); font-weight:400; }
+
+    .gr-rumus{ padding:24px 22px; border-radius:22px; background:var(--gr-paper2); border:2px dashed var(--gr-tan2); position:relative; }
+    .gr-slots{ display:flex; flex-wrap:wrap; align-items:center; gap:10px; }
+    .gr-slot{
+      font-size:13.5px; font-weight:700; padding:11px 17px; border-radius:14px; background:var(--gr-tan);
+      color:var(--gr-ink); white-space:nowrap; box-shadow:0 3px 0 var(--gr-tan2); transition:transform .3s var(--gr-pop);
+    }
+    .gr-slot:hover{ transform:translateY(-3px); }
+    .gr-slot.key{
+      font-family:var(--hanzi-serif-font); font-weight:900; font-size:21px; color:#fff;
+      background:linear-gradient(140deg,var(--gr-seal),#E8544F); box-shadow:0 4px 0 #A82724, 0 8px 18px rgba(214,51,47,.28);
+      transform:rotate(-2deg);
+    }
+    .gr-slot.key:hover{ transform:rotate(0) translateY(-3px); }
+    .gr-plus{ color:var(--gr-ink2); font-family:var(--display-font); font-weight:700; font-size:17px; opacity:.55; }
+
+    .gr-ex{
+      margin-top:14px; padding:20px 21px; border-radius:22px; background:var(--gr-paper2); display:flex; gap:15px;
+      align-items:flex-start; border:1.5px solid var(--gr-tan2); box-shadow:0 4px 0 var(--gr-tan2);
+      transition:transform .3s var(--gr-pop), box-shadow .3s;
+    }
+    .gr-ex:hover{ transform:translate(3px,-3px); box-shadow:0 7px 0 var(--gr-tan2); }
+    .gr-ex .n{
+      font-family:var(--display-font); font-weight:800; font-size:15px; width:29px; height:29px; flex:0 0 auto;
+      border-radius:50%; display:grid; place-items:center; background:var(--gr-seal); color:#fff;
+      box-shadow:0 3px 8px rgba(214,51,47,.3);
+    }
+    .gr-ex .hz{ font-family:var(--hanzi-serif-font); font-size:23px; line-height:1.65; color:var(--gr-ink); }
+    .gr-ex .hz b{ font-weight:900; color:#B3261E; background:linear-gradient(180deg, transparent 54%, rgba(242,176,30,.55) 54%); padding:0 2px; }
+    .gr-ex .py{ font-family:var(--dv4-mono); font-size:11.5px; color:var(--gr-ink2); margin-top:8px; }
+    .gr-peek{
+      margin-top:11px; border:none; cursor:pointer; font-family:inherit; font-weight:700; font-size:12.5px;
+      color:var(--gr-ink); background:#FFE9A8; padding:9px 15px; border-radius:11px; transform:rotate(-1.2deg);
+      box-shadow:0 3px 0 #E8C86E; transition:transform .28s var(--gr-pop); width:auto; margin-top:11px;
+    }
+    .gr-peek:hover{ transform:rotate(0) translateY(-2px); }
+    .gr-idw{ font-size:14px; color:var(--gr-ink); margin-top:11px; padding-left:13px; border-left:3px solid var(--gold); animation:grFade .4s var(--gr-ease); }
+    @keyframes grFade{ from{ opacity:0; transform:translateY(-4px); } to{ opacity:1; } }
+
+    .gr-pFoot{ display:flex; gap:11px; align-items:center; flex-wrap:wrap; padding:22px 34px 28px; background:var(--gr-tan); border-top:2px dashed var(--gr-tan2); }
+    .gr-spacer{ flex:1; }
+    .gr-pCount{ font-family:var(--dv4-mono); font-size:10.5px; color:var(--gr-ink2); }
+    .gr-conf{ position:fixed; pointer-events:none; z-index:99; font-size:17px; animation:grCf .95s var(--gr-ease) forwards; }
+    @keyframes grCf{
+      0%{ opacity:1; transform:translate(0,0) scale(.5) rotate(0); }
+      100%{ opacity:0; transform:translate(var(--dx),var(--dy)) scale(1.15) rotate(var(--rot)); }
+    }
+
+    @media (max-width:760px){
+      .gr-content{ padding:4px 2px 60px; }
+      .gr-h1{ font-size:27px; }
+      .gr-hero{ flex-direction:column; text-align:center; }
+      .gr-hero .gr-bub::before{ left:calc(50% - 7px); top:-7px; }
+      .gr-pTop, .gr-paper, .gr-pFoot{ padding-left:20px; padding-right:20px; }
+      .gr-pHz{ font-size:40px; }
+      .gr-talk{ flex-direction:column; }
+      .gr-talk .gr-bub::before{ left:26px; top:-7px; border:none; border-top:1.5px solid var(--gr-tan2); border-left:1.5px solid var(--gr-tan2); }
+    }
   </style>
 </head>
 <body>
@@ -2423,6 +2683,47 @@
         <button id="toneCoachExitBtn" class="practiceExit">Kembali ke Materi</button>
       </div>
 
+      <!-- ============ GRAMMAR (TATA BAHASA) ============
+           Port dari incoming/grammar.html (mockup "paper book" -- rak/daftar bab/halaman).
+           3 view dalam 1 card (gr-view1/2/3), toggle visibility, BUKAN 3 pageCard terpisah --
+           sama persis pola mockup-nya sendiri (satu <main>, 3 <section> di-toggle .hide).
+           Data 100% dari window.GRAMMAR_DATA (grammar-data.js, root repo) -- NOL query Supabase.
+           Progres baca: localStorage 'xingGrammarDone' (array index), BUKAN ke server. -->
+      <div id="grammarCard" class="pageCard grammar hidden">
+        <div class="gr-skyWrap" aria-hidden="true">
+          <div class="gr-dots" id="grDots"></div>
+          <div class="gr-sky" id="grSky"></div>
+        </div>
+        <div class="gr-content">
+
+          <section id="grView1">
+            <div class="gr-crumb"><span id="grCrumb1Label">MATERIALS · GRAMMAR</span></div>
+            <h1 class="gr-h1"><span id="grShelfTitleA">Rak</span> <em id="grShelfTitleB">Tata Bahasa</em></h1>
+            <p class="gr-lead" id="grShelfLead">Empat buku, satu per level. Baca sebab, kumpulin stempelnya.</p>
+            <div class="gr-hero" id="grHero"></div>
+            <div class="gr-shelf" id="grShelf"></div>
+            <button type="button" class="practiceExit" id="grExitBtn">Kembali ke Materi</button>
+          </section>
+
+          <section id="grView2" class="hidden">
+            <div class="gr-crumb" id="grCrumb2"></div>
+            <h1 class="gr-h1" id="grBookTitle"></h1>
+            <p class="gr-lead" id="grBookLead"></p>
+            <div class="gr-tools">
+              <button type="button" class="gr-btn ghost" id="grToShelfBtn">← <span id="grAllBooksLabel">Semua buku</span></button>
+              <div class="gr-search"><span class="gr-mag">⌕</span><input type="text" id="grSearchInput" autocomplete="off" /></div>
+            </div>
+            <div class="gr-chaps" id="grChaps"></div>
+          </section>
+
+          <section id="grView3" class="hidden">
+            <div class="gr-crumb" id="grCrumb3"></div>
+            <div class="gr-page" id="grPage"></div>
+          </section>
+
+        </div>
+      </div>
+
       <!-- ============ STROKE PRACTICE (LATIHAN GORESAN) ============ -->
       <div id="strokePracticeCard" class="pageCard browse hidden">
         <p class="sub browseTitle" id="strokeHeader">Latihan Goresan</p>
@@ -2592,16 +2893,15 @@
             </div>
           </button>
 
-          <div class="hubCard comingSoon" data-card="grammar">
+          <button type="button" class="hubCard" id="hubCardGrammar" data-card="grammar">
             <div class="hubCardCover grammar">
               <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><rect x="4" y="4" width="16" height="11" rx="3"/><path d="M9 15 6 19v-4"/><path d="M7.5 8h9M7.5 11h6"/></svg>
-              <span class="hubStatusPill" id="hubStatusGrammar">Coming soon</span>
             </div>
             <div class="hubCardBody">
               <div class="hubCardTitle" id="hubCardGrammarTitle">Grammar</div>
               <div class="hubCardMeta" id="hubCardGrammarMeta">Sentence patterns, per level</div>
             </div>
-          </div>
+          </button>
 
           <button type="button" class="hubCard" id="hubCardListening" data-card="listening">
             <div class="hubCardCover listening">
@@ -2738,6 +3038,9 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.28.1/dist/index.js"></script>
+  <!-- grammar-page: 72 poin data statis (HSK 1-4), path absolut karena app ada di /app/.
+       window.GRAMMAR_DATA -- tidak per-user, tidak butuh Supabase. -->
+  <script src="/grammar-data.js"></script>
   <script>
   /* ==========================================================
      KONFIG — dua nilai ini aman ditaruh di client (public-safe)
@@ -2968,6 +3271,24 @@
           hubChipAll:'Semua', hubChipVocab:'Kosakata', hubChipGrammar:'Grammar', hubChipListening:'Listening', hubChipMock:'Mock',
           hubCardVocabTitle:'Deck Kosakata', hubCardVocabMeta:'Flashcard per level',
           hubCardGrammarTitle:'Grammar', hubCardGrammarMeta:'Pola kalimat per level',
+          grCrumbMaterials:'MATERIALS · GRAMMAR', grShelfTitleA:'Rak', grShelfTitleB:'Tata Bahasa',
+          grShelfLead:'Empat buku, satu per level. Baca sebab, kumpulin stempelnya.',
+          grAllBooks:'Semua buku', grSearchPlaceholder:'Cari bab…', grNoResults:'Gak ketemu. Coba kata kunci lain.',
+          grLevelTag:'LEVEL {n}', grChapCountLabel:'bab pola kalimat',
+          grBookTitlePrefix:'Buku', grBookLeadDone:'Semua {n} bab kelar. Rapi banget.',
+          grBookLeadProgress:'{total} bab · {n} udah kamu baca.',
+          grChapterLabel:'BAB {n}', grChapterOf:'BAB {n} DARI {total}',
+          grFormulaLabel:'Rumusnya begini', grFormulaSmall:'RUMUS',
+          grExampleLabel:'Coba tebak artinya', grExampleSmall:'CONTOH',
+          grPeek:'Lihat artinya →', grBackToChaps:'Daftar bab',
+          grPrev:'Sebelumnya', grNext:'Berikutnya',
+          grMarkDone:'Tandai udah dibaca', grMarkedDone:'Udah dibaca',
+          grHeroProgress:'Udah {n} bab kekumpul dari {total}.',
+          grHi1:'Halo! Siap nambah pola baru hari ini?', grHi2:'Pelan-pelan aja — satu bab sehari udah keren.',
+          grHi3:'Pilih buku mana aja, gak harus urut kok.', grHi4:'Yuk lanjut. Stempelnya nunggu dikumpulin.',
+          grSay1:'Nah, gitu polanya. Gampang kok kalau udah kebiasa.', grSay2:'Perhatiin posisi katanya ya.',
+          grSay3:'Coba baca contohnya keras-keras, biar nempel.', grSay4:'Kalau bingung, liat lagi rumusnya di atas.',
+          grYay1:'Mantap! Stempel dapet.', grYay2:'Satu bab kelar. Lanjut?', grYay3:'Keren, tambah satu lagi.',
           hubCardListeningTitle:'Listening', hubCardListeningMeta:'Latihan audio per level',
           hubCardReadingTitle:'Reading', hubCardReadingMeta:'Paket latihan membaca',
           hubCardWritingTitle:'Writing', hubCardWritingMeta:'Ruang latihan menulis bebas',
@@ -3114,6 +3435,24 @@
           hubChipAll:'All', hubChipVocab:'Vocab', hubChipGrammar:'Grammar', hubChipListening:'Listening', hubChipMock:'Mock',
           hubCardVocabTitle:'Vocab Deck', hubCardVocabMeta:'Flashcard deck, per level',
           hubCardGrammarTitle:'Grammar', hubCardGrammarMeta:'Sentence patterns, per level',
+          grCrumbMaterials:'MATERIALS · GRAMMAR', grShelfTitleA:'Grammar', grShelfTitleB:'Shelf',
+          grShelfLead:'Four books, one per level. Read the why, collect the stamps.',
+          grAllBooks:'All books', grSearchPlaceholder:'Search chapters…', grNoResults:'No matches. Try another keyword.',
+          grLevelTag:'LEVEL {n}', grChapCountLabel:'sentence pattern chapters',
+          grBookTitlePrefix:'Book', grBookLeadDone:'All {n} chapters done. Nicely done.',
+          grBookLeadProgress:'{total} chapters · {n} read so far.',
+          grChapterLabel:'CH {n}', grChapterOf:'CHAPTER {n} OF {total}',
+          grFormulaLabel:'Here’s the formula', grFormulaSmall:'FORMULA',
+          grExampleLabel:'Guess the meaning', grExampleSmall:'EXAMPLE',
+          grPeek:'See meaning →', grBackToChaps:'Chapter list',
+          grPrev:'Previous', grNext:'Next',
+          grMarkDone:'Mark as read', grMarkedDone:'Read',
+          grHeroProgress:'{n} of {total} chapters collected.',
+          grHi1:'Halo! Siap nambah pola baru hari ini?', grHi2:'Pelan-pelan aja — satu bab sehari udah keren.',
+          grHi3:'Pilih buku mana aja, gak harus urut kok.', grHi4:'Yuk lanjut. Stempelnya nunggu dikumpulin.',
+          grSay1:'Nah, gitu polanya. Gampang kok kalau udah kebiasa.', grSay2:'Perhatiin posisi katanya ya.',
+          grSay3:'Coba baca contohnya keras-keras, biar nempel.', grSay4:'Kalau bingung, liat lagi rumusnya di atas.',
+          grYay1:'Mantap! Stempel dapet.', grYay2:'Satu bab kelar. Lanjut?', grYay3:'Keren, tambah satu lagi.',
           hubCardListeningTitle:'Listening', hubCardListeningMeta:'Audio drills, per level',
           hubCardReadingTitle:'Reading', hubCardReadingMeta:'Reading practice sets',
           hubCardWritingTitle:'Writing', hubCardWritingMeta:'Free-write workspace',
@@ -3260,6 +3599,24 @@
           hubChipAll:'全部', hubChipVocab:'词汇', hubChipGrammar:'语法', hubChipListening:'听力', hubChipMock:'模拟',
           hubCardVocabTitle:'词汇卡组', hubCardVocabMeta:'按级别分类的记忆卡组',
           hubCardGrammarTitle:'语法', hubCardGrammarMeta:'按级别分类的句型',
+          grCrumbMaterials:'学习材料 · 语法', grShelfTitleA:'语法', grShelfTitleB:'书架',
+          grShelfLead:'四本书，每个级别一本。理解原因，收集印章。',
+          grAllBooks:'所有书', grSearchPlaceholder:'搜索章节…', grNoResults:'没有找到，换个关键词试试。',
+          grLevelTag:'第 {n} 级', grChapCountLabel:'个句型章节',
+          grBookTitlePrefix:'书', grBookLeadDone:'全部 {n} 章已完成，真棒。',
+          grBookLeadProgress:'共 {total} 章 · 已读 {n} 章。',
+          grChapterLabel:'第 {n} 章', grChapterOf:'第 {n} 章，共 {total} 章',
+          grFormulaLabel:'公式是这样的', grFormulaSmall:'公式',
+          grExampleLabel:'猜猜意思', grExampleSmall:'例句',
+          grPeek:'查看意思 →', grBackToChaps:'章节列表',
+          grPrev:'上一个', grNext:'下一个',
+          grMarkDone:'标记为已读', grMarkedDone:'已读',
+          grHeroProgress:'已收集 {total} 章中的 {n} 章。',
+          grHi1:'Halo! Siap nambah pola baru hari ini?', grHi2:'Pelan-pelan aja — satu bab sehari udah keren.',
+          grHi3:'Pilih buku mana aja, gak harus urut kok.', grHi4:'Yuk lanjut. Stempelnya nunggu dikumpulin.',
+          grSay1:'Nah, gitu polanya. Gampang kok kalau udah kebiasa.', grSay2:'Perhatiin posisi katanya ya.',
+          grSay3:'Coba baca contohnya keras-keras, biar nempel.', grSay4:'Kalau bingung, liat lagi rumusnya di atas.',
+          grYay1:'Mantap! Stempel dapet.', grYay2:'Satu bab kelar. Lanjut?', grYay3:'Keren, tambah satu lagi.',
           hubCardListeningTitle:'听力', hubCardListeningMeta:'按级别分类的听力练习',
           hubCardReadingTitle:'阅读', hubCardReadingMeta:'阅读练习题集',
           hubCardWritingTitle:'写作', hubCardWritingMeta:'自由写作练习区',
@@ -3490,7 +3847,6 @@
     $('hubChipMock').textContent = t('hubChipMock');
     $('hubCardVocabTitle').textContent = t('hubCardVocabTitle');
     $('hubCardVocabMeta').textContent = t('hubCardVocabMeta');
-    $('hubStatusGrammar').textContent = t('comingSoon');
     $('hubCardGrammarTitle').textContent = t('hubCardGrammarTitle');
     $('hubCardGrammarMeta').textContent = t('hubCardGrammarMeta');
     $('hubCardListeningTitle').textContent = t('hubCardListeningTitle');
@@ -3527,6 +3883,13 @@
     $('hubCardToneCoachMeta').textContent = t('hubCardToneCoachMeta');
     $('toneCoachHeader').textContent = t('toneCoachHeader');
     $('toneCoachExitBtn').textContent = t('backToMateri');
+    $('grExitBtn').textContent = t('backToMateri');
+    $('grCrumb1Label').textContent = t('grCrumbMaterials');
+    $('grShelfTitleA').textContent = t('grShelfTitleA');
+    $('grShelfTitleB').textContent = t('grShelfTitleB');
+    $('grShelfLead').textContent = t('grShelfLead');
+    $('grAllBooksLabel').textContent = t('grAllBooks');
+    $('grSearchInput').setAttribute('placeholder', t('grSearchPlaceholder'));
     $('tcListenBtn').textContent = t('toneCoachListenBtn');
     $('tcNextBtn').textContent = t('toneCoachNext');
     if(!tcRecording) $('tcRecordBtn').textContent = t('toneCoachRecordBtn');
@@ -3642,7 +4005,7 @@
 
   /* ---------- navigasi appShell (Task: reskin) ---------- */
   function hideAllPages(){
-    ['dashCard','practiceCard','raportCard','browseCard','radicalsCard','strokePracticeCard','pinyinGuideCard','sandhiGuideCard','toneCoachCard','mockListCard','attemptCard','resultCard','riwayatCard','materialsHubCard','adminCard']
+    ['dashCard','practiceCard','raportCard','browseCard','radicalsCard','strokePracticeCard','pinyinGuideCard','sandhiGuideCard','toneCoachCard','grammarCard','mockListCard','attemptCard','resultCard','riwayatCard','materialsHubCard','adminCard']
       .forEach(id => $(id).classList.add('hidden'));
   }
 
@@ -6240,6 +6603,310 @@
   $('tcNextBtn') && $('tcNextBtn').addEventListener('click', ()=>{
     tcLoadWord((tcWordIndex + 1) % TONE_COACH_WORDS.length);
   });
+
+  /* ==========================================================
+     GRAMMAR (TATA BAHASA) -- port dari incoming/grammar.html.
+     Data 100% dari window.GRAMMAR_DATA (grammar-data.js) -- NOL query Supabase, NOL tabel baru.
+     Progres baca: localStorage 'xingGrammarDone' (array index global ke GRAMMAR_DATA), BUKAN
+     ke server. Semua state/fungsi di-scope ke IIFE sendiri (nama pendek generik ala mockup --
+     done/q/idx/lv -- BERISIKO tabrakan sama scope besar file ini, jadi di-prefix gr* + dibungkus
+     IIFE terpisah, bukan sekadar disiplin naming). openGrammar/closeGrammar TETAP bisa dipanggil
+     dari luar (navTo/hub click) lewat closure biasa -- TIDAK perlu expose ke window, cukup
+     addEventListener-nya didaftarkan di dalam IIFE yang sama. Satu-satunya exception: fallback
+     mascot pakai onerror inline (butuh scope global sungguhan, beda dari closure JS biasa). ====== */
+  (function(){
+    const DATA = window.GRAMMAR_DATA || [];
+    const TH = {
+      1:['var(--gr-c1a)','var(--gr-c1b)','一'], 2:['var(--gr-c2a)','var(--gr-c2b)','二'],
+      3:['var(--gr-c3a)','var(--gr-c3b)','三'], 4:['var(--gr-c4a)','var(--gr-c4b)','四']
+    };
+    const MASC = {1:'mascot-wave.png', 2:'mascot-sit.png', 3:'mascot-study.png', 4:'mascot-desk.png'};
+    const DONE_KEY = 'xingGrammarDone';
+
+    function grLoadDone(){
+      try{ return new Set(JSON.parse(localStorage.getItem(DONE_KEY) || '[]')); }
+      catch(e){ return new Set(); }
+    }
+    let grDone = grLoadDone();
+    function grSaveDone(){ localStorage.setItem(DONE_KEY, JSON.stringify([...grDone])); }
+
+    let grLevel = 1, grQuery = '', grIdx = 0, grView = 1;
+
+    function grByLevel(n){ return DATA.filter(g => g.hsk === n); }
+    function grGlobalIndex(g){ return DATA.indexOf(g); }
+    function grPick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+    function grPct(n){
+      const a = grByLevel(n);
+      const d = a.filter(x => grDone.has(grGlobalIndex(x))).length;
+      return [d, a.length, a.length ? Math.round(d / a.length * 100) : 0];
+    }
+
+    /* mascot -- src ABSOLUT (/assets/...), onerror fallback lingkaran emas (sesuai instruksi
+       eksplisit "gak pernah broken image"). window.grMascFallback: SATU-SATUNYA fungsi grammar
+       yang genuinely perlu global scope (inline onerror attribute jalan di global scope, bukan
+       closure JS biasa -- beda dari semua fungsi gr* lain di file ini). */
+    window.grMascFallback = function(img){
+      if(img) img.outerHTML = '<div class="gr-mascFb">虎</div>';
+    };
+    function grMascotHtml(level){
+      const src = '/assets/' + (MASC[level] || MASC[1]);
+      return '<img class="gr-masc" src="' + src + '" alt="" onerror="grMascFallback(this)" />';
+    }
+    function grDoodleSvg(){
+      return '<svg class="gr-doodle" viewBox="0 0 200 140" preserveAspectRatio="none">' +
+        '<circle cx="26" cy="26" r="40" fill="rgba(255,255,255,.14)"/>' +
+        '<circle cx="182" cy="118" r="30" fill="rgba(255,255,255,.12)"/>' +
+        '<circle cx="160" cy="24" r="4" fill="rgba(255,255,255,.5)"/>' +
+        '<circle cx="140" cy="46" r="2.5" fill="rgba(255,255,255,.4)"/>' +
+        '<circle cx="40" cy="112" r="3" fill="rgba(255,255,255,.45)"/>' +
+        '<path d="M0 128 Q50 108 100 126 T200 118" stroke="rgba(255,255,255,.16)" stroke-width="7" fill="none" stroke-linecap="round"/></svg>';
+    }
+    function grKeys(g){ return g.hanzi.split('…').filter(x => x && x !== '?'); }
+    function grHighlight(text, g){
+      let o = text;
+      grKeys(g).forEach(k => { o = o.split(k).join('' + k + ''); });
+      return escapeHtml(o).split('').join('<b>').split('').join('</b>');
+    }
+
+    function grRenderShelf(){
+      const total = DATA.length, dn = grDone.size;
+      const greetPool = [t('grHi1'), t('grHi2'), t('grHi3'), t('grHi4')];
+      const greetText = dn
+        ? t('grHeroProgress').replace('{n}', dn).replace('{total}', total) + ' ' + grPick(greetPool)
+        : grPick(greetPool);
+      $('grHero').innerHTML = grMascotHtml(1) + '<div class="gr-bub">' + escapeHtml(greetText) + '</div>';
+
+      $('grShelf').innerHTML = [1,2,3,4].map(function(n){
+        const th = TH[n], a = th[0], b = th[1], gl = th[2];
+        const stat = grPct(n), d = stat[0], tt = stat[1], p = stat[2];
+        const stones = grByLevel(n).map(x =>
+          '<span class="gr-stone' + (grDone.has(grGlobalIndex(x)) ? ' on' : '') + '"></span>'
+        ).join('');
+        return '<button type="button" class="gr-book" data-level="' + n + '">' +
+          '<div class="top" style="background:linear-gradient(140deg,' + a + ',' + b + ')">' + grDoodleSvg() +
+            '<span class="gr-lvtag">' + escapeHtml(t('grLevelTag').replace('{n}', n)) + '</span><div class="glyph">' + gl + '</div></div>' +
+          '<div class="bot"><b>HSK ' + n + '</b><small>' + tt + ' ' + escapeHtml(t('grChapCountLabel')) + '</small>' +
+            '<div class="gr-stones">' + stones + '</div><span class="pct">' + d + '/' + tt + ' · ' + p + '%</span></div></button>';
+      }).join('');
+    }
+
+    function grOpenBook(n){
+      grLevel = n; grQuery = ''; $('grSearchInput').value = '';
+      grView = 2; grShowView(2); grRenderChapters();
+    }
+
+    function grRenderChapters(){
+      const stat = grPct(grLevel), d = stat[0], tt = stat[1];
+      $('grCrumb2').innerHTML = escapeHtml(t('grCrumbMaterials')) + ' · <b>HSK ' + grLevel + '</b>';
+      $('grBookTitle').innerHTML = escapeHtml(t('grBookTitlePrefix')) + ' <em>HSK ' + grLevel + '</em>';
+      $('grBookLead').textContent = d === tt
+        ? t('grBookLeadDone').replace('{n}', tt)
+        : t('grBookLeadProgress').replace('{total}', tt).replace('{n}', d);
+
+      const s = grQuery.trim().toLowerCase();
+      const levelList = grByLevel(grLevel);
+      const list = levelList.filter(g =>
+        !s || g.hanzi.includes(s) || g.pinyin.toLowerCase().includes(s) || g.desc.toLowerCase().includes(s)
+      );
+      const el = $('grChaps');
+      if(!list.length){
+        el.innerHTML = '<div class="gr-empty">' + escapeHtml(t('grNoResults')) + '</div>';
+        return;
+      }
+      const th = TH[grLevel], a = th[0], b = th[1];
+      el.innerHTML = list.map(function(g){
+        const i = grGlobalIndex(g);
+        const no = levelList.indexOf(g) + 1;
+        return '<button type="button" class="gr-chap' + (grDone.has(i) ? ' done' : '') + '" data-idx="' + (no - 1) + '">' +
+          '<span class="gr-ribbon" style="background:linear-gradient(180deg,' + a + ',' + b + ')"></span>' +
+          '<span class="gr-seal">读</span><div class="no">' + escapeHtml(t('grChapterLabel').replace('{n}', String(no).padStart(2,'0'))) + '</div>' +
+          '<div class="hz">' + escapeHtml(g.hanzi) + '</div><div class="py">' + escapeHtml(g.pinyin) + '</div>' +
+          '<div class="ds">' + escapeHtml(g.desc) + '</div></button>';
+      }).join('');
+    }
+
+    function grOpenPage(i){
+      grIdx = i; grView = 3; grShowView(3); grRenderPage();
+      window.scrollTo({ top:0, behavior:'smooth' });
+    }
+
+    function grRenderPage(){
+      const arr = grByLevel(grLevel);
+      const g = arr[grIdx];
+      if(!g) return;
+      const i = grGlobalIndex(g);
+      const th = TH[grLevel], a = th[0], b = th[1];
+      $('grCrumb3').innerHTML = escapeHtml(t('grCrumbMaterials')) + ' · HSK ' + grLevel + ' · <b>' +
+        escapeHtml(t('grChapterLabel').replace('{n}', String(grIdx + 1).padStart(2,'0'))) + '</b>';
+
+      const slots = g.formula.split('+').map(s => s.trim()).filter(Boolean).map(function(s){
+        const isKey = /[一-鿿]/.test(s);
+        return '<span class="gr-slot' + (isKey ? ' key' : '') + '">' + escapeHtml(s) + '</span>';
+      }).join('<span class="gr-plus">+</span>');
+
+      const sayLine = grPick([t('grSay1'), t('grSay2'), t('grSay3'), t('grSay4')]);
+
+      const examplesHtml = g.examples.map((e, n) =>
+        '<div class="gr-ex"><div class="n">' + (n + 1) + '</div>' +
+          '<div style="min-width:0"><div class="hz">' + grHighlight(e.hz, g) + '</div>' +
+          '<div class="py">' + escapeHtml(e.py) + '</div>' +
+          '<button type="button" class="gr-peek" data-id="' + escapeHtml(e.id) + '">' + escapeHtml(t('grPeek')) + '</button></div></div>'
+      ).join('');
+
+      $('grPage').innerHTML =
+        '<div class="gr-pTop" style="background:linear-gradient(140deg,' + a + ',' + b + ')">' + grDoodleSvg() +
+          (grDone.has(i) ? '<span class="gr-seal big" style="transform:rotate(-13deg) scale(1);opacity:.96">读</span>' : '') +
+          '<div class="in"><div class="pNo">' + escapeHtml(t('grChapterOf').replace('{n}', String(grIdx + 1).padStart(2,'0')).replace('{total}', arr.length)) + '</div>' +
+          '<div class="pHz">' + escapeHtml(g.hanzi) + '</div><div class="pPy">' + escapeHtml(g.pinyin.toUpperCase()) + '</div></div></div>' +
+        '<div class="gr-paper"><div class="gr-tape"></div>' +
+          '<div class="gr-talk">' + grMascotHtml(grLevel) + '<div class="gr-bub">' + escapeHtml(g.desc) +
+            '<span class="say">' + escapeHtml(sayLine) + '</span></div></div>' +
+          '<div class="gr-lab"><span class="gr-pin">✎</span>' + escapeHtml(t('grFormulaLabel')) + ' <small>' + escapeHtml(t('grFormulaSmall')) + '</small></div>' +
+          '<div class="gr-rumus"><div class="gr-slots">' + slots + '</div></div>' +
+          '<div class="gr-lab"><span class="gr-pin">?</span>' + escapeHtml(t('grExampleLabel')) + ' <small>' + escapeHtml(t('grExampleSmall')) + '</small></div>' +
+          examplesHtml +
+        '</div>' +
+        '<div class="gr-pFoot">' +
+          '<button type="button" class="gr-btn paperbtn" data-action="toChaps">← ' + escapeHtml(t('grBackToChaps')) + '</button>' +
+          '<button type="button" class="gr-btn paperbtn" data-action="prev"' + (grIdx === 0 ? ' disabled' : '') + '>' + escapeHtml(t('grPrev')) + '</button>' +
+          '<span class="gr-pCount">' + (grIdx + 1) + ' / ' + arr.length + '</span>' +
+          '<button type="button" class="gr-btn paperbtn" data-action="next"' + (grIdx === arr.length - 1 ? ' disabled' : '') + '>' + escapeHtml(t('grNext')) + '</button>' +
+          '<span class="gr-spacer"></span>' +
+          '<button type="button" class="gr-btn ' + (grDone.has(i) ? 'paperbtn' : 'gold') + '" data-action="mark" data-idx="' + i + '">' +
+            (grDone.has(i) ? '✓ ' + escapeHtml(t('grMarkedDone')) : escapeHtml(t('grMarkDone'))) + '</button></div>';
+    }
+
+    function grJump(d){
+      const arr = grByLevel(grLevel);
+      grIdx = Math.min(arr.length - 1, Math.max(0, grIdx + d));
+      grRenderPage();
+      window.scrollTo({ top:0, behavior:'smooth' });
+    }
+
+    function grBoom(el){
+      if(!el) return;
+      const r = el.getBoundingClientRect();
+      const symbols = ['✦','★','✧','·'];
+      const colors = ['#F2B01E','#F7C657','#D6332F','#F09000'];
+      for(let i = 0; i < 16; i++){
+        const s = document.createElement('div');
+        s.className = 'gr-conf';
+        s.textContent = grPick(symbols);
+        const dx = (Math.random() * 260 - 130).toFixed(0);
+        const dy = (Math.random() * -190 - 40).toFixed(0);
+        const rot = (Math.random() * 540 - 270).toFixed(0);
+        s.style.cssText = 'left:' + (r.left + r.width / 2) + 'px; top:' + (r.top + r.height / 2) + 'px; ' +
+          'color:' + grPick(colors) + '; --dx:' + dx + 'px; --dy:' + dy + 'px; --rot:' + rot + 'deg';
+        document.body.appendChild(s);
+        setTimeout(() => s.remove(), 1000);
+      }
+    }
+
+    function grMark(i, btn){
+      const was = grDone.has(i);
+      if(was) grDone.delete(i); else grDone.add(i);
+      grSaveDone();
+      if(!was) grBoom(btn);
+      grRenderPage();
+      grRenderShelf();
+      if(!was){
+        const foot = document.querySelector('#grPage .gr-pFoot');
+        if(foot){
+          const toast = document.createElement('span');
+          toast.className = 'gr-pCount';
+          toast.style.cssText = 'color:var(--gr-seal); font-weight:700;';
+          toast.textContent = grPick([t('grYay1'), t('grYay2'), t('grYay3')]);
+          foot.appendChild(toast);
+          setTimeout(() => toast.remove(), 2400);
+        }
+      }
+    }
+
+    function grShowView(n){
+      [1,2,3].forEach(x => $('grView' + x).classList.toggle('hidden', x !== n));
+    }
+    function grToShelf(){ grView = 1; grShowView(1); grRenderShelf(); window.scrollTo({ top:0, behavior:'smooth' }); }
+    function grToChaps(){ grView = 2; grShowView(2); grRenderChapters(); window.scrollTo({ top:0, behavior:'smooth' }); }
+
+    function openGrammar(){
+      setActiveNav('materi');
+      hideAllPages();
+      $('grammarCard').classList.remove('hidden');
+      grShowView(grView);
+      if(grView === 1) grRenderShelf();
+      else if(grView === 2) grRenderChapters();
+      else grRenderPage();
+    }
+    function closeGrammar(){ navTo(openMaterialsHub); }
+
+    $('hubCardGrammar') && $('hubCardGrammar').addEventListener('click', () => navTo(openGrammar));
+    $('grExitBtn').addEventListener('click', closeGrammar);
+    $('grToShelfBtn').addEventListener('click', grToShelf);
+    $('grSearchInput').addEventListener('input', e => { grQuery = e.target.value; grRenderChapters(); });
+
+    $('grShelf').addEventListener('click', function(e){
+      const btn = e.target.closest('.gr-book');
+      if(!btn) return;
+      grOpenBook(+btn.dataset.level);
+    });
+    $('grChaps').addEventListener('click', function(e){
+      const btn = e.target.closest('.gr-chap');
+      if(!btn) return;
+      grOpenPage(+btn.dataset.idx);
+    });
+    $('grPage').addEventListener('click', function(e){
+      const peekBtn = e.target.closest('.gr-peek');
+      if(peekBtn){
+        const idw = document.createElement('div');
+        idw.className = 'gr-idw';
+        idw.textContent = peekBtn.dataset.id;
+        peekBtn.replaceWith(idw);
+        return;
+      }
+      const actionBtn = e.target.closest('[data-action]');
+      if(!actionBtn) return;
+      const action = actionBtn.dataset.action;
+      if(action === 'toChaps') grToChaps();
+      else if(action === 'prev') grJump(-1);
+      else if(action === 'next') grJump(1);
+      else if(action === 'mark') grMark(+actionBtn.dataset.idx, actionBtn);
+    });
+    document.addEventListener('keydown', function(e){
+      if($('grammarCard').classList.contains('hidden')) return;
+      if(grView !== 3) return;
+      if(e.key === 'ArrowLeft') grJump(-1);
+      if(e.key === 'ArrowRight') grJump(1);
+    });
+
+    /* bintang malam -- 55 titik, nilai PERSIS mockup, generate SEKALI (guard dataset flag). */
+    (function(){
+      const wrap = $('grDots');
+      if(!wrap || wrap.dataset.grInit) return;
+      wrap.dataset.grInit = '1';
+      let html = '';
+      for(let i = 0; i < 55; i++){
+        html += '<span style="left:' + (Math.random() * 100).toFixed(2) + '%;top:' + (Math.random() * 100).toFixed(2) + '%;animation-delay:' + (Math.random() * 5).toFixed(2) + 's"></span>';
+      }
+      wrap.innerHTML = html;
+    })();
+    /* awan siang -- 6 awan, array [top%,durasi,lebar,tinggi] PERSIS mockup, generate SEKALI. */
+    (function(){
+      const wrap = $('grSky');
+      if(!wrap || wrap.dataset.grInit) return;
+      wrap.dataset.grInit = '1';
+      const C = [[9,74,58,26],[26,150,96,42],[54,58,46,20],[71,120,78,34],[88,92,62,26],[41,200,120,52]];
+      wrap.innerHTML = C.map(function(c, i){
+        const top = c[0], dur = c[1], w = c[2], h = c[3];
+        const delay = (dur * (i * 0.17 % 1)).toFixed(0);
+        return '<div class="gr-cloud" style="top:' + top + '%;width:' + w + 'px;height:' + h + 'px;' +
+          'animation:grDrift ' + dur + 's linear infinite;animation-delay:-' + delay + 's">' +
+          '<svg viewBox="0 0 120 52" width="' + w + '" height="' + h + '">' +
+          '<ellipse cx="38" cy="34" rx="30" ry="17" fill="#fff"/>' +
+          '<ellipse cx="66" cy="26" rx="24" ry="21" fill="#fff"/>' +
+          '<ellipse cx="88" cy="35" rx="22" ry="15" fill="#fff"/></svg></div>';
+      }).join('');
+    })();
+  })();
 
   /* ==========================================================
      ADMIN — USER MANAGEMENT (v1, DECISIONS_NEEDED #30/#31)

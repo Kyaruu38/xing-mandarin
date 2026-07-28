@@ -6756,8 +6756,8 @@
       $('grPage').innerHTML =
         '<div class="gr-pTop" style="background:linear-gradient(140deg,' + a + ',' + b + ')">' + grDoodleSvg() +
           (grDone.has(i) ? '<span class="gr-seal big" style="transform:rotate(-13deg) scale(1);opacity:.96">读</span>' : '') +
-          '<div class="in"><div class="pNo">' + escapeHtml(t('grChapterOf').replace('{n}', String(grIdx + 1).padStart(2,'0')).replace('{total}', arr.length)) + '</div>' +
-          '<div class="pHz">' + escapeHtml(g.hanzi) + '</div><div class="pPy">' + escapeHtml(g.pinyin.toUpperCase()) + '</div></div></div>' +
+          '<div class="in"><div class="gr-pNo">' + escapeHtml(t('grChapterOf').replace('{n}', String(grIdx + 1).padStart(2,'0')).replace('{total}', arr.length)) + '</div>' +
+          '<div class="gr-pHz">' + escapeHtml(g.hanzi) + '</div><div class="gr-pPy">' + escapeHtml(g.pinyin.toUpperCase()) + '</div></div></div>' +
         '<div class="gr-paper"><div class="gr-tape"></div>' +
           '<div class="gr-talk">' + grMascotHtml(grLevel) + '<div class="gr-bub">' + escapeHtml(g.desc) +
             '<span class="say">' + escapeHtml(sayLine) + '</span></div></div>' +

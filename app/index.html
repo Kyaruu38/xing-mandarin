@@ -830,12 +830,10 @@
     .dashV4-skillTop{ display:flex; align-items:baseline; justify-content:space-between; margin-bottom:7px; font-size:12.5px; font-weight:700; }
     .dashV4-skillTop .v{ font-family:var(--dv4-mono); font-size:11.5px; color:var(--muted); font-weight:400; }
     .dashV4-skillTop .v b{ color:var(--text); font-size:13px; }
-    /* dashboard-rebuild D2/D3: row per-seksi SELALU dirender (termasuk Writing walau belum ada
+    /* dashboard-rebuild D2: row per-seksi SELALU dirender (termasuk Writing walau belum ada
        data valid -- lihat laporan diagnosa D1), empty state IN-ROW (bukan whole-card fallback
-       lagi). Row REVIEW (SRS) dipisah garis tipis + label beda warna, biar jelas bukan skor ujian. */
+       lagi). */
     .dashV4-skillTop .vEmpty{ font-family:inherit; font-size:11.5px; color:rgba(var(--text-rgb),.4); font-weight:600; }
-    .dashV4-skillReview{ margin-top:15px; padding-top:15px; border-top:1px solid var(--line); }
-    .dashV4-skillReview .dashV4-skillTop > span:first-child{ color:var(--gold); }
     .dashV4-skillBar{ height:7px; border-radius:99px; background:rgba(var(--text-rgb),.1); position:relative; }
     /* dashboard-rebuild: garis putus-putus penanda 60% (kriteria resmi HSK), nilai dari
        mockup .skill-bar em disalin persis. */
@@ -844,6 +842,17 @@
        aturan "maksimal 1 blok besar" cuma berlaku buat blok background gold penuh (CTA/badge/
        sidebar block), bukan aksen tipis kayak ini. */
     .dashV4-skillBar i{ display:block; height:100%; width:0; border-radius:99px; background:var(--gold); transition:width 1.1s cubic-bezier(.22,1,.36,1); }
+    /* dashboard-rebuild (koreksi D3): teks analisis di bawah 3 bar seksi -- NILAI PERSIS
+       mockup .skill-note/.skill-note b. Seksi terlemah di-highlight --danger (bukan --gold,
+       ini bukan aksen "budget emas" -- warna mockup asli buat menyorot kelemahan). */
+    .dashV4-skillNote{ margin-top:16px; font-size:12px; color:var(--muted); }
+    .dashV4-skillNote b{ color:var(--danger); }
+    .dashV4-skillNoteBtn{
+      display:inline-flex; align-items:center; gap:5px; margin-top:9px; width:auto;
+      padding:6px 13px; border-radius:999px; font-size:11.5px; font-weight:700;
+      background:rgba(var(--text-rgb),.06); color:var(--text); border:none; cursor:pointer; font-family:inherit;
+    }
+    .dashV4-skillNoteBtn:hover{ background:rgba(var(--text-rgb),.1); }
 
     /* ---- MISI HARI INI -- checklist mockup, isi Target Harian real, TANPA XP ---- */
     .dashV4-missionHead{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px; }
@@ -2105,6 +2114,7 @@
             <div class="dashV4-card">
               <div class="dashV4-eyebrow" id="eyebrowSkill">SKOR PER SEKSI</div>
               <div id="dashV4SkillBody"></div>
+              <div class="dashV4-skillNote" id="dashV4SkillNote"></div>
             </div>
 
             <div class="dashV4-card">
@@ -2910,7 +2920,12 @@
           avaPassSubmit:'Simpan', avaPassTooShort:'Password minimal 8 karakter', avaPassMismatch:'Password tidak sama',
           avaPassSuccess:'Password berhasil diubah', avaMenuWa:'Hubungi Admin',
           gaugeAvgLabel:'Rata-rata 3 simulasi terakhir', gaugePassLine:'Garis lulus: ',
-          gaugeEmptyState:'Belum ada simulasi', skillEmptyState:'Belum ada data', skillReviewLabel:'PENGUASAAN KATA (SRS)',
+          gaugeEmptyState:'Belum ada simulasi', skillEmptyState:'Belum ada data',
+          skillNoteEmpty:'Selesaikan simulasi pertamamu buat lihat analisis.',
+          skillNoteNeutralFew:'Selesaikan simulasi di seksi lain juga biar analisisnya lengkap.',
+          skillNoteNeutralEqual:'Performamu merata di semua seksi — pertahankan ritmenya!',
+          skillNoteWeakest:'masih paling lemah dibanding seksi lain.',
+          recToneCoach:'Coba Tone Coach', recFlashcard:'Latihan Flashcard SRS', recStroke:'Latihan Goresan',
           dailyMissionLabel:'Kata direview hari ini',
           dailyMissionsHead:'Misi Selesai', missionReviewLabel:'Review kata', missionMockLabel:'Selesaikan mock test', missionStrokeLabel:'Latihan goresan',
           greetTowardLevel:'Menuju HSK {n}', greetAboveLine:'prediksimu di atas garis lulus', greetBelowLine:'prediksimu di bawah garis lulus',
@@ -3051,7 +3066,12 @@
           avaPassSubmit:'Save', avaPassTooShort:'Password must be at least 8 characters', avaPassMismatch:'Passwords do not match',
           avaPassSuccess:'Password changed successfully', avaMenuWa:'Contact Admin',
           gaugeAvgLabel:'Average of last 3 simulations', gaugePassLine:'Pass line: ',
-          gaugeEmptyState:'No simulations yet', skillEmptyState:'No data yet', skillReviewLabel:'WORD MASTERY (SRS)',
+          gaugeEmptyState:'No simulations yet', skillEmptyState:'No data yet',
+          skillNoteEmpty:'Finish your first simulation to see the analysis.',
+          skillNoteNeutralFew:'Try a simulation in other sections too for a fuller analysis.',
+          skillNoteNeutralEqual:'Your performance is even across all sections — keep it up!',
+          skillNoteWeakest:'is still your weakest section.',
+          recToneCoach:'Try Tone Coach', recFlashcard:'Practice Flashcard SRS', recStroke:'Practice Strokes',
           dailyMissionLabel:'Words reviewed today',
           dailyMissionsHead:'Missions Done', missionReviewLabel:'Review words', missionMockLabel:'Finish a mock test', missionStrokeLabel:'Stroke practice',
           greetTowardLevel:'Heading to HSK {n}', greetAboveLine:'your prediction is above the passing line', greetBelowLine:'your prediction is below the passing line',
@@ -3192,7 +3212,12 @@
           avaPassSubmit:'保存', avaPassTooShort:'密码至少需要 8 个字符', avaPassMismatch:'两次输入的密码不一致',
           avaPassSuccess:'密码修改成功', avaMenuWa:'联系管理员',
           gaugeAvgLabel:'近3次模拟平均分', gaugePassLine:'及格线：',
-          gaugeEmptyState:'还没有模拟考试', skillEmptyState:'暂无数据', skillReviewLabel:'词汇掌握度（SRS）',
+          gaugeEmptyState:'还没有模拟考试', skillEmptyState:'暂无数据',
+          skillNoteEmpty:'完成第一次模拟考试即可查看分析。',
+          skillNoteNeutralFew:'也去完成其他部分的模拟考试，分析会更完整。',
+          skillNoteNeutralEqual:'各部分表现均衡——保持下去！',
+          skillNoteWeakest:'仍是你最弱的部分。',
+          recToneCoach:'试试声调教练', recFlashcard:'练习闪卡 SRS', recStroke:'练习笔画',
           dailyMissionLabel:'今天已复习的词',
           dailyMissionsHead:'已完成任务', missionReviewLabel:'复习单词', missionMockLabel:'完成一次模拟测试', missionStrokeLabel:'笔画练习',
           greetTowardLevel:'迈向HSK {n}', greetAboveLine:'你的预测分数已达到及格线', greetBelowLine:'你的预测分数低于及格线',
@@ -8532,12 +8557,14 @@
        tapi total_points=0, ke-filter di atas jadi effectively "no data"). Empty state IN-ROW,
        bukan sembunyi baris/whole-card lagi. */
     skillBody.innerHTML = '';
+    const sectionAvgs = {};
     SECTIONS.forEach(function(sec){
       const list = bySection[sec];
       const row = document.createElement('div');
       row.className = 'dashV4-skill';
       if(list && list.length){
         const avgSec = Math.round(list.reduce((a,b)=>a+b,0) / list.length);
+        sectionAvgs[sec] = avgSec;
         row.innerHTML = '<div class="dashV4-skillTop"><span>' + (SECTION_LABEL[sec] || sec) +
           '</span><span class="v"><b>' + avgSec + '</b> /100</span></div>' +
           '<div class="dashV4-skillBar"><i style="width:' + avgSec + '%"></i><em></em></div>';
@@ -8549,28 +8576,45 @@
       skillBody.appendChild(row);
     });
 
-    /* D3 -- baris REVIEW (SRS), dipisah garis tipis (.dashV4-skillReview) + label gold (beda
-       dari 3 seksi ujian di atas). Metrik: kata mastery_level>=MASTERED_THRESHOLD (const yang
-       SUDAH ADA, sama definisi dengan stat "Kata Dikuasai") dibagi total kata level 1..target
-       (fetchVocabLevelCounts() -- CALLABLE, bukan fungsi terlarang -- kumulatif, sama konvensi
-       dengan PACKAGE_LEVELS/word-of-day). currentProfile.target_level null -> fallback 4 (sama
-       seperti gauge di atas). Data gak ada -> 0%, BUKAN disembunyikan (tetap jujur, bukan angka karang). */
-    try{
-      const [{ count: masteredCount, error: mErr }, vocabTotals] = await Promise.all([
-        sb.from('user_mastery').select('user_id', { count:'exact', head:true })
-          .eq('user_id', currentUser).gte('mastery_level', MASTERED_THRESHOLD),
-        fetchVocabLevelCounts()
-      ]);
-      let totalInScope = 0;
-      for(let lv = 1; lv <= level; lv++) totalInScope += (vocabTotals[lv] || 0);
-      const reviewPct = (!mErr && totalInScope > 0) ? Math.round((masteredCount || 0) / totalInScope * 100) : 0;
-      const reviewRow = document.createElement('div');
-      reviewRow.className = 'dashV4-skill dashV4-skillReview';
-      reviewRow.innerHTML = '<div class="dashV4-skillTop"><span>' + t('skillReviewLabel') +
-        '</span><span class="v"><b>' + reviewPct + '</b>%</span></div>' +
-        '<div class="dashV4-skillBar"><i style="width:' + reviewPct + '%"></i></div>';
-      skillBody.appendChild(reviewRow);
-    }catch(e){ console.error('Gagal hitung progres review:', e.message); }
+    /* D3 (KOREKSI sesi ini -- BUKAN baris ke-4 lagi, itu salah paham instruksi sebelumnya):
+       teks analisis di bawah bar, NILAI PERSIS mockup .skill-note (seksi terlemah di-danger,
+       sisanya muted). Poin 2b (tipe soal tersering salah, dari join test_attempts.answers x
+       question_bank) SENGAJA DI-SKIP -- bukan soal berat/data kurang, tapi SECURITY: semua
+       SELECT question_bank di app ini (2 tempat lain) SENGAJA TIDAK PERNAH include kolom
+       `answer`/`explanation` (lihat riwayat sql/09_submit_attempt_entitlement.sql soal
+       kebocoran jawaban yang belum full ditambal) -- narik `answer` ke client buat fitur ini
+       bakal buka balik celah yang sama. Analisis berhenti di level seksi + rekomendasi fitur
+       (poin 2a + 2c), TIDAK ada detail tipe soal/grammar (poin 5, gak dikarang). */
+    (function renderSkillNote(){
+      const noteEl = $('dashV4SkillNote');
+      if(!noteEl) return;
+      const withData = Object.keys(sectionAvgs);
+      if(withData.length === 0){
+        noteEl.textContent = t('skillNoteEmpty');
+        return;
+      }
+      if(withData.length === 1){
+        noteEl.textContent = t('skillNoteNeutralFew');
+        return;
+      }
+      const vals = withData.map(s => sectionAvgs[s]);
+      const minVal = Math.min.apply(null, vals);
+      const maxVal = Math.max.apply(null, vals);
+      if(minVal === maxVal){
+        noteEl.textContent = t('skillNoteNeutralEqual');
+        return;
+      }
+      const weakest = withData.find(s => sectionAvgs[s] === minVal);
+      const REC = {
+        listening: { label: t('recToneCoach'), go: ()=> navTo(openToneCoach) },
+        reading:   { label: t('recFlashcard'), go: ()=> openPractice() },
+        writing:   { label: t('recStroke'),    go: ()=> navTo(openStrokePractice) }
+      };
+      const rec = REC[weakest];
+      noteEl.innerHTML = '<b>' + (SECTION_LABEL[weakest] || weakest) + '</b> ' + t('skillNoteWeakest') +
+        (rec ? '<br/><button type="button" class="dashV4-skillNoteBtn" id="dashV4SkillNoteBtn">' + rec.label + ' →</button>' : '');
+      if(rec){ $('dashV4SkillNoteBtn').addEventListener('click', rec.go); }
+    })();
 
     updateGreetSubtitle(pcts.length > 0, avgPct);
   });

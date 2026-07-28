@@ -43,6 +43,11 @@
       --dv4-shadow:0 18px 44px rgba(31,42,80,.10);
       --dv4-shadow-hover:0 26px 60px rgba(31,42,80,.15), 0 0 50px rgba(242,176,30,.12);
       --dv4-mono:'IBM Plex Mono', monospace;
+      /* dashboard-rebuild: --sky-1/--cloud mockup (nama diprefix --dv4- ikut konvensi token
+         section ini). Cuma dipakai light mode (siang) -- tidak didefinisikan ulang di blok
+         [data-theme="dark"] di bawah karena elemen awan/burung disembunyikan total di dark. */
+      --dv4-sky1:#BFE0F5;
+      --dv4-cloud:#FFFFFF;
     }
     [data-theme="dark"]{
       --bg:#0B1128; --bg2:#121A38; --panel:#1C2B58; --panel-2:#141F45;
@@ -386,6 +391,18 @@
       flex:1; min-width:0; padding:clamp(24px,3vw,40px); overflow-x:hidden;
       background:radial-gradient(120% 80% at 100% 0%, var(--bg2), var(--bg) 60%);
     }
+    /* dashboard-rebuild: pas dashboard aktif (body.dashV4-page-active, lihat observer JS),
+       .mainContent lepas padding-nya sendiri -- spacing dipindah ke #dashCard punya 2 anak
+       langsung (.pageHeader + .dashV4-grid) dengan nilai PERSIS mockup (.topbar:32px 36px 10px,
+       .grid:26px 30px 52px -- 2 rule beda, bukan 1, sama seperti sumbernya), biar lebar grid =
+       viewport - sidebar tanpa terpotong padding ganda. Desktop/tablet SAJA (>760px) -- mobile
+       TIDAK disentuh, .mainContent mobile punya alasan lain (clearance .bottomNav fixed via
+       safe-area calc, lihat rule mobile-nya sendiri) yang harus tetap utuh. */
+    @media (min-width:761px){
+      body.dashV4-page-active .mainContent{ padding:0; }
+      #dashCard .pageHeader{ padding:32px 36px 10px; }
+      #dashCard .dashV4-grid{ padding:22px 36px 52px; }
+    }
 
     /* ============ mobile header + bottom nav (fase 1, <=760px only) ============
        Hidden here by default (desktop) -- @media (max-width:760px) below is what turns
@@ -434,11 +451,14 @@
     }
 
     /* dashboard -- no outer card chrome, matches design (cards float directly on .mainContent gradient) */
-    /* dashboard-rebuild (sesi ini): max-width/margin:0 auto DIHAPUS -- itu yang bikin dashboard
-       sempit dengan ruang kosong kiri-kanan. Mockup: full width dikurangi sidebar, tanpa
-       max-width. Scoped ke .pageCard.dash SAJA (selector ini sudah spesifik dashboard, tidak
+    /* dashboard-rebuild (sesi INI, root-cause fix): sesi SEBELUMNYA cuma hapus max-width/margin
+       dari .pageCard.dash, tapi base .pageCard{ max-width:720px; margin:0 auto; } di atas TETAP
+       KENA -- .dash tidak pernah override 2 properti itu, jadi cascade tetap ambil dari base
+       rule (per-property, bukan per-selector). Makanya "sudah dihapus" tapi dashboard tetap
+       ke-clamp. Fix beneran: override EKSPLISIT max-width:none + margin:0 di sini. Scoped ke
+       .pageCard.dash SAJA (kombinasi class ini cuma dipakai #dashCard, grep dikonfirmasi -- tidak
        memengaruhi .pageCard polos yang dipakai halaman lain). */
-    .pageCard.dash{ background:none; border:none; box-shadow:none; padding:0; animation:fadeIn .4s ease; }
+    .pageCard.dash{ background:none; border:none; box-shadow:none; padding:0; max-width:none; margin:0; animation:fadeIn .4s ease; }
     .dash .hello{font-family:var(--display-font); font-size:31px; font-weight:700; line-height:1.1; margin:0;}
     .dash .hello b{color:var(--text)}
     .dash .sub{ margin-top:1px; font-size:14.5px; color:rgba(var(--text-rgb),.6); }
@@ -702,6 +722,51 @@
     @keyframes dashV4Twinkle{ 0%,100%{ opacity:.28; } 50%{ opacity:.85; } }
     @media (prefers-reduced-motion: reduce){ [data-theme="dark"] .dashV4-dots span{ animation:none; opacity:.5; } }
 
+    /* ---- light-mode "siang" sky (dashboard-rebuild sesi ini). Mockup PUNYA elemen awan
+       (.cloud/.cd-1/.cd-2, cuma 2 instance -- diport PERSIS termasuk JUMLAHNYA, bukan
+       ditambah ke 4-6 sesuai brief fallback, karena instruksinya "kalau ADA, port persis")
+       tapi TIDAK punya elemen burung -- itu dibangun sendiri sesuai brief (2-3 ekor).
+       Awan mockup pakai position:fixed ke viewport polos; di sini di-scope
+       position:absolute di dalam .dashV4-aurWrap (sudah overflow:hidden + inset:0 ke
+       #dashCard) -- alasan SAMA PERSIS kayak kenapa .dashV4-aur juga bukan position:fixed
+       (lihat komentar di atas): biar tidak bocor ke halaman lain pas dashCard hidden.
+       TIDAK pakai blur apapun buat efek visualnya -- bentuk awan dari 3 lingkaran solid
+       (radius via border-radius), sesuai instruksi eksplisit (iOS render blur jadi kotak
+       hitam kalau elemen di luar viewport/composited aneh). */
+    [data-theme="light"] .dashV4-aurWrap{
+      background:linear-gradient(180deg, var(--dv4-sky1) 0%, var(--bg) 68%);
+    }
+    .dashV4-cloud{
+      position:absolute; width:120px; height:34px; background:var(--dv4-cloud);
+      border-radius:999px; opacity:0; pointer-events:none;
+      animation:dashV4CloudDrift 85s ease-in-out infinite;
+    }
+    .dashV4-cloud::before, .dashV4-cloud::after{
+      content:''; position:absolute; background:var(--dv4-cloud); border-radius:999px;
+    }
+    .dashV4-cloud::before{ width:48px; height:48px; top:-24px; left:16px; }
+    .dashV4-cloud::after{ width:60px; height:60px; top:-28px; right:14px; }
+    @keyframes dashV4CloudDrift{ 0%,100%{ transform:translateX(0) scale(var(--s,1)); } 50%{ transform:translateX(60px) scale(var(--s,1)); } }
+    .dashV4-cloud.c1{ --s:.75; top:15%; right:3%; }
+    .dashV4-cloud.c2{ --s:.5; top:36%; left:5%; animation-duration:100s; }
+    [data-theme="light"] .dashV4-cloud{ opacity:.65; }
+    /* burung -- TIDAK ada di mockup, dibangun sendiri: siluet garis ganda (2 lengkung),
+       terbang horizontal pelan + naik-turun tipis (mengepak), 3 ekor beda tinggi/kecepatan. */
+    .dashV4-bird{
+      position:absolute; width:22px; height:11px; color:rgba(var(--text-rgb),.35);
+      opacity:0; pointer-events:none; animation:dashV4BirdFly 55s linear infinite;
+    }
+    @keyframes dashV4BirdFly{
+      0%{ transform:translate(-10vw,0); }
+      50%{ transform:translate(55vw,-14px); }
+      100%{ transform:translate(120vw,0); }
+    }
+    .dashV4-bird.b1{ top:12%; animation-duration:52s; animation-delay:-6s; }
+    .dashV4-bird.b2{ top:22%; width:16px; height:8px; animation-duration:68s; animation-delay:-24s; }
+    .dashV4-bird.b3{ top:8%; width:18px; height:9px; animation-duration:60s; animation-delay:-40s; }
+    [data-theme="light"] .dashV4-bird{ opacity:.55; }
+    @media (prefers-reduced-motion: reduce){ .dashV4-cloud, .dashV4-bird{ animation:none !important; } }
+
     /* ---- RESUME hero -- dipakai buat "Lanjutkan Latihan" (Continue Practice prod) ---- */
     .dashV4-resumeTop{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap; }
     .dashV4-resumeTop h2{ font-family:var(--display-font); font-weight:700; font-size:23px; line-height:1.2; color:var(--text); }
@@ -880,7 +945,12 @@
        Tablet: instruksi eksplisit "stat span 6, sisanya span 12" -- dipakai literal, override
        breakpoint asli mockup punya gauge/skill/day/word (yang aslinya span 6 di tablet). Mobile:
        semua span 12, sama seperti mockup (grid-template-columns collapse ke 1fr). ---- */
-    .dashV4-grid{ display:grid; grid-template-columns:repeat(12,1fr); gap:22px; margin-top:22px; }
+    /* dashboard-rebuild: align-items:start -- default grid stretch bikin SEMUA card di 1 baris
+       ke-force setinggi card tertinggi di baris itu (mis. Skor per Seksi/Aktivitas/Misi ketarik
+       setinggi yang paling panjang), isinya numpuk di atas + kosong di bawah. start = card
+       setinggi konten sendiri-sendiri. Efek samping BAIK: kalau Skor per Seksi cuma render 2
+       baris seksi (bukan 3), card-nya otomatis ikut mengecil -- tidak perlu logic tambahan. */
+    .dashV4-grid{ display:grid; grid-template-columns:repeat(12,1fr); gap:22px; margin-top:22px; align-items:start; }
     .dashV4-gridStat{ grid-column:span 3; }
     .dashV4-gridContinue{ grid-column:span 8; }
     .dashV4-gridSm{ grid-column:span 4; }
@@ -1881,6 +1951,11 @@
           <span class="dashV4-aur a2"></span>
           <span class="dashV4-aur a3"></span>
           <div class="dashV4-dots" id="dashV4Dots"></div>
+          <span class="dashV4-cloud c1"></span>
+          <span class="dashV4-cloud c2"></span>
+          <svg class="dashV4-bird b1" viewBox="0 0 24 12" fill="none"><path d="M0 6 Q6 0 12 6 Q18 0 24 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <svg class="dashV4-bird b2" viewBox="0 0 24 12" fill="none"><path d="M0 6 Q6 0 12 6 Q18 0 24 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <svg class="dashV4-bird b3" viewBox="0 0 24 12" fill="none"><path d="M0 6 Q6 0 12 6 Q18 0 24 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
         </div>
         <div class="dashV4-content">
 
@@ -8160,6 +8235,22 @@
     document.querySelectorAll('.dashV4-greetHz rt').forEach(el => { el.textContent = g[1]; });
   })();
 
+  /* ---------- body class "dashV4-page-active" -- MURNI sinyal CSS-scoping (bukan boot-once
+     macam dashV4OnBoot di atas), karena #dashCard toggle hidden/visible BERULANG kali tiap
+     user pindah halaman (bukan cuma sekali di awal sesi). Dipakai buat scope override padding
+     .mainContent KHUSUS pas dashboard aktif (lihat CSS .dashV4-grid/.mainContent di bawah) --
+     tanpa ini, .mainContent (dipakai SEMUA halaman) tidak bisa di-override cuma buat dashboard
+     tanpa :has() (sengaja dihindari di file ini, lihat komentar .toggleChip:focus-within) atau
+     nyentuh hideAllPages()/goBerandaContent()/renderDash() (yang terakhir terlarang diedit).
+     Observer ini baca ATTRIBUTE class (presence/absence), BUKAN konten/data. */
+  (function(){
+    const dashCard = $('dashCard');
+    if(!dashCard) return;
+    function sync(){ document.body.classList.toggle('dashV4-page-active', !dashCard.classList.contains('hidden')); }
+    sync();
+    new MutationObserver(sync).observe(dashCard, { attributes:true, attributeFilter:['class'] });
+  })();
+
   /* ================================================================
      DASHBOARD v4 (dashboard-rebuild) -- reveal animation, NILAI/MEKANISME PERSIS
      incoming/dashboard.html (staggered setTimeout per index, skip stagger kalau
@@ -8341,19 +8432,23 @@
      rebuild sesi ini): test_attempts.created_at + user_mastery.last_reviewed, jendela 84 hari
      (=12x7, pas sama grid). user_mastery.last_reviewed itu overwrite per kata (bukan log per
      kejadian) jadi hari lama memang bisa bolong -- itu diterima, TIDAK diisi angka random.
-     Rendering titik (posisi jitter, radius per intensitas, opacity) NILAI PERSIS dari algoritma
-     mockup (hash()/R[] array/COLS/ROWS/CS/PAD), cuma lvl(i) fiktifnya diganti hitungan real.
+     Rendering titik (posisi jitter, radius per intensitas, opacity) algoritma dari mockup
+     (hash()/R[] array/COLS/ROWS), cuma lvl(i) fiktifnya diganti hitungan real. CS/PAD (ukuran
+     sel) DINAIKKAN dari nilai mockup (22/7 -> 26/9) atas instruksi eksplisit "perbesar area
+     gridnya supaya mengisi card" -- BUKAN nilai yang wajib disalin persis (itu cuma parameter
+     rendering JS, bukan CSS mockup), aspect ratio COLS:ROWS (12:7) tidak berubah.
      Trail/klik-reveal mockup TIDAK diport (di luar scope -- titik intensitas aja yang diminta).
      Streak pakai computeStreak() yang SUDAH ADA (tidak diedit), dikasih Set gabungan 2 sumber
      di atas supaya konsisten sama definisi "aktif" card ini sendiri. Guard query-sekali-per-sesi
-     otomatis dari dashV4OnBoot (observer disconnect sesudah fire pertama). ---------- */
+     dari dashV4OnBoot (fire sekali per currentUser id, bukan disconnect permanen -- lihat
+     komentar dispatcher-nya soal kasus ganti akun tanpa reload). ---------- */
   dashV4OnBoot(async function(){
     const svg = $('dashV4SkyGrid');
     const sumEl = $('dashV4SkySum');
     const streakEl = $('dashV4SkyStreak');
     if(!svg) return;
     const NS = 'http://www.w3.org/2000/svg';
-    const COLS = 12, ROWS = 7, CS = 22, PADX = 7, PADY = 7;
+    const COLS = 12, ROWS = 7, CS = 26, PADX = 9, PADY = 9;
     const DAYS = COLS * ROWS;
     svg.setAttribute('viewBox', '0 0 ' + (COLS*CS+PADX*2) + ' ' + (ROWS*CS+PADY*2));
     function hash(i){ const x = Math.sin(i*97.13) * 43758.5453; return x - Math.floor(x); }

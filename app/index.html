@@ -323,6 +323,22 @@
     .sidebarStreakLabel{ font-size:10.5px; color:var(--text); font-weight:800; text-transform:uppercase; letter-spacing:.07em; }
     .sidebarStreakNum{ font-size:19px; font-weight:800; color:var(--text); }
     .sidebarStreakUnit{ font-size:11.5px; font-weight:600; color:rgba(var(--text-rgb),.6); }
+    /* dashboard-rebuild: sidebar "PAKET AKTIF" block, nilai layout dari mockup .pkg/.dev
+       disalin persis; warna surface diganti ke token app yang sudah ada (--dv4-panel/
+       --dv4-hairline, pola sama seperti .sidebarStreak di atas) karena mockup pakai
+       --raise/--star-core yang tidak ada di app ini. TANPA CTA upgrade (tidak ada alurnya). */
+    .sidebarPkg{
+      border-radius:20px; padding:15px 15px 15px 17px; margin-bottom:8px;
+      background:var(--dv4-panel); box-shadow:inset 3px 0 0 0 var(--gold), inset 0 0 0 1px var(--dv4-hairline);
+    }
+    .sidebarPkgMono{ font-size:9px; letter-spacing:.22em; color:var(--gold); font-weight:800; text-transform:uppercase; }
+    .sidebarPkgName{ display:block; font-size:13.5px; font-weight:700; color:var(--text); margin:4px 0 2px; }
+    .sidebarPkgUntil{ display:block; font-size:11.5px; color:var(--muted); }
+    .sidebarDev{
+      display:flex; align-items:center; gap:9px; padding:10px 14px; border-radius:999px;
+      background:rgba(var(--text-rgb),.06); font-size:11.5px; color:var(--muted); margin-bottom:14px;
+    }
+    .sidebarDev .hz{ font-size:12px; color:var(--ok); }
     .sidebarUser{ border-top:1px solid var(--line); padding-top:14px; }
     .sidebarUserName{ font-weight:700; font-size:14px; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .sidebarUserMeta{ font-size:12px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -418,7 +434,11 @@
     }
 
     /* dashboard -- no outer card chrome, matches design (cards float directly on .mainContent gradient) */
-    .pageCard.dash{ background:none; border:none; box-shadow:none; padding:0; max-width:1000px; margin:0 auto; animation:fadeIn .4s ease; }
+    /* dashboard-rebuild (sesi ini): max-width/margin:0 auto DIHAPUS -- itu yang bikin dashboard
+       sempit dengan ruang kosong kiri-kanan. Mockup: full width dikurangi sidebar, tanpa
+       max-width. Scoped ke .pageCard.dash SAJA (selector ini sudah spesifik dashboard, tidak
+       memengaruhi .pageCard polos yang dipakai halaman lain). */
+    .pageCard.dash{ background:none; border:none; box-shadow:none; padding:0; animation:fadeIn .4s ease; }
     .dash .hello{font-family:var(--display-font); font-size:31px; font-weight:700; line-height:1.1; margin:0;}
     .dash .hello b{color:var(--text)}
     .dash .sub{ margin-top:1px; font-size:14.5px; color:rgba(var(--text-rgb),.6); }
@@ -447,6 +467,38 @@
     }
     .packageBadge.vip .planIcon{ display:none; }
     .packageBadge.vip .crownIcon{ display:inline; }
+    /* dashboard-rebuild: avatar dari mockup .ava (nilai disalin persis), dipasangkan di
+       samping packageBadge lewat wrapper flex row baru (mockup nempatkannya di .top-right
+       terpisah, layout app ini beda jadi butuh wrapper -- bukan bagian dari nilai mockup itu
+       sendiri). Klik avatar buka menu akun berisi aksi yang SUDAH ADA (tema/bahasa/keluar). */
+    .dashV4-planRow{ display:flex; align-items:center; justify-content:flex-end; gap:12px; position:relative; }
+    .dashV4-ava{
+      width:42px; height:42px; border-radius:50%; flex-shrink:0;
+      background:linear-gradient(135deg,var(--gold),var(--gold-soft)); color:#1C2A5E;
+      display:flex; align-items:center; justify-content:center; font-weight:800; font-size:15px;
+      transition:transform .3s cubic-bezier(.22,1,.36,1); cursor:pointer; border:none; padding:0;
+      font-family:inherit;
+    }
+    .dashV4-ava:hover{ transform:scale(1.08); }
+    .dashV4-avaMenu{
+      position:absolute; top:calc(100% + 10px); right:0; min-width:180px; z-index:20;
+      background:var(--dv4-panel); border:1px solid var(--dv4-hairline); border-radius:16px;
+      padding:8px; box-shadow:var(--dv4-shadow); backdrop-filter:blur(20px);
+      display:flex; flex-direction:column; gap:2px;
+    }
+    .dashV4-avaMenu.hidden{ display:none; }
+    .dashV4-avaMenuItem{
+      display:flex; align-items:center; gap:9px; width:100%; margin-top:0; padding:9px 11px;
+      border-radius:10px; background:none; border:none; font-family:inherit; font-size:13px;
+      font-weight:600; color:var(--text); text-align:left; cursor:pointer; transition:background .2s;
+    }
+    .dashV4-avaMenuItem:hover{ background:rgba(var(--text-rgb),.06); }
+    .dashV4-avaMenuLangRow{ display:flex; gap:4px; padding:4px 4px 6px; }
+    .dashV4-avaMenuLangRow button{
+      flex:1; width:auto; margin-top:0; padding:6px 0; border-radius:8px; font-size:12px;
+      font-weight:700; background:rgba(var(--text-rgb),.06); color:var(--text); border:none;
+    }
+    .dashV4-avaMenuLangRow button.active{ background:var(--gold); color:#1c2a5e; }
     .rowline{display:flex; justify-content:space-between; padding:14px 0; border-bottom:1px solid var(--line); font-size:14px}
     .rowline:last-child{border-bottom:none}
     .rowline .k{color:var(--muted)}
@@ -689,7 +741,10 @@
     .dashV4-skillTop{ display:flex; align-items:baseline; justify-content:space-between; margin-bottom:7px; font-size:12.5px; font-weight:700; }
     .dashV4-skillTop .v{ font-family:var(--dv4-mono); font-size:11.5px; color:var(--muted); font-weight:400; }
     .dashV4-skillTop .v b{ color:var(--text); font-size:13px; }
-    .dashV4-skillBar{ height:7px; border-radius:99px; background:rgba(var(--text-rgb),.1); }
+    .dashV4-skillBar{ height:7px; border-radius:99px; background:rgba(var(--text-rgb),.1); position:relative; }
+    /* dashboard-rebuild: garis putus-putus penanda 60% (kriteria resmi HSK), nilai dari
+       mockup .skill-bar em disalin persis. */
+    .dashV4-skillBar em{ position:absolute; top:-3px; bottom:-3px; left:60%; width:0; border-left:2.2px dashed var(--danger); opacity:.5; }
     /* budget emas (koreksi): aksen kecil (bar fill) ikut mockup apa adanya, gold solid --
        aturan "maksimal 1 blok besar" cuma berlaku buat blok background gold penuh (CTA/badge/
        sidebar block), bukan aksen tipis kayak ini. */
@@ -726,6 +781,32 @@
     .dashV4-wodMean{ margin-top:10px; }
     .dashV4-wodMean b{ display:block; font-size:14.5px; }
     .dashV4-wodMean span{ font-size:12px; color:var(--muted); }
+    /* dashboard-rebuild: mascot pojok kanan card Kata Hari Ini, nilai dari mockup .mascot
+       disalin persis (posisi/ukuran/animasi), warna drop-shadow tetap hitam transparan
+       (bukan token tema) sama seperti mockup. */
+    .dashV4-mascot{
+      position:absolute; top:42px; right:20px; width:58px; pointer-events:none;
+      filter:drop-shadow(0 8px 16px rgba(0,0,0,.3)); animation:dashV4Floaty 6s ease-in-out infinite;
+    }
+    .dashV4-mascot img{ width:100%; height:auto; display:block; }
+    @keyframes dashV4Floaty{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-7px); } }
+    @media (max-width:760px){ .dashV4-mascot{ display:none; } }
+    /* dashboard-rebuild: card heatmap aktivitas, nilai layout dari mockup .sky-panel/.sky-days/
+       .sky-foot disalin persis; warna --star-core/--panel-2 mockup diganti var(--gold)/
+       var(--panel-2) app (--panel-2 sudah ada persis dgn nama sama, --star-core tidak ada jadi
+       dipetakan ke --gold, aksen kecil sesuai budget emas). Trail/klik-reveal mockup TIDAK
+       diport -- di luar scope task (cuma titik intensitas yang diminta). */
+    .dashV4-sky{ border-radius:20px; padding:13px 11px 9px; position:relative; background:var(--panel-2); display:flex; gap:10px; }
+    .dashV4-skyDays{ display:flex; flex-direction:column; justify-content:space-between; padding:5px 0 7px; }
+    .dashV4-skyDays span{ font-family:var(--dv4-mono); font-size:8px; color:var(--muted); }
+    .dashV4-sky svg{ flex:1; width:100%; height:auto; display:block; overflow:visible; }
+    .dashV4-hcore{ fill:var(--gold); animation:dashV4Dtw 5.5s ease-in-out infinite; }
+    .dashV4-hoff{ fill:var(--muted); opacity:.16; }
+    .dashV4-tring{ fill:none; stroke:var(--gold); stroke-width:1.3; transform-origin:center; transform-box:fill-box; animation:dashV4RingP 3.2s ease-out infinite; }
+    @keyframes dashV4Dtw{ 0%,100%{ opacity:.28; } 50%{ opacity:.85; } }
+    @keyframes dashV4RingP{ 0%{ transform:scale(.6); opacity:.9; } 70%,100%{ transform:scale(1.7); opacity:0; } }
+    .dashV4-skyFoot{ display:flex; align-items:center; justify-content:space-between; margin-top:13px; font-family:var(--dv4-mono); font-size:11px; color:var(--muted); flex-wrap:wrap; gap:6px; }
+    .dashV4-skyFoot b{ color:var(--gold); font-weight:700; }
 
     /* ---- floating pill (mockup .tile) -- background PAKAI --dv4-panel juga ---- */
     .dashV4-tileRow{ display:flex; flex-wrap:wrap; gap:10px; }
@@ -1768,6 +1849,14 @@
           <div><span class="sidebarStreakNum" id="sideStreak">—</span> <span class="sidebarStreakUnit" id="sideStreakUnit">hari</span></div>
         </div>
       </div>
+      <div class="sidebarPkg hidden" id="sidebarPkg">
+        <span class="sidebarPkgMono" id="sidebarPkgEyebrow">PAKET AKTIF</span>
+        <b class="sidebarPkgName" id="sidebarPkgName">—</b>
+        <span class="sidebarPkgUntil hidden" id="sidebarPkgUntil">—</span>
+      </div>
+      <div class="sidebarDev hidden" id="sidebarDev">
+        <span class="hz">锁</span><span id="sidebarDevLabel">—</span>
+      </div>
       <div class="sidebarUser">
         <div class="sidebarUserName" id="sideUserName">—</div>
         <div class="sidebarUserMeta" id="sideUserMeta">—</div>
@@ -1804,11 +1893,27 @@
           </div>
           <div class="planBlock">
             <div class="planBlockLabel" id="yourPlanLabel">Your Plan</div>
-            <span class="packageBadge" id="packageBadge">
-              <span class="packageBadgeIcon planIcon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 5.5A2 2 0 0 1 6 3.5h13v15H6a2 2 0 0 0-2 2z"/><path d="M8 5v14"/></svg></span>
-              <span class="packageBadgeIcon crownIcon">👑</span>
-              <span id="packageBadgeText">HSK 1&ndash;4</span>
-            </span>
+            <div class="dashV4-planRow">
+              <span class="packageBadge" id="packageBadge">
+                <span class="packageBadgeIcon planIcon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 5.5A2 2 0 0 1 6 3.5h13v15H6a2 2 0 0 0-2 2z"/><path d="M8 5v14"/></svg></span>
+                <span class="packageBadgeIcon crownIcon">👑</span>
+                <span id="packageBadgeText">HSK 1&ndash;4</span>
+              </span>
+              <button type="button" class="dashV4-ava" id="dashV4Ava" aria-haspopup="true" aria-expanded="false">—</button>
+              <div class="dashV4-avaMenu hidden" id="dashV4AvaMenu" role="menu">
+                <button type="button" class="dashV4-avaMenuItem" id="dashV4AvaThemeBtn" role="menuitem">
+                  <span id="dashV4AvaThemeIcon">🌙</span><span id="dashV4AvaThemeLabel">Ganti Tema</span>
+                </button>
+                <div class="dashV4-avaMenuLangRow">
+                  <button type="button" data-lang="id">ID</button>
+                  <button type="button" data-lang="en">EN</button>
+                  <button type="button" data-lang="zh">中</button>
+                </div>
+                <button type="button" class="dashV4-avaMenuItem" id="dashV4AvaLogoutBtn" role="menuitem">
+                  <span>🚪</span><span id="dashV4AvaLogoutLabel">Keluar</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1837,31 +1942,39 @@
               </svg>
               <div class="dashV4-o-center">
                 <span class="big" id="dashV4GaugeNum">—</span>
-                <span class="of">%</span>
+                <span class="of" id="dashV4GaugeScale">/300</span>
               </div>
               <div class="dashV4-seal" id="dashV4Seal">及格</div>
             </div>
             <div class="dashV4-gaugeFoot" id="dashV4GaugeFoot">
               <span id="gaugeAvgLabel">Rata-rata 3 simulasi terakhir</span>
-              <span id="gaugePassLine">Standar lulus: 60%</span>
+              <span><span id="gaugePassLine">Garis lulus: </span><span id="dashV4PassLineNum">—</span></span>
             </div>
             <div class="dashV4-cardEmpty hidden" id="dashV4GaugeEmpty">Belum ada simulasi</div>
           </div>
 
-          <!-- ROW 2: Skor per Seksi (mockup c-skill) + Misi Harian (mockup c-day, isi Daily Goal
-               real). span 6+6=12 -- SENGAJA bukan 4+4+4 kayak sebelumnya, karena kartu ke-3
-               (Kata Hari Ini) kondisional hidden by default; kalau tetap ikut baris ini, Materi
-               (span 12 sesudahnya) gak muat di sisa 4 kolom dan grid auto-placement bikin lubang
-               4 kolom (bug A2). Kata Hari Ini dipindah jadi baris TERPISAH di bawah -- pas hidden,
-               baris itu simply tidak ada, tidak ganggu baris manapun. -->
-          <div class="dashV4-card dashV4-gridHalf">
+          <!-- ROW 2 (dashboard-rebuild, span 4+4+4=12): Skor per Seksi (mockup c-skill) +
+               Aktivitas (mockup c-sky, heatmap real) + Misi Harian (mockup c-day, Daily Goal real). -->
+          <div class="dashV4-card dashV4-gridSm">
             <div class="dashV4-eyebrow" id="eyebrowSkill">SKOR PER SEKSI</div>
             <div id="dashV4SkillBody">
               <div class="dashV4-cardEmpty" id="dashV4SkillEmpty">Belum ada data skor per seksi</div>
             </div>
           </div>
 
-          <div class="dashV4-card dashV4-gridHalf">
+          <div class="dashV4-card dashV4-gridSm">
+            <div class="dashV4-eyebrow" id="eyebrowActivity">AKTIVITAS · 12 MINGGU TERAKHIR</div>
+            <div class="dashV4-sky">
+              <div class="dashV4-skyDays"><span id="dashV4SkyDMon">Sen</span><span id="dashV4SkyDWed">Rab</span><span id="dashV4SkyDFri">Jum</span><span id="dashV4SkyDSun">Min</span></div>
+              <svg id="dashV4SkyGrid" aria-hidden="true"></svg>
+            </div>
+            <div class="dashV4-skyFoot">
+              <span id="dashV4SkySum">—</span>
+              <b id="dashV4SkyStreak">—</b>
+            </div>
+          </div>
+
+          <div class="dashV4-card dashV4-gridSm">
             <div class="dashV4-eyebrow" id="eyebrowMissions">MISI HARI INI</div>
             <div class="dashV4-missionHead"><b id="dailyGoalLabel">Target Harian</b><span id="dashV4MissionCount">0/20</span></div>
             <!-- A1: elemen div biasa, sengaja BUKAN tombol -- lihat komentar CSS .dashV4-mission soal kenapa. -->
@@ -1875,18 +1988,20 @@
             <div class="dailyGoalTrack hidden"><div class="dailyGoalFill" id="dashDailyFill"></div></div>
           </div>
 
-          <!-- ROW 2b: Kata Hari Ini -- kondisional (hidden default), span 12 SENDIRIAN biar
-               absennya tidak pernah bikin baris lain bolong (lihat catatan A2 di atas). -->
-          <div class="dashV4-card dashV4-gridFull hidden" id="dashV4WordCard">
+          <!-- ROW 3 (dashboard-rebuild, span 4+8=12): Kata Hari Ini (mockup c-word, query vocab
+               langsung -- SELALU dirender, empty state di DALAM card kalau query gagal, supaya
+               tidak reproduce bug lubang grid dari commit sebelumnya) + Materi & Latihan. -->
+          <div class="dashV4-card dashV4-gridSm" id="dashV4WordCard">
             <div class="dashV4-eyebrow" id="eyebrowWord">KATA HARI INI</div>
+            <div class="dashV4-mascot" aria-hidden="true"><img src="/assets/mascot-study.png" alt="" /></div>
             <div class="dashV4-wod">
               <div class="dashV4-wodHz"><ruby><rb id="dashV4WordHz">—</rb><rt id="dashV4WordPy">—</rt></ruby></div>
-              <div class="dashV4-wodMean"><b id="dashV4WordMean">—</b></div>
+              <div class="dashV4-wodMean"><b id="dashV4WordMean">—</b><span id="dashV4WordType"></span></div>
             </div>
+            <div class="dashV4-cardEmpty hidden" id="dashV4WordEmpty">—</div>
           </div>
 
-          <!-- ROW 3: Materi & Latihan (mockup c-mat, Quick Actions prod sebagai floating pill) -->
-          <div class="dashV4-card dashV4-gridFull">
+          <div class="dashV4-card dashV4-gridContinue">
             <div class="dashV4-eyebrow" id="eyebrowMat">MATERI & LATIHAN</div>
             <div class="dashV4-tileRow">
               <button id="mockTestBtn" class="dashV4-tile" type="button"><span class="dashV4-tileIco test"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="4" width="14" height="17" rx="2.2"/><path d="m9 12 2 2 4-4"/></svg></span><span id="quickTileMockTestLabel">Mock Test</span></button>
@@ -2630,7 +2745,9 @@
           eyebrowProgress:'PROGRES PER LEVEL', eyebrowQuick:'AKSI CEPAT', eyebrowHistory:'RIWAYAT SIMULASI', eyebrowAccount:'AKUN',
           eyebrowResume:'LANJUTKAN LATIHAN', eyebrowGauge:'PREDIKSI SKOR', eyebrowSkill:'SKOR PER SEKSI',
           eyebrowMissions:'MISI HARI INI', eyebrowWord:'KATA HARI INI', eyebrowMat:'MATERI & LATIHAN',
-          gaugeAvgLabel:'Rata-rata 3 simulasi terakhir', gaugePassLine:'Standar lulus: 60%',
+          eyebrowActivity:'AKTIVITAS · 12 MINGGU TERAKHIR', skyDMon:'Sen', skyDWed:'Rab', skyDFri:'Jum', skyDSun:'Min',
+          skyActiveDays:'{n} hari aktif', daysStreak:'{n} hari beruntun', wordEmpty:'Belum ada kata buat hari ini',
+          gaugeAvgLabel:'Rata-rata 3 simulasi terakhir', gaugePassLine:'Garis lulus: ',
           gaugeEmptyState:'Belum ada simulasi', skillEmptyState:'Belum ada data skor per seksi',
           dailyMissionLabel:'Kata direview hari ini',
           greetTowardLevel:'Menuju HSK {n}', greetAboveLine:'prediksimu di atas garis lulus', greetBelowLine:'prediksimu di bawah garis lulus',
@@ -2764,7 +2881,9 @@
           eyebrowProgress:'PROGRESS BY LEVEL', eyebrowQuick:'QUICK ACTIONS', eyebrowHistory:'SIMULATION HISTORY', eyebrowAccount:'ACCOUNT',
           eyebrowResume:'CONTINUE PRACTICE', eyebrowGauge:'SCORE PREDICTION', eyebrowSkill:'SCORE BY SECTION',
           eyebrowMissions:"TODAY'S MISSION", eyebrowWord:'WORD OF THE DAY', eyebrowMat:'MATERIALS & PRACTICE',
-          gaugeAvgLabel:'Average of last 3 simulations', gaugePassLine:'Passing standard: 60%',
+          eyebrowActivity:'ACTIVITY · LAST 12 WEEKS', skyDMon:'Mon', skyDWed:'Wed', skyDFri:'Fri', skyDSun:'Sun',
+          skyActiveDays:'{n} active days', daysStreak:'{n} day streak', wordEmpty:'No word available today',
+          gaugeAvgLabel:'Average of last 3 simulations', gaugePassLine:'Pass line: ',
           gaugeEmptyState:'No simulations yet', skillEmptyState:'No section score data yet',
           dailyMissionLabel:'Words reviewed today',
           greetTowardLevel:'Heading to HSK {n}', greetAboveLine:'your prediction is above the passing line', greetBelowLine:'your prediction is below the passing line',
@@ -2898,7 +3017,9 @@
           eyebrowProgress:'各级进度', eyebrowQuick:'快捷操作', eyebrowHistory:'模拟记录', eyebrowAccount:'账户',
           eyebrowResume:'继续练习', eyebrowGauge:'预测分数', eyebrowSkill:'分项得分',
           eyebrowMissions:'今日任务', eyebrowWord:'每日一词', eyebrowMat:'材料与练习',
-          gaugeAvgLabel:'近3次模拟平均分', gaugePassLine:'及格标准：60%',
+          eyebrowActivity:'学习记录 · 最近 12 周', skyDMon:'一', skyDWed:'三', skyDFri:'五', skyDSun:'日',
+          skyActiveDays:'{n} 天活跃', daysStreak:'连续 {n} 天', wordEmpty:'今天还没有词',
+          gaugeAvgLabel:'近3次模拟平均分', gaugePassLine:'及格线：',
           gaugeEmptyState:'还没有模拟考试', skillEmptyState:'还没有分项得分数据',
           dailyMissionLabel:'今天已复习的词',
           greetTowardLevel:'迈向HSK {n}', greetAboveLine:'你的预测分数已达到及格线', greetBelowLine:'你的预测分数低于及格线',
@@ -3114,6 +3235,11 @@
     $('eyebrowMat').textContent = t('eyebrowMat');
     $('gaugeAvgLabel').textContent = t('gaugeAvgLabel');
     $('gaugePassLine').textContent = t('gaugePassLine');
+    $('eyebrowActivity').textContent = t('eyebrowActivity');
+    $('dashV4SkyDMon').textContent = t('skyDMon');
+    $('dashV4SkyDWed').textContent = t('skyDWed');
+    $('dashV4SkyDFri').textContent = t('skyDFri');
+    $('dashV4SkyDSun').textContent = t('skyDSun');
 
     $('practiceLevelPrompt').textContent = t('practiceLevelPrompt');
     $('practiceExitBtn1').textContent = t('back');
@@ -7901,7 +8027,7 @@
     const wrap = $('dashV4Dots');
     if(!wrap || wrap.dataset.dv4Init) return;
     wrap.dataset.dv4Init = '1';
-    for(let i = 0; i < 30; i++){
+    for(let i = 0; i < 60; i++){
       const sp = document.createElement('span');
       sp.style.left = (Math.random() * 100) + '%';
       sp.style.top = (Math.random() * 100) + '%';
@@ -7909,6 +8035,117 @@
       wrap.appendChild(sp);
     }
   })();
+
+  /* ---------- boot-ready dispatcher (dashboard-rebuild sesi ini), DIPAKAI BERSAMA oleh semua
+     section baru yang butuh currentUser/currentProfile (avatar, prediksi+skor, heatmap, kata
+     hari ini) -- keduanya cuma keisi di dalam renderDash()/loadBerandaExtras() (fungsi
+     terlarang, tidak disentuh/dipanggil ulang). #dTrack dipakai MURNI sebagai sinyal TIMING
+     ("renderDash sudah selesai nulis") lewat 1 MutationObserver, BUKAN dibaca sebagai sumber
+     data -- dipilih karena renderDash SELALU nulis ulang textContent-nya tiap render (beda
+     dari #dName yang cuma ditulis kalau display_name terisi). "Cache per sesi" = per LOGIN
+     SESSION (per currentUser id), bukan per page-load mati -- guard lewat lastFiredFor, BUKAN
+     disconnect permanen. Alasan: app ini pure SPA (tidak ada location.reload() di
+     forceLogout/localLogout), jadi user bisa logout lalu login sebagai akun LAIN di tab yang
+     sama; kalau observer disconnect abis fire pertama, dashboard akun baru bakal nampilin data
+     akun lama yang basi. Guard by-user-id ini mencegah baik query berulang (user sama, re-render
+     dashboard yang sama tidak refetch) MAUPUN data basi (user beda, refetch). */
+  const dashV4BootFns = [];
+  function dashV4OnBoot(fn){ dashV4BootFns.push(fn); }
+  (function(){
+    const sentinel = $('dTrack');
+    if(!sentinel) return;
+    let lastFiredFor = null;
+    function tryFire(){
+      if(!currentUser || !currentProfile || currentUser === lastFiredFor) return;
+      lastFiredFor = currentUser;
+      dashV4BootFns.forEach(fn=>{ try{ fn(); }catch(e){ console.error(e); } });
+    }
+    new MutationObserver(tryFire).observe(sentinel, { childList:true, characterData:true, subtree:true });
+    tryFire();
+  })();
+
+  /* ---------- avatar header + menu akun. Menu HANYA proxy ke aksi yang sudah ada & sudah
+     wired (toggleTheme/setLang/logoutBtn) -- tidak ada logic baru, cuma UI baru buat
+     manggilnya dari dashboard. Inisial avatar dibaca LANGSUNG dari currentProfile.display_name
+     (variabel module-level, bukan scrape teks). ---------- */
+  (function(){
+    const ava = $('dashV4Ava');
+    const menu = $('dashV4AvaMenu');
+    const nameEl = $('dName');
+    if(!ava || !menu || !nameEl) return;
+    const AVA_MENU_LABEL = {
+      id:{ theme:'Ganti Tema', logout: t('keluar') },
+      en:{ theme:'Switch Theme', logout: t('keluar') },
+      zh:{ theme:'切换主题', logout: t('keluar') }
+    };
+    function syncInitial(){
+      const nm = currentProfile && currentProfile.display_name ? String(currentProfile.display_name).trim() : '';
+      ava.textContent = nm ? nm.charAt(0).toUpperCase() : '—';
+    }
+    function syncThemeIcon(){
+      $('dashV4AvaThemeIcon').textContent = currentTheme === 'dark' ? '☀️' : '🌙';
+    }
+    function syncLabels(){
+      const L = AVA_MENU_LABEL[currentLang] || AVA_MENU_LABEL.id;
+      $('dashV4AvaThemeLabel').textContent = L.theme;
+      $('dashV4AvaLogoutLabel').textContent = L.logout;
+      menu.querySelectorAll('.dashV4-avaMenuLangRow button').forEach(b=>{
+        b.classList.toggle('active', b.dataset.lang === currentLang);
+      });
+    }
+    function openMenu(){
+      menu.classList.remove('hidden');
+      ava.setAttribute('aria-expanded', 'true');
+      syncThemeIcon();
+      syncLabels();
+    }
+    function closeMenu(){
+      menu.classList.add('hidden');
+      ava.setAttribute('aria-expanded', 'false');
+    }
+    dashV4OnBoot(syncInitial);
+    ava.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      menu.classList.contains('hidden') ? openMenu() : closeMenu();
+    });
+    $('dashV4AvaThemeBtn').addEventListener('click', ()=>{ toggleTheme(); syncThemeIcon(); });
+    $('dashV4AvaLogoutBtn').addEventListener('click', ()=> $('logoutBtn').click());
+    menu.querySelectorAll('.dashV4-avaMenuLangRow button').forEach(b=>{
+      b.addEventListener('click', ()=>{ setLang(b.dataset.lang); syncLabels(); });
+    });
+    document.addEventListener('click', (e)=>{
+      if(!menu.classList.contains('hidden') && !menu.contains(e.target) && e.target !== ava) closeMenu();
+    });
+  })();
+
+  /* ---------- sidebar "PAKET AKTIF" (dashboard-rebuild sesi ini). Data langsung dari
+     currentProfile (sudah di-select('*') oleh loadProfile(), tidak perlu query baru) --
+     PACKAGE_BADGE_LABEL sudah ada (dipakai packageBadge di header), dipakai ulang di sini
+     biar nama paket konsisten satu sumber. TANPA CTA upgrade (belum ada alurnya di app). */
+  dashV4OnBoot(function(){
+    const box = $('sidebarPkg');
+    const devBox = $('sidebarDev');
+    if(!box || !devBox) return;
+    const EYEBROW = { id:'PAKET AKTIF', en:'ACTIVE PLAN', zh:'当前套餐' };
+    const UNTIL_PREFIX = { id:'Aktif s.d. ', en:'Active until ', zh:'有效期至 ' };
+    const pkg = currentProfile.package;
+    $('sidebarPkgEyebrow').textContent = EYEBROW[currentLang] || EYEBROW.id;
+    $('sidebarPkgName').textContent = PACKAGE_BADGE_LABEL[pkg] || PACKAGE_BADGE_LABEL.hsk_1_4;
+    const untilEl = $('sidebarPkgUntil');
+    if(currentProfile.subscription_end){
+      untilEl.textContent = (UNTIL_PREFIX[currentLang] || UNTIL_PREFIX.id) + currentProfile.subscription_end;
+      untilEl.classList.remove('hidden');
+    } else {
+      untilEl.classList.add('hidden');
+    }
+    box.classList.remove('hidden');
+
+    const label = currentProfile.device_label;
+    if(label && currentProfile.active_session_id){
+      $('sidebarDevLabel').textContent = label;
+      devBox.classList.remove('hidden');
+    }
+  });
 
   /* ---------- greeting hanzi, dari jam LOKAL (bukan i18n -- hanzi/pinyin-nya sendiri
      memang selalu tampil dalam bahasa Mandarin, sama seperti sumber mockup-nya, terlepas
@@ -7960,117 +8197,220 @@
     new MutationObserver(reflect).observe(fillEl, { attributes:true, attributeFilter:['style'] });
   })();
 
-  /* ---------- Prediksi + Skor per Seksi -- agregat dari 3 attempt terakhir yang SUDAH
-     dirender loadBerandaExtras() ke #dashRecentHistory (.historyCard). TIDAK query baru --
-     baca ulang DOM yang sudah jadi (section dari class .historyCardIcon, skor dari textContent
-     .historyCardScore). loadBerandaExtras() sendiri TIDAK disentuh/dipanggil dari sini.
-     Standar lulus 60% = kriteria resmi HSK (jawaban benar >=60%), bukan angka fiktif. ---------- */
-  (function(){
-    const histEl = $('dashRecentHistory');
+  /* ---------- Prediksi (skala HSK) + Skor per Seksi -- QUERY LANGSUNG ke test_attempts
+     (dashboard-rebuild sesi ini, gantikan scrape DOM #dashRecentHistory yang lama). 3 attempt
+     terakhir user, section dari kolom `section` asli (bukan class DOM). Skala prediksi ikut
+     target_level: HSK 1-2 -> /200 (garis lulus 120), HSK 3-6 -> /300 (garis lulus 180) --
+     proyeksi dari rata-rata PERSENTASE 3 attempt terakhir dikali skala, dibulatkan. Garis
+     lulus 60% (PASS_PCT) = kriteria resmi HSK (jawaban benar >=60%), dipakai independen buat
+     threshold seal/subjudul greeting. Didaftarkan lewat dashV4OnBoot -- query jalan SEKALI per
+     sesi (cache per page-load), tidak pernah berulang di render berikutnya. */
+  dashV4OnBoot(async function(){
     const gaugeBox = $('dashV4GaugeBox');
     const gaugeFoot = $('dashV4GaugeFoot');
     const gaugeNum = $('dashV4GaugeNum');
+    const gaugeScaleEl = $('dashV4GaugeScale');
     const gaugeRing = $('dashV4GaugeRing');
     const gaugeSeal = $('dashV4Seal');
     const gaugeEmpty = $('dashV4GaugeEmpty');
+    const gaugePassNum = $('dashV4PassLineNum');
     const skillBody = $('dashV4SkillBody');
     const skillEmpty = $('dashV4SkillEmpty');
-    if(!histEl || !gaugeBox || !gaugeNum || !gaugeRing || !skillBody) return;
+    if(!gaugeBox || !gaugeNum || !gaugeRing || !skillBody) return;
     const CIRC = 2 * Math.PI * 84;
-    const PASS_LINE = 60;
+    const PASS_PCT = 60;
     const SECTIONS = ['listening','reading','writing'];
+    const level = currentProfile.target_level || 4;
+    const SCALE = level <= 2 ? 200 : 300;
+    const PASS_LINE = level <= 2 ? 120 : 180;
 
-    /* D2 -- subjudul header kontekstual. Pakai currentProfile (variabel module-level yang SUDAH
-       ADA, bukan query baru) buat target_level, dan avg yang SUDAH dihitung di render() ini --
-       tidak recompute apa pun. Kalau belum ada attempt/profile/target_level, dGreet dibiarkan
-       teks default (t('readyToday') dari applyStaticI18n(), TIDAK ditimpa) -- tidak karang angka. */
-    function updateGreetSubtitle(hasAttempt, avg){
+    /* D2 -- subjudul header kontekstual, threshold TETAP persentase (60%) terlepas dari skala
+       tampilan gauge. Kalau belum ada attempt/target_level, dGreet dibiarkan teks default. */
+    function updateGreetSubtitle(hasAttempt, avgPct){
       const greetEl = $('dGreet');
-      if(!greetEl || !currentProfile || !currentProfile.target_level) return;
+      if(!greetEl || !currentProfile.target_level) return;
       if(!hasAttempt){
         greetEl.textContent = t('greetNoAttempt');
         return;
       }
       const levelPhrase = t('greetTowardLevel').replace('{n}', currentProfile.target_level);
-      const linePhrase = avg >= PASS_LINE ? t('greetAboveLine') : t('greetBelowLine');
+      const linePhrase = avgPct >= PASS_PCT ? t('greetAboveLine') : t('greetBelowLine');
       greetEl.textContent = levelPhrase + ' — ' + linePhrase + '. ' + t('greetEncourage');
     }
 
-    function render(){
-      const cards = histEl.querySelectorAll('.historyCard');
-      const pcts = [];
-      const bySection = {};
-      cards.forEach(function(card){
-        const scoreEl = card.querySelector('.historyCardScore');
-        const iconEl = card.querySelector('.historyCardIcon');
-        if(!scoreEl || !iconEl) return;
-        const pct = parseInt(scoreEl.textContent, 10);
-        if(isNaN(pct)) return;
+    const { data: attempts, error } = await sb
+      .from('test_attempts').select('score,total_points,section,created_at')
+      .eq('user_id', currentUser)
+      .order('created_at', { ascending:false })
+      .limit(3);
+
+    const pcts = [];
+    const bySection = {};
+    if(!error && attempts){
+      attempts.forEach(function(a){
+        if(!a.total_points) return;
+        const pct = Math.round(a.score / a.total_points * 100);
         pcts.push(pct);
-        const sec = [...iconEl.classList].find(c => SECTIONS.includes(c));
-        if(sec){ (bySection[sec] = bySection[sec] || []).push(pct); }
+        if(a.section){ (bySection[a.section] = bySection[a.section] || []).push(pct); }
       });
-
-      let avg = 0;
-      if(pcts.length === 0){
-        gaugeBox.classList.add('hidden');
-        if(gaugeFoot) gaugeFoot.classList.add('hidden');
-        if(gaugeSeal) gaugeSeal.classList.remove('show');
-        gaugeEmpty.classList.remove('hidden');
-      } else {
-        gaugeBox.classList.remove('hidden');
-        if(gaugeFoot) gaugeFoot.classList.remove('hidden');
-        gaugeEmpty.classList.add('hidden');
-        avg = Math.round(pcts.reduce((a,b)=>a+b,0) / pcts.length);
-        gaugeNum.textContent = avg;
-        const off = CIRC * (1 - Math.min(100,avg) / 100);
-        gaugeRing.setAttribute('stroke-dashoffset', off.toFixed(2));
-        if(gaugeSeal) gaugeSeal.classList.toggle('show', avg >= PASS_LINE);
-      }
-
-      skillBody.innerHTML = '';
-      const sectionsWithData = SECTIONS.filter(s => bySection[s] && bySection[s].length);
-      if(sectionsWithData.length === 0){
-        skillBody.appendChild(skillEmpty);
-        skillEmpty.textContent = t('skillEmptyState');
-        skillEmpty.classList.remove('hidden');
-      } else {
-        sectionsWithData.forEach(function(sec){
-          const list = bySection[sec];
-          const avgSec = Math.round(list.reduce((a,b)=>a+b,0) / list.length);
-          const row = document.createElement('div');
-          row.className = 'dashV4-skill';
-          row.innerHTML = '<div class="dashV4-skillTop"><span>' + (SECTION_LABEL[sec] || sec) +
-            '</span><span class="v"><b>' + avgSec + '</b>%</span></div>' +
-            '<div class="dashV4-skillBar"><i style="width:' + avgSec + '%"></i></div>';
-          skillBody.appendChild(row);
-        });
-      }
-
-      updateGreetSubtitle(pcts.length > 0, avg);
     }
 
-    render();
-    new MutationObserver(render).observe(histEl, { childList:true });
-  })();
+    let avgPct = 0;
+    if(pcts.length === 0){
+      gaugeBox.classList.add('hidden');
+      if(gaugeFoot) gaugeFoot.classList.add('hidden');
+      if(gaugeSeal) gaugeSeal.classList.remove('show');
+      if(gaugeEmpty) gaugeEmpty.classList.remove('hidden');
+    } else {
+      gaugeBox.classList.remove('hidden');
+      if(gaugeFoot) gaugeFoot.classList.remove('hidden');
+      if(gaugeEmpty) gaugeEmpty.classList.add('hidden');
+      avgPct = Math.round(pcts.reduce((a,b)=>a+b,0) / pcts.length);
+      const scoreScaled = Math.round(avgPct / 100 * SCALE);
+      gaugeNum.textContent = scoreScaled;
+      if(gaugeScaleEl) gaugeScaleEl.textContent = '/' + SCALE;
+      if(gaugePassNum) gaugePassNum.textContent = PASS_LINE;
+      const off = CIRC * (1 - Math.min(SCALE, scoreScaled) / SCALE);
+      gaugeRing.setAttribute('stroke-dashoffset', off.toFixed(2));
+      if(gaugeSeal) gaugeSeal.classList.toggle('show', scoreScaled >= PASS_LINE);
+    }
 
-  /* ---------- Kata Hari Ini -- 1 kata dari browseCache KALAU SUDAH ke-load (user pernah buka
-     Kamus sesi ini sebelum dashboard render). browseCache variabel module-level yang SUDAH ADA,
-     BUKAN query baru. Dicek SEKALI (fresh dashboard load = browseCache kosong = card tetap
-     hidden, sesuai instruksi "kalau vocab belum ke-load, sembunyikan card"). Pilihan
-     deterministik per hari (epoch day index), bukan random tiap render. ---------- */
-  (function(){
+    skillBody.innerHTML = '';
+    const sectionsWithData = SECTIONS.filter(s => bySection[s] && bySection[s].length);
+    if(sectionsWithData.length === 0){
+      skillBody.appendChild(skillEmpty);
+      skillEmpty.textContent = t('skillEmptyState');
+      skillEmpty.classList.remove('hidden');
+    } else {
+      sectionsWithData.forEach(function(sec){
+        const list = bySection[sec];
+        const avgSec = Math.round(list.reduce((a,b)=>a+b,0) / list.length);
+        const row = document.createElement('div');
+        row.className = 'dashV4-skill';
+        row.innerHTML = '<div class="dashV4-skillTop"><span>' + (SECTION_LABEL[sec] || sec) +
+          '</span><span class="v"><b>' + avgSec + '</b> /100</span></div>' +
+          '<div class="dashV4-skillBar"><i style="width:' + avgSec + '%"></i><em></em></div>';
+        skillBody.appendChild(row);
+      });
+    }
+
+    updateGreetSubtitle(pcts.length > 0, avgPct);
+  });
+
+  /* ---------- Kata Hari Ini -- QUERY LANGSUNG ke vocab (dashboard-rebuild sesi ini, gantikan
+     browseCache yang sering kosong di fresh load). Filter hsk_level <= target_level (fallback 4,
+     sama seperti skala prediksi di atas). Pilihan deterministik per hari (day-of-year % jumlah
+     baris) -- pola sama persis loadWordOfDay() punya login page (tidak disentuh), cuma target
+     beda (level-filtered buat dashboard, bukan global HSK 1-3 buat semua pengunjung). Card
+     SELALU dirender (empty state DI DALAM card kalau query gagal/kosong) supaya grid Baris 3
+     (Kata Hari Ini 4 + Materi 8) tidak pernah bolong. */
+  dashV4OnBoot(async function(){
     const card = $('dashV4WordCard');
     if(!card) return;
-    if(!Array.isArray(browseCache) || browseCache.length === 0) return;
-    const dayIndex = Math.floor(Date.now() / 86400000);
-    const word = browseCache[dayIndex % browseCache.length];
-    if(!word || !word.hanzi) return;
-    $('dashV4WordHz').textContent = word.hanzi;
-    $('dashV4WordPy').textContent = (word.pinyin || '').toUpperCase();
-    $('dashV4WordMean').textContent = word.meaning_id || word.meaning_en || '';
-    card.classList.remove('hidden');
-  })();
+    const wodBody = card.querySelector('.dashV4-wod');
+    const empty = $('dashV4WordEmpty');
+    const level = currentProfile.target_level || 4;
+    try{
+      const now = new Date();
+      const start = new Date(now.getFullYear(), 0, 0);
+      const dayOfYear = Math.floor((now - start) / 86400000);
+      const { count, error: countErr } = await sb
+        .from('vocab').select('*', { count:'exact', head:true }).lte('hsk_level', level);
+      if(countErr || !count) throw new Error('no vocab');
+      const offset = dayOfYear % count;
+      const { data, error } = await sb
+        .from('vocab').select('hanzi,pinyin,meaning_en,meaning_id,pos,hsk_level')
+        .lte('hsk_level', level)
+        .order('id', { ascending:true })
+        .range(offset, offset);
+      if(error || !data || !data[0]) throw new Error('no word');
+      const w = data[0];
+      $('dashV4WordHz').textContent = w.hanzi;
+      $('dashV4WordPy').textContent = (w.pinyin || '').toUpperCase();
+      $('dashV4WordMean').textContent = w.meaning_id || w.meaning_en || '';
+      $('dashV4WordType').textContent = (w.pos ? w.pos + ' · ' : '') + 'HSK ' + w.hsk_level;
+      if(wodBody) wodBody.classList.remove('hidden');
+      if(empty) empty.classList.add('hidden');
+    }catch(e){
+      if(wodBody) wodBody.classList.add('hidden');
+      if(empty){ empty.textContent = t('wordEmpty'); empty.classList.remove('hidden'); }
+    }
+  });
+
+  /* ---------- Aktivitas · 12 minggu terakhir -- heatmap real, 2 QUERY LANGSUNG (dashboard-
+     rebuild sesi ini): test_attempts.created_at + user_mastery.last_reviewed, jendela 84 hari
+     (=12x7, pas sama grid). user_mastery.last_reviewed itu overwrite per kata (bukan log per
+     kejadian) jadi hari lama memang bisa bolong -- itu diterima, TIDAK diisi angka random.
+     Rendering titik (posisi jitter, radius per intensitas, opacity) NILAI PERSIS dari algoritma
+     mockup (hash()/R[] array/COLS/ROWS/CS/PAD), cuma lvl(i) fiktifnya diganti hitungan real.
+     Trail/klik-reveal mockup TIDAK diport (di luar scope -- titik intensitas aja yang diminta).
+     Streak pakai computeStreak() yang SUDAH ADA (tidak diedit), dikasih Set gabungan 2 sumber
+     di atas supaya konsisten sama definisi "aktif" card ini sendiri. Guard query-sekali-per-sesi
+     otomatis dari dashV4OnBoot (observer disconnect sesudah fire pertama). ---------- */
+  dashV4OnBoot(async function(){
+    const svg = $('dashV4SkyGrid');
+    const sumEl = $('dashV4SkySum');
+    const streakEl = $('dashV4SkyStreak');
+    if(!svg) return;
+    const NS = 'http://www.w3.org/2000/svg';
+    const COLS = 12, ROWS = 7, CS = 22, PADX = 7, PADY = 7;
+    const DAYS = COLS * ROWS;
+    svg.setAttribute('viewBox', '0 0 ' + (COLS*CS+PADX*2) + ' ' + (ROWS*CS+PADY*2));
+    function hash(i){ const x = Math.sin(i*97.13) * 43758.5453; return x - Math.floor(x); }
+
+    function isoDay(d){ return d.toISOString().slice(0,10); }
+    const today = new Date(); today.setUTCHours(0,0,0,0);
+    const windowStart = new Date(today); windowStart.setUTCDate(windowStart.getUTCDate() - (DAYS - 1));
+
+    const counts = new Map();
+    function bump(dateStr){
+      if(!dateStr) return;
+      const d = dateStr.slice(0,10);
+      counts.set(d, (counts.get(d) || 0) + 1);
+    }
+    try{
+      const sinceIso = windowStart.toISOString();
+      const [{ data: attempts, error: e1 }, { data: reviews, error: e2 }] = await Promise.all([
+        sb.from('test_attempts').select('created_at').eq('user_id', currentUser).gte('created_at', sinceIso),
+        sb.from('user_mastery').select('last_reviewed').eq('user_id', currentUser).gte('last_reviewed', sinceIso)
+      ]);
+      if(!e1 && attempts) attempts.forEach(a => bump(a.created_at));
+      if(!e2 && reviews) reviews.forEach(r => bump(r.last_reviewed));
+    }catch(e){ /* diam -- card tetap render dengan grid kosong, bukan error state */ }
+
+    const activeDateSet = new Set([...counts.keys()].filter(k => counts.get(k) > 0));
+    const R = [0, 1.1, 1.5, 2, 2.6];
+    for(let i = 0; i < DAYS; i++){
+      const w = Math.floor(i / ROWS), d = i % ROWS;
+      const dayDate = new Date(windowStart); dayDate.setUTCDate(dayDate.getUTCDate() + i);
+      const cnt = counts.get(isoDay(dayDate)) || 0;
+      const L = cnt === 0 ? 0 : cnt <= 2 ? 1 : cnt <= 5 ? 2 : cnt <= 10 ? 3 : 4;
+      const x = PADX + w*CS + CS/2 + (hash(i)-0.5)*5;
+      const y = PADY + d*CS + CS/2 + (hash(i+500)-0.5)*5;
+      const c = document.createElementNS(NS, 'circle');
+      c.setAttribute('cx', x); c.setAttribute('cy', y);
+      if(L === 0){
+        c.setAttribute('r', 0.8);
+        c.setAttribute('class', 'dashV4-hoff');
+      } else {
+        c.setAttribute('r', R[L]);
+        c.setAttribute('class', 'dashV4-hcore');
+        c.style.opacity = 0.35 + L*0.16;
+        c.style.animationDelay = (hash(i+90)*5) + 's';
+      }
+      svg.appendChild(c);
+      if(i === DAYS - 1){
+        const ring = document.createElementNS(NS, 'circle');
+        ring.setAttribute('cx', x); ring.setAttribute('cy', y);
+        ring.setAttribute('r', 5.5);
+        ring.setAttribute('class', 'dashV4-tring');
+        svg.appendChild(ring);
+      }
+    }
+
+    if(sumEl) sumEl.textContent = t('skyActiveDays').replace('{n}', activeDateSet.size);
+    if(streakEl) streakEl.textContent = '✦ ' + t('daysStreak').replace('{n}', computeStreak(activeDateSet));
+  });
 
   // Mobile bottom nav (fase 1) -- separate registrations, same target functions as the
   // sidebar's own listeners directly above (not a second source of truth, just a second

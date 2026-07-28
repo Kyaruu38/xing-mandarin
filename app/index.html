@@ -400,7 +400,12 @@
        safe-area calc, lihat rule mobile-nya sendiri) yang harus tetap utuh. */
     @media (min-width:761px){
       body.dashV4-page-active .mainContent{ padding:0; }
-      #dashCard .pageHeader{ padding:32px 36px 10px; }
+      /* dashboard-rebuild (sesi ini): 32px mockup (.topbar) ternyata masih kerasa kemepetan di
+         app ini -- header dashboard punya ruby <rt> (pinyin) yang render DI ATAS hanzi (default
+         browser ruby-position:over), nambah tinggi visual di atas garis dasar yang mockup-nya
+         (teks polos, tanpa ruby di topbar) nggak punya. Dinaikkan ke 40px biar ada ruang aman
+         buat itu, sesuai instruksi eksplisit "kemepetan atas, tambah padding-top yang cukup". */
+      #dashCard .pageHeader{ padding:40px 36px 14px; }
       #dashCard .dashV4-grid{ padding:22px 36px 52px; }
     }
 
@@ -493,7 +498,7 @@
        sendiri). Klik avatar buka menu akun berisi aksi yang SUDAH ADA (tema/bahasa/keluar). */
     .dashV4-planRow{ display:flex; align-items:center; justify-content:flex-end; gap:12px; position:relative; }
     .dashV4-ava{
-      width:42px; height:42px; border-radius:50%; flex-shrink:0;
+      width:42px; height:42px; margin:0; border-radius:50%; flex-shrink:0;
       background:linear-gradient(135deg,var(--gold),var(--gold-soft)); color:#1C2A5E;
       display:flex; align-items:center; justify-content:center; font-weight:800; font-size:15px;
       transition:transform .3s cubic-bezier(.22,1,.36,1); cursor:pointer; border:none; padding:0;
@@ -501,24 +506,43 @@
     }
     .dashV4-ava:hover{ transform:scale(1.08); }
     .dashV4-avaMenu{
-      position:absolute; top:calc(100% + 10px); right:0; min-width:180px; z-index:20;
+      position:absolute; top:calc(100% + 10px); right:0; min-width:230px; z-index:20;
       background:var(--dv4-panel); border:1px solid var(--dv4-hairline); border-radius:16px;
       padding:8px; box-shadow:var(--dv4-shadow); backdrop-filter:blur(20px);
-      display:flex; flex-direction:column; gap:2px;
+      display:flex; flex-direction:column; gap:2px; max-height:calc(100vh - 90px); overflow-y:auto;
     }
     .dashV4-avaMenu.hidden{ display:none; }
     .dashV4-avaMenuItem{
       display:flex; align-items:center; gap:9px; width:100%; margin-top:0; padding:9px 11px;
       border-radius:10px; background:none; border:none; font-family:inherit; font-size:13px;
       font-weight:600; color:var(--text); text-align:left; cursor:pointer; transition:background .2s;
+      text-decoration:none;
     }
     .dashV4-avaMenuItem:hover{ background:rgba(var(--text-rgb),.06); }
-    .dashV4-avaMenuLangRow{ display:flex; gap:4px; padding:4px 4px 6px; }
-    .dashV4-avaMenuLangRow button{
+    /* B (dashboard-rebuild sesi ini): menu akun 4 bagian -- bahasa/tampilan/ganti password/
+       hubungi admin. .dashV4-avaMenuSegRow generik dipakai buat 2 baris pilihan (bahasa 3
+       opsi, tampilan 2 opsi), bukan cuma bahasa lagi (nama lama -LangRow diganti generik). */
+    .dashV4-avaMenuSectionLabel{
+      font-family:var(--dv4-mono); font-size:9.5px; letter-spacing:.14em; text-transform:uppercase;
+      color:rgba(var(--text-rgb),.42); font-weight:800; padding:8px 11px 5px;
+    }
+    .dashV4-avaMenuSegRow{ display:flex; gap:4px; padding:0 4px 6px; }
+    .dashV4-avaMenuSegRow button{
       flex:1; width:auto; margin-top:0; padding:6px 0; border-radius:8px; font-size:12px;
       font-weight:700; background:rgba(var(--text-rgb),.06); color:var(--text); border:none;
+      font-family:inherit; cursor:pointer;
     }
-    .dashV4-avaMenuLangRow button.active{ background:var(--gold); color:#1c2a5e; }
+    .dashV4-avaMenuSegRow button.active{ background:var(--gold); color:#1c2a5e; }
+    .dashV4-avaMenuDivider{ height:1px; background:rgba(var(--text-rgb),.1); margin:6px 4px; }
+    .dashV4-avaPassForm{ padding:0 11px 8px; display:flex; flex-direction:column; }
+    .dashV4-avaPassForm label{ margin:8px 0 4px; font-size:11px; }
+    .dashV4-avaPassForm input{ padding:8px 10px; font-size:13px; border-radius:8px; }
+    .dashV4-avaPassSubmit{
+      width:auto; margin-top:10px; padding:8px 0; border-radius:8px; font-size:12.5px;
+      font-weight:700; background:linear-gradient(135deg,var(--gold),var(--gold-soft));
+      color:#1c2a5e; border:none; cursor:pointer; font-family:inherit;
+    }
+    .dashV4-avaPassForm .msg{ margin-top:8px; font-size:11.5px; padding:7px 9px; }
     .rowline{display:flex; justify-content:space-between; padding:14px 0; border-bottom:1px solid var(--line); font-size:14px}
     .rowline:last-child{border-bottom:none}
     .rowline .k{color:var(--muted)}
@@ -806,6 +830,12 @@
     .dashV4-skillTop{ display:flex; align-items:baseline; justify-content:space-between; margin-bottom:7px; font-size:12.5px; font-weight:700; }
     .dashV4-skillTop .v{ font-family:var(--dv4-mono); font-size:11.5px; color:var(--muted); font-weight:400; }
     .dashV4-skillTop .v b{ color:var(--text); font-size:13px; }
+    /* dashboard-rebuild D2/D3: row per-seksi SELALU dirender (termasuk Writing walau belum ada
+       data valid -- lihat laporan diagnosa D1), empty state IN-ROW (bukan whole-card fallback
+       lagi). Row REVIEW (SRS) dipisah garis tipis + label beda warna, biar jelas bukan skor ujian. */
+    .dashV4-skillTop .vEmpty{ font-family:inherit; font-size:11.5px; color:rgba(var(--text-rgb),.4); font-weight:600; }
+    .dashV4-skillReview{ margin-top:15px; padding-top:15px; border-top:1px solid var(--line); }
+    .dashV4-skillReview .dashV4-skillTop > span:first-child{ color:var(--gold); }
     .dashV4-skillBar{ height:7px; border-radius:99px; background:rgba(var(--text-rgb),.1); position:relative; }
     /* dashboard-rebuild: garis putus-putus penanda 60% (kriteria resmi HSK), nilai dari
        mockup .skill-bar em disalin persis. */
@@ -833,7 +863,12 @@
     }
     /* budget emas (koreksi): checkbox done-state ikut mockup apa adanya, gold + centang. */
     .dashV4-mission.done .box{ background:var(--gold); box-shadow:none; color:#1C2A5E; }
+    .dashV4-mission .t{ flex:1; min-width:0; }
     .dashV4-mission.done .t{ opacity:.5; text-decoration:line-through; }
+    /* dashboard-rebuild: 3 misi (sebelumnya 1) -- counter kanan per item, mono kecil, TANPA XP
+       (belum ada sistemnya, sesuai instruksi eksplisit). */
+    .dashV4-mission .c{ font-family:var(--dv4-mono); font-size:11px; color:var(--muted); flex-shrink:0; }
+    .dashV4-mission.done .c{ opacity:.5; }
 
     /* ---- KATA HARI INI -- 1 kata dari browseCache (kalau ada), deterministik per hari ---- */
     .dashV4-wod{ display:flex; flex-direction:column; }
@@ -865,6 +900,20 @@
     .dashV4-skyDays{ display:flex; flex-direction:column; justify-content:space-between; padding:5px 0 7px; }
     .dashV4-skyDays span{ font-family:var(--dv4-mono); font-size:8px; color:var(--muted); }
     .dashV4-sky svg{ flex:1; width:100%; height:auto; display:block; overflow:visible; }
+    /* dashboard-rebuild E3: card Aktivitas align-self:stretch (ngikut tinggi kolom kiri di
+       row-nya, lihat .dashV4-stackCol), makanya perlu jadi flex-column sendiri supaya
+       .dashV4-sky bisa flex:1 ngisi ruang vertikal ekstra -- svg ganti dari width:100%/
+       height:auto (dikunci lebar) jadi width/height:100% (isi kotak penuh, viewBox SVG
+       default preserveAspectRatio="xMidYMid meet" yang jaga rasio + center, tanpa distorsi). */
+    .dashV4-skyCard{ display:flex; flex-direction:column; align-self:stretch; }
+    .dashV4-skyCard .dashV4-sky{ flex:1; min-height:0; }
+    .dashV4-skyCard .dashV4-sky svg{ width:100%; height:100%; }
+    /* E3: kolom kiri (Skor per Seksi + Misi Harian) ditumpuk 1 grid-item, gap SAMA dengan
+       grid utama (22px) biar ritme visual konsisten. */
+    .dashV4-stackCol{ display:flex; flex-direction:column; gap:22px; }
+    /* E4: khusus baris Kata Hari Ini + Materi & Latihan -- align-self:stretch (grid-wide
+       align-items:start di .dashV4-grid TETAP dipertahankan buat baris lain). */
+    .dashV4-stretchRow{ align-self:stretch; }
     .dashV4-hcore{ fill:var(--gold); animation:dashV4Dtw 5.5s ease-in-out infinite; }
     .dashV4-hoff{ fill:var(--muted); opacity:.16; }
     .dashV4-tring{ fill:none; stroke:var(--gold); stroke-width:1.3; transform-origin:center; transform-box:fill-box; animation:dashV4RingP 3.2s ease-out infinite; }
@@ -1967,7 +2016,6 @@
             <p class="sub" id="dGreet">Siap belajar hari ini?</p>
           </div>
           <div class="planBlock">
-            <div class="planBlockLabel" id="yourPlanLabel">Your Plan</div>
             <div class="dashV4-planRow">
               <span class="packageBadge" id="packageBadge">
                 <span class="packageBadgeIcon planIcon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 5.5A2 2 0 0 1 6 3.5h13v15H6a2 2 0 0 0-2 2z"/><path d="M8 5v14"/></svg></span>
@@ -1975,15 +2023,35 @@
                 <span id="packageBadgeText">HSK 1&ndash;4</span>
               </span>
               <button type="button" class="dashV4-ava" id="dashV4Ava" aria-haspopup="true" aria-expanded="false">—</button>
-              <div class="dashV4-avaMenu hidden" id="dashV4AvaMenu" role="menu">
-                <button type="button" class="dashV4-avaMenuItem" id="dashV4AvaThemeBtn" role="menuitem">
-                  <span id="dashV4AvaThemeIcon">🌙</span><span id="dashV4AvaThemeLabel">Ganti Tema</span>
-                </button>
-                <div class="dashV4-avaMenuLangRow">
+              <div class="dashV4-avaMenu hidden" id="dashV4AvaMenu" role="menu" tabindex="-1">
+                <div class="dashV4-avaMenuSectionLabel" id="avaMenuLangLabel">BAHASA</div>
+                <div class="dashV4-avaMenuSegRow" id="dashV4AvaLangRow">
                   <button type="button" data-lang="id">ID</button>
                   <button type="button" data-lang="en">EN</button>
                   <button type="button" data-lang="zh">中</button>
                 </div>
+
+                <div class="dashV4-avaMenuSectionLabel" id="avaMenuThemeLabel">TAMPILAN</div>
+                <div class="dashV4-avaMenuSegRow" id="dashV4AvaThemeRow">
+                  <button type="button" data-theme-choice="light" id="dashV4AvaThemeLightBtn">Terang</button>
+                  <button type="button" data-theme-choice="dark" id="dashV4AvaThemeDarkBtn">Gelap</button>
+                </div>
+
+                <div class="dashV4-avaMenuDivider"></div>
+                <div class="dashV4-avaMenuSectionLabel" id="avaMenuPassLabel">GANTI PASSWORD</div>
+                <div class="dashV4-avaPassForm">
+                  <label for="avaNewPass" id="avaNewPassLabel">Password baru</label>
+                  <input type="password" id="avaNewPass" autocomplete="new-password" />
+                  <label for="avaNewPass2" id="avaNewPass2Label">Konfirmasi password</label>
+                  <input type="password" id="avaNewPass2" autocomplete="new-password" />
+                  <button type="button" class="dashV4-avaPassSubmit" id="avaPassSubmitBtn">Simpan</button>
+                  <div class="msg" id="avaPassMsg"></div>
+                </div>
+
+                <div class="dashV4-avaMenuDivider"></div>
+                <a class="dashV4-avaMenuItem" id="dashV4AvaWaBtn" href="https://wa.me/6287886908357" target="_blank" rel="noopener">
+                  <span>💬</span><span id="avaMenuWaLabel">Hubungi Admin</span>
+                </a>
                 <button type="button" class="dashV4-avaMenuItem" id="dashV4AvaLogoutBtn" role="menuitem">
                   <span>🚪</span><span id="dashV4AvaLogoutLabel">Keluar</span>
                 </button>
@@ -1993,8 +2061,9 @@
         </div>
 
         <div class="dashV4-grid">
-          <!-- ROW 1: Lanjutkan Latihan (mockup c-resume, repurpose ke Continue Practice prod) + Prediksi (mockup c-gauge, avg 3 attempt terakhir) -->
-          <button id="practiceBtn" class="dashV4-card dashV4-gridContinue" type="button" style="text-align:left; cursor:pointer;">
+          <!-- ROW 1 (dashboard-rebuild: 8+4 -> 6+6, lebar disamakan): Lanjutkan Latihan (mockup
+               c-resume, repurpose ke Continue Practice prod) + Prediksi (mockup c-gauge, avg 3 attempt terakhir) -->
+          <button id="practiceBtn" class="dashV4-card dashV4-gridHalf" type="button" style="text-align:left; cursor:pointer;">
             <div class="dashV4-eyebrow" id="eyebrowResume">LANJUTKAN LATIHAN</div>
             <div class="dashV4-resumeTop">
               <div>
@@ -2007,7 +2076,7 @@
             </div>
           </button>
 
-          <div class="dashV4-card dashV4-gridSm" style="text-align:center">
+          <div class="dashV4-card dashV4-gridHalf" style="text-align:center">
             <div class="dashV4-eyebrow" id="eyebrowGauge">PREDIKSI SKOR</div>
             <div class="dashV4-orbitbox" id="dashV4GaugeBox">
               <svg viewBox="0 0 200 200">
@@ -2028,16 +2097,42 @@
             <div class="dashV4-cardEmpty hidden" id="dashV4GaugeEmpty">Belum ada simulasi</div>
           </div>
 
-          <!-- ROW 2 (dashboard-rebuild, span 4+4+4=12): Skor per Seksi (mockup c-skill) +
-               Aktivitas (mockup c-sky, heatmap real) + Misi Harian (mockup c-day, Daily Goal real). -->
-          <div class="dashV4-card dashV4-gridSm">
-            <div class="dashV4-eyebrow" id="eyebrowSkill">SKOR PER SEKSI</div>
-            <div id="dashV4SkillBody">
-              <div class="dashV4-cardEmpty" id="dashV4SkillEmpty">Belum ada data skor per seksi</div>
+          <!-- ROW 2 (dashboard-rebuild, span 4+8=12, restrukturisasi sesi ini): kolom kiri
+               (.dashV4-stackCol, span4) numpuk Skor per Seksi + Misi Harian vertikal dalam 1
+               grid-item; kolom kanan (span8) Aktivitas, align-self:stretch biar tingginya ngikut
+               kolom kiri (lihat .dashV4-skyCard). -->
+          <div class="dashV4-gridSm dashV4-stackCol">
+            <div class="dashV4-card">
+              <div class="dashV4-eyebrow" id="eyebrowSkill">SKOR PER SEKSI</div>
+              <div id="dashV4SkillBody"></div>
+            </div>
+
+            <div class="dashV4-card">
+              <div class="dashV4-eyebrow" id="eyebrowMissions">MISI HARI INI</div>
+              <div class="dashV4-missionHead"><b id="dailyMissionsHeadLabel">Misi Selesai</b><span><span id="dashV4MissionCount">0</span>/3</span></div>
+              <!-- A1: elemen div biasa, sengaja BUKAN tombol -- lihat komentar CSS .dashV4-mission soal kenapa.
+                   3 misi (dashboard-rebuild sesi ini), masing-masing dari sumber data REAL yang
+                   dikonfirmasi ADA (lihat laporan C1): user_mastery.last_reviewed, test_attempts.created_at,
+                   stroke_progress.completed_at. TANPA XP -- belum ada sistemnya. -->
+              <div class="dashV4-mission" id="dashV4MissionReview">
+                <span class="box">✓</span><span class="t" id="dashV4MissionReviewText">Review kata</span><span class="c" id="dashV4MissionReviewCount">0/20</span>
+              </div>
+              <div class="dashV4-mission" id="dashV4MissionMock">
+                <span class="box">✓</span><span class="t" id="dashV4MissionMockText">Selesaikan mock test</span><span class="c" id="dashV4MissionMockCount">0/1</span>
+              </div>
+              <div class="dashV4-mission" id="dashV4MissionStroke">
+                <span class="box">✓</span><span class="t" id="dashV4MissionStrokeText">Latihan goresan</span><span class="c" id="dashV4MissionStrokeCount">0/5</span>
+              </div>
+              <!-- dashDailyLabel/dailyGoalTrack/dashDailyFill TETAP ADA (id sama persis) karena
+                   loadBerandaExtras() menulis ke situ -- disembunyikan visual (tidak pernah
+                   ditampilkan di UI manapun lagi sejak A1), TIDAK dihapus supaya loadBerandaExtras()
+                   (fungsi terlarang) tidak error nyari elemen yang hilang. -->
+              <span id="dashDailyLabel" class="hidden"></span>
+              <div class="dailyGoalTrack hidden"><div class="dailyGoalFill" id="dashDailyFill"></div></div>
             </div>
           </div>
 
-          <div class="dashV4-card dashV4-gridSm">
+          <div class="dashV4-card dashV4-gridContinue dashV4-skyCard">
             <div class="dashV4-eyebrow" id="eyebrowActivity">AKTIVITAS · 12 MINGGU TERAKHIR</div>
             <div class="dashV4-sky">
               <div class="dashV4-skyDays"><span id="dashV4SkyDMon">Sen</span><span id="dashV4SkyDWed">Rab</span><span id="dashV4SkyDFri">Jum</span><span id="dashV4SkyDSun">Min</span></div>
@@ -2049,24 +2144,12 @@
             </div>
           </div>
 
-          <div class="dashV4-card dashV4-gridSm">
-            <div class="dashV4-eyebrow" id="eyebrowMissions">MISI HARI INI</div>
-            <div class="dashV4-missionHead"><b id="dailyGoalLabel">Target Harian</b><span id="dashV4MissionCount">0/20</span></div>
-            <!-- A1: elemen div biasa, sengaja BUKAN tombol -- lihat komentar CSS .dashV4-mission soal kenapa. -->
-            <div class="dashV4-mission" id="dashV4MissionItem">
-              <span class="box">✓</span><span class="t" id="dashV4MissionText">—</span>
-            </div>
-            <!-- dashDailyLabel/dailyGoalTrack/dashDailyFill TETAP ADA (id sama persis) karena
-                 loadBerandaExtras() menulis ke situ -- disembunyikan visual (bukan dihapus),
-                 teksnya sudah tidak dobel-tampil lagi (A1). -->
-            <span id="dashDailyLabel" class="hidden"></span>
-            <div class="dailyGoalTrack hidden"><div class="dailyGoalFill" id="dashDailyFill"></div></div>
-          </div>
-
           <!-- ROW 3 (dashboard-rebuild, span 4+8=12): Kata Hari Ini (mockup c-word, query vocab
                langsung -- SELALU dirender, empty state di DALAM card kalau query gagal, supaya
-               tidak reproduce bug lubang grid dari commit sebelumnya) + Materi & Latihan. -->
-          <div class="dashV4-card dashV4-gridSm" id="dashV4WordCard">
+               tidak reproduce bug lubang grid dari commit sebelumnya) + Materi & Latihan.
+               .dashV4-stretchRow di kedua card -- align-self:stretch KHUSUS baris ini (tinggi
+               beda jauh kalau start-aligned kayak baris lain), baris lain di grid tetap start. -->
+          <div class="dashV4-card dashV4-gridSm dashV4-stretchRow" id="dashV4WordCard">
             <div class="dashV4-eyebrow" id="eyebrowWord">KATA HARI INI</div>
             <div class="dashV4-mascot" aria-hidden="true"><img src="/assets/mascot-study.png" alt="" /></div>
             <div class="dashV4-wod">
@@ -2076,7 +2159,7 @@
             <div class="dashV4-cardEmpty hidden" id="dashV4WordEmpty">—</div>
           </div>
 
-          <div class="dashV4-card dashV4-gridContinue">
+          <div class="dashV4-card dashV4-gridContinue dashV4-stretchRow">
             <div class="dashV4-eyebrow" id="eyebrowMat">MATERI & LATIHAN</div>
             <div class="dashV4-tileRow">
               <button id="mockTestBtn" class="dashV4-tile" type="button"><span class="dashV4-tileIco test"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="4" width="14" height="17" rx="2.2"/><path d="m9 12 2 2 4-4"/></svg></span><span id="quickTileMockTestLabel">Mock Test</span></button>
@@ -2822,9 +2905,14 @@
           eyebrowMissions:'MISI HARI INI', eyebrowWord:'KATA HARI INI', eyebrowMat:'MATERI & LATIHAN',
           eyebrowActivity:'AKTIVITAS · 12 MINGGU TERAKHIR', skyDMon:'Sen', skyDWed:'Rab', skyDFri:'Jum', skyDSun:'Min',
           skyActiveDays:'{n} hari aktif', daysStreak:'{n} hari beruntun', wordEmpty:'Belum ada kata buat hari ini',
+          avaMenuLang:'BAHASA', avaMenuTheme:'TAMPILAN', avaMenuPassword:'GANTI PASSWORD',
+          themeLight:'Terang', themeDark:'Gelap', avaNewPassLabel:'Password baru', avaNewPass2Label:'Konfirmasi password',
+          avaPassSubmit:'Simpan', avaPassTooShort:'Password minimal 8 karakter', avaPassMismatch:'Password tidak sama',
+          avaPassSuccess:'Password berhasil diubah', avaMenuWa:'Hubungi Admin',
           gaugeAvgLabel:'Rata-rata 3 simulasi terakhir', gaugePassLine:'Garis lulus: ',
-          gaugeEmptyState:'Belum ada simulasi', skillEmptyState:'Belum ada data skor per seksi',
+          gaugeEmptyState:'Belum ada simulasi', skillEmptyState:'Belum ada data', skillReviewLabel:'PENGUASAAN KATA (SRS)',
           dailyMissionLabel:'Kata direview hari ini',
+          dailyMissionsHead:'Misi Selesai', missionReviewLabel:'Review kata', missionMockLabel:'Selesaikan mock test', missionStrokeLabel:'Latihan goresan',
           greetTowardLevel:'Menuju HSK {n}', greetAboveLine:'prediksimu di atas garis lulus', greetBelowLine:'prediksimu di bawah garis lulus',
           greetEncourage:'Terus semangat!', greetNoAttempt:'Mulai simulasi pertamamu buat lihat prediksi skor.',
           showPassword:'Tampilkan password', hidePassword:'Sembunyikan password',
@@ -2958,9 +3046,14 @@
           eyebrowMissions:"TODAY'S MISSION", eyebrowWord:'WORD OF THE DAY', eyebrowMat:'MATERIALS & PRACTICE',
           eyebrowActivity:'ACTIVITY · LAST 12 WEEKS', skyDMon:'Mon', skyDWed:'Wed', skyDFri:'Fri', skyDSun:'Sun',
           skyActiveDays:'{n} active days', daysStreak:'{n} day streak', wordEmpty:'No word available today',
+          avaMenuLang:'LANGUAGE', avaMenuTheme:'APPEARANCE', avaMenuPassword:'CHANGE PASSWORD',
+          themeLight:'Light', themeDark:'Dark', avaNewPassLabel:'New password', avaNewPass2Label:'Confirm password',
+          avaPassSubmit:'Save', avaPassTooShort:'Password must be at least 8 characters', avaPassMismatch:'Passwords do not match',
+          avaPassSuccess:'Password changed successfully', avaMenuWa:'Contact Admin',
           gaugeAvgLabel:'Average of last 3 simulations', gaugePassLine:'Pass line: ',
-          gaugeEmptyState:'No simulations yet', skillEmptyState:'No section score data yet',
+          gaugeEmptyState:'No simulations yet', skillEmptyState:'No data yet', skillReviewLabel:'WORD MASTERY (SRS)',
           dailyMissionLabel:'Words reviewed today',
+          dailyMissionsHead:'Missions Done', missionReviewLabel:'Review words', missionMockLabel:'Finish a mock test', missionStrokeLabel:'Stroke practice',
           greetTowardLevel:'Heading to HSK {n}', greetAboveLine:'your prediction is above the passing line', greetBelowLine:'your prediction is below the passing line',
           greetEncourage:'Keep it up!', greetNoAttempt:'Start your first simulation to see your score prediction.',
           showPassword:'Show password', hidePassword:'Hide password',
@@ -3094,9 +3187,14 @@
           eyebrowMissions:'今日任务', eyebrowWord:'每日一词', eyebrowMat:'材料与练习',
           eyebrowActivity:'学习记录 · 最近 12 周', skyDMon:'一', skyDWed:'三', skyDFri:'五', skyDSun:'日',
           skyActiveDays:'{n} 天活跃', daysStreak:'连续 {n} 天', wordEmpty:'今天还没有词',
+          avaMenuLang:'语言', avaMenuTheme:'外观', avaMenuPassword:'修改密码',
+          themeLight:'浅色', themeDark:'深色', avaNewPassLabel:'新密码', avaNewPass2Label:'确认密码',
+          avaPassSubmit:'保存', avaPassTooShort:'密码至少需要 8 个字符', avaPassMismatch:'两次输入的密码不一致',
+          avaPassSuccess:'密码修改成功', avaMenuWa:'联系管理员',
           gaugeAvgLabel:'近3次模拟平均分', gaugePassLine:'及格线：',
-          gaugeEmptyState:'还没有模拟考试', skillEmptyState:'还没有分项得分数据',
+          gaugeEmptyState:'还没有模拟考试', skillEmptyState:'暂无数据', skillReviewLabel:'词汇掌握度（SRS）',
           dailyMissionLabel:'今天已复习的词',
+          dailyMissionsHead:'已完成任务', missionReviewLabel:'复习单词', missionMockLabel:'完成一次模拟测试', missionStrokeLabel:'笔画练习',
           greetTowardLevel:'迈向HSK {n}', greetAboveLine:'你的预测分数已达到及格线', greetBelowLine:'你的预测分数低于及格线',
           greetEncourage:'继续加油！', greetNoAttempt:'开始你的第一次模拟考试，查看预测分数。',
           showPassword:'显示密码', hidePassword:'隐藏密码',
@@ -3280,7 +3378,6 @@
     $('passwordToggle').setAttribute('aria-label', $('password').type === 'text' ? t('hidePassword') : t('showPassword'));
     $('loginWordOfDayLabelText').textContent = t('wordOfDayLabel');
     renderWordOfDay();
-    $('yourPlanLabel').textContent = t('yourPlanLabel');
     renderContinueSubtitle();
 
     $('dGreet').textContent = t('readyToday');
@@ -3289,7 +3386,7 @@
     $('statLabelMastered').textContent = t('wordsMastered');
     $('statLabelMockDone').textContent = t('mockTestsDone');
     $('continueCardLabel').textContent = t('continuePractice');
-    $('dailyGoalLabel').textContent = t('dailyGoal');
+    $('dailyMissionsHeadLabel').textContent = t('dailyMissionsHead');
     $('quickTileMockTestLabel').textContent = t('mockTest');
     $('quickTileDictLabel').textContent = t('materi');
     $('quickTileReportLabel').textContent = t('report');
@@ -3305,7 +3402,9 @@
     $('eyebrowGauge').textContent = t('eyebrowGauge');
     $('eyebrowSkill').textContent = t('eyebrowSkill');
     $('eyebrowMissions').textContent = t('eyebrowMissions');
-    $('dashV4MissionText').textContent = t('dailyMissionLabel');
+    $('dashV4MissionReviewText').textContent = t('missionReviewLabel');
+    $('dashV4MissionMockText').textContent = t('missionMockLabel');
+    $('dashV4MissionStrokeText').textContent = t('missionStrokeLabel');
     $('eyebrowWord').textContent = t('eyebrowWord');
     $('eyebrowMat').textContent = t('eyebrowMat');
     $('gaugeAvgLabel').textContent = t('gaugeAvgLabel');
@@ -8139,39 +8238,41 @@
     tryFire();
   })();
 
-  /* ---------- avatar header + menu akun. Menu HANYA proxy ke aksi yang sudah ada & sudah
-     wired (toggleTheme/setLang/logoutBtn) -- tidak ada logic baru, cuma UI baru buat
-     manggilnya dari dashboard. Inisial avatar dibaca LANGSUNG dari currentProfile.display_name
-     (variabel module-level, bukan scrape teks). ---------- */
+  /* ---------- avatar header + menu akun, 4 bagian (dashboard-rebuild sesi ini): bahasa/
+     tampilan/ganti password/hubungi admin. Bahasa & tampilan proxy ke setLang()/setTheme()
+     yang SUDAH ADA (localStorage xingLang/xingTheme sudah ditangani di sana, tidak
+     diduplikasi di sini). Ganti password LANGSUNG panggil sb.auth.updateUser() -- fungsi
+     baru genuinely, belum ada padanan di app manapun. Hubungi Admin = link wa.me statis,
+     href-nya di-set sekali lewat dashV4OnBoot (butuh currentProfile.display_name).
+     Tutup lewat: klik avatar lagi, klik di luar menu (backdrop), atau Esc. ---------- */
   (function(){
     const ava = $('dashV4Ava');
     const menu = $('dashV4AvaMenu');
-    const nameEl = $('dName');
-    if(!ava || !menu || !nameEl) return;
-    const AVA_MENU_LABEL = {
-      id:{ theme:'Ganti Tema', logout: t('keluar') },
-      en:{ theme:'Switch Theme', logout: t('keluar') },
-      zh:{ theme:'切换主题', logout: t('keluar') }
-    };
+    if(!ava || !menu) return;
     function syncInitial(){
       const nm = currentProfile && currentProfile.display_name ? String(currentProfile.display_name).trim() : '';
       ava.textContent = nm ? nm.charAt(0).toUpperCase() : '—';
     }
-    function syncThemeIcon(){
-      $('dashV4AvaThemeIcon').textContent = currentTheme === 'dark' ? '☀️' : '🌙';
-    }
     function syncLabels(){
-      const L = AVA_MENU_LABEL[currentLang] || AVA_MENU_LABEL.id;
-      $('dashV4AvaThemeLabel').textContent = L.theme;
-      $('dashV4AvaLogoutLabel').textContent = L.logout;
-      menu.querySelectorAll('.dashV4-avaMenuLangRow button').forEach(b=>{
+      $('avaMenuLangLabel').textContent = t('avaMenuLang');
+      $('avaMenuThemeLabel').textContent = t('avaMenuTheme');
+      $('avaMenuPassLabel').textContent = t('avaMenuPassword');
+      $('avaNewPassLabel').textContent = t('avaNewPassLabel');
+      $('avaNewPass2Label').textContent = t('avaNewPass2Label');
+      $('avaPassSubmitBtn').textContent = t('avaPassSubmit');
+      $('avaMenuWaLabel').textContent = t('avaMenuWa');
+      $('dashV4AvaThemeLightBtn').textContent = t('themeLight');
+      $('dashV4AvaThemeDarkBtn').textContent = t('themeDark');
+      $('dashV4AvaLogoutLabel').textContent = t('keluar');
+      menu.querySelectorAll('#dashV4AvaLangRow button').forEach(b=>{
         b.classList.toggle('active', b.dataset.lang === currentLang);
       });
+      $('dashV4AvaThemeLightBtn').classList.toggle('active', currentTheme === 'light');
+      $('dashV4AvaThemeDarkBtn').classList.toggle('active', currentTheme === 'dark');
     }
     function openMenu(){
       menu.classList.remove('hidden');
       ava.setAttribute('aria-expanded', 'true');
-      syncThemeIcon();
       syncLabels();
     }
     function closeMenu(){
@@ -8179,17 +8280,58 @@
       ava.setAttribute('aria-expanded', 'false');
     }
     dashV4OnBoot(syncInitial);
+    dashV4OnBoot(function(){
+      const waBtn = $('dashV4AvaWaBtn');
+      if(!waBtn) return;
+      const name = (currentProfile.display_name || t('genericStudent')).trim();
+      const msg = 'Halo Xing Mandarin, saya ' + name + ' butuh bantuan';
+      waBtn.href = 'https://wa.me/6287886908357?text=' + encodeURIComponent(msg);
+    });
     ava.addEventListener('click', (e)=>{
       e.stopPropagation();
       menu.classList.contains('hidden') ? openMenu() : closeMenu();
     });
-    $('dashV4AvaThemeBtn').addEventListener('click', ()=>{ toggleTheme(); syncThemeIcon(); });
-    $('dashV4AvaLogoutBtn').addEventListener('click', ()=> $('logoutBtn').click());
-    menu.querySelectorAll('.dashV4-avaMenuLangRow button').forEach(b=>{
+    menu.querySelectorAll('#dashV4AvaLangRow button').forEach(b=>{
       b.addEventListener('click', ()=>{ setLang(b.dataset.lang); syncLabels(); });
     });
+    $('dashV4AvaThemeLightBtn').addEventListener('click', ()=>{ setTheme('light'); syncLabels(); });
+    $('dashV4AvaThemeDarkBtn').addEventListener('click', ()=>{ setTheme('dark'); syncLabels(); });
+    $('dashV4AvaLogoutBtn').addEventListener('click', ()=> $('logoutBtn').click());
     document.addEventListener('click', (e)=>{
       if(!menu.classList.contains('hidden') && !menu.contains(e.target) && e.target !== ava) closeMenu();
+    });
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === 'Escape' && !menu.classList.contains('hidden')) closeMenu();
+    });
+
+    // B3 -- ganti password. sb.auth.updateUser() LANGSUNG (bukan resetPasswordForEmail,
+    // yang butuh konfigurasi email redirect yang belum ada -- sesuai instruksi eksplisit).
+    $('avaPassSubmitBtn').addEventListener('click', async ()=>{
+      const p1 = $('avaNewPass').value;
+      const p2 = $('avaNewPass2').value;
+      const msgEl = $('avaPassMsg');
+      if(p1.length < 8){
+        msgEl.textContent = t('avaPassTooShort');
+        msgEl.className = 'msg err';
+        return;
+      }
+      if(p1 !== p2){
+        msgEl.textContent = t('avaPassMismatch');
+        msgEl.className = 'msg err';
+        return;
+      }
+      $('avaPassSubmitBtn').disabled = true;
+      const { error } = await sb.auth.updateUser({ password: p1 });
+      $('avaPassSubmitBtn').disabled = false;
+      if(error){
+        msgEl.textContent = error.message;
+        msgEl.className = 'msg err';
+        return;
+      }
+      msgEl.textContent = t('avaPassSuccess');
+      msgEl.className = 'msg ok';
+      $('avaNewPass').value = '';
+      $('avaNewPass2').value = '';
     });
   })();
 
@@ -8267,26 +8409,46 @@
     setTimeout(function(){ cards.forEach(function(c){ c.classList.add('in'); }); }, 800);
   })();
 
-  /* ---------- Misi Harian -- checklist mockup, isi Target Harian real, TANPA XP. A1 fix: teks
-     item (#dashV4MissionText) SEKARANG label statis via t('dailyMissionLabel') (diisi
-     applyStaticI18n(), bukan di sini) -- BUKAN lagi salinan #dashDailyLabel, biar tidak dobel
-     sama counter "{count}/{DAILY_GOAL}" di mission-head. DAILY_GOAL direferensi LANGSUNG (const
-     module-level yang sudah ada), bukan hardcode ulang. Cuma observe #dashDailyFill.style.width
-     buat nentuin count + status "done". loadBerandaExtras() sendiri TIDAK disentuh/dipanggil. ---------- */
-  (function(){
-    const fillEl = $('dashDailyFill');
-    const missionEl = $('dashV4MissionItem');
+  /* ---------- Misi Harian -- 3 misi (dashboard-rebuild sesi ini, gantikan 1 misi lama yang
+     baca dashDailyFill.style.width via MutationObserver). QUERY LANGSUNG ke 3 sumber yang
+     dikonfirmasi ADA (lihat laporan C1 tugas ini):
+       - user_mastery.last_reviewed >= hari ini  -> "Review kata", target DAILY_GOAL (const
+         module-level yang sudah ada, bukan hardcode ulang)
+       - test_attempts.created_at >= hari ini    -> "Selesaikan mock test", target 1
+       - stroke_progress.completed_at >= hari ini -> "Latihan goresan", target 5 karakter
+         (judgment call -- tidak ada target "resmi" buat goresan di app manapun, 5 dipilih
+         biar sepadan skala-nya sama misi lain, bukan angka yang dijanjikan di tempat lain)
+     TANPA XP -- belum ada sistemnya. Header "{n}/3" = jumlah misi done. Guard query-sekali-
+     per-sesi dari dashV4OnBoot (per currentUser id). ---------- */
+  dashV4OnBoot(async function(){
     const countEl = $('dashV4MissionCount');
-    if(!fillEl || !missionEl || !countEl) return;
-    function reflect(){
-      const pct = Math.min(100, Math.max(0, parseFloat(fillEl.style.width) || 0));
-      const count = Math.round(pct / 100 * DAILY_GOAL);
-      countEl.textContent = count + '/' + DAILY_GOAL;
-      missionEl.classList.toggle('done', pct >= 100);
+    const reviewBox = $('dashV4MissionReview');
+    const mockBox = $('dashV4MissionMock');
+    const strokeBox = $('dashV4MissionStroke');
+    if(!countEl || !reviewBox || !mockBox || !strokeBox) return;
+    const REVIEW_TARGET = DAILY_GOAL;
+    const MOCK_TARGET = 1;
+    const STROKE_TARGET = 5;
+    const since = todayStr();
+
+    const [reviewRes, mockRes, strokeRes] = await Promise.all([
+      sb.from('user_mastery').select('user_id', { count:'exact', head:true }).eq('user_id', currentUser).gte('last_reviewed', since),
+      sb.from('test_attempts').select('set_id', { count:'exact', head:true }).eq('user_id', currentUser).gte('created_at', since),
+      sb.from('stroke_progress').select('id', { count:'exact', head:true }).eq('user_id', currentUser).gte('completed_at', since)
+    ]);
+
+    function setMission(box, cEl, count, target){
+      const clamped = Math.min(count, target);
+      cEl.textContent = clamped + '/' + target;
+      box.classList.toggle('done', count >= target);
     }
-    reflect();
-    new MutationObserver(reflect).observe(fillEl, { attributes:true, attributeFilter:['style'] });
-  })();
+    setMission(reviewBox, $('dashV4MissionReviewCount'), reviewRes.count || 0, REVIEW_TARGET);
+    setMission(mockBox, $('dashV4MissionMockCount'), mockRes.count || 0, MOCK_TARGET);
+    setMission(strokeBox, $('dashV4MissionStrokeCount'), strokeRes.count || 0, STROKE_TARGET);
+
+    const doneCount = [reviewBox, mockBox, strokeBox].filter(b => b.classList.contains('done')).length;
+    countEl.textContent = doneCount;
+  });
 
   /* ---------- Prediksi (skala HSK) + Skor per Seksi -- QUERY LANGSUNG ke test_attempts
      (dashboard-rebuild sesi ini, gantikan scrape DOM #dashRecentHistory yang lama). 3 attempt
@@ -8306,7 +8468,6 @@
     const gaugeEmpty = $('dashV4GaugeEmpty');
     const gaugePassNum = $('dashV4PassLineNum');
     const skillBody = $('dashV4SkillBody');
-    const skillEmpty = $('dashV4SkillEmpty');
     if(!gaugeBox || !gaugeNum || !gaugeRing || !skillBody) return;
     const CIRC = 2 * Math.PI * 84;
     const PASS_PCT = 60;
@@ -8366,24 +8527,50 @@
       if(gaugeSeal) gaugeSeal.classList.toggle('show', scoreScaled >= PASS_LINE);
     }
 
+    /* D2 -- SEMUA 3 seksi SELALU dirender (termasuk Writing walau bySection.writing kosong/
+       total_points=0 -- lihat laporan diagnosa D1: set esai-murni tetap insert row test_attempts
+       tapi total_points=0, ke-filter di atas jadi effectively "no data"). Empty state IN-ROW,
+       bukan sembunyi baris/whole-card lagi. */
     skillBody.innerHTML = '';
-    const sectionsWithData = SECTIONS.filter(s => bySection[s] && bySection[s].length);
-    if(sectionsWithData.length === 0){
-      skillBody.appendChild(skillEmpty);
-      skillEmpty.textContent = t('skillEmptyState');
-      skillEmpty.classList.remove('hidden');
-    } else {
-      sectionsWithData.forEach(function(sec){
-        const list = bySection[sec];
+    SECTIONS.forEach(function(sec){
+      const list = bySection[sec];
+      const row = document.createElement('div');
+      row.className = 'dashV4-skill';
+      if(list && list.length){
         const avgSec = Math.round(list.reduce((a,b)=>a+b,0) / list.length);
-        const row = document.createElement('div');
-        row.className = 'dashV4-skill';
         row.innerHTML = '<div class="dashV4-skillTop"><span>' + (SECTION_LABEL[sec] || sec) +
           '</span><span class="v"><b>' + avgSec + '</b> /100</span></div>' +
           '<div class="dashV4-skillBar"><i style="width:' + avgSec + '%"></i><em></em></div>';
-        skillBody.appendChild(row);
-      });
-    }
+      } else {
+        row.innerHTML = '<div class="dashV4-skillTop"><span>' + (SECTION_LABEL[sec] || sec) +
+          '</span><span class="vEmpty">' + t('skillEmptyState') + '</span></div>' +
+          '<div class="dashV4-skillBar"></div>';
+      }
+      skillBody.appendChild(row);
+    });
+
+    /* D3 -- baris REVIEW (SRS), dipisah garis tipis (.dashV4-skillReview) + label gold (beda
+       dari 3 seksi ujian di atas). Metrik: kata mastery_level>=MASTERED_THRESHOLD (const yang
+       SUDAH ADA, sama definisi dengan stat "Kata Dikuasai") dibagi total kata level 1..target
+       (fetchVocabLevelCounts() -- CALLABLE, bukan fungsi terlarang -- kumulatif, sama konvensi
+       dengan PACKAGE_LEVELS/word-of-day). currentProfile.target_level null -> fallback 4 (sama
+       seperti gauge di atas). Data gak ada -> 0%, BUKAN disembunyikan (tetap jujur, bukan angka karang). */
+    try{
+      const [{ count: masteredCount, error: mErr }, vocabTotals] = await Promise.all([
+        sb.from('user_mastery').select('user_id', { count:'exact', head:true })
+          .eq('user_id', currentUser).gte('mastery_level', MASTERED_THRESHOLD),
+        fetchVocabLevelCounts()
+      ]);
+      let totalInScope = 0;
+      for(let lv = 1; lv <= level; lv++) totalInScope += (vocabTotals[lv] || 0);
+      const reviewPct = (!mErr && totalInScope > 0) ? Math.round((masteredCount || 0) / totalInScope * 100) : 0;
+      const reviewRow = document.createElement('div');
+      reviewRow.className = 'dashV4-skill dashV4-skillReview';
+      reviewRow.innerHTML = '<div class="dashV4-skillTop"><span>' + t('skillReviewLabel') +
+        '</span><span class="v"><b>' + reviewPct + '</b>%</span></div>' +
+        '<div class="dashV4-skillBar"><i style="width:' + reviewPct + '%"></i></div>';
+      skillBody.appendChild(reviewRow);
+    }catch(e){ console.error('Gagal hitung progres review:', e.message); }
 
     updateGreetSubtitle(pcts.length > 0, avgPct);
   });

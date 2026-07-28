@@ -400,38 +400,80 @@
 
     @media (max-width: 880px){
       .loginScreen{ grid-template-columns:1fr; }
-      /* Was display:none (sky/moon/logo motion never visible on mobile at all) -- now a short
-         top strip so the sky animations from task 2 are still seen. Task explicitly scopes the
-         strip to sky + moon + logo card only ("lengkap dengan langit, bulan, dan logo card") --
-         the big hanzi headline/tagline/word-of-day card/mascot don't fit ~260px and are hidden
-         below, not because they're broken, just out of the strip's explicit scope. */
+      /* Strip capped at 200px (was 260px, still too tall -- ate ~45% of a 375x667 viewport,
+         pushing the form below the fold). max-height + overflow:hidden per the fix spec, rather
+         than a hard height -- lets the strip clip from the bottom if content doesn't fit, which
+         combined with DOM order (logo card first, word-of-day card last inside
+         .loginBrandContent) naturally gives the requested priority: logo card > moon (small,
+         positioned near the top, essentially always fits) > word-of-day card (last, first to
+         get clipped under pressure). */
       .loginBrandPanel{
-        display:flex; align-items:flex-start; min-height:260px; height:260px; padding:22px 24px;
+        display:flex; align-items:flex-start; max-height:200px; overflow:hidden; padding:18px 24px;
       }
       .loginBrandContent{ max-width:none; width:100%; }
-      .loginBrandLogoCard{ margin-bottom:0; }
-      .loginBrandTitle, .loginBrandDesc, .loginWordOfDay{ display:none; }
+      .loginBrandLogoCard{ margin-bottom:10px; }
+      .loginBrandTitle, .loginBrandDesc{ display:none; }
       .loginMascot{ display:none; }
       .loginMoon{ width:56px; height:56px; top:14%; right:10%; }
       .loginBrandOrnament{ font-size:260px; right:-70px; bottom:-130px; }
+      /* Word-of-day card: WAS display:none here, but .loginWordOfDay.ready{display:flex}
+         (unconditional, outside this media query, see ~line 275) has higher specificity
+         (.loginWordOfDay.ready = 2 classes) than a single-class display:none in here -- so once
+         the async Supabase word-of-day fetch resolved and JS added .ready (which it does on
+         basically every real page load), the card won the cascade anyway and rendered at full
+         DESKTOP size (38px hanzi, 15px/20px padding, max-width:300px) inside the 200px strip --
+         that's the actual root cause of "kartu kegedean, makan hampir setengah layar", not just
+         the strip being tall. Fix is two-part: (a) stop fighting it with display:none -- shrink
+         it instead so it's fine to show, (b) compact sizing below, ported to a single row. */
+      .loginWordOfDay{
+        max-width:none; width:auto; margin-top:0; padding:6px 12px; border-radius:12px;
+      }
+      .loginWordOfDayLabel{ display:none; }
+      .loginWordOfDayRow{ margin-top:0; gap:8px; }
+      .loginWordOfDayHanzi{ font-size:26px; }
+      /* pinyin+arti stacked (desktop) -> side by side (mobile), so hanzi+pinyin+arti read as one
+         compact row instead of a 2-line block. */
+      .loginWordOfDayMeta{ display:flex; align-items:baseline; gap:6px; min-width:0; }
+      .loginWordOfDayPinyin{ font-size:12px; white-space:nowrap; }
+      .loginWordOfDayMeaning{
+        font-size:11px; margin-top:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      }
       /* .loginMobileBrand stays display:none (its base rule) -- the strip above now carries the
          mobile logo via .loginBrandLogoCard, so this centered duplicate is no longer flipped to
          flex here (was the only place that turned it on). Avoids showing the logo twice. */
-      .loginFormPanel{ padding:32px 20px; }
-      .loginLangSwitch{ top:14px; right:14px; }
+      /* Toggle was position:absolute over the title (bug #1: title text got clipped/covered on
+         real iPhones). Pulled into normal flow as its own row above the title instead (flex-
+         direction:column so it stacks above .loginFormBox, which comes right after it in the
+         HTML), align-self:flex-end keeps it right-aligned like before -- can never overlap
+         anything below it again. */
+      .loginFormPanel{ padding:28px 20px 32px; flex-direction:column; }
+      .loginLangSwitch{
+        position:static; align-self:flex-end; top:auto; right:auto; margin:0 0 18px;
+      }
+      /* Touch targets: theme toggle (was 42x36) and lang pill buttons (no explicit size, just
+         padding) were both under the 44x44 minimum. Scoped via .loginLangSwitch ancestor (not
+         just .loginThemeToggle/.loginLangBtn alone) -- their real, comprehensive base rules live
+         later in this stylesheet (~line 562/571, outside any media query), so a same-specificity
+         single-class override in here would silently lose to them regardless of viewport, same
+         cascade trap as the word-of-day .ready bug above. Two classes beats one regardless of
+         source order. */
+      .loginLangSwitch .loginThemeToggle{ width:44px; height:44px; }
+      .loginLangSwitch .loginLangBtn{ min-width:44px; min-height:44px; padding:0 8px; }
+      /* Password show/hide toggle -- was icon-sized only (~20px hit area). Bigger box, icon
+         itself unchanged, right:0 (was 14px) keeps it clear of the input's rounded corner. */
+      .passwordToggle{ width:44px; height:44px; right:0; display:flex; align-items:center; justify-content:center; }
 
-      /* Rest below: ported from Mobile.dc.html lines 51-55 (isLogin) -- centered heading,
-         sr-only field labels (comp has icon-only inputs, no visible "Email"/"Password" text --
-         but it's a static mockup with no screen reader, so the label stays in the DOM for
-         real accessibility, just visually hidden here instead of removed). Desktop's own
-         .loginFormTitle/.loginFormSub/label/.inputWrap rules above are untouched -- these are
-         overrides scoped to this existing breakpoint only, not a new one. */
+      /* Rest below: ported from Mobile.dc.html lines 51-55 (isLogin) -- centered heading.
+         Desktop's own .loginFormTitle/.loginFormSub/.inputWrap rules above are untouched --
+         these are overrides scoped to this existing breakpoint only, not a new one. */
       .loginFormTitle{ text-align:center; font-size:25px; margin:0 0 3px; }
       .loginFormSub{ text-align:center; font-size:13px; margin:0 0 24px; }
-      .loginFormPanel label:not(.rememberMe){
-        position:absolute; width:1px; height:1px; padding:0; margin:-1px;
-        overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
-      }
+      /* Bug #4: labels were sr-only AND placeholders were empty ("") -- two empty icon boxes,
+         no visible hint at all what to type. Fix picks ONE of the two options from the spec:
+         show the labels (already localized via t() -- emailLabel/passwordLabel, no new i18n
+         needed) rather than add placeholders, since placeholder-as-only-label is itself a
+         known accessibility anti-pattern (vanishes the moment the user starts typing). So:
+         the old sr-only rule for labels is simply not carried over to this rewritten block. */
       .loginFormPanel .inputWrap + .inputWrap{ margin-top:11px; }
     }
 
@@ -2287,7 +2329,7 @@
           <div class="loginWordOfDayLabel"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c1 6 5 10 12 12-7 2-11 6-12 12-1-6-5-10-12-12 7-2 11-6 12-12z"/></svg><span id="loginWordOfDayLabelText">WORD OF THE DAY</span></div>
           <div class="loginWordOfDayRow">
             <div class="loginWordOfDayHanzi" id="loginWordOfDayHanzi"></div>
-            <div>
+            <div class="loginWordOfDayMeta">
               <div class="loginWordOfDayPinyin" id="loginWordOfDayPinyin"></div>
               <div class="loginWordOfDayMeaning" id="loginWordOfDayMeaning"></div>
             </div>

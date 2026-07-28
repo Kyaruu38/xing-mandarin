@@ -61,9 +61,18 @@
       --dv4-shadow-hover:0 30px 70px rgba(0,0,0,.5), 0 0 60px rgba(242,176,30,.07);
     }
     *{box-sizing:border-box}
-    html{ overflow-x:hidden; }
+    /* dashboard-rebuild: overflow-x:hidden DIHAPUS dari html/body -- ini akar bug "sidebar gak
+       sticky", dikonfirmasi via reproduksi browser terisolasi (bukan tebakan). Alasan teknis:
+       set overflow-x TANPA overflow-y bikin browser hitung overflow-y jadi 'auto' otomatis
+       (aturan CSS overflow spec -- salah satu 'visible' & yang lain bukan -> yang 'visible'
+       dipaksa jadi 'auto'). html/body jadi scroll container sendiri, .sidebar (descendant,
+       position:sticky) kehilangan containing-block yang benar buat nempel ke viewport asli.
+       Containment horizontal SEKARANG di .mainContent (sudah ada overflow-x:hidden sendiri,
+       cakupannya sama sekali dashboard/app content) + .loginScreen (baru, cakupan sama sekali
+       login) -- keduanya BUKAN ancestor .sidebar, jadi aman dipasangi overflow tanpa
+       ngerusak sticky lagi. */
     body{
-      margin:0; min-height:100vh; background:var(--bg); overflow-x:hidden;
+      margin:0; min-height:100vh; background:var(--bg);
       color:var(--text); font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
       transition:background-color .2s ease, color .2s ease;
     }
@@ -107,7 +116,9 @@
       .cardSparkle{ animation:none !important; }
     }
 
-    .loginScreen{ display:grid; grid-template-columns:minmax(420px,46%) 1fr; min-height:100vh; }
+    /* overflow-x:hidden dipindah ke sini dari body (lihat komentar body{} soal sticky bug) --
+       .loginScreen sibling dari #appShell, BUKAN ancestor .sidebar, aman. */
+    .loginScreen{ display:grid; grid-template-columns:minmax(420px,46%) 1fr; min-height:100vh; overflow-x:hidden; }
 
     .loginBrandPanel{
       position:relative; overflow:hidden; background:linear-gradient(158deg,#2b3c78,#131e40 84%);

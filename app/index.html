@@ -8690,9 +8690,16 @@
     const streakEl = $('dashV4SkyStreak');
     if(!svg) return;
     const NS = 'http://www.w3.org/2000/svg';
-    const COLS = 12, ROWS = 7, CS = 26, PADX = 9, PADY = 9;
+    /* dashboard-rebuild: CSW/CSH kepisah (dulu 1 nilai CS persegi 26x26) -- card Activity
+       (span8) kelebihan tinggi dibanding kolom kiri (Score by Section + Today's Mission
+       ditumpuk, span4). Dikonfirmasi via reproduksi browser: lebar card fix (ngikut grid),
+       tinggi ngikut aspect-ratio viewBox -- CSW=26 (lebar per kolom, TIDAK diubah, dot masih
+       sama besar karena scale svg dihitung dari lebar) + CSH=17,PADY=7 (tinggi per baris
+       dikecilin) bikin tinggi card PERSIS nyamain kolom kiri (diukur 545px=545px di
+       reproduksi). COLS/ROWS tetap 12x7, jumlah data TIDAK dikurangi. */
+    const COLS = 12, ROWS = 7, CSW = 26, CSH = 17, PADX = 9, PADY = 7;
     const DAYS = COLS * ROWS;
-    svg.setAttribute('viewBox', '0 0 ' + (COLS*CS+PADX*2) + ' ' + (ROWS*CS+PADY*2));
+    svg.setAttribute('viewBox', '0 0 ' + (COLS*CSW+PADX*2) + ' ' + (ROWS*CSH+PADY*2));
     function hash(i){ const x = Math.sin(i*97.13) * 43758.5453; return x - Math.floor(x); }
 
     function isoDay(d){ return d.toISOString().slice(0,10); }
@@ -8722,8 +8729,8 @@
       const dayDate = new Date(windowStart); dayDate.setUTCDate(dayDate.getUTCDate() + i);
       const cnt = counts.get(isoDay(dayDate)) || 0;
       const L = cnt === 0 ? 0 : cnt <= 2 ? 1 : cnt <= 5 ? 2 : cnt <= 10 ? 3 : 4;
-      const x = PADX + w*CS + CS/2 + (hash(i)-0.5)*5;
-      const y = PADY + d*CS + CS/2 + (hash(i+500)-0.5)*5;
+      const x = PADX + w*CSW + CSW/2 + (hash(i)-0.5)*5;
+      const y = PADY + d*CSH + CSH/2 + (hash(i+500)-0.5)*5;
       const c = document.createElementNS(NS, 'circle');
       c.setAttribute('cx', x); c.setAttribute('cy', y);
       if(L === 0){

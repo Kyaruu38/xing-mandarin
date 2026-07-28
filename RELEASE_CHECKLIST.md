@@ -273,12 +273,62 @@ Tabel ini `select * from question_bank` — salinan LENGKAP 160 baris termasuk
 kolom `answer` (kunci jawaban), sudah di-`grant select ... to service_role`.
 Bukan tabel yang ke-cover RLS `question_bank` biasa — jangan dibiarkan lama.
 `drop table public.question_bank_bak_20260728;` setelah pending #2 selesai.
+**UPDATE (lihat section (j)): tabel ini sekarang isinya 162 baris (bukan 160
+lagi) dan masih dipakai aktif sebagai daftar target oleh batch 2 — jangan
+drop sampai section (j) juga selesai di-QA.**
 
 **⏳ PENDING #2 — verifikasi dengar oleh tim konten.** Putar beberapa dari 147
 klip langsung di app (bukan cuma percaya log "upload sukses"), terutama yang
 `audio_url`-nya dipakai >1 soal. CDN/browser cache bisa bikin klip lama
 (versi 女的) masih kedengeran beberapa jam meski file di Storage sudah
 ketimpa.
+
+---
+
+## (j) QA konten tim Xing — batch 2, 2026-07-28 — APPLIED, 1 PENDING cleanup
+
+4 perbaikan reading/listening dari review konten tim, di luar batch gender
+di section (i). Detail query lengkap: `sql/10_fix_listening_gender.sql`
+(bagian "BATCH 2"). Semua **sudah di-apply & diverifikasi ke prod**.
+
+- **(a) `H1XING010` order 7–10** — ganti `这个` jadi nama benda konkret di
+  4 kalimat reading. Untuk order 9, usulan awal tim (`米饭`/nasi) **tidak
+  dipakai** karena gambar kunci jawaban C ternyata mi, bukan nasi — dipakai
+  `面条` (mi) supaya cocok sama gambarnya. Kalau dipaksa pakai usulan awal,
+  murid yang pilih gambar yang benar justru dinilai salah.
+- **(b) `H1XING010` order 14** — soal lama pakai `去` tapi kunci jawaban
+  `在北京` (berada di, bukan pergi ke). Diperbaiki dari sisi `prompt` soal,
+  bukan opsi jawaban — array `choices` di order 14 dipakai bersama order 11,
+  ubah opsi akan ikut mengubah order 11 (di luar scope QA ini).
+- **(c) `H1XING008` order 10** — `天冷了` → `天气冷了` (`冷` butuh subjek
+  `天气`, bukan `天` — versi lama gramatikal janggal untuk HSK 1).
+- **(d) Listening `来`/`去`, set `h1-listening-3` & `h1-listening-7` order
+  17** — speaker B jawab `我来。` ke ajakan A, padahal B yang bergerak ke
+  tempat A (harusnya `去` dari sudut pandang B). Pertanyaan & pilihan
+  jawaban **tetap** pakai `来` (sudut pandang narator/A, sesuai pola HSK
+  asli) — cuma baris jawaban B di `transcript` yang diperbaiki, kunci
+  jawaban (`answer`) tidak berubah.
+
+**Audio**: 2 baris dari (d) ditambahkan ke `question_bank_bak_20260728`,
+diregenerate bareng lewat `scripts/regen_fixed_audio.py`. Run terakhir:
+**149/149 berhasil, 0 gagal** (147 sisa batch gender + 2 dari `来`/`去`).
+
+**⏳ PENDING — sama dengan PENDING #1 section (i)**: `question_bank_bak_20260728`
+sekarang 162 baris campuran (160 gender + 2 ini), dipakai aktif sebagai
+daftar target regenerasi audio — jangan di-drop sampai kedua batch selesai
+di-QA dengar oleh tim konten.
+
+**Belum dikerjakan (di luar scope batch ini)**:
+- Usulan tim `这个给你的` untuk `H1XING010` order 11 — **tidak diterapkan**,
+  kalimat sekarang (`这是给你的。`) sudah gramatikal; usulan tim kurang `是`.
+- `H1XING003` order 24, keluhan "tidak ada gambar" — dicek, gambar ADA
+  (`payload.image_svg`, bulan sabit), renderer `image_tf` punya fallback ke
+  `image_svg` (`app/index.html:7690`). Kemungkinan SVG kurang jelas, bukan
+  hilang — butuh screenshot tim buat pastikan sebelum diputuskan bug/bukan.
+- Semua keluhan GAMBAR (打电话 vs 玩手机, "他们" digambar 2 orang, gambar
+  E/F ambigu, D≡F, baju digambar bukan jaket) — belum dikerjakan. SVG
+  inline di payload dan sebagian dipakai lintas set (sama seperti isu
+  choices di poin (b)) — butuh audit + batch terpisah.
 
 ---
 

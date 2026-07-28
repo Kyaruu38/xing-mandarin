@@ -141,3 +141,91 @@ where q.question_type='listening_mc'
 --    LAMA (versi 女的) masih kedengeran beberapa jam meski file di Storage
 --    sudah ketimpa -- jangan langsung simpulkan "masih salah" tanpa hard
 --    refresh / cek versi file di Storage dashboard dulu.
+
+-- ============================================================
+-- BATCH 2 -- QA KONTEN TIM XING, 2026-07-28
+-- ============================================================
+-- Semua di bawah ini SUDAH di-apply & diverifikasi ke prod oleh user.
+
+-- (a) Reading H1XING010, order 7-10 -- ganti 这个 jadi nama benda konkret +
+-- perbaikan lain. Untuk order 9, DIVERIFIKASI dulu gambar kunci jawaban
+-- cocok dengan kata benda barunya sebelum apply: usulan awal tim tulis
+-- 米饭 (nasi), TAPI gambar kunci jawaban C adalah MI -- jadi yang dipakai
+-- 面条 (mi), BUKAN 米饭. Kalau paksa pakai usulan awal (米饭), murid yang
+-- jawab benar (pilih gambar mi) justru dinilai salah.
+update question_bank set payload = payload
+  || jsonb_build_object('prompt','我看书学汉语。',
+                        'prompt_id','Aku belajar bahasa Mandarin dengan buku.')
+where set_id='H1XING010' and order_index=7;
+
+update question_bank set payload = payload
+  || jsonb_build_object('prompt','我生病了，要吃药。',
+                        'prompt_id','Aku sakit, harus minum obat.')
+where set_id='H1XING010' and order_index=8;
+
+update question_bank set payload = payload
+  || jsonb_build_object('prompt','中午我吃了一碗面条。',
+                        'prompt_id','Siang tadi aku makan semangkuk mi.')
+where set_id='H1XING010' and order_index=9;
+
+update question_bank set payload = payload
+  || jsonb_build_object('prompt','晚上我在家看电视。',
+                        'prompt_id','Malam aku nonton TV di rumah.')
+where set_id='H1XING010' and order_index=10;
+
+-- (b) H1XING010 order 14 -- soal lama pakai 去 tapi kunci jawaban 在北京
+-- (nyambungnya ke "berada di", bukan "pergi ke"). Diperbaiki dari SISI
+-- SOAL (prompt), bukan opsi jawaban -- karena array choices di order 14
+-- ini DIPAKAI BERSAMA oleh order 11 (kalau opsi yang diubah, order 11 ikut
+-- kena, itu di luar scope QA ini).
+update question_bank set payload = payload
+  || jsonb_build_object('prompt','你在哪儿工作？')
+where set_id='H1XING010' and order_index=14;
+
+-- (c) H1XING008 order 10 -- 天冷了 -> 天气冷了 (冷 butuh subjek 天气,
+-- bukan 天 -- 天冷了 secara gramatikal janggal buat HSK1).
+update question_bank set payload = payload
+  || jsonb_build_object('prompt','天气冷了，我穿这个。')
+where set_id='H1XING008' and order_index=10;
+
+-- (d) Listening 来/去, set h1-listening-3 & h1-listening-7 order 17:
+-- speaker A tanya "明天你来吗？" ke B, B jawab "我来。" -- salah
+-- perspektif, sebab B yang BERGERAK ke tempat A (harusnya 去 dari sudut
+-- pandang B), bukan 来. Pertanyaan & pilihan jawaban TETAP pakai 来
+-- (sudut pandang narator/A tidak diubah, sesuai pola soal HSK asli) --
+-- yang diperbaiki CUMA baris jawaban B di transcript, kunci jawaban
+-- (answer) TIDAK berubah.
+update question_bank
+set payload = jsonb_set(payload, '{transcript,1,1}', '"我去。"'::jsonb)
+where set_id in ('h1-listening-3','h1-listening-7') and order_index=17;
+
+-- AUDIO: 2 baris (d) ditambahkan ke question_bank_bak_20260728, lalu
+-- diregenerate bareng lewat scripts/regen_fixed_audio.py. Run terakhir:
+-- 149/149 berhasil, 0 gagal (147 sisa dari batch gender + 2 dari 来/去).
+--
+-- CATATAN PENTING soal tabel backup: question_bank_bak_20260728 sekarang
+-- isinya CAMPUR -- 160 baris batch gender (bagian atas file ini) + 2 baris
+-- 来/去 (poin d) = 162 baris. Tabel ini dipakai scripts/regen_fixed_audio.py
+-- sebagai DAFTAR TARGET (sumber id buat query "apa yang perlu diregenerate"),
+-- BUKAN sekadar snapshot backup pasif -- PENDING #1 di bagian batch gender
+-- di atas ("drop table setelah QA batch gender selesai") perlu ditinjau
+-- ulang: jangan drop tabel ini sampai SEMUA batch yang masih bergantung
+-- padanya (termasuk batch 2 ini) selesai diverifikasi.
+
+-- ============================================================
+-- YANG TIDAK DIKERJAKAN + ALASANNYA
+-- ============================================================
+-- - Usulan tim "这个给你的" untuk H1XING010 order 11: TIDAK diterapkan.
+--   Kalimat yang sekarang, 这是给你的。, sudah gramatikal. Usulan tim
+--   kurang 是 -- kalau mau versi "这个", yang benar 这个是给你的。
+-- - H1XING003 order 24, keluhan "tidak ada gambar": dicek, gambarnya ADA
+--   (payload.image_svg, bulan sabit) dan renderer image_tf punya fallback
+--   ke image_svg kalau image_url kosong (app/index.html:7690). Kemungkinan
+--   SVG-nya kurang jelas/kecil, bukan hilang. Perlu screenshot dari tim
+--   buat pastikan sebelum diputuskan ini bug atau bukan.
+-- - Semua keluhan GAMBAR (打电话 vs 玩手机, "他们" digambar 2 orang,
+--   gambar E/F ambigu, D sama persis dengan F, baju digambar bukan
+--   jaket): BELUM dikerjakan. SVG inline di payload, dan beberapa gambar
+--   dipakai lintas set (ubah 1 gambar bisa kena beberapa soal sekaligus,
+--   sama kayak isu choices di poin (b) di atas) -- butuh audit terpisah,
+--   batch tersendiri.

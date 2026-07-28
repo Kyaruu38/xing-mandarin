@@ -5,6 +5,16 @@
 -- Sisa (belum ditambal): user masih bisa narik correct_answer
 --    dalam paket sendiri dengan submit p_answers kosong.
 --
+-- UPDATE 2026-07-28: mapping business/convo diubah dari "tidak ada level sama
+-- sekali" (v_max_level=0, submit_attempt SELALU tolak set apa pun) jadi
+-- business=HSK 1-5, convo=HSK 1-4 -- align sama pricelist (paket.html), yang
+-- ternyata emang jual materi HSK buat 2 paket ini. BELUM ke-apply ke prod --
+-- file ini harus di-paste MANUAL ke Supabase SQL Editor biar perubahan
+-- v_max_level business/convo ini kepakai di database live. Perubahan
+-- PACKAGE_LEVELS di frontend (app/index.html) TIDAK otomatis nyambung ke
+-- fungsi server-side ini -- 2 tempat terpisah, harus disinkron manual tiap ada
+-- perubahan kayak gini.
+--
 -- Sumber: bukan hasil query live (Claude tidak punya akses SQL Editor, lihat
 -- sql/04_rls_snapshot.sql). Basis fungsi diambil dari snapshot live terakhir
 -- (dicapture 2026-07-17, section 6 file itu) -- kalau definisi di prod sudah
@@ -15,10 +25,10 @@
 --   1. gateReason(profile) -- admin selalu lolos; status='expired' -> tolak;
 --      subscription_end < hari ini -> tolak.
 --   2. PACKAGE_LEVELS -- profiles.package menentukan level HSK maksimum yang
---      boleh diakses (hsk_1_4=1..4, hsk_5=1..5, hsk_6/vip=1..6,
---      business/convo=tidak ada level sama sekali). package NULL/tidak
---      dikenal fallback ke hsk_1_4, sama seperti userPackageLevels fallback
---      di frontend (baris ~2139 app/index.html).
+--      boleh diakses (hsk_1_4=1..4, hsk_5=1..5, hsk_6/vip=1..6, business=1..5,
+--      convo=1..4 [update 2026-07-28, lihat catatan di atas]). package
+--      NULL/tidak dikenal fallback ke hsk_1_4, sama seperti userPackageLevels
+--      fallback di frontend (baris ~2139 app/index.html).
 --
 -- Efek: kalau set_id yang diminta levelnya di luar entitlement caller, fungsi
 -- RAISE EXCEPTION sebelum sempat query question_bank -- jadi answer/explanation
@@ -70,8 +80,8 @@ begin
       when 'hsk_5'   then 5
       when 'hsk_6'   then 6
       when 'vip'     then 6
-      when 'business' then 0
-      when 'convo'    then 0
+      when 'business' then 5  -- update 2026-07-28: business HSK 1-5 (align pricelist)
+      when 'convo'    then 4  -- update 2026-07-28: convo HSK 1-4 (align pricelist)
       else 4  -- fallback hsk_1_4, mirror `PACKAGE_LEVELS[profile.package] || PACKAGE_LEVELS.hsk_1_4`
     end;
 

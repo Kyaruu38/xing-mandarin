@@ -355,12 +355,11 @@ footer{box-shadow:0 -1px 0 var(--line);padding:34px 0 max(34px,env(safe-area-ins
      inside the available width, which looked broken. Text stays in the DOM for screen readers
      (sr-only technique, same one already used for the login screen's mobile field labels) --
      nothing is removed from accessibility, just hidden visually. */
-  .nav-login{width:44px;height:44px;min-height:44px;padding:0;border-radius:50%;gap:0}
-  .nav-login-icon{display:block}
-  .nav-login-text{
-    position:absolute;width:1px;height:1px;padding:0;margin:-1px;
-    overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
-  }
+  /* Login jadi tombol BERLABEL di mobile (dulu lingkaran ikon -> kebaca kayak logout).
+     Ikon disembunyikan, teks navLogin (Masuk/Sign in/登录) ditampilkan sebagai pill. */
+  .nav-login{width:auto;height:auto;min-height:32px;padding:6px 13px;border-radius:999px;gap:0;white-space:nowrap;font-size:12px;font-weight:700}
+  .nav-login-icon{display:none}
+  .nav-login-text{position:static;width:auto;height:auto;padding:0;margin:0;overflow:visible;clip:auto;white-space:nowrap;border:0}
   header{padding:118px 0 72px}
   .hero-ctas .btn{flex:1;min-width:0}
   .hero-stats{display:grid;grid-template-columns:1fr 1fr;gap:20px}

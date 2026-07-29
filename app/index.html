@@ -1647,6 +1647,23 @@
       .adminRow{ grid-template-columns:1fr; gap:6px; }
     }
 
+    /* ===== Dashboard profile consolidation (MOBILE-ONLY, <=760px) =====
+       Kontrol tema/bahasa/logout/VIP di header lama disembunyikan; avatar + menu akun
+       direlokasi ke header via JS (matchMedia), VIP badge masuk ke DALAM menu. Desktop
+       (>760px) TIDAK tersentuh -- semua override di dalam media query ini. */
+    @media (max-width: 760px){
+      .mobileHeaderActions > #packageBadgeMobile,
+      .mobileHeaderActions > #themeToggleMobile,
+      .mobileHeaderActions > .sbLangPill,
+      .mobileHeaderActions > #logoutBtnMobile{ display:none !important; }
+      /* .planBlock jadi kosong setelah planRow direlokasi -- sembunyikan biar gak ada gap */
+      .planBlock{ display:none; }
+      /* menu akun tampil sebagai dropdown di bawah header sticky */
+      .mobileHeaderActions .dashV4-avaMenu{ z-index:60; min-width:min(280px,calc(100vw - 24px)); }
+      /* VIP badge sekarang jadi baris pertama di dalam menu */
+      .dashV4-avaMenu > .packageBadge{ align-self:flex-start; margin:2px 4px 8px; }
+    }
+
     /* ============ ADMIN — USER MANAGEMENT (v1, DECISIONS_NEEDED #30/#31) ============
        No design-comp pixel port here beyond what #30 already settled (sidebar as-is, modal
        form pattern) -- toolbar/list/pill styling below reuses this app's own established
@@ -9154,6 +9171,36 @@
       $('avaNewPass').value = '';
       $('avaNewPass2').value = '';
     });
+  })();
+
+  /* ---------- Dashboard mobile: konsolidasi kontrol ke avatar (MOBILE-ONLY, <=760px).
+     Relokasi .dashV4-planRow ke .mobileHeaderActions + pindahkan VIP badge (#packageBadge)
+     ke dalam menu akun. Desktop (>760px): planRow tetap di sapaan, badge tetap di planRow --
+     TIDAK tersentuh. Reversible penuh via matchMedia (rotasi/resize aman). Reuse menu +
+     wiring yang SUDAH ADA (tidak diduplikasi). ---------- */
+  (function(){
+    const mq = window.matchMedia('(max-width: 760px)');
+    const planRow = document.querySelector('.dashV4-planRow');
+    const headerActions = document.querySelector('.mobileHeaderActions');
+    const menu = $('dashV4AvaMenu');
+    const badge = $('packageBadge');
+    if(!planRow || !headerActions || !menu || !badge) return;
+    // penanda posisi asli (buat balikin persis di desktop)
+    const planHome = document.createComment('dv4-planRow-home');
+    planRow.parentNode.insertBefore(planHome, planRow);
+    const badgeHome = document.createComment('dv4-badge-home');
+    badge.parentNode.insertBefore(badgeHome, badge);
+    function toMobile(){
+      if(planRow.parentNode !== headerActions) headerActions.appendChild(planRow);
+      if(badge.parentNode !== menu) menu.insertBefore(badge, menu.firstChild);
+    }
+    function toDesktop(){
+      if(badgeHome.parentNode) badgeHome.parentNode.insertBefore(badge, badgeHome.nextSibling);
+      if(planHome.parentNode) planHome.parentNode.insertBefore(planRow, planHome.nextSibling);
+    }
+    function apply(){ mq.matches ? toMobile() : toDesktop(); }
+    apply();
+    mq.addEventListener ? mq.addEventListener('change', apply) : mq.addListener(apply);
   })();
 
   /* ---------- sidebar "PAKET AKTIF" (dashboard-rebuild sesi ini). Data langsung dari

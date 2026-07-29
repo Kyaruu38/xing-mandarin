@@ -148,77 +148,105 @@
     }
 
     /* overflow-x:hidden tetap di sini (bukan body) -- .loginScreen sibling #appShell, aman.
-       Redesign premium (v5): ornamen dipangkas, layout dirapiin, emas cuma aksen solid.
-       Keyframes twinkle/floatY/moonGlow + lg* + reduced-motion block DIPERTAHANKAN di atas. */
+       Login v6: DESKTOP = desain lama yang rame (login-alive) + matahari gaya landing.
+       MOBILE (<=880px, di media query bawah) = versi clean centered + footer toggle.
+       ISOLASI: semua ornamen rich ada di .loginBrandPanel yang display:none di mobile,
+       jadi mobile TIDAK terpengaruh. Keyframes twinkle/floatY/moonGlow + lg* + reduced-motion
+       DIPERTAHANKAN di blok atas. */
     .loginScreen{
       display:grid; grid-template-columns:minmax(440px,48%) 1fr; min-height:100vh; overflow-x:hidden;
-      --lg-ease:cubic-bezier(.22,1,.36,1); --lg-pop:cubic-bezier(.34,1.56,.64,1);
-      /* login-scoped tokens (default = LIGHT, dark override di bawah) -- tidak sentuh token global */
+      --lg-ease:cubic-bezier(.22,1,.36,1); --lg-pop:cubic-bezier(.34,1.56,.64,1); --lg-star:#FFF3D2;
       --lgField:#FFFFFF; --lgFieldLine:rgba(28,42,94,.12); --lgRaise:rgba(28,42,94,.05);
-      --lgFormA:#FBF5E6; --lgFormB:#F7F1DE; --lgStar:#FFF3D2;
+      --lgFormA:#FBF5E6; --lgFormB:#F7F1DE;
     }
     [data-theme="dark"] .loginScreen{
       --lgField:#0F1730; --lgFieldLine:rgba(255,255,255,.09); --lgRaise:rgba(147,155,182,.12);
       --lgFormA:#0E1531; --lgFormB:#0B1128;
     }
 
-    /* ===== BRAND SIDE ===== */
-    .loginBrandPanel{ position:relative; overflow:hidden; display:flex; flex-direction:column;
-      justify-content:center; padding:clamp(44px,5vw,60px); }
-    [data-theme="dark"] .loginBrandPanel{ background:linear-gradient(158deg,#26356F,#111A3C 88%); border-right:1px solid rgba(242,176,30,.16); }
-    [data-theme="light"] .loginBrandPanel{ background:linear-gradient(155deg,#BFE0F5,#9FCCEE 52%,#8FC0E8); }
-    .loginBrandGlow{ position:absolute; top:-180px; left:-140px; width:520px; height:520px; border-radius:50%;
-      background:radial-gradient(circle,rgba(242,176,30,.16),transparent 70%); pointer-events:none; }
+    /* ===== BRAND SIDE (desktop only) ===== */
+    .loginBrandPanel{ position:relative; overflow:hidden; display:flex; flex-direction:column; padding:clamp(38px,4.4vw,58px); }
+    [data-theme="dark"] .loginBrandPanel{ border-right:1px solid rgba(242,176,30,.2); background:linear-gradient(158deg,#2b3c78,#131e40 84%); }
+    [data-theme="light"] .loginBrandPanel{ background:linear-gradient(155deg,#BFE0F5 0%,#9FCCEE 52%,#8FC0E8 100%); }
+    .loginBrandGlow{ position:absolute; top:-160px; left:-160px; width:520px; height:520px; border-radius:50%;
+      background:radial-gradient(circle,rgba(242,176,30,.18),transparent 70%); pointer-events:none; }
+    .loginBrandOrnament{ position:absolute; right:-6%; bottom:-16%; font-family:var(--hanzi-font); font-weight:900;
+      font-size:min(46vw,560px); line-height:.8; color:rgba(255,255,255,.045); pointer-events:none; user-select:none;
+      animation:lgWmFloat 22s ease-in-out infinite; }
+    [data-theme="light"] .loginBrandOrnament{ color:rgba(28,42,94,.06); }
 
     .loginSky{ position:absolute; inset:0; overflow:hidden; pointer-events:none; }
-    .loginStar{ position:absolute; border-radius:50%; background:var(--lgStar); opacity:0; pointer-events:none; }
-    [data-theme="dark"] .loginStar{ opacity:.7; animation:twinkle 5s ease-in-out infinite; }
+    .loginStar{ position:absolute; border-radius:50%; background:var(--lg-star); animation:lgTwinkle 4.5s ease-in-out infinite; pointer-events:none; }
+    [data-theme="light"] .loginStar{ opacity:0 !important; }
+    .loginSparkle{ position:absolute; color:var(--gold-soft); font-size:13px; animation:lgSpark 6s ease-in-out infinite; pointer-events:none; }
+    [data-theme="light"] .loginSparkle{ opacity:0 !important; }
+    .loginShoot{ position:absolute; width:110px; height:1.6px; opacity:0;
+      background:linear-gradient(90deg,transparent,var(--lg-star),transparent);
+      filter:drop-shadow(0 0 4px rgba(255,243,210,.7)); pointer-events:none; }
+    [data-theme="light"] .loginShoot{ display:none; }
+    .loginFloatHz{ position:absolute; font-family:var(--hanzi-font); font-weight:700; color:rgba(255,243,210,.14);
+      user-select:none; animation:lgRise linear infinite; pointer-events:none; }
+    [data-theme="light"] .loginFloatHz{ color:rgba(28,42,94,.1); }
+    .loginCloud{ position:absolute; opacity:0; transition:opacity .6s; pointer-events:none; }
+    [data-theme="light"] .loginCloud{ opacity:.95; }
 
-    .loginMoon{ position:absolute; top:34px; right:44px; width:88px; height:88px; pointer-events:none; }
+    /* celestial: bulan (dark) / matahari gaya landing (light) */
+    .loginMoon{ position:absolute; top:8%; right:14%; width:92px; height:92px; pointer-events:none; animation:lgBreathe 6s ease-in-out infinite; }
     .loginMoonGlow{ position:absolute; inset:-40px; border-radius:50%;
-      background:radial-gradient(circle,rgba(242,176,30,.4),transparent 66%); animation:moonGlow 6s ease-in-out infinite; }
+      background:radial-gradient(circle,rgba(242,176,30,.42),transparent 68%); animation:moonGlow 5.5s ease-in-out infinite; }
     .loginMoon svg{ position:relative; display:block; }
-    .loginSun{ display:none; position:absolute; inset:8px; border-radius:50%;
-      background:radial-gradient(circle at 42% 40%,#FFFDF3 0%,#FFEFB0 36%,#FFD65C 64%,#F9BE3E 100%);
-      box-shadow:0 0 24px 3px rgba(255,206,92,.6), 0 0 64px 20px rgba(255,193,72,.32), inset -5px -7px 16px rgba(240,150,0,.26); }
+    .loginSun{ display:none; position:absolute; inset:0; border-radius:50%;
+      background:radial-gradient(circle at 38% 34%,#FFE9A8,var(--gold) 62%,#E09A0F); box-shadow:0 0 60px rgba(242,176,30,.55); }
+    .loginSunRays{ display:none; position:absolute; inset:-20px; border-radius:50%; pointer-events:none;
+      background:repeating-conic-gradient(from 0deg,rgba(242,176,30,.5) 0deg 7deg,transparent 7deg 30deg);
+      -webkit-mask:radial-gradient(circle,transparent 56%,#000 58%); mask:radial-gradient(circle,transparent 56%,#000 58%);
+      animation:sunspin 26s linear infinite; }
     [data-theme="light"] .loginMoon svg{ display:none; }
+    [data-theme="light"] .loginMoonGlow{ display:none; }
     [data-theme="light"] .loginSun{ display:block; }
-    [data-theme="light"] .loginMoonGlow{ inset:-48px; background:radial-gradient(circle,rgba(255,201,84,.5),rgba(255,201,84,.16) 46%,transparent 72%); }
+    [data-theme="light"] .loginSunRays{ display:block; }
+    @keyframes sunspin{ to{ transform:rotate(360deg); } }
 
-    .loginBrandContent{ position:relative; max-width:440px; }
-    .loginBrandLogoCard{ position:relative; display:inline-flex; align-items:center; gap:12px; width:fit-content;
-      padding:9px 18px 9px 10px; border-radius:16px; text-decoration:none; margin-bottom:34px;
-      background:linear-gradient(150deg,#FFFDF6,#FBF3E0 60%,#F6E9CC);
-      box-shadow:0 0 0 1.5px rgba(242,176,30,.42), 0 10px 24px rgba(0,0,0,.24);
-      animation:lgIn .8s var(--lg-ease) both; transition:transform .3s var(--lg-pop); }
-    .loginBrandLogoCard:hover{ transform:translateY(-2px); }
-    .loginBrandLogo{ width:42px; height:42px; object-fit:contain; display:block; flex-shrink:0; }
-    .loginBrandLogoTitle{ font-family:var(--display-font); font-weight:700; font-size:17px; line-height:1.05; color:#1c2a5e; }
-    .loginBrandLogoTagline{ font-family:var(--hanzi-font); font-size:11px; color:#B9820C; font-weight:500; margin-top:2px; letter-spacing:.04em; }
-    .loginBrandTitle{ font-family:var(--hanzi-serif-font); font-weight:700; font-size:clamp(46px,5.2vw,64px); line-height:1.06; margin:0; color:#fff; letter-spacing:.01em; }
-    [data-theme="light"] .loginBrandTitle{ color:#16306B; text-shadow:0 4px 20px rgba(255,255,255,.4); }
+    .loginBrandContent{ position:relative; z-index:2; display:flex; flex-direction:column; height:100%; max-width:460px; }
+    .loginBrandLogoCard{ position:relative; align-self:flex-start; display:inline-flex; align-items:center; gap:13px; border-radius:18px;
+      padding:11px 20px 11px 12px; text-decoration:none;
+      background:linear-gradient(150deg,#FFFDF6 0%,#FDF6E4 55%,#F8EBCF 100%);
+      box-shadow:0 0 0 1.5px rgba(242,176,30,.5), 0 10px 26px rgba(0,0,0,.28), 0 0 34px rgba(242,176,30,.22);
+      animation:lgIn .8s var(--lg-ease) both, lgLogoGlow 5s ease-in-out 1s infinite; transition:transform .3s var(--lg-pop); }
+    .loginBrandLogoCard:hover{ transform:translateY(-3px); }
+    .loginBrandLogo{ width:44px; height:44px; object-fit:contain; display:block; flex-shrink:0; }
+    .loginBrandLogoTitle{ font-family:var(--display-font); font-weight:700; font-size:18px; line-height:1.05; color:#1c2a5e; }
+    .loginBrandLogoTagline{ font-family:var(--hanzi-font); font-size:11px; color:#C7900F; font-weight:500; margin-top:2px; }
+    .loginBrandMid{ margin-top:auto; margin-bottom:auto; padding:34px 0; }
+    .loginBrandTitle{ font-family:var(--hanzi-serif-font); font-weight:700; font-size:clamp(44px,5.4vw,64px); line-height:1.1; margin:0; color:#fff; }
+    [data-theme="light"] .loginBrandTitle{ color:#16306B; text-shadow:0 4px 20px rgba(255,255,255,.5); }
     .loginBrandTitle span{ display:block; opacity:0; animation:lgIn .9s var(--lg-ease) both; }
     .loginBrandTitle span:nth-child(1){ animation-delay:.15s; }
     .loginBrandTitle span:nth-child(2){ animation-delay:.3s; }
-    .loginBrandDesc{ margin:20px 0 0; max-width:330px; font-size:15.5px; line-height:1.62; color:rgba(255,255,255,.72);
+    .loginBrandDesc{ color:#aab2d8; font-size:16px; line-height:1.7; margin:20px 0 0; max-width:360px;
       opacity:0; animation:lgIn .9s var(--lg-ease) .45s both; }
-    [data-theme="light"] .loginBrandDesc{ color:rgba(22,48,107,.72); }
+    [data-theme="light"] .loginBrandDesc{ color:rgba(22,48,107,.78); }
 
-    .loginWordOfDay{ position:relative; display:none; align-items:center; gap:14px; width:fit-content; margin-top:32px;
-      padding:11px 18px; border-radius:14px; background:var(--lgRaise); box-shadow:inset 0 0 0 1px rgba(242,176,30,.22);
-      opacity:0; animation:lgIn .9s var(--lg-ease) .6s both; }
-    [data-theme="light"] .loginWordOfDay{ background:rgba(255,255,255,.55); box-shadow:inset 0 0 0 1px rgba(242,176,30,.3); }
-    .loginWordOfDay.ready{ display:inline-flex; }
-    .loginWordOfDayHanzi{ font-family:var(--hanzi-serif-font); font-size:30px; font-weight:700; color:#fff; line-height:1; white-space:nowrap; }
+    .loginWordOfDay{ position:relative; display:none; flex-direction:column; width:min(320px,100%); margin-top:6px; opacity:0;
+      border-radius:20px; padding:15px 18px;
+      background:linear-gradient(150deg,#1B2A5E 0%,#16224C 100%);
+      box-shadow:inset 0 0 0 1.5px rgba(242,176,30,.28), 0 16px 36px rgba(0,0,0,.42);
+      animation:lgIn .9s var(--lg-ease) .6s both, floatY 5.5s ease-in-out .6s infinite; }
+    [data-theme="light"] .loginWordOfDay{ background:linear-gradient(150deg,#FFFDF6 0%,#FBF3E0 100%);
+      box-shadow:inset 0 0 0 1.5px rgba(242,176,30,.42), 0 12px 30px rgba(31,42,80,.16); }
+    .loginWordOfDay.ready{ display:flex; }
+    .loginWordOfDayLabel{ display:flex; align-items:center; gap:6px; font-family:var(--dv4-mono); font-size:8.5px; letter-spacing:.2em; color:var(--gold-soft); font-weight:600; }
+    .loginWordOfDayRow{ display:flex; align-items:baseline; gap:11px; margin-top:9px; }
+    .loginWordOfDayHanzi{ font-family:var(--hanzi-serif-font); font-weight:700; font-size:33px; color:#fff; line-height:1; white-space:nowrap; }
     [data-theme="light"] .loginWordOfDayHanzi{ color:#16306B; }
-    .loginWodLbl{ display:block; font-family:var(--dv4-mono); font-size:8.5px; letter-spacing:.22em; color:var(--gold-soft); font-weight:600; margin-bottom:4px; }
-    [data-theme="light"] .loginWodLbl{ color:#B9820C; }
-    .loginWordOfDayPinyin{ font-size:13.5px; font-weight:800; color:var(--gold-soft); }
-    [data-theme="light"] .loginWordOfDayPinyin{ color:#B9820C; }
-    .loginWordOfDayMeaning{ font-size:12px; color:rgba(255,255,255,.62); margin-left:8px; }
+    .loginWordOfDayPinyin{ font-family:var(--dv4-mono); font-size:12px; color:var(--gold-soft); }
+    .loginWordOfDayMeaning{ font-size:12.5px; color:rgba(255,255,255,.72); margin-top:6px; }
     [data-theme="light"] .loginWordOfDayMeaning{ color:rgba(22,48,107,.6); }
 
-    /* ===== FORM SIDE ===== */
+    .loginMascot{ position:absolute; left:44px; bottom:-14px; width:128px; z-index:3;
+      animation:lgPeek 1s var(--lg-pop) 1s both, lgBob 4.4s ease-in-out 2s infinite; }
+
+    /* ===== FORM SIDE (shared desktop+mobile) ===== */
     .loginFormPanel{ position:relative; display:flex; align-items:center; justify-content:center;
       padding:48px 40px; background:linear-gradient(180deg,var(--lgFormA),var(--lgFormB)); }
     .loginLangSwitch{ position:absolute; top:22px; right:26px; display:flex; align-items:center; gap:9px; z-index:2; }
@@ -275,7 +303,6 @@
       background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent); transition:left .7s var(--lg-ease); }
     #loginBtn:hover::before{ left:130%; }
 
-    /* jaga konten tetap kelihatan kalau user aktifin reduce-motion (base opacity:0 -> dipaksa 1) */
     @media (prefers-reduced-motion: reduce){
       .loginBrandLogoCard, .loginBrandTitle span, .loginBrandDesc, .loginWordOfDay.ready{ opacity:1 !important; }
     }
@@ -305,14 +332,13 @@
 
     @media (max-width: 880px){
       .loginScreen{ grid-template-columns:1fr; }
-      /* Panel brand split disembunyikan -- mobile pakai brand lockup di tengah (bawah),
-         jadi gak ada strip sesak / brand dobel lagi. */
+      /* Brand panel rich (desktop) DISEMBUNYIKAN total -- mobile pakai brand lockup ketengah. */
       .loginBrandPanel{ display:none; }
       .loginFormPanel{ flex-direction:column; align-items:center; justify-content:flex-start; padding:26px 22px 34px; }
       .loginFormBox{ max-width:400px; }
-      /* Toggle bahasa/tema turun jadi footer halus (order:9) -- bagian atas tetap bersih. */
+      /* Toggle turun jadi footer halus (order:9). Tinggi tombol tema = tinggi pill bahasa (42px) -- no mismatch. */
       .loginLangSwitch{ position:static; order:9; align-self:center; margin:22px auto 2px; }
-      .loginLangSwitch .loginThemeToggle{ width:40px; height:36px; }
+      .loginLangSwitch .loginThemeToggle{ width:42px; height:42px; }
       .loginLangSwitch .loginLangBtn{ min-width:40px; min-height:34px; }
       .loginMobileBrand{ display:flex; }
       .loginFormTitle{ text-align:center; font-size:26px; margin:0 0 4px; }
@@ -2136,14 +2162,16 @@
 
   <!-- ============ LOGIN ============ -->
   <div id="loginCard" class="loginScreen">
-    <!-- BRAND (desktop split; disembunyikan di mobile, diganti .loginMobileBrand) -->
+    <!-- BRAND (desktop split; disembunyikan di mobile via .loginBrandPanel{display:none}) -->
     <div class="loginBrandPanel">
       <div class="loginBrandGlow"></div>
       <div class="loginSky" id="loginSky"></div>
+      <div class="loginBrandOrnament">星</div>
       <div class="loginMoon">
         <div class="loginMoonGlow"></div>
-        <svg width="88" height="88" viewBox="0 0 96 96"><defs><mask id="loginMoonMask"><rect width="96" height="96" fill="#000"/><circle cx="48" cy="48" r="34" fill="#fff"/><circle cx="63" cy="38" r="29" fill="#000"/></mask></defs><circle cx="48" cy="48" r="34" fill="#F2B01E" mask="url(#loginMoonMask)"/></svg>
+        <svg width="92" height="92" viewBox="0 0 96 96"><defs><mask id="loginMoonMask"><rect width="96" height="96" fill="#000"/><circle cx="48" cy="48" r="34" fill="#fff"/><circle cx="63" cy="38" r="29" fill="#000"/></mask></defs><circle cx="48" cy="48" r="34" fill="#F2B01E" mask="url(#loginMoonMask)"/></svg>
         <div class="loginSun"></div>
+        <i class="loginSunRays"></i>
       </div>
       <div class="loginBrandContent">
         <a class="loginBrandLogoCard" href="javascript:void(0)">
@@ -2153,19 +2181,23 @@
             <div class="loginBrandLogoTagline">学中文 · 走天下</div>
           </div>
         </a>
-        <h1 class="loginBrandTitle"><span>学中文，</span><span>走天下</span></h1>
-        <p class="loginBrandDesc">HSK practice, the way the real exam feels. Listening, reading, writing — all in one place.</p>
+        <div class="loginBrandMid">
+          <h1 class="loginBrandTitle"><span>学中文，</span><span>走天下</span></h1>
+          <p class="loginBrandDesc">HSK practice, the way the real exam feels. Listening, reading, writing — all in one place.</p>
+        </div>
         <div class="loginWordOfDay" id="loginWordOfDay">
-          <div class="loginWordOfDayHanzi" id="loginWordOfDayHanzi"></div>
-          <div class="loginWodBody">
-            <span class="loginWodLbl" id="loginWordOfDayLabelText">WORD OF THE DAY</span>
-            <div><span class="loginWordOfDayPinyin" id="loginWordOfDayPinyin"></span><span class="loginWordOfDayMeaning" id="loginWordOfDayMeaning"></span></div>
+          <div class="loginWordOfDayLabel">✦ <span id="loginWordOfDayLabelText">WORD OF THE DAY</span></div>
+          <div class="loginWordOfDayRow">
+            <span class="loginWordOfDayHanzi" id="loginWordOfDayHanzi"></span>
+            <span class="loginWordOfDayPinyin" id="loginWordOfDayPinyin"></span>
           </div>
+          <div class="loginWordOfDayMeaning" id="loginWordOfDayMeaning"></div>
         </div>
       </div>
+      <img class="loginMascot" src="/assets/mascot-wave.png" alt="" onerror="this.style.display='none'" />
     </div>
 
-    <!-- FORM -->
+    <!-- FORM (shared) -->
     <div class="loginFormPanel">
       <div class="loginLangSwitch" id="loginLangSwitch">
         <button type="button" class="loginThemeToggle" id="loginThemeToggle" aria-label="Switch to dark mode">☀️</button>
@@ -2176,7 +2208,6 @@
         </div>
       </div>
       <div class="loginFormBox">
-        <!-- brand lockup mobile (hanya <=880px) -- pengganti strip lama yang sesak -->
         <div class="loginMobileBrand">
           <div class="loginMobileLogo"><img src="/logo.png" alt="Xing Mandarin" onerror="this.style.display='none'; this.parentElement.textContent='星'" /></div>
           <div class="loginMobileTag">学中文，走天下</div>
@@ -4084,16 +4115,44 @@
   function buildLoginSky(){
     const sky = $('loginSky');
     if(!sky) return;
-    // Redesign v5: ornamen dipangkas -- cuma 16 bintang halus (dulu 52 bintang + 5 sparkle +
-    // 8 hanzi terbang + 3 awan + shooting star). Bintang di-hide di light theme via CSS.
+    // Login v6: langit rich dibalikin (desktop-only -- #loginSky ada di .loginBrandPanel yang
+    // display:none di mobile, jadi ini TIDAK menambah apa-apa di mobile).
     let html = '';
-    for(let i=0; i<16; i++){
-      const s = (Math.random()*2+1.2).toFixed(1);
-      html += `<span class="loginStar" style="left:${(Math.random()*100).toFixed(1)}%; top:${(Math.random()*72).toFixed(1)}%;
-        width:${s}px; height:${s}px; box-shadow:0 0 ${(+s*2.4).toFixed(1)}px rgba(255,243,210,.55);
-        animation-delay:${(Math.random()*5).toFixed(1)}s"></span>`;
+    for(let i=0; i<52; i++){
+      const s = (Math.random()*2.4+1.4).toFixed(1);
+      html += `<span class="loginStar" style="left:${(Math.random()*100).toFixed(1)}%; top:${(Math.random()*100).toFixed(1)}%;
+        width:${s}px; height:${s}px; box-shadow:0 0 ${(+s*2.6).toFixed(1)}px rgba(255,243,210,.6);
+        animation-delay:${(Math.random()*4.5).toFixed(1)}s"></span>`;
     }
+    [[18,26],[62,14],[38,72],[76,58],[52,40]].forEach(([l,tp],i)=>{
+      html += `<span class="loginSparkle" style="left:${l}%; top:${tp}%; animation-delay:${i*1.2}s">✦</span>`;
+    });
+    ['学','汉','语','星','考','词','书','读'].forEach((ch,i)=>{
+      html += `<span class="loginFloatHz" style="left:${8+i*11.5}%; bottom:${4+(i%3)*8}%; font-size:${16+(i%4)*7}px;
+        animation-duration:${17+i*2.4}s; animation-delay:${i*2.1}s">${ch}</span>`;
+    });
+    [[12,66,52],[34,104,80],[70,58,44]].forEach(([tp,d,w],i)=>{
+      html += `<div class="loginCloud" style="top:${tp}%; width:${w}px; animation:lgDrift ${d}s linear infinite;
+        animation-delay:-${(d*(i*.27%1)).toFixed(0)}s"><svg viewBox="0 0 120 52" width="${w}">
+        <ellipse cx="38" cy="34" rx="30" ry="17" fill="#fff"/><ellipse cx="66" cy="26" rx="24" ry="21" fill="#fff"/>
+        <ellipse cx="88" cy="35" rx="22" ry="15" fill="#fff"/></svg></div>`;
+    });
+    html += '<span class="loginShoot" id="loginShoot"></span>';
     sky.innerHTML = html;
+    (function loop(){
+      const delay = 9000 + Math.random()*11000;
+      setTimeout(()=>{
+        const s = $('loginShoot');
+        if(s){
+          s.style.left = (8 + Math.random()*38) + '%';
+          s.style.top = (4 + Math.random()*26) + '%';
+          s.style.animation = 'none';
+          void s.offsetWidth;
+          s.style.animation = 'lgShootA 1.5s ease-out';
+        }
+        loop();
+      }, delay);
+    })();
   }
 
   // Word of the day: global (bukan personalized), sama buat semua pengunjung dalam

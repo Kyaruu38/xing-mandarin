@@ -1148,6 +1148,29 @@
        A real disabled attribute would swallow the click. */
     button.levelBtn.locked{ opacity:.5; cursor:not-allowed; box-shadow:none; }
 
+    /* HSK 7-9 "coming soon" placeholder chip (renderLevelSoonChip()). Sengaja BEDA dari
+       .locked: locked = level yang ada tapi di luar paket user (upsell, bisa diklik buat
+       nampilin pesan). .soon = kontennya memang belum ada buat SIAPA PUN, jadi mati total
+       (pointer-events:none) -- nggak ada pesan, nggak ada state aktif. Dasarnya .levelBtn
+       jadi bentuk/ukurannya ngikut saudaranya di kedua varian (div & button). */
+    .levelBtn.soon{
+      opacity:.55; cursor:default; pointer-events:none; box-shadow:none;
+      background:transparent; border:1px dashed var(--line);
+      color:rgba(var(--text-rgb),.55); font-weight:700; white-space:nowrap;
+    }
+    /* Label "Segera" sengaja teks biasa, BUKAN badge/pill: badge punya box sendiri yang bikin
+       baris chip jadi lebih tinggi dari chip HSK 1-6 di sebelahnya (kebukti pas diukur:
+       36-39px vs 33px). Teks inline ikut line-height yang sama persis -> sejajar sempurna
+       di kedua varian (div & button), tanpa perlu nambal padding per-varian. */
+    .levelBtn.soon .soonTag{
+      font-weight:800; opacity:.85;
+      font-size:.86em; letter-spacing:.01em;
+    }
+    .levelBtn.soon .soonTag::before{ content:'·'; margin:0 5px; opacity:.7; }
+    /* Varian pill (Kamus) base-nya border:none, jadi border putus-putus di atas nambah 2px.
+       Padding vertikalnya dikurangi 1px biar tingginya balik PERSIS sama (33px, terukur). */
+    button.levelBtn.soon{ padding:8px 14px; }
+
     /* session view, ported from .dc.html isPractice block (lines 185-229) */
     .deckHeader{ display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:12px; }
     .deckHeaderTitle{ font-family:var(--display-font); font-size:28px; font-weight:700; color:var(--text); }
@@ -3415,6 +3438,7 @@
           orderingInstructions:'Susun kata-kata berikut menjadi kalimat yang benar (ketuk sesuai urutan).',
           noWordsPickedYet:'(belum ada kata dipilih)', buildingSentence:'Kalimat yang sedang kamu susun',
           completeSentence:'Kalimat lengkap', pinyinHint:'Pinyin petunjuk',
+          levelSoonLabel:'HSK 7–9', levelSoonTag:'Segera',
           typeHanziPlaceholder:'Ketik hanzi di sini...', targetChars:'target {n}', minChars:'min {n}',
           charsCount:'{n} karakter', requiredWord:'Kata yang harus dipakai', requiredWords:'Kata-kata yang harus dipakai',
           articleToSummarize:'Artikel untuk diringkas', yourAnswer:'Jawaban kamu',
@@ -3581,6 +3605,7 @@
           orderingInstructions:'Arrange the words below into a correct sentence (tap in order).',
           noWordsPickedYet:'(no words picked yet)', buildingSentence:'The sentence you are building',
           completeSentence:'Complete sentence', pinyinHint:'Pinyin hint',
+          levelSoonLabel:'HSK 7–9', levelSoonTag:'Soon',
           typeHanziPlaceholder:'Type hanzi here...', targetChars:'target {n}', minChars:'min {n}',
           charsCount:'{n} characters', requiredWord:'Word to use', requiredWords:'Words to use',
           articleToSummarize:'Article to summarize', yourAnswer:'Your answer',
@@ -3747,6 +3772,7 @@
           orderingInstructions:'把下面的词语组成正确的句子（按顺序点击）',
           noWordsPickedYet:'（还没有选择词语）', buildingSentence:'你正在组的句子',
           completeSentence:'完整句子', pinyinHint:'拼音提示',
+          levelSoonLabel:'HSK 7–9', levelSoonTag:'即将推出',
           typeHanziPlaceholder:'在这里输入汉字...', targetChars:'目标 {n}', minChars:'最少 {n}',
           charsCount:'{n} 字', requiredWord:'必须使用的词', requiredWords:'必须使用的词语',
           articleToSummarize:'需要概括的文章', yourAnswer:'你的答案',
@@ -5117,6 +5143,24 @@
   // userPackageLevels stay on screen so the user can see what exists, but get a dimmed/locked
   // state instead of a click handler that loads data. No vocab fetch ever fires for a locked
   // level (loadBrowseLevel is only wired to the unlocked branch below).
+  /* HSK 7-9 masih coming soon: chip placeholder yang dipasang di UJUNG ketiga level picker
+     (Kamus / Goresan / Simulasi). Sengaja BUKAN pakai pola .locked -- locked itu buat level
+     yang kontennya ADA tapi di luar paket user (bisa diklik, munculin pesan upsell). Ini
+     kontennya belum ada buat siapa pun, jadi mati total: nggak bisa diklik, nggak nyimpen
+     state, nggak pernah jadi defaultLevel. Loop level tetap 1..6 -- fungsi ini nempel di
+     luar loop, jadi logika akses/paket yang sudah ada NOL perubahan.
+     Kalau HSK 7-9 nanti dibuka: hapus pemanggilan fungsi ini, naikin batas loop, dan
+     tambahin 7 ke PACKAGE_LEVELS. Vocab-nya sudah diparkir di DB (hsk_level = 7). */
+  function appendLevelSoonChip(wrap, tagName){
+    if(!wrap) return;
+    const el = document.createElement(tagName || 'div');
+    el.className = 'levelBtn soon';
+    el.setAttribute('aria-disabled', 'true');
+    if(tagName === 'button') el.type = 'button';
+    el.innerHTML = `<span>${t('levelSoonLabel')}</span><span class="soonTag">${t('levelSoonTag')}</span>`;
+    wrap.appendChild(el);
+  }
+
   function renderBrowseLevelPicker(){
     const wrap = $('browseLevelPicker');
     wrap.innerHTML = '';
@@ -5147,6 +5191,7 @@
       }
       wrap.appendChild(b);
     }
+    appendLevelSoonChip(wrap, 'button');   // HSK 7-9 -- coming soon
     if(hasAnyAllowed){
       loadBrowseLevel(defaultLevel);
     } else {
@@ -5607,6 +5652,7 @@
       });
       wrap.appendChild(b);
     }
+    appendLevelSoonChip(wrap, 'div');      // HSK 7-9 -- coming soon
     loadStrokeLevel(defaultLevel);
   }
 
@@ -7581,6 +7627,7 @@
       }
       wrap.appendChild(b);
     }
+    appendLevelSoonChip(wrap, 'div');      // HSK 7-9 -- coming soon
     if(hasAnyAllowed){
       loadMockList(defaultLevel);
     } else {

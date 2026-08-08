@@ -248,7 +248,10 @@
     .loginWordOfDayMeaning{ font-size:12.5px; color:rgba(255,255,255,.72); margin-top:6px; }
     [data-theme="light"] .loginWordOfDayMeaning{ color:rgba(22,48,107,.6); }
 
-    .loginMascot{ position:absolute; left:44px; bottom:-14px; width:128px; z-index:3;
+    /* Maskot dipindah ke SISI KANAN panel (dulu left:44px) -- .loginWordOfDay lebarnya
+       min(320px,100%) dan nempel kiri, jadi maskot di kiri nutupin hanzi-nya. z-index
+       diturunkan ke 1 (di bawah kartu) sebagai pengaman kalau viewport sempit. */
+    .loginMascot{ position:absolute; right:40px; bottom:-14px; width:128px; z-index:1;
       animation:lgPeek 1s var(--lg-pop) 1s both, lgBob 4.4s ease-in-out 2s infinite; }
 
     /* ===== FORM SIDE (shared desktop+mobile) ===== */
@@ -1396,6 +1399,100 @@
     }
     .hubChip.active{ background:var(--gold); color:#1c2a5e; font-weight:800; box-shadow:none; }
     .hubGrid{ margin-top:22px; display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:18px; }
+
+    /* ===== Mock Test: hub bagian (kotak ala Materials) =====
+       Reuse .hubCard/.hubCardCover yang sudah ada; cuma cover-nya lebih pendek karena
+       kartunya cuma 4 dan nggak perlu setinggi grid Materials. */
+    /* Kotak level (langkah 1). Cover pakai angka hanzi 一..六 lewat .hubCardCoverGlyph
+       yang sudah dipakai halaman Materi. Warna naik bertahap sesuai level. */
+    /* 9 kartu (HSK 1..9) -> minmax dipilih supaya jatuh jadi 3 kolom = 3x3 rapi,
+       bukan 4+4+1 yang menyisakan satu kartu sendirian di baris terakhir. */
+    .mockLevelHub{ margin-top:18px; grid-template-columns:repeat(auto-fill,minmax(232px,1fr)); gap:16px; }
+    .mockLevelHub .hubCardCover{ height:104px; }
+    .mockLevelHub .hubCardCoverGlyph{ font-size:46px; }
+    .hubCardCover.lv1{ background:linear-gradient(140deg,#34A98A,#268a70); }
+    .hubCardCover.lv2{ background:linear-gradient(140deg,#5B93D6,#3f76b8); }
+    .hubCardCover.lv3{ background:linear-gradient(140deg,#F2B01E,#d99400); }
+    .hubCardCover.lv4{ background:linear-gradient(140deg,#E86F52,#cf5238); }
+    .hubCardCover.lv5{ background:linear-gradient(140deg,#8A6BD1,#6f4fb5); }
+    .hubCardCover.lv6{ background:linear-gradient(140deg,#C24E72,#9E3A59); }
+    .hubCardCover.lvSoon{ background:linear-gradient(140deg,#2b3c78,#16234E); }
+    .mockLevelHub .hubCard.locked .hubCardCover{ filter:saturate(.2) brightness(.55); }
+    .mockLevelHub .hubCard.locked .hubCardTitle{ color:var(--muted); }
+    .mockLevelHub .hubCard.soon{ cursor:default; }
+    .mockLevelHub .hubCard.soon:hover{ transform:none; box-shadow:none; }
+    .mockLevelHub .hubCard.soon .hubCardCover{ filter:saturate(.5) brightness(.8); }
+
+    .mockSectionHub{ margin-top:16px; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; }
+    .mockSectionHub .hubCardCover{ height:96px; }
+    /* "Set Test" = simulasi penuh, kartu utama -> pakai emas biar beda dari 3 kartu bagian.
+       Di-scope ke .mockSectionHub supaya kartu Mock di halaman Materi TIDAK ikut berubah. */
+    .mockSectionHub .hubCardCover.mock{ background:linear-gradient(140deg,#F2B01E,#d99400); }
+    .mockSectionHub .hubCardBody{ display:flex; flex-direction:column; }
+    .mockSectionHub .hubCardMeta{ min-height:2.6em; }
+    .mockSectionHub .hubCardCount{ margin-top:auto; padding-top:3px; font-size:12px; color:var(--muted); }
+    .mockSectionHub .hubCard[disabled]{ opacity:.5; cursor:default; }
+    .mockSectionHub .hubCard.soon .hubCardCover{ filter:saturate(.45) brightness(.8); }
+    .mockSectionHub .hubCard.soon .hubCardCount{ color:var(--gold-soft); font-weight:700; }
+    .mockSectionHub .hubCard[disabled]:hover{ transform:none; box-shadow:none; }
+
+    /* width/margin di-reset eksplisit: ada aturan global `button{ width:100%; margin-top:22px }`. */
+    .mockBackBtn{ display:inline-flex; width:auto; align-items:center; gap:6px; margin:16px 0 0;
+      padding:7px 13px 7px 9px; border:1px solid var(--line); border-radius:999px;
+      background:var(--panel); color:var(--text); font-size:12.5px; font-weight:700;
+      cursor:pointer; transition:background .15s ease, border-color .15s ease; }
+    .mockBackBtn:hover{ background:var(--panel-2, var(--panel)); border-color:var(--gold-soft); }
+    .mockSectionTitle{ margin:14px 0 2px; font-size:15px; font-weight:800; color:var(--text); }
+
+    /* ===== Daftar set (langkah 3) juga kotak, sebentuk dengan hub =====
+       .mockSetCard lama (list datar) diganti .hubCard supaya seluruh alur Mock Test
+       konsisten: kotak -> kotak -> kotak. */
+    /* Selector pakai #mockList supaya menang dari aturan lama `#mockList{...minmax(320px)}`
+       di atas -- ID (100) mengalahkan class (10). */
+    #mockList.mockSetGrid{ margin-top:16px; display:grid; grid-template-columns:repeat(auto-fill,minmax(212px,1fr)); gap:16px; }
+    .mockSetGrid .hubCard{ text-align:left; }
+    .mockSetGrid .hubCardCover{ height:84px; position:relative; }
+    .mockSetGrid .hubCardCoverNum{ font-family:var(--dv4-mono); font-size:30px; font-weight:800;
+      color:rgba(255,255,255,.94); letter-spacing:.02em; line-height:1; }
+    .mockSetGrid .hubCardBody{ display:flex; flex-direction:column; gap:2px; }
+    .mockSetGrid .mockSetMeta{ font-size:11.5px; color:var(--muted); line-height:1.5; }
+    .mockSetGrid .mockSetScore{ margin-top:5px; font-size:11.5px; font-weight:700; color:var(--gold-soft); }
+    /* width/margin di-reset: aturan global button{width:100%;margin-top:22px} */
+    .mockSetGrid .mockSetBtn{ width:100%; margin:11px 0 0; padding:9px; border:0; border-radius:9px;
+      background:linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#241a08;
+      font-size:13px; font-weight:800; cursor:pointer; }
+    /* pojok kanan atas cover: penanda sudah pernah dikerjakan */
+    .mockSetDoneTag{ position:absolute; top:9px; right:9px; padding:3px 8px; border-radius:999px;
+      background:rgba(0,0,0,.32); color:#fff; font-family:var(--dv4-mono); font-size:10px; font-weight:700; }
+
+    /* ===== Label versi + banner "ada versi baru" ===== */
+    .appVersionLine{ margin-top:14px; text-align:center; font-family:var(--dv4-mono);
+      font-size:10.5px; letter-spacing:.08em; color:var(--muted); opacity:.75; }
+    .appVersionLine.inMenu{ margin:10px 4px 2px; text-align:left; }
+
+    #updateBanner{ position:fixed; left:50%; transform:translateX(-50%) translateY(140%);
+      bottom:max(18px, env(safe-area-inset-bottom)); z-index:9999;
+      display:flex; align-items:center; gap:12px; max-width:min(520px, calc(100vw - 24px));
+      padding:12px 14px 12px 16px; border-radius:14px;
+      background:var(--panel); color:var(--text);
+      border:1px solid var(--line); box-shadow:0 18px 44px -12px rgba(0,0,0,.45);
+      transition:transform .38s cubic-bezier(.22,1,.36,1); }
+    #updateBanner.show{ transform:translateX(-50%) translateY(0); }
+    #updateBannerText{ flex:1 1 auto; min-width:0; font-size:13px; line-height:1.45; }
+    #updateBannerText b{ font-weight:800; }
+    /* WAJIB reset width/margin: ada aturan global `button{ width:100%; margin-top:22px }`
+       (lihat catatan di blok .attemptCard) -- tanpa ini tombol banner ke-stretch. */
+    #updateBannerBtn{ flex:0 0 auto; width:auto; margin:0; padding:8px 15px; border:0; border-radius:999px;
+      background:linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#241a08;
+      font-size:12.5px; font-weight:800; cursor:pointer; white-space:nowrap; }
+    #updateBannerClose{ flex:0 0 auto; width:26px; height:26px; margin:0; padding:0; border:0;
+      border-radius:50%; background:transparent; color:var(--muted); font-size:17px;
+      line-height:1; cursor:pointer; }
+    #updateBannerClose:hover{ color:var(--text); }
+    @media (max-width:520px){
+      #updateBanner{ left:12px; right:12px; transform:translateY(140%); max-width:none; }
+      #updateBanner.show{ transform:translateY(0); }
+    }
     /* .hubCard = shared shape for both the real (button, clickable-later) and coming-soon (div,
        genuinely inert -- a button that does nothing is the same dead-affordance issue as #6/#8)
        cards. Button-specific resets (width/margin/padding/border/text-align/color/font-weight)
@@ -2284,8 +2381,16 @@
         <div id="loginMsg" class="msg"></div>
         <div class="loginDeviceNote" id="loginDeviceNote"><span class="hz">锁</span><span id="loginDeviceNoteText"></span></div>
         <p class="foot" id="loginFoot">Belum punya akun? <b>Hubungi admin</b> untuk daftar.</p>
+        <p class="appVersionLine" id="loginVersionLine"></p>
       </div>
     </div>
+  </div>
+
+  <!-- Banner "ada versi baru" -- disuntik sekali, dipakai baik di layar login maupun dashboard. -->
+  <div id="updateBanner" role="status" aria-live="polite">
+    <span id="updateBannerText"></span>
+    <button type="button" id="updateBannerBtn"></button>
+    <button type="button" id="updateBannerClose" aria-label="Tutup">&times;</button>
   </div>
 
   <!-- ============ APP SHELL ============ -->
@@ -2440,6 +2545,7 @@
                 <button type="button" class="dashV4-avaMenuItem" id="dashV4AvaLogoutBtn" role="menuitem">
                   <span>🚪</span><span id="dashV4AvaLogoutLabel">Keluar</span>
                 </button>
+                <p class="appVersionLine inMenu" id="dashVersionLine"></p>
               </div>
             </div>
           </div>
@@ -2845,10 +2951,34 @@
       <div id="mockListCard" class="pageCard mocklist hidden">
         <p class="sub" id="mockListHeader">Mock Test</p>
 
-        <div class="levelPicker" id="mockLevelPicker"></div>
+        <!-- Mock Test = 3 langkah, satu layar satu keputusan:
+             (1) #mockLevelStep     -> kotak HSK 1..6 (+ 7-9 coming soon)
+             (2) #mockSectionStep   -> kotak Set Test / Reading / Listening / Writing
+             (3) #mockSectionDetail -> daftar set beneran
+             Chip level & chip section yang lama dihapus: dulu ketiganya ditumpuk di satu
+             layar sehingga kartu set langsung memenuhi halaman. -->
+        <div id="mockLevelStep">
+          <div class="hubGrid mockLevelHub" id="mockLevelHub"></div>
+        </div>
         <div id="mockLevelLockedMsg" class="msg"></div>
-        <div class="levelPicker sectionPicker" id="mockSectionPicker"></div>
-        <div id="mockList"></div>
+
+        <div id="mockSectionStep" class="hidden">
+          <button type="button" class="mockBackBtn" id="mockLevelBackBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            <span id="mockLevelBackLabel">Pilih level</span>
+          </button>
+          <p class="mockSectionTitle" id="mockLevelTitle"></p>
+          <div class="hubGrid mockSectionHub" id="mockSectionHub"></div>
+        </div>
+
+        <div id="mockSectionDetail" class="hidden">
+          <button type="button" class="mockBackBtn" id="mockSectionBackBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            <span id="mockSectionBackLabel">Semua bagian</span>
+          </button>
+          <p class="mockSectionTitle" id="mockSectionTitle"></p>
+          <div id="mockList"></div>
+        </div>
 
         <button id="mockListExitBtn" class="practiceExit">Kembali ke Dashboard</button>
       </div>
@@ -3150,6 +3280,18 @@
   /* ==========================================================
      KONFIG — dua nilai ini aman ditaruh di client (public-safe)
      ========================================================== */
+  /* ============================================================
+     VERSI APLIKASI
+     Aturan: update besar +1  (4.0 -> 5.0), update kecil +0.1 (4.0 -> 4.1).
+     Setelah x.9 naik ke integer berikutnya (4.9 -> 5.0).
+     PENTING: kalau naikin versi, ubah DUA tempat:
+       1) APP_VERSION di bawah ini
+       2) /version.json di root repo  <- ini yang dipakai buat deteksi update
+     Kalau keduanya beda, user yang masih buka tab lama bakal dikasih
+     banner "ada versi baru".
+     ============================================================ */
+  const APP_VERSION = '4.0';
+
   const SUPABASE_URL  = 'https://xzgvhzmmqbijpbrhagjf.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6Z3Zoem1tcWJpanBicmhhZ2pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0OTA4NjMsImV4cCI6MjA5OTA2Njg2M30.9OtBJIBDDUhhSsvtz9Pql12hWToGzmULOGh7Tj-vzNs';
 
@@ -3371,6 +3513,12 @@
           sessionComplete:'Sesi selesai! {correct} / {total} kartu terjawab benar.',
           backToDashboard:'Kembali ke Dashboard', backToMateri:'Kembali ke Materi', weakestWords:'Kata Terlemah', mockTestHistory:'Riwayat Mock Test',
           comingSoon:'Konten segera hadir',
+          mockDescAll:'Simulasi penuh, semua bagian', mockDescReading:'Latihan membaca',
+          mockDescListening:'Latihan menyimak', mockDescWriting:'Latihan menulis',
+          mockSetCount:'set', mockBackToSections:'Semua bagian', mockBackToLevels:'Pilih level',
+          levelLockedShort:'Terkunci',
+          versionLabel:'Versi', updateTitle:'Versi baru tersedia', updateBody:'Refresh biar dapat yang terbaru.',
+          updateBtn:'Refresh',
           raportHeader:'Raport Belajar', vocabDictionary:'Kamus Kosakata',
           searchPlaceholder:'Cari hanzi, pinyin, atau arti...', loadMore:'Muat Lebih Banyak',
           hubSubtitle:'Semua yang kamu butuhin — deck kosakata, grammar, drill, dan paket mock test.',
@@ -3538,6 +3686,12 @@
           sessionComplete:'Session complete! {correct} / {total} cards answered correctly.',
           backToDashboard:'Back to Dashboard', backToMateri:'Back to Materials', weakestWords:'Weakest Words', mockTestHistory:'Mock Test History',
           comingSoon:'Content coming soon',
+          mockDescAll:'Full simulation, all sections', mockDescReading:'Reading practice',
+          mockDescListening:'Listening practice', mockDescWriting:'Writing practice',
+          mockSetCount:'sets', mockBackToSections:'All sections', mockBackToLevels:'Choose level',
+          levelLockedShort:'Locked',
+          versionLabel:'Version', updateTitle:'New version available', updateBody:'Refresh to get the latest.',
+          updateBtn:'Refresh',
           raportHeader:'Learning Report', vocabDictionary:'Vocabulary Dictionary',
           searchPlaceholder:'Search hanzi, pinyin, or meaning...', loadMore:'Load More',
           hubSubtitle:'Everything you need — decks, grammar, drills & mock papers.',
@@ -3705,6 +3859,12 @@
           sessionComplete:'本次学习完成！{correct} / {total} 张卡片回答正确',
           backToDashboard:'返回主页', backToMateri:'返回学习资料', weakestWords:'最薄弱词汇', mockTestHistory:'模拟考试记录',
           comingSoon:'内容即将上线',
+          mockDescAll:'完整模拟，全部部分', mockDescReading:'阅读练习',
+          mockDescListening:'听力练习', mockDescWriting:'书写练习',
+          mockSetCount:'套', mockBackToSections:'全部部分', mockBackToLevels:'选择级别',
+          levelLockedShort:'已锁定',
+          versionLabel:'版本', updateTitle:'有新版本', updateBody:'刷新即可获取最新版。',
+          updateBtn:'刷新',
           raportHeader:'学习报告', vocabDictionary:'词汇词典',
           searchPlaceholder:'搜索汉字、拼音或释义...', loadMore:'加载更多',
           hubSubtitle:'你需要的一切——词汇卡组、语法、听力练习和模拟试卷。',
@@ -3887,6 +4047,7 @@
     $('loginFoot').innerHTML = `${t('noAccount')} <a class="forgotLink" href="https://wa.me/6287886908357?text=${encodeURIComponent(t('contactAdminWaMsg'))}" target="_blank" rel="noopener"><b>${t('contactAdmin')}</b></a> ${t('toRegister')}`;
     $('passwordToggle').setAttribute('aria-label', $('password').type === 'text' ? t('hidePassword') : t('showPassword'));
     $('loginWordOfDayLabelText').textContent = t('wordOfDayLabel');
+    renderVersionLabels();
     $('loginDeviceNoteText').textContent = t('loginDeviceNote');
     renderWordOfDay();
     renderContinueSubtitle();
@@ -7547,8 +7708,7 @@
     $('dashCard').classList.add('hidden');
     $('mockListCard').classList.remove('hidden');
     renderMockExitLabel();
-    renderMockSectionPicker();
-    renderMockLevelPicker();
+    renderMockLevelPicker();     // selalu mulai dari langkah 1 (kotak level)
   }
 
   // Exit label must follow mockOrigin, same reasoning as renderBrowseExitLabel (DECISIONS_NEEDED
@@ -7556,6 +7716,8 @@
   // (language just changed, origin didn't) so both cases stay correct.
   function renderMockExitLabel(){
     $('mockListExitBtn').textContent = t(mockOrigin === 'hub' ? 'backToMateri' : 'backToDashboard');
+    $('mockSectionBackLabel').textContent = t('mockBackToSections');
+    $('mockLevelBackLabel').textContent = t('mockBackToLevels');
   }
 
   function closeMockList(){
@@ -7568,22 +7730,156 @@
     $('dashCard').classList.remove('hidden');
   }
 
-  function renderMockSectionPicker(){
-    const wrap = $('mockSectionPicker');
+  /* ---------- Mock Test: navigasi 3 langkah ----------
+     level (kotak HSK) -> bagian (kotak Set Test/Reading/Listening/Writing) -> daftar set.
+     Semua hitungan diambil SEKALI lewat satu query ringan (cuma kolom hsk_level+section)
+     saat halaman dibuka, lalu dipakai ulang oleh kedua hub -- pindah antar langkah tidak
+     memicu query baru. Query berat (judul, durasi, jumlah soal, riwayat attempt) tetap
+     cuma jalan di langkah ke-3 lewat loadMockList(). */
+  const LEVEL_GLYPH = { 1:'\u4e00', 2:'\u4e8c', 3:'\u4e09', 4:'\u56db', 5:'\u4e94', 6:'\u516d',
+                        7:'\u4e03', 8:'\u516b', 9:'\u4e5d' };
+  const MOCK_SECTION_CARDS = [
+    { key:'all',       cover:'mock',      icon:'<rect x="5" y="4" width="14" height="17" rx="2.2"/><path d="m9 12 2 2 4-4"/>' },
+    { key:'reading',   cover:'reading',   icon:SECTION_ICON.reading },
+    { key:'listening', cover:'listening', icon:SECTION_ICON.listening },
+    { key:'writing',   cover:'writing',   icon:SECTION_ICON.writing }
+  ];
+  const SOON_LEVELS = [7, 8, 9];  // HSK 7/8/9 -- kotaknya tampil tapi kontennya belum ada
+  const isSoonLevel = lv => SOON_LEVELS.includes(lv);
+  let mockCounts = null;          // { [level]: {all,reading,listening,writing} }
+  let mockPendingSection = null;  // bagian yang diminta pemanggil (mis. dari kartu Materi)
+
+  function mockCardLabel(key){
+    return ({ all:'Set Test', reading:'Reading', listening:'Listening', writing:'Writing' })[key];
+  }
+  function mockCardDesc(key){
+    return ({ all:t('mockDescAll'), reading:t('mockDescReading'),
+              listening:t('mockDescListening'), writing:t('mockDescWriting') })[key] || '';
+  }
+
+  async function fetchMockCounts(){
+    const box = {};
+    for(let lv=1; lv<=6; lv++) box[lv] = { all:0, reading:0, listening:0, writing:0 };
+    if(!userPackageLevels.length) return box;
+    const { data, error } = await sb
+      .from('test_sets').select('hsk_level,section')
+      .eq('is_published', true).in('hsk_level', userPackageLevels);
+    if(error || !data) return box;
+    data.forEach(r => {
+      const b = box[r.hsk_level];
+      if(!b) return;
+      b.all++;
+      if(b[r.section] !== undefined) b[r.section]++;
+    });
+    return box;
+  }
+
+  /* ---- LANGKAH 1: kotak level ---- */
+  function renderMockLevelHub(){
+    const wrap = $('mockLevelHub');
+    if(!wrap) return;
     wrap.innerHTML = '';
-    SECTION_TABS.forEach(t => {
-      const b = document.createElement('div');
-      b.className = 'levelBtn' + (t.key === mockSection ? ' active' : '');
-      b.textContent = t.label;
+    for(let lv=1; lv<=6; lv++){
+      const locked = !isLevelAllowed(lv);
+      const n = mockCounts ? mockCounts[lv].all : null;
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'hubCard' + (locked ? ' locked' : '');
+      const meta = locked ? t('levelLockedShort')
+                          : (n === null ? '&nbsp;' : (n + ' ' + t('mockSetCount')));
+      b.innerHTML = `
+        <div class="hubCardCover lv${lv}"><span class="hubCardCoverGlyph">${LEVEL_GLYPH[lv]}</span></div>
+        <div class="hubCardBody">
+          <div class="hubCardTitle">${locked ? '\uD83D\uDD12 ' : ''}HSK ${lv}</div>
+          <div class="hubCardMeta">${meta}</div>
+        </div>`;
       b.addEventListener('click', ()=>{
-        mockSection = t.key;
-        [...wrap.children].forEach(c=>c.classList.remove('active'));
-        b.classList.add('active');
-        if(mockLevel) loadMockList(mockLevel);
+        if(locked){
+          const el = $('mockLevelLockedMsg');
+          el.textContent = t('errLevelLocked');
+          el.className = 'msg lock';
+          return;
+        }
+        hideMockLockedMsg();
+        openMockLevel(lv);
       });
+      wrap.appendChild(b);
+    }
+    // HSK 7, 8, 9 -- masing-masing punya kotak sendiri. Kontennya belum ada, tapi kartunya
+    // tetap bisa dibuka supaya user lihat bagian apa saja yang nanti tersedia; di dalamnya
+    // keempat bagian ditandai "segera" dan tidak bisa diklik (lihat isSoonLevel() di
+    // renderMockSectionHub).
+    SOON_LEVELS.forEach(lv => {
+      const soon = document.createElement('button');
+      soon.type = 'button';
+      soon.className = 'hubCard soon';
+      soon.innerHTML = `
+        <div class="hubCardCover lvSoon"><span class="hubCardCoverGlyph">${LEVEL_GLYPH[lv]}</span></div>
+        <div class="hubCardBody">
+          <div class="hubCardTitle">HSK ${lv}</div>
+          <div class="hubCardMeta">${t('levelSoonTag')}</div>
+        </div>`;
+      soon.addEventListener('click', ()=>{ hideMockLockedMsg(); openMockLevel(lv); });
+      wrap.appendChild(soon);
+    });
+  }
+
+  /* ---- LANGKAH 2: kotak bagian ---- */
+  function renderMockSectionHub(){
+    const wrap = $('mockSectionHub');
+    if(!wrap) return;
+    wrap.innerHTML = '';
+    const isSoon = isSoonLevel(mockLevel);
+    const bucket = (!isSoon && mockCounts && mockLevel) ? mockCounts[mockLevel] : null;
+    MOCK_SECTION_CARDS.forEach(sc => {
+      const n = isSoon ? 0 : (bucket ? bucket[sc.key] : null);
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'hubCard' + (isSoon ? ' soon' : '');
+      if(n === 0) b.disabled = true;
+      b.innerHTML = `
+        <div class="hubCardCover ${sc.cover}">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${sc.icon}</svg>
+        </div>
+        <div class="hubCardBody">
+          <div class="hubCardTitle">${mockCardLabel(sc.key)}</div>
+          <div class="hubCardMeta">${mockCardDesc(sc.key)}</div>
+          <div class="hubCardCount">${isSoon ? t('levelSoonTag') : (n === null ? '&nbsp;' : (n + ' ' + t('mockSetCount')))}</div>
+        </div>`;
+      if(n !== 0) b.addEventListener('click', ()=> openMockSection(sc.key));
       wrap.appendChild(b);
     });
   }
+
+  /* ---- perpindahan antar langkah ---- */
+  function showMockStep(step){
+    $('mockLevelStep').classList.toggle('hidden', step !== 'level');
+    $('mockSectionStep').classList.toggle('hidden', step !== 'section');
+    $('mockSectionDetail').classList.toggle('hidden', step !== 'detail');
+  }
+
+  function openMockLevel(lv){
+    mockLevel = lv;
+    $('mockLevelTitle').textContent = 'HSK ' + lv + (isSoonLevel(lv) ? ' \u00b7 ' + t('levelSoonTag') : '');
+    renderMockSectionHub();
+    showMockStep('section');
+    if(!isSoonLevel(lv) && mockPendingSection && mockPendingSection !== 'all'){
+      const want = mockPendingSection;
+      mockPendingSection = null;
+      const bucket = mockCounts ? mockCounts[lv] : null;
+      if(!bucket || bucket[want] > 0) openMockSection(want);
+    }
+  }
+
+  function openMockSection(key){
+    mockSection = key;
+    $('mockSectionTitle').textContent = mockCardLabel(key) + ' \u00b7 HSK ' + mockLevel;
+    showMockStep('detail');
+    if(mockLevel) loadMockList(mockLevel);
+  }
+
+  function backToMockLevels(){ mockPendingSection = null; showMockStep('level'); }
+  function backToMockSections(){ $('mockList').innerHTML = ''; showMockStep('section'); }
 
   // Hides the locked-level inline note -- same component/reasoning as hideBrowseLockedMsg (#22).
   function hideMockLockedMsg(){
@@ -7598,42 +7894,19 @@
   // for a locked level. This is orthogonal to DECISIONS_NEEDED #9's empty state (Writing HSK1/2
   // for an hsk_1_4 account): that level is unlocked (isLevelAllowed(1)===true), so it still goes
   // through the normal loadMockList() -> emptyNoMockForLevel path, never the lock branch.
-  function renderMockLevelPicker(){
-    const wrap = $('mockLevelPicker');
-    wrap.innerHTML = '';
+  /* Entry point halaman Mock Test: satu query hitungan, lalu tampilkan kotak level. */
+  async function renderMockLevelPicker(){
     hideMockLockedMsg();
-    const hasAnyAllowed = userPackageLevels.length > 0;
-    const defaultLevel = hasAnyAllowed
-      ? ((currentProfile?.target_level && isLevelAllowed(currentProfile.target_level)) ? currentProfile.target_level : userPackageLevels[0])
-      : null;
-    for(let lv=1; lv<=6; lv++){
-      const locked = !isLevelAllowed(lv);
-      const b = document.createElement('div');
-      b.className = 'levelBtn' + (!locked && lv===defaultLevel ? ' active' : '') + (locked ? ' locked' : '');
-      b.textContent = (locked ? '🔒 ' : '') + 'HSK ' + lv;
-      if(locked){
-        b.addEventListener('click', ()=>{
-          const el = $('mockLevelLockedMsg');
-          el.textContent = t('errLevelLocked');
-          el.className = 'msg lock';
-        });
-      } else {
-        b.addEventListener('click', ()=>{
-          hideMockLockedMsg();
-          [...wrap.children].forEach(c=>c.classList.remove('active'));
-          b.classList.add('active');
-          loadMockList(lv);
-        });
-      }
-      wrap.appendChild(b);
+    mockPendingSection = (mockSection && mockSection !== 'all') ? mockSection : null;
+    showMockStep('level');
+    mockCounts = null;
+    renderMockLevelHub();                 // render dulu tanpa angka biar nggak layar kosong
+    if(!userPackageLevels.length){
+      $('mockLevelHub').innerHTML = `<p class="emptyState">${t('comingSoon')}</p>`;
+      return;
     }
-    appendLevelSoonChip(wrap, 'div');      // HSK 7-9 -- coming soon
-    if(hasAnyAllowed){
-      loadMockList(defaultLevel);
-    } else {
-      $('mockSectionPicker').innerHTML = '';
-      $('mockList').innerHTML = `<p class="emptyState">${t('comingSoon')}</p>`;
-    }
+    mockCounts = await fetchMockCounts();
+    renderMockLevelHub();                 // render ulang dengan jumlah set
   }
 
   function formatMockDate(iso){
@@ -7649,6 +7922,7 @@
   async function loadMockList(level){
     mockLevel = level;
     const wrap = $('mockList');
+    wrap.className = '';
     wrap.innerHTML = `<p class="emptyState">${t('loading')}</p>`;
 
     let query = sb
@@ -7683,18 +7957,32 @@
     }
   }
 
+  /* Ambil nomor urut dari judul set ("H6XING007" -> "07") buat ditulis besar di cover.
+     Kalau judulnya nggak ada angka, pakai urutan tampil sebagai cadangan. */
+  function setCoverNum(title, idx){
+    const m = String(title).match(/(\d+)\s*$/);
+    const n = m ? parseInt(m[1], 10) : (idx + 1);
+    return String(n).padStart(2, '0');
+  }
+
   function renderMockFlatList(wrap, sets, lastAttempt){
-    sets.forEach(s=>{
+    wrap.className = 'mockSetGrid';
+    sets.forEach((s, i)=>{
       const attempt = lastAttempt.get(s.set_id);
       const minutes = Math.round(s.time_limit_seconds / 60);
       const card = document.createElement('div');
-      card.className = 'mockSetCard';
+      card.className = 'hubCard';
       card.innerHTML = `
-        <div class="mockSetTitle">${s.title}</div>
-        <div class="mockSetMeta">HSK ${s.hsk_level} · ${SECTION_LABEL[s.section] || s.section} · ${s.total_questions} ${t('soal')} · ${minutes} ${t('menit')}</div>
-        ${attempt ? `<div class="mockSetScore">${t('terakhir')} ${attempt.score}/${attempt.total_points} · ${t('benar')} ${attempt.correct_count}/${attempt.total_questions} · ${formatMockDate(attempt.created_at)}</div>` : ''}
-        <button class="mockSetBtn" data-set="${s.set_id}">${attempt ? t('ulangi') : t('mulai')}</button>
-      `;
+        <div class="hubCardCover lv${s.hsk_level}">
+          <span class="hubCardCoverNum">${setCoverNum(s.title, i)}</span>
+          ${attempt ? `<span class="mockSetDoneTag">${attempt.score}/${attempt.total_points}</span>` : ''}
+        </div>
+        <div class="hubCardBody">
+          <div class="hubCardTitle">${s.title}</div>
+          <div class="mockSetMeta">HSK ${s.hsk_level} · ${SECTION_LABEL[s.section] || s.section}<br>${s.total_questions} ${t('soal')} · ${minutes} ${t('menit')}</div>
+          ${attempt ? `<div class="mockSetScore">${t('terakhir')} ${formatMockDate(attempt.created_at)}</div>` : ''}
+          <button class="mockSetBtn" data-set="${s.set_id}">${attempt ? t('ulangi') : t('mulai')}</button>
+        </div>`;
       wrap.appendChild(card);
     });
   }
@@ -7702,6 +7990,7 @@
   // Tab "Semua": satu kartu per kode dasar (mis. "H4XING001"), gabungan semua section
   // yang berbagi kode itu. Urutan bagian pas dikerjain: listening -> reading -> writing.
   function renderMockGroupedList(wrap, sets, lastAttempt){
+    wrap.className = 'mockSetGrid';
     mockGroupedSets = new Map();
     sets.forEach(s=>{
       const code = getBaseCode(s.title);
@@ -7725,17 +8014,23 @@
         const correct = attemptsForGroup.reduce((sum,a) => sum + (a.correct_count||0), 0);
         const totalQ = attemptsForGroup.reduce((sum,a) => sum + (a.total_questions||0), 0);
         const latestDate = attemptsForGroup.reduce((latest,a) => a.created_at > latest ? a.created_at : latest, attemptsForGroup[0].created_at);
-        scoreLine = `<div class="mockSetScore">${t('terakhir')} ${score}/${totalPoints} · ${t('benar')} ${correct}/${totalQ} · ${formatMockDate(latestDate)}</div>`;
+        scoreLine = `<div class="mockSetScore">${score}/${totalPoints} · ${formatMockDate(latestDate)}</div>`;
       }
 
+      const lv = groupSets[0].hsk_level;
       const card = document.createElement('div');
-      card.className = 'mockSetCard';
+      card.className = 'hubCard';
       card.innerHTML = `
-        <div class="mockSetTitle">${code}</div>
-        <div class="mockSetMeta">HSK ${groupSets[0].hsk_level} · ${sectionLabels} · ${totalQuestions} ${t('soal')} · ${totalMinutes} ${t('menit')}</div>
-        ${scoreLine}
-        <button class="mockSetBtn" data-group="${code}">${allAttempted ? t('ulangi') : t('mulai')}</button>
-      `;
+        <div class="hubCardCover lv${lv}">
+          <span class="hubCardCoverNum">${setCoverNum(code, codes.indexOf(code))}</span>
+          ${allAttempted ? `<span class="mockSetDoneTag">\u2713</span>` : ''}
+        </div>
+        <div class="hubCardBody">
+          <div class="hubCardTitle">${code}</div>
+          <div class="mockSetMeta">HSK ${lv} · ${sectionLabels}<br>${totalQuestions} ${t('soal')} · ${totalMinutes} ${t('menit')}</div>
+          ${scoreLine}
+          <button class="mockSetBtn" data-group="${code}">${allAttempted ? t('ulangi') : t('mulai')}</button>
+        </div>`;
       wrap.appendChild(card);
     });
   }
@@ -8603,7 +8898,7 @@
     setActiveNav('latihan');
     $('attemptCard').classList.add('hidden');
     $('mockListCard').classList.remove('hidden');
-    if(mockLevel) loadMockList(mockLevel);
+    if(mockLevel){ showMockStep('detail'); loadMockList(mockLevel); }
   }
 
   async function exitAttempt(){
@@ -8764,7 +9059,7 @@
     setActiveNav('latihan');
     $('resultCard').classList.add('hidden');
     $('mockListCard').classList.remove('hidden');
-    if(mockLevel) loadMockList(mockLevel);
+    if(mockLevel){ showMockStep('detail'); loadMockList(mockLevel); }
   }
 
   function renderReview(reviewArr){
@@ -8958,7 +9253,57 @@
   $('adminStatusFilter').addEventListener('change', applyAdminFilter);
   $('adminAddBtn').addEventListener('click', openCreateUserModal);
   $('mockTestBtn').addEventListener('click', ()=> navTo(()=> openMockList('all','dash')));
+  /* ==========================================================
+     CEK VERSI BARU
+     APP_VERSION = versi kode yang LAGI JALAN di tab ini (di-bake ke HTML).
+     /version.json = versi yang LAGI TERPASANG di server.
+     Beda -> user pegang tab lama -> munculin banner.
+     Dicek: 60 detik setelah load, tiap 10 menit, dan tiap tab balik difokus
+     (kasus paling umum: tab dibiarkan kebuka berhari-hari).
+     Semua fetch pakai cache:'no-store' + query string biar nggak kena cache CDN.
+     ========================================================== */
+  let updateBannerShown = false;
+  let updateDismissed   = false;
+
+  function renderVersionLabels(){
+    const txt = t('versionLabel') + ' ' + APP_VERSION;
+    const a = $('loginVersionLine'); if(a) a.textContent = txt;
+    const b = $('dashVersionLine');  if(b) b.textContent = txt;
+  }
+
+  function showUpdateBanner(newVer){
+    if(updateBannerShown || updateDismissed) return;
+    updateBannerShown = true;
+    const el = $('updateBanner');
+    $('updateBannerText').innerHTML =
+      '<b>' + t('updateTitle') + (newVer ? ' (' + newVer + ')' : '') + '</b><br>' + t('updateBody');
+    $('updateBannerBtn').textContent = t('updateBtn');
+    el.classList.add('show');
+  }
+
+  async function checkAppVersion(){
+    if(updateDismissed) return;
+    try{
+      const r = await fetch('/version.json?_=' + Date.now(), { cache:'no-store' });
+      if(!r.ok) return;
+      const j = await r.json();
+      if(j && j.version && String(j.version) !== String(APP_VERSION)) showUpdateBanner(j.version);
+    }catch(e){ /* offline / file belum ada -- diamkan, jangan ganggu user */ }
+  }
+
+  $('updateBannerBtn').addEventListener('click', ()=>{ location.reload(true); });
+  $('updateBannerClose').addEventListener('click', ()=>{
+    updateDismissed = true;
+    $('updateBanner').classList.remove('show');
+  });
+  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) checkAppVersion(); });
+  setTimeout(checkAppVersion, 60000);
+  setInterval(checkAppVersion, 600000);
+  renderVersionLabels();
+
   $('mockListExitBtn').addEventListener('click', closeMockList);
+  $('mockSectionBackBtn').addEventListener('click', backToMockSections);
+  $('mockLevelBackBtn').addEventListener('click', backToMockLevels);
   $('hubCardReading').addEventListener('click', ()=> navTo(()=> openMockList('reading','hub')));
   $('hubCardListening').addEventListener('click', ()=> navTo(()=> openMockList('listening','hub')));
   $('hubCardWriting').addEventListener('click', ()=> navTo(()=> openMockList('writing','hub')));

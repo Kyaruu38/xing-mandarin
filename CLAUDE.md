@@ -111,6 +111,34 @@ bagian tersebut.
 
 ## Jebakan yang sudah pernah kena — jangan diulang
 
+**Skor dengan rumus berbeda tidak boleh diadu langsung.** Tone Coach versi pertama
+memberi tiap nada rumus skornya sendiri (nada 1 pakai "range", nada 2 "slope/6", nada 3
+"dipDepth/4") lalu mengurutkannya untuk memilih pemenang. Satuannya beda, jadi urutannya
+tidak berarti. Lebih parah: kalau semua rumus menghasilkan 0, `Object.entries().sort()`
+mengembalikan kunci pertama, sehingga **nada 1 diam-diam jadi jawaban default setiap kali
+sistem bingung** — dengan confidence 0% yang tetap ditampilkan sebagai hasil. Kalau
+membandingkan beberapa kandidat, semuanya harus diukur dengan penggaris yang sama, dan
+kasus "tidak ada yang cocok" harus ditangani eksplisit.
+
+**Autokorelasi mentah bias ke lag pendek.** `Σ x[i]x[i+lag]` menjumlahkan `len-lag` suku,
+jadi jumlahnya makin kecil hanya karena lag-nya makin besar. Membandingkan nilai antar lag
+tanpa normalisasi = menghukum nada rendah. Ambang `clarity = best/energy0 >= 0.75` jadi
+mustahil dicapai suara cowo (lag panjang cuma memakai ~75% frame), sehingga 84% rekaman
+mereka ditolak mentah. Kalau butuh deteksi pitch, pakai YIN/NCCF yang sudah ternormalisasi.
+
+**Gate energi relatif-puncak membunuh ekor nada 3 & 4.** Ambang `RMS >= 15% dari RMS
+tertinggi` membuang 40%+ frame pada nada yang berakhir rendah: F0-nya turun, mic HP memang
+memotong bass, jadi energinya jatuh jauh di bawah puncak suku kata padahal masih bersuara.
+Ikat ambang ke **lantai derau rekaman**, bukan ke puncak sinyal, dan serahkan keputusan
+bersuara/tidak ke clarity detektor pitch.
+
+**Generator uji juga bisa salah.** Backtest pertama Tone Coach memberi angka yang terlalu
+pesimis untuk dua-duanya karena konsonan sintetisnya dibuat 7x lebih keras dari vokal, dan
+level derau dihitung dari RMS seluruh sinyal (ikut terangkat konsonan). Sebelum percaya
+hasil benchmark, cek dulu asumsi generatornya masuk akal. Dan selalu uji di generator
+KEDUA yang asumsinya beda (holdout), kalau tidak yang terukur cuma seberapa bagus kode
+mencocoki simulator sendiri.
+
 **`button { width:100% }` global.** Ada aturan global untuk `button` di CSS (width 100%,
 margin-top 22px, background emas). Setiap tombol baru yang bukan tombol utama WAJIB reset
 `width:auto; margin:0;` secara eksplisit, kalau tidak tombolnya melar memenuhi kontainer.

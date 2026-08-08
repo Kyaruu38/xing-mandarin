@@ -3327,7 +3327,7 @@
      Kalau keduanya beda, user yang masih buka tab lama bakal dikasih
      banner "ada versi baru".
      ============================================================ */
-  const APP_VERSION = '4.2';
+  const APP_VERSION = '4.3';
 
   const SUPABASE_URL  = 'https://xzgvhzmmqbijpbrhagjf.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6Z3Zoem1tcWJpanBicmhhZ2pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0OTA4NjMsImV4cCI6MjA5OTA2Njg2M30.9OtBJIBDDUhhSsvtz9Pql12hWToGzmULOGh7Tj-vzNs';
@@ -6677,127 +6677,304 @@
     tcAudioContext = tcMediaStream = tcSourceNode = tcCaptureNode = null;
   }
 
-  // ---- Pitch detection: autocorrelation, 40ms frame / 15ms hop, parabolic interpolation.
+  // ---- Deteksi pitch: YIN (2002) di 16 kHz. Menggantikan autokorelasi mentah versi
+  // pertama, yang membandingkan JUMLAH korelasi antar lag padahal jumlah suku per lag
+  // berbeda -- akibatnya suara rendah hampir selalu ditolak dan salah oktaf sering lolos.
   function tcFrameRMS(frame){
     let sum = 0;
     for(let i=0;i<frame.length;i++) sum += frame[i]*frame[i];
     return Math.sqrt(sum/frame.length);
   }
 
-  function tcAutocorrelate(frame, sampleRate){
-    const minLag = Math.max(1, Math.floor(sampleRate/450));
-    const maxLag = Math.min(frame.length-1, Math.floor(sampleRate/60));
-    let energy0 = 0;
-    for(let i=0;i<frame.length;i++) energy0 += frame[i]*frame[i];
-    if(energy0 <= 1e-8) return null;
-    const corrAt = (lag)=>{
-      let sum = 0;
-      for(let i=0;i<frame.length-lag;i++) sum += frame[i]*frame[i+lag];
-      return sum;
-    };
-    let bestLag = -1, bestVal = -Infinity;
-    for(let lag=minLag; lag<=maxLag; lag++){
-      const v = corrAt(lag);
-      if(v > bestVal){ bestVal = v; bestLag = lag; }
+  // Turunkan ke 16 kHz dulu. F0 manusia maksimum ~450 Hz jadi 16 kHz jauh lebih dari
+  // cukup, tapi biaya YIN turun ~9x -- penting supaya tetap ringan di HP kentang.
+  function tcDownsample(samples, srIn, srOut){
+    if(srIn <= srOut) return { data: samples, sampleRate: srIn };
+    const ratio = srIn / srOut;
+    const half = 24, fc = 0.45 / ratio;
+    const taps = new Float32Array(2*half+1);
+    let tapSum = 0;
+    for(let i=-half;i<=half;i++){
+      const sinc = i === 0 ? 2*fc : Math.sin(2*Math.PI*fc*i)/(Math.PI*i);
+      const win = 0.54 + 0.46*Math.cos(Math.PI*i/half);
+      taps[i+half] = sinc*win; tapSum += sinc*win;
     }
-    if(bestLag <= 0) return null;
-    const clarity = bestVal / energy0;
-    if(clarity < 0.75) return null;
-    const c0 = corrAt(Math.max(bestLag-1, minLag));
-    const c1 = bestVal;
-    const c2 = corrAt(Math.min(bestLag+1, maxLag));
-    const denom = (c0 - 2*c1 + c2);
-    const shift = denom !== 0 ? 0.5*(c0-c2)/denom : 0;
+    for(let i=0;i<taps.length;i++) taps[i] /= tapSum;
+    const outLen = Math.floor(samples.length / ratio);
+    const out = new Float32Array(outLen);
+    for(let n=0;n<outLen;n++){
+      const center = Math.round(n*ratio);
+      let acc = 0;
+      for(let k=-half;k<=half;k++){
+        const idx = center + k;
+        if(idx >= 0 && idx < samples.length) acc += samples[idx]*taps[k+half];
+      }
+      out[n] = acc;
+    }
+    return { data: out, sampleRate: srIn/ratio };
+  }
+
+  const TC_F0_MIN = 55, TC_F0_MAX = 500, TC_YIN_THRESH = 0.16;
+
+  function tcYin(frame, sampleRate){
+    const maxLag = Math.min(Math.floor(frame.length/2), Math.floor(sampleRate/TC_F0_MIN));
+    const minLag = Math.max(2, Math.floor(sampleRate/TC_F0_MAX));
+    if(maxLag <= minLag+2) return null;
+    const cmp = frame.length - maxLag;
+    const d = new Float32Array(maxLag+1);
+    for(let lag=1; lag<=maxLag; lag++){
+      let s = 0;
+      for(let i=0;i<cmp;i++){ const diff = frame[i] - frame[i+lag]; s += diff*diff; }
+      d[lag] = s;
+    }
+    const dn = new Float32Array(maxLag+1);
+    dn[0] = 1;
+    let run = 0;
+    for(let lag=1; lag<=maxLag; lag++){
+      run += d[lag];
+      dn[lag] = run === 0 ? 1 : d[lag]*lag/run;
+    }
+    // Ambil lembah PERTAMA yang di bawah ambang, bukan yang terdalam. Justru ini yang
+    // bikin YIN tahan salah oktaf: harmonik ke-2 juga bikin lembah, tapi lebih jauh.
+    let bestLag = -1;
+    for(let lag=minLag; lag<=maxLag; lag++){
+      if(dn[lag] < TC_YIN_THRESH){
+        while(lag+1 <= maxLag && dn[lag+1] < dn[lag]) lag++;
+        bestLag = lag; break;
+      }
+    }
+    if(bestLag < 0){
+      let bv = Infinity;
+      for(let lag=minLag; lag<=maxLag; lag++) if(dn[lag] < bv){ bv = dn[lag]; bestLag = lag; }
+      if(bestLag < 0 || bv > 0.55) return null;
+    }
+    const x0 = Math.max(minLag, bestLag-1), x2 = Math.min(maxLag, bestLag+1);
+    const denom = dn[x0] - 2*dn[bestLag] + dn[x2];
+    const shift = denom !== 0 ? 0.5*(dn[x0]-dn[x2])/denom : 0;
     const refinedLag = bestLag + Math.max(-1, Math.min(1, shift));
-    return { freq: sampleRate/refinedLag, clarity };
+    return { freq: sampleRate/refinedLag, clarity: 1 - Math.min(1, dn[bestLag]) };
   }
 
   // Balikin { times:[0..1,...], semitones:[...] } relatif ke median pitch UCAPAN SENDIRI,
-  // atau null kalau durasi voiced di luar 0.2-1.5 detik (spec: minta ulang).
-  function tcAnalyzePitch(samples, sampleRate){
-    const frameLen = Math.round(sampleRate * 0.04);
-    const hopLen = Math.round(sampleRate * 0.015);
-    const rmsValues = [];
-    for(let i=0;i+frameLen<=samples.length;i+=hopLen) rmsValues.push(tcFrameRMS(samples.subarray(i,i+frameLen)));
-    const maxRms = Math.max(1e-6, ...rmsValues);
-    const energyGate = maxRms * 0.15;
+  // atau null kalau tidak ada bagian bersuara yang cukup panjang.
+  function tcAnalyzePitch(samplesIn, sampleRateIn){
+    const ds = tcDownsample(samplesIn, sampleRateIn, 16000);
+    const samples = ds.data, sampleRate = ds.sampleRate;
+    const frameLen = Math.round(sampleRate * 0.045);
+    const hopLen = Math.round(sampleRate * 0.010);
+    if(samples.length < frameLen*2) return null;
 
-    const raw = [];
-    for(let i=0, fi=0; i+frameLen<=samples.length; i+=hopLen, fi++){
-      const frame = samples.subarray(i, i+frameLen);
-      if(rmsValues[fi] < energyGate){ raw.push(null); continue; }
-      const r = tcAutocorrelate(frame, sampleRate);
-      raw.push(r ? r.freq : null);
+    const nFrames = Math.floor((samples.length - frameLen)/hopLen) + 1;
+    const rms = new Float32Array(nFrames);
+    for(let fi=0; fi<nFrames; fi++) rms[fi] = tcFrameRMS(samples.subarray(fi*hopLen, fi*hopLen+frameLen));
+
+    // Gate energi HANYA untuk membuang senyap; bersuara/tidaknya diputuskan clarity YIN.
+    // Gate relatif-puncak versi lama (15% dari RMS tertinggi) membuang 40%+ frame pada
+    // nada 3 & 4 -- ekor kedua nada itu turun ke F0 rendah dan mic HP memang memotong
+    // bass, jadi energinya jatuh jauh di bawah puncak suku kata padahal masih bersuara.
+    const sortedRms = Array.prototype.slice.call(rms).sort((a,b)=>a-b);
+    const noiseFloor = sortedRms[Math.floor(sortedRms.length*0.15)] || 0;
+    const maxRms = sortedRms[sortedRms.length-1] || 1e-7;
+    const gate = Math.max(noiseFloor*2.2, maxRms*0.02);
+
+    const f = new Array(nFrames).fill(null);
+    for(let fi=0; fi<nFrames; fi++){
+      if(rms[fi] < gate) continue;
+      const r = tcYin(samples.subarray(fi*hopLen, fi*hopLen+frameLen), sampleRate);
+      // Ambang clarity pada skala YIN yang sudah ternormalisasi. Ini juga yang otomatis
+      // membuang konsonan desis: keras, tapi tidak periodik.
+      if(r && r.clarity >= 0.45) f[fi] = r.freq;
     }
 
-    // Trim unvoiced di ujung.
-    let start = 0, end = raw.length-1;
-    while(start <= end && raw[start] == null) start++;
-    while(end >= start && raw[end] == null) end--;
-    if(start > end) return null;
-    const trimmed = raw.slice(start, end+1);
+    const med = (arr)=>{ const s = arr.slice().sort((a,b)=>a-b); return s[Math.floor(s.length/2)]; };
+    const voicedVals = f.filter(v => v != null);
+    if(voicedVals.length < 8) return null;
 
-    const voicedDurationSec = (trimmed.length * hopLen) / sampleRate;
-    if(voicedDurationSec < 0.2 || voicedDurationSec > 1.5) return null;
-
-    // Isi gap kecil (null di tengah) pakai interpolasi linear antar tetangga voiced terdekat --
-    // lebih natural daripada nge-drop titik itu sepenuhnya dari kurva.
-    const filled = trimmed.slice();
-    for(let i=0;i<filled.length;i++){
-      if(filled[i] != null) continue;
-      let a=i-1; while(a>=0 && filled[a]==null) a--;
-      let b=i+1; while(b<filled.length && filled[b]==null) b++;
-      if(a>=0 && b<filled.length) filled[i] = filled[a] + (filled[b]-filled[a])*((i-a)/(b-a));
-      else filled[i] = a>=0 ? filled[a] : (b<filled.length ? filled[b] : 150);
+    // Perbaiki lompatan oktaf yang tersisa.
+    const gm1 = med(voicedVals);
+    for(let i=0;i<nFrames;i++){
+      if(f[i] == null) continue;
+      const r = f[i]/gm1;
+      if(r > 1.7 && r < 2.4) f[i] /= 2;
+      else if(r > 0.42 && r < 0.6) f[i] *= 2;
+    }
+    // Buang sisa outlier: >7 semitone dari median global bukan pitch beneran.
+    const gm2 = med(f.filter(v => v != null));
+    for(let i=0;i<nFrames;i++){
+      if(f[i] != null && Math.abs(12*Math.log2(f[i]/gm2)) > 7) f[i] = null;
     }
 
-    // Median filter window 5.
-    const medFiltered = filled.map((_,i)=>{
-      const lo = Math.max(0,i-2), hi = Math.min(filled.length-1,i+2);
-      const window = filled.slice(lo,hi+1).slice().sort((a,b)=>a-b);
-      return window[Math.floor(window.length/2)];
+    // Ambil rentetan bersuara TERPANJANG, dengan toleransi celah 70 ms -- creak di dasar
+    // nada 3 sering memutus deteksi sesaat, dan kalau runtun dipotong di situ, bagian
+    // naiknya ikut hilang sehingga nada 3 terbaca nada 4.
+    const MAX_GAP = 7;
+    let bs = -1, be = -1, cs = -1, lastOn = -1;
+    for(let i=0;i<=nFrames;i++){
+      const on = i < nFrames && f[i] != null;
+      if(on){
+        if(cs < 0) cs = i;
+        else if(i - lastOn - 1 > MAX_GAP){
+          if(be - bs < lastOn - cs){ bs = cs; be = lastOn; }
+          cs = i;
+        }
+        lastOn = i;
+      }
+    }
+    if(cs >= 0 && be - bs < lastOn - cs){ bs = cs; be = lastOn; }
+    if(bs < 0) return null;
+    // Potong 1 frame di tiap ujung: onset glotal & napas/creak di akhir adalah sumber
+    // "dip" dan "jatuh" palsu yang paling sering bikin nada 1 dibaca nada 4.
+    if(be - bs >= 8){ bs += 1; be -= 1; }
+
+    const seg = [];
+    for(let i=bs;i<=be;i++) seg.push(f[i]);
+    for(let i=0;i<seg.length;i++){
+      if(seg[i] != null) continue;
+      let a=i-1; while(a>=0 && seg[a]==null) a--;
+      let b=i+1; while(b<seg.length && seg[b]==null) b++;
+      if(a>=0 && b<seg.length) seg[i] = seg[a] + (seg[b]-seg[a])*((i-a)/(b-a));
+      else seg[i] = a>=0 ? seg[a] : seg[b];
+    }
+
+    const durationSec = (seg.length*hopLen)/sampleRate;
+    if(durationSec < 0.12 || durationSec > 2.0) return null;
+
+    const smoothed = seg.map((_,i)=>{
+      const lo = Math.max(0,i-2), hi = Math.min(seg.length-1,i+2);
+      return med(seg.slice(lo,hi+1));
     });
-
-    const sortedAll = medFiltered.slice().sort((a,b)=>a-b);
-    const medianF = sortedAll[Math.floor(sortedAll.length/2)];
-
-    const semitones = medFiltered.map(f => 12 * Math.log2(f / medianF));
-    const times = medFiltered.map((_,i)=> medFiltered.length>1 ? i/(medFiltered.length-1) : 0);
-    return { times, semitones, durationSec: voicedDurationSec };
+    const medianF = med(smoothed);
+    const semitones = smoothed.map(v => 12*Math.log2(v/medianF));
+    const times = smoothed.map((_,i)=> smoothed.length>1 ? i/(smoothed.length-1) : 0);
+    return { times, semitones, durationSec, medianF };
   }
 
-  // ---- Klasifikasi nada (heuristik transparan, sesuai spec).
-  function tcClassifyContour(contour){
-    const { semitones } = contour;
-    const n = semitones.length;
-    const range = Math.max(...semitones) - Math.min(...semitones);
-    const start = semitones[0], end = semitones[n-1];
-    const slope = end - start;
-    let minIdx = 0; for(let i=1;i<n;i++) if(semitones[i] < semitones[minIdx]) minIdx = i;
-    const minPos = n>1 ? minIdx/(n-1) : 0.5;
-    const dipDepth = Math.max(...semitones.slice(0, Math.max(1,Math.floor(n*0.7)))) - semitones[minIdx];
+  // ---- Klasifikasi nada: cocokkan bentuk kurva ke template, satu penggaris untuk semua.
+  // Versi pertama memberi tiap nada rumus skornya SENDIRI (nada 1 pakai "range", nada 2
+  // pakai "slope/6", nada 3 pakai "dipDepth/4") lalu membandingkan angkanya langsung --
+  // padahal satuannya beda, jadi peringkatnya tidak berarti. Efek sampingnya paling parah:
+  // kalau semua rumus menghasilkan 0, hasil pengurutan jatuh ke nada 1 dengan confidence
+  // 0%, sehingga "nada 1" diam-diam jadi jawaban default setiap kali sistem bingung.
+  const TC_NPTS = 16;
+  const TC_CHAO_ST = 2.875;   // 1 langkah Chao ~ 2.875 semitone
 
-    const scores = { 1:0, 2:0, 3:0, 4:0 };
-    // Tone 1: datar, range kecil.
-    scores[1] = range < 2.5 ? (1 - range/2.5) : 0;
-    // Tone 2: naik jelas, minimum di awal.
-    scores[2] = (slope >= 3 && minPos < 0.4) ? Math.min(1, slope/6) : 0;
-    // Tone 3: dip di tengah (posisi 0.3-0.7), kedalaman >= 2.5 st. Half-third (dip lemah/di
-    // pinggir) tetap dihitung nada 3 tapi diberi verdict khusus di caller (bukan di sini).
-    scores[3] = (minPos >= 0.2 && minPos <= 0.8 && dipDepth >= 1.5) ? Math.min(1, dipDepth/4) : 0;
-    // Tone 4: turun tajam, mulai tinggi.
-    scores[4] = (slope <= -4 && start > (Math.max(...semitones)-1.5)) ? Math.min(1, -slope/8) : 0;
+  function tcResampleCurve(arr, n){
+    const out = new Array(n);
+    for(let i=0;i<n;i++){
+      const p = (arr.length-1) * i/(n-1);
+      const a = Math.floor(p), b = Math.min(arr.length-1, a+1);
+      out[i] = arr[a] + (arr[b]-arr[a])*(p-a);
+    }
+    return out;
+  }
+  function tcCenter(arr){
+    const m = arr.reduce((s,v)=>s+v,0)/arr.length;
+    return arr.map(v=>v-m);
+  }
+  // Template dalam SEMITONE SUNGGUHAN (nilai Chao 1930 x 2.875 st). Nada 1 ikut jadi
+  // template (garis nol) supaya dia diukur dengan penggaris yang sama, bukan lewat
+  // aturan terpisah.
+  // Chao 1..5 -> semitone relatif TENGAH rentang penutur. Chao 3 = tengah = ~0 st.
+  // (Bukan chao*2.875 begitu saja: itu menggeser seluruh template ~8,9 semitone ke atas,
+  // yang tidak apa-apa untuk kurva yang di-center, tapi merusak pencocokan absolut.)
+  function tcChaoToSt(chao){ return -6 + TC_CHAO_ST*(chao-1); }
+  function tcMkTpl(tone, half, chaoPts){
+    const abs = tcResampleCurve(chaoPts.map(tcChaoToSt), TC_NPTS);
+    return { tone, half, t: tcCenter(abs), abs };
+  }
 
-    const ranked = Object.entries(scores).sort((a,b)=> b[1]-a[1]);
-    const [bestTone, bestScore] = ranked[0];
-    const [secondTone, secondScore] = ranked[1];
-    const isHalfThird = Number(bestTone) === 3 && dipDepth < 2.5 && dipDepth >= 1.5;
-    const ambiguous = bestScore > 0 && secondScore > 0 && (bestScore - secondScore) < 0.15;
+  // Register suara pengguna, ditaksir sambil jalan dari rekaman-rekaman sebelumnya di
+  // sesi ini. Gunanya: kurva yang dinormalisasi ke median ucapannya sendiri kehilangan
+  // info KETINGGIAN. Nada 3 duduk di dasar rentang orang dan nada 1 di puncaknya, tapi
+  // kalau dua-duanya diratakan ke median masing-masing, bentuknya jadi mirip. Dengan
+  // tahu di mana puncak rentang orang itu, nada 3 bisa dikenali dari posisinya.
+  // Anchor = persentil-90 semua F0 yang pernah terdeteksi (bukan rata-rata: rata-rata
+  // ikut berubah tergantung nada apa yang kebetulan dilatih, puncak rentang jauh lebih
+  // stabil karena nada 1, 2, dan 4 sama-sama menyentuh atas).
+  let tcRegisterLog = [];
+  const TC_REG_MIN_SAMPLES = 40;     // ~2 rekaman sukses sebelum petunjuk ini dipakai
+  const TC_REG_MAX_SAMPLES = 1500;
+  const TC_REG_WEIGHT = 0.4;         // dari backtest: 0.4 terbaik, 0.7 mulai turun lagi
+
+  function tcRegisterRef(){
+    if(tcRegisterLog.length < TC_REG_MIN_SAMPLES) return null;
+    const s = tcRegisterLog.slice().sort((a,b)=>a-b);
+    const top = s[Math.min(s.length-1, Math.floor(s.length*0.90))];   // ~Chao 5
+    return Math.pow(2, top) / Math.pow(2, 5.75/12);                   // turunkan ke Chao 3
+  }
+  function tcRegisterPush(contour){
+    for(let i=0;i<contour.semitones.length;i+=2){
+      tcRegisterLog.push(Math.log2(contour.medianF) + contour.semitones[i]/12);
+    }
+    if(tcRegisterLog.length > TC_REG_MAX_SAMPLES){
+      tcRegisterLog = tcRegisterLog.slice(-TC_REG_MAX_SAMPLES);
+    }
+  }
+  const TC_TEMPLATES = [
+    tcMkTpl(1, false, [5.0,5.0,5.0,5.0,4.95,4.9,4.85,4.8]),   // 55
+    tcMkTpl(2, false, [3.0,2.9,2.9,3.1,3.5,4.1,4.6,5.0]),     // 35
+    tcMkTpl(3, false, [2.2,1.6,1.1,1.0,1.0,1.6,2.9,4.0]),     // 214
+    tcMkTpl(3, true,  [2.2,1.7,1.3,1.1,1.0,1.0,1.0,1.0]),     // 21 half-third
+    tcMkTpl(4, false, [5.0,4.4,3.6,2.9,2.3,1.7,1.3,1.0])      // 51
+  ];
+
+  function tcClassifyContour(contour, refMidF0){
+    const u = tcCenter(tcResampleCurve(contour.semitones, TC_NPTS));
+    const range = Math.max(...u) - Math.min(...u);
+
+    // Petunjuk register cuma dipakai kalau taksirannya masuk akal. Kalau ucapan ini
+    // lebih dari satu oktaf dari register tersimpan (mis. HP-nya dipinjam orang lain),
+    // taksirannya diabaikan dan kita balik ke penilaian bentuk saja.
+    let absCurve = null;
+    if(refMidF0){
+      const offset = 12*Math.log2(contour.medianF/refMidF0);
+      if(Math.abs(offset) <= 12){
+        absCurve = tcResampleCurve(contour.semitones, TC_NPTS).map(v => v + offset);
+      }
+    }
+
+    const scored = TC_TEMPLATES.map(tp => {
+      // Skala pas-pasan: pelajar sering kurang ekspresif, penutur lain berlebihan.
+      // Boleh melar 0.55x--1.7x, tapi melarnya kena denda ringan supaya BESARAN gerakan
+      // tetap jadi bukti -- ini yang memisahkan half-third (turun ~3 st) dari nada 4
+      // (turun ~11 st), dua-duanya sama-sama "kurva turun" kalau cuma dilihat bentuknya.
+      let num = 0, den = 0;
+      for(let i=0;i<TC_NPTS;i++){ num += u[i]*tp.t[i]; den += tp.t[i]*tp.t[i]; }
+      let a = den > 1e-9 ? num/den : 0;
+      let pen = 0;
+      if(den > 1e-9){
+        a = Math.max(0.55, Math.min(1.7, a));
+        pen = 0.8*Math.abs(Math.log(Math.max(a, 1e-3)));
+      }
+      let s = 0;
+      for(let i=0;i<TC_NPTS;i++){ const d = u[i] - a*tp.t[i]; s += d*d; }
+      let cost = Math.sqrt(s/TC_NPTS) + pen;
+      if(absCurve){
+        let sa = 0;
+        for(let i=0;i<TC_NPTS;i++){ const d = absCurve[i] - tp.abs[i]; sa += d*d; }
+        cost += TC_REG_WEIGHT * Math.sqrt(sa/TC_NPTS);
+      }
+      return { tone: tp.tone, half: tp.half, cost };
+    });
+    scored.sort((x,y)=> x.cost - y.cost);
+
+    const best = scored[0];
+    const second = scored.find(s => s.tone !== best.tone) || scored[1];
+    const margin = second.cost - best.cost;
+    const scale = absCurve ? (1 + TC_REG_WEIGHT) : 1;
+    const fit = Math.max(0, 1 - best.cost/(2.2*scale));
+    const sep = Math.max(0, Math.min(1, margin/(0.75*scale)));
+    const confidence = Math.max(0.05, Math.min(1, 0.4*fit + 0.6*sep));
+    const ambiguous = margin < 0.16*scale;
 
     return {
-      tone: Number(bestTone), score: bestScore, isHalfThird,
-      ambiguous, candidates: ambiguous ? [Number(bestTone), Number(secondTone)] : [Number(bestTone)],
-      confidence: bestScore
+      tone: best.tone,
+      score: confidence,
+      isHalfThird: best.tone === 3 && best.half,
+      ambiguous,
+      candidates: ambiguous ? [best.tone, second.tone] : [best.tone],
+      confidence,
+      range
     };
   }
 
@@ -6859,22 +7036,36 @@
 
     if(result.ambiguous){
       panel.className = 'tcVerdictPanel ambiguous';
-      titleEl.textContent = `Kurang jelas — kedengeran antara nada ${result.candidates[0]} atau ${result.candidates[1]}`;
-      tipEl.textContent = 'Coba ucapkan lagi lebih jelas, atau lebih dekat ke mic.';
+      const nearMiss = result.candidates.indexOf(target) >= 0;
+      const other = result.candidates.find(x => x !== target);
+      titleEl.textContent = nearMiss
+        ? `Hampir — kurva kamu masih di antara nada ${target} dan nada ${other}.`
+        : `Kurang jelas — kedengeran antara nada ${result.candidates[0]} atau ${result.candidates[1]}`;
+      tipEl.textContent = (nearMiss && TONE_COACH_TIPS[target] && TONE_COACH_TIPS[target][other])
+        ? TONE_COACH_TIPS[target][other]
+        : 'Coba ucapkan lagi lebih jelas, atau lebih dekat ke mic.';
       confEl.textContent = '';
       return;
     }
 
     const correct = result.tone === target;
+    // Gerak nada di bawah 3 semitone itu terlalu tipis buat dinilai mantap, walaupun
+    // arahnya sudah betul -- kasih tau supaya dia belajar melebarkan, bukan cuma "benar".
+    const tooFlat = target !== 1 && typeof result.range === 'number' && result.range < 3;
     panel.className = 'tcVerdictPanel ' + (correct ? 'pass' : 'fail');
-    if(correct && result.isHalfThird){
+    if(correct && tooFlat){
+      titleEl.textContent = `Benar, nada ${target} — tapi masih tipis.`;
+      tipEl.textContent = 'Arah naik-turunnya sudah betul, cuma jaraknya kurang lebar. Coba lebih berani naik/turunnya biar jelas kedengeran.';
+    } else if(correct && result.isHalfThird){
       titleEl.textContent = `Benar! (half-third, wajar buat nada 3 di sini)`;
       tipEl.textContent = 'Nada 3 kamu keluar sebagai "setengah-ketiga" (cuma turun, ga naik lagi) — itu SAH, bukan salah, malah ciri khas native speaker.';
     } else if(correct){
       titleEl.textContent = `Benar! Nada ${target} terdeteksi.`;
       tipEl.textContent = 'Mantap, kurva kamu cocok sama target.';
     } else {
-      titleEl.textContent = `Kedengeran nada ${result.tone}, targetnya nada ${target}.`;
+      titleEl.textContent = result.tone === 1
+        ? `Nadanya kedengeran datar, targetnya nada ${target}.`
+        : `Kedengeran nada ${result.tone}, targetnya nada ${target}.`;
       tipEl.textContent = (TONE_COACH_TIPS[target] && TONE_COACH_TIPS[target][result.tone])
         || 'Coba dengerin contoh lagi, perhatikan naik-turun nadanya.';
     }
@@ -6972,7 +7163,8 @@
     }
 
     const target = TONE_COACH_WORDS[tcWordIndex].tone;
-    const result = tcClassifyContour(contour);
+    const result = tcClassifyContour(contour, tcRegisterRef());
+    tcRegisterPush(contour);            // dicatat SESUDAH dinilai, jadi tidak menilai diri sendiri
     tcDrawCurves(target, contour);
     tcRenderVerdict(target, result);
     $('tcNextBtn').classList.remove('hidden');

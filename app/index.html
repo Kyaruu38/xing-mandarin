@@ -40,9 +40,13 @@
       --hanzi-font:'Noto Sans SC',"Microsoft YaHei","PingFang SC",-apple-system,sans-serif;
       --display-font:'Baloo 2',cursive;
       --hanzi-serif-font:'Noto Serif SC',serif;
-      /* dashboard v4 -- token BARU, prefix --dv4-, TIDAK menyentuh --panel/--shadow-*/dst
+      /* dashboard v4 -- token BARU, prefix --dv4-, TIDAK menyentuh --panel / --shadow-* / dst
          global (dipakai halaman lain). :root di file ini = default LIGHT (lihat --bg:#F7F1DE
          di atas), jadi nilai "light" dari spec taruh di sini. */
+      /* --gold dipakai juga sebagai warna TEKS (pinyin, label). Di tema terang emas murni
+         cuma ~1.7:1 kontrasnya di atas panel krem -- nyaris tak terbaca. --gold-ink adalah
+         versi yang aman dibaca; di tema gelap nilainya balik ke --gold. */
+      --gold-ink:#B9820C;
       --dv4-panel:rgba(255,255,255,.97);
       --dv4-hairline:rgba(28,42,94,0);
       --dv4-shadow:0 18px 44px rgba(31,42,80,.10);
@@ -55,6 +59,7 @@
       --dv4-cloud:#FFFFFF;
     }
     [data-theme="dark"]{
+      --gold-ink:var(--gold);
       --bg:#0B1128; --bg2:#121A38; --panel:#1C2B58; --panel-2:#141F45;
       --track:rgba(255,255,255,.12); --line:#2A3763; --text:#EAF0FF; --text-rgb:234,240,255; --muted:#8D96C4; --muted-rgb:141,150,196;
       --shadow-sm:0 2px 8px rgba(0,0,0,.24);
@@ -280,7 +285,7 @@
     .loginFormPanel label{ display:block; font-size:12.5px; font-weight:700; color:var(--text); margin:0 0 7px; }
     .inputWrap{ position:relative; display:flex; align-items:center; }
     .inputIcon{ position:absolute; left:15px; display:flex; pointer-events:none; color:var(--muted); transition:color .2s ease; }
-    .inputWrap:focus-within .inputIcon{ color:var(--gold); }
+    .inputWrap:focus-within .inputIcon{ color:var(--gold-ink); }
     .loginFormPanel input{ width:100%; height:50px; padding:0 15px 0 44px; font-family:inherit; font-size:14.5px;
       color:var(--text); background:var(--lgField); border:1.5px solid var(--lgFieldLine); border-radius:13px; outline:none;
       transition:border-color .15s ease, box-shadow .15s ease; }
@@ -298,7 +303,7 @@
     .rememberMe input[type=checkbox]:checked{ background:var(--gold); border-color:transparent;
       background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%231C2A5E' stroke-width='3.4'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
       background-repeat:no-repeat; background-position:center; }
-    .forgotLink{ color:var(--gold); font-weight:700; text-decoration:none; }
+    .forgotLink{ color:var(--gold-ink); font-weight:700; text-decoration:none; }
     .forgotLink:hover{ text-decoration:underline; }
 
     #loginBtn{ position:relative; overflow:hidden; width:100%; height:52px; margin-top:22px; padding:0; border:none; border-radius:14px;
@@ -317,7 +322,7 @@
 
     .loginDeviceNote{ display:flex; gap:11px; align-items:flex-start; padding:12px 15px; border-radius:13px;
       background:var(--lgRaise); font-size:12px; line-height:1.55; color:var(--muted); margin-top:22px; }
-    .loginDeviceNote .hz{ font-family:var(--hanzi-font); font-weight:900; color:var(--gold); font-size:15px; flex:0 0 auto; }
+    .loginDeviceNote .hz{ font-family:var(--hanzi-font); font-weight:900; color:var(--gold-ink); font-size:15px; flex:0 0 auto; }
 
     .msg{margin-top:16px; font-size:13px; padding:10px 12px; border-radius:9px; display:none}
     .msg.err{display:flex; align-items:flex-start; gap:8px; background:#FDEDEE; color:#A03A44; border:1px solid #F6CFD2; animation:lgShake .45s;}
@@ -422,7 +427,7 @@
       border-radius:20px; padding:15px 15px 15px 17px; margin-bottom:8px;
       background:var(--dv4-panel); box-shadow:inset 3px 0 0 0 var(--gold), inset 0 0 0 1px var(--dv4-hairline);
     }
-    .sidebarPkgMono{ font-size:9px; letter-spacing:.22em; color:var(--gold); font-weight:800; text-transform:uppercase; }
+    .sidebarPkgMono{ font-size:9px; letter-spacing:.22em; color:var(--gold-ink); font-weight:800; text-transform:uppercase; }
     .sidebarPkgName{ display:block; font-size:13.5px; font-weight:700; color:var(--text); margin:4px 0 2px; }
     .sidebarPkgUntil{ display:block; font-size:11.5px; color:var(--muted); }
     .sidebarDev{
@@ -503,7 +508,10 @@
     .mobileHeader{
       display:none; align-items:center; justify-content:space-between; gap:10px;
       padding:10px 14px; background:var(--panel-2); border-bottom:1px solid var(--line);
-      position:sticky; top:0; z-index:20;
+      /* z-index 40 (bukan 20): header ini stacking context, dan .dashV4-avaMenu di dalamnya
+         harus bisa menang lawan .bottomNav (z-20) -- kalau seri, nav menang karena lebih
+         belakang di DOM dan tombol Keluar jadi tidak bisa diklik di layar pendek. */
+      position:sticky; top:0; z-index:40;
     }
     .mobileHeaderLogo .sidebarLogoIconWrap{ width:34px; height:32px; border-radius:9px; }
     .mobileHeaderLogo img{ width:26px; height:26px; object-fit:contain; display:block; }
@@ -573,7 +581,7 @@
        (--dv4-panel), border gold TIPIS (1px, warisan dari .packageBadge base), teks gold. Padding
        dikecilkan dari base (8px 16px) biar bedanya bukan cuma warna tapi juga ukuran. */
     .packageBadge.vip{
-      background:var(--dv4-panel); color:var(--gold); border-color:var(--gold);
+      background:var(--dv4-panel); color:var(--gold-ink); border-color:var(--gold);
       box-shadow:none; padding:6px 14px;
     }
     .packageBadge.vip .planIcon{ display:none; }
@@ -640,7 +648,6 @@
       background:rgba(var(--text-rgb),.06); border:none; border-radius:12px;
       color:rgba(var(--text-rgb),.7); font-weight:700; font-size:13px;
     }
-    .foot{margin-top:22px; text-align:center; color:var(--muted); font-size:11px}
 
     .statGrid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-top:24px; }
     .statCard{ background:var(--panel); border-radius:22px; padding:20px; display:flex; flex-direction:column; animation:fadeUp .5s ease both; }
@@ -671,8 +678,11 @@
     .continueStar.gold{ background:#F7C64D; animation:twinkle 3.8s ease-in-out infinite .5s; }
     .continueSparkle{ position:absolute; animation:twinkle 4.6s ease-in-out infinite .3s; pointer-events:none; }
     .continueCardText{ position:relative; display:flex; flex-direction:column; min-width:0; }
-    .continueCardLabel{ font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.16em; color:var(--gold); }
-    .continueCardTitle{ margin-top:9px; font-family:var(--display-font); font-size:26px; font-weight:700; color:#fff; }
+    .continueCardLabel{ font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.16em; color:var(--gold-ink); }
+    /* color:#fff dulu untuk .continueCard (kartu navy lama). Sekarang span ini dipakai di
+       dalam .dashV4-card yang terang, jadi pakai token; putih di-scope ke kartu lamanya. */
+    .continueCardTitle{ margin-top:9px; font-family:var(--display-font); font-size:26px; font-weight:700; color:var(--text); }
+    .continueCard .continueCardTitle{ color:#fff; }
     .continueCardSubtitle{ margin-top:5px; font-size:13px; color:rgba(255,255,255,.65); }
     .continueCardArrow{
       position:relative; width:58px; height:58px; border-radius:50%; background:var(--gold); flex-shrink:0;
@@ -799,7 +809,11 @@
        padding 26px, shadow, hairline, mobile override 22px/24px) -- BUKAN disesuaikan ke markup
        lama, sesuai instruksi "salin apa adanya". background PAKAI --dv4-panel (translucent) --
        --panel global TIDAK disentuh. ---- */
+    /* margin-top:0 WAJIB: class ini juga dipakai pada <button> (#practiceBtn), dan ada
+       aturan global button{ width:100%; margin-top:22px } yang bikin kartunya turun 22px
+       sehingga tidak sejajar dengan kartu sebelahnya. */
     .dashV4-card{
+      margin-top:0;
       background:var(--dv4-panel); border-radius:28px; padding:26px;
       box-shadow:var(--dv4-shadow), inset 0 0 0 1px var(--dv4-hairline);
       position:relative; overflow:hidden;
@@ -1015,11 +1029,12 @@
     @keyframes dashV4Dtw{ 0%,100%{ opacity:.28; } 50%{ opacity:.85; } }
     @keyframes dashV4RingP{ 0%{ transform:scale(.6); opacity:.9; } 70%,100%{ transform:scale(1.7); opacity:0; } }
     .dashV4-skyFoot{ display:flex; align-items:center; justify-content:space-between; margin-top:13px; font-family:var(--dv4-mono); font-size:11px; color:var(--muted); flex-wrap:wrap; gap:6px; }
-    .dashV4-skyFoot b{ color:var(--gold); font-weight:700; }
+    .dashV4-skyFoot b{ color:var(--gold-ink); font-weight:700; }
 
     /* ---- floating pill (mockup .tile) -- background PAKAI --dv4-panel juga ---- */
     .dashV4-tileRow{ display:flex; flex-wrap:wrap; gap:10px; }
     .dashV4-tile{
+      margin-top:0;                       /* lihat catatan button{} global di .dashV4-card */
       border-radius:999px; min-height:52px; padding:9px 20px 9px 10px; display:flex; align-items:center; gap:11px;
       background:var(--dv4-panel); box-shadow:var(--dv4-shadow), inset 0 0 0 1px var(--dv4-hairline);
       transition:transform .25s ease, box-shadow .25s ease; cursor:pointer; border:none; text-align:left;
@@ -1307,7 +1322,7 @@
     .weakItem{display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--line); font-size:13px}
     .weakItem:last-child{border-bottom:none}
     .weakHanzi{font-size:20px; font-weight:700; width:40px; flex-shrink:0; font-family:var(--hanzi-font)}
-    .weakPinyin{width:70px; flex-shrink:0; color:var(--gold)}
+    .weakPinyin{width:70px; flex-shrink:0; color:var(--gold-ink)}
     .weakMeaning{flex:1; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
     .weakMastery{color:var(--muted); font-size:11px; flex-shrink:0}
     /* browse / kamus — search bar chrome ported from .dc.html isMaterials (line 269).
@@ -1341,6 +1356,9 @@
       transition:border-color .15s ease, box-shadow .15s ease;
     }
     .browseSearchInput:focus{ border-color:var(--gold); box-shadow:0 0 0 4px rgba(242,176,30,.14); }
+    /* .hubSearchInput punya outline:none tanpa pengganti -- pengguna keyboard kehilangan
+       penanda fokus. Samakan dengan .browseSearchInput di atas. */
+    .hubSearchInput:focus{ border-color:var(--gold); box-shadow:0 0 0 4px rgba(242,176,30,.14); }
     .browseSearchInput::placeholder{ color:rgba(var(--text-rgb),.4); }
     /* Cream-on-white contrast fix, same .mockSetCard token pair (var(--panel-2) + var(--line)
        border) -- ported, not invented. Horizontal inset lives on .browseItem (not here) so each
@@ -1350,7 +1368,7 @@
     .browseItem{display:flex; align-items:center; gap:10px; padding:10px 16px; border-bottom:1px solid var(--line); font-size:13px}
     .browseItem:last-child{border-bottom:none}
     .browseHanzi{font-size:20px; font-weight:700; width:44px; flex-shrink:0; font-family:var(--hanzi-font)}
-    .browsePinyin{width:76px; flex-shrink:0; color:var(--gold)}
+    .browsePinyin{width:76px; flex-shrink:0; color:var(--gold-ink)}
     .browseMeaning{flex:1; color:var(--text)}
     .browseCount{font-size:11px; color:var(--muted); text-align:center; margin:10px 0 0}
     .browseStrokeBtn{
@@ -1442,6 +1460,12 @@
       background:var(--panel); color:var(--text); font-size:12.5px; font-weight:700;
       cursor:pointer; transition:background .15s ease, border-color .15s ease; }
     .mockBackBtn:hover{ background:var(--panel-2, var(--panel)); border-color:var(--gold-soft); }
+    /* Target sentuh minimal ~40px di layar sentuh (chip/tab/link tadinya 32px atau lebih kecil). */
+    @media (max-width:760px){
+      .hubChip, .strokeTab, .mockBackBtn{ min-height:40px; }
+      .forgotLink{ display:inline-flex; align-items:center; min-height:40px; }
+      .rememberMe{ min-height:40px; }
+    }
     .mockSectionTitle{ margin:14px 0 2px; font-size:15px; font-weight:800; color:var(--text); }
 
     /* ===== Daftar set (langkah 3) juga kotak, sebentuk dengan hub =====
@@ -1470,8 +1494,10 @@
       font-size:10.5px; letter-spacing:.08em; color:var(--muted); opacity:.75; }
     .appVersionLine.inMenu{ margin:10px 4px 2px; text-align:left; }
 
+    /* z-index 150: di ATAS konten & bottom nav (20), tapi di BAWAH modal overlay (200).
+       bottom pakai calc + inset (bukan max) supaya di HP berponi tetap naik dari home bar. */
     #updateBanner{ position:fixed; left:50%; transform:translateX(-50%) translateY(140%);
-      bottom:max(18px, env(safe-area-inset-bottom)); z-index:9999;
+      bottom:calc(18px + env(safe-area-inset-bottom, 0px)); z-index:150;
       display:flex; align-items:center; gap:12px; max-width:min(520px, calc(100vw - 24px));
       padding:12px 14px 12px 16px; border-radius:14px;
       background:var(--panel); color:var(--text);
@@ -1490,7 +1516,9 @@
       line-height:1; cursor:pointer; }
     #updateBannerClose:hover{ color:var(--text); }
     @media (max-width:520px){
-      #updateBanner{ left:12px; right:12px; transform:translateY(140%); max-width:none; }
+      /* naikkan di atas .bottomNav (tinggi ~59px + inset) supaya nav tetap bisa ditekan */
+      #updateBanner{ left:12px; right:12px; transform:translateY(140%); max-width:none;
+        bottom:calc(78px + env(safe-area-inset-bottom, 0px)); }
       #updateBanner.show{ transform:translateY(0); }
     }
     /* .hubCard = shared shape for both the real (button, clickable-later) and coming-soon (div,
@@ -1535,11 +1563,13 @@
 
     /* mock test list */
     .mocklist{max-width:1200px}
-    #mockList{ display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:16px; }
+    /* min(320px,100%) supaya state loading/kosong (saat class .mockSetGrid belum dipasang)
+       tidak memaksa kolom 320px di layar 375px lalu terpotong. */
+    #mockList{ display:grid; grid-template-columns:repeat(auto-fill,minmax(min(320px,100%),1fr)); gap:16px; }
     .mockSetCard{background:var(--panel-2); border:1px solid var(--line); border-radius:16px; padding:16px 18px}
     .mockSetTitle{font-weight:700; font-size:14px; margin-bottom:4px}
     .mockSetMeta{font-size:12px; color:var(--muted); margin-bottom:8px}
-    .mockSetScore{font-size:12px; color:var(--gold); margin-bottom:10px; font-weight:600}
+    .mockSetScore{font-size:12px; color:var(--gold-ink); margin-bottom:10px; font-weight:600}
     .mockSetBtn{margin-top:0}
     /* mock test attempt */
     .attempt{max-width:920px}
@@ -1577,13 +1607,13 @@
     .qPassageTrans{font-size:13px; color:var(--muted); margin-top:8px; font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
     .qStem{font-size:16px; line-height:1.75; margin-bottom:6px; font-family:var(--hanzi-font); white-space:pre-line}
     .qStemTrans{font-size:13px; color:var(--muted); margin-bottom:14px}
-    ruby rt{ font-size:0.55em; color:var(--gold); font-weight:600; user-select:none; }
+    ruby rt{ font-size:0.55em; color:var(--gold-ink); font-weight:600; user-select:none; }
     .choiceList{display:flex; flex-direction:column; gap:8px; margin-top:10px}
     .choiceItem{display:flex; align-items:baseline; flex-wrap:wrap; gap:8px; width:auto; margin-top:0; padding:12px 14px; background:var(--panel); border:1px solid var(--line); border-radius:12px; cursor:pointer; font-size:14px; color:var(--text); font-weight:400; text-align:left; line-height:normal}
     .choiceItem.active{border-color:var(--gold); background:rgba(242,176,30,.10)}
-    .choiceKey{font-weight:700; color:var(--gold); flex-shrink:0}
+    .choiceKey{font-weight:700; color:var(--gold-ink); flex-shrink:0}
     .choiceHanzi{font-family:var(--hanzi-font); font-size:16px}
-    .choicePinyin{color:var(--gold); font-size:12px}
+    .choicePinyin{color:var(--gold-ink); font-size:12px}
     .choiceTrans{color:var(--muted); font-size:12px}
     .segmentList{display:flex; flex-direction:column; gap:8px; margin-top:10px}
     .segmentItem{display:flex; align-items:center; gap:10px; width:auto; margin-top:0; padding:12px 14px; background:var(--panel); border:1px solid var(--line); border-radius:12px; cursor:pointer; color:var(--text); font-weight:400; text-align:left; line-height:normal}
@@ -1692,7 +1722,7 @@
     .reviewChoice.isCorrect{background:rgba(47,158,91,.10); border-color:var(--ok)}
     .reviewChoice.isWrongPick{background:rgba(214,69,69,.10); border-color:var(--danger)}
     .reviewChoiceKey{font-weight:700; color:var(--text)}
-    .reviewChoicePinyin{color:var(--gold); font-size:11px}
+    .reviewChoicePinyin{color:var(--gold-ink); font-size:11px}
     .reviewChoiceTrans{color:var(--muted); font-size:11px}
     .reviewMark{color:var(--muted); font-size:11px; margin-left:auto}
     .reviewOrderRow{font-size:13px; margin-bottom:6px; line-height:1.6}
@@ -1768,8 +1798,6 @@
       .bottomNav{ display:flex; }
       .mainContent{ padding:20px 14px calc(76px + env(safe-area-inset-bottom, 0px)); }
       .statGrid{ grid-template-columns:repeat(2,1fr); }
-      .adminListHead{ display:none; }
-      .adminRow{ grid-template-columns:1fr; gap:6px; }
     }
 
     /* ===== Dashboard profile consolidation (MOBILE-ONLY, <=760px) =====
@@ -1815,6 +1843,14 @@
       display:grid; grid-template-columns:1.6fr 1.4fr 1fr .8fr 1fr 1fr; gap:10px; align-items:center;
       padding:14px 16px; border-bottom:1px solid var(--line); cursor:pointer;
       transition:background .15s ease;
+    }
+    /* Override mobile admin: HARUS setelah aturan dasar .adminListHead/.adminRow di atas.
+       Sebelumnya ditulis di dalam blok @media 760px yang posisinya LEBIH AWAL dari aturan
+       dasar, jadi kalah cascade (specificity sama, yang belakangan menang) dan tabel admin
+       tetap 6 kolom di HP -- kolom email jadi selebar 13px. */
+    @media (max-width:760px){
+      .adminListHead{ display:none; }
+      .adminRow{ grid-template-columns:1fr; gap:6px; }
     }
     .adminRow:last-child{ border-bottom:none; }
     .adminRow:hover{ background:var(--panel); }
@@ -1922,7 +1958,7 @@
     }
     .radicalCard:hover{ border-color:var(--gold); }
     .radicalCardGlyph{ font-family:var(--hanzi-serif-font); font-size:28px; color:var(--text); line-height:1; }
-    .radicalCardPinyin{ font-size:10.5px; color:var(--gold); font-weight:700; margin-top:4px; }
+    .radicalCardPinyin{ font-size:10.5px; color:var(--gold-ink); font-weight:700; margin-top:4px; }
     .radicalCardCheck{
       position:absolute; top:4px; right:6px; font-size:11px; color:var(--ok); display:none;
     }
@@ -1969,7 +2005,7 @@
     .pinyinToneBtn .toneSyl{ display:block; font-size:20px; }
     .pinyinToneBtn .toneNote{ display:block; font-size:10px; color:var(--muted); font-weight:600; margin-top:4px; }
     .pinyinBasicsContent{ font-size:13.5px; line-height:1.75; color:var(--text); }
-    .pinyinBasicsContent h4{ font-size:14px; margin:18px 0 6px; color:var(--gold); }
+    .pinyinBasicsContent h4{ font-size:14px; margin:18px 0 6px; color:var(--gold-ink); }
     .pinyinBasicsContent h4:first-child{ margin-top:0; }
     .pinyinBasicsContent p{ margin:0 0 8px; }
     .pinyinBasicsContent ul{ margin:0 0 8px; padding-left:20px; }
@@ -1987,7 +2023,7 @@
     .sandhiExampleGrid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:10px; margin-bottom:14px; }
     .sandhiExampleCard{ background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:10px; text-align:center; }
     .sandhiExampleHanzi{ font-family:var(--hanzi-serif-font); font-size:22px; color:var(--text); }
-    .sandhiExamplePinyin{ font-size:11.5px; color:var(--gold); font-weight:700; margin-top:2px; }
+    .sandhiExamplePinyin{ font-size:11.5px; color:var(--gold-ink); font-weight:700; margin-top:2px; }
     .sandhiExampleBtns{ display:flex; gap:6px; justify-content:center; margin-top:8px; }
     .sandhiAudioBtn{
       width:auto; margin-top:0; padding:6px 8px; border-radius:8px; background:var(--panel-2);
@@ -2098,9 +2134,9 @@
     @media (prefers-reduced-motion: reduce){ .gr-dots span, .gr-cloud{ animation:none !important; } }
 
     .gr-crumb{ font-family:var(--dv4-mono); font-size:9.5px; letter-spacing:.2em; color:var(--muted); margin-bottom:14px; }
-    .gr-crumb b{ color:var(--gold); font-weight:500; }
+    .gr-crumb b{ color:var(--gold-ink); font-weight:500; }
     .gr-h1{ font-family:var(--display-font); font-weight:800; font-size:38px; margin:0; letter-spacing:-.015em; color:var(--text); }
-    .gr-h1 em{ font-style:normal; color:var(--gold); }
+    .gr-h1 em{ font-style:normal; color:var(--gold-ink); }
     .gr-lead{ color:var(--muted); font-size:14px; margin:10px 0 0; max-width:58ch; line-height:1.65; }
 
     .gr-hero{
@@ -3291,7 +3327,7 @@
      Kalau keduanya beda, user yang masih buka tab lama bakal dikasih
      banner "ada versi baru".
      ============================================================ */
-  const APP_VERSION = '4.1';
+  const APP_VERSION = '4.2';
 
   const SUPABASE_URL  = 'https://xzgvhzmmqbijpbrhagjf.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6Z3Zoem1tcWJpanBicmhhZ2pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0OTA4NjMsImV4cCI6MjA5OTA2Njg2M30.9OtBJIBDDUhhSsvtz9Pql12hWToGzmULOGh7Tj-vzNs';
@@ -4630,6 +4666,10 @@
 
   function openPractice(){
     practiceOrigin = 'dash';
+    // Reset wajib: keluar dari Survival Kit lewat sidebar/bottom-nav tidak melewati
+    // backToDash(), jadi flag-nya bisa tersangkut dan bikin flashcard biasa memakai
+    // label + audio Survival.
+    survivalModeActive = false;
     setActiveNav('latihan');
     $('dashCard').classList.add('hidden');
     $('practiceCard').classList.remove('hidden');
@@ -4837,6 +4877,10 @@
 
   async function gradeCard(grade){
     if(!revealed) return;
+    // Konsumsi 'revealed' SEBELUM await pertama. Tanpa ini, tap kedua pada tombol nilai
+    // (koneksi lambat) masuk lagi dengan sessionIndex yang sama, menaikkannya dua kali,
+    // dan satu kartu terlewat tanpa pernah ditampilkan.
+    revealed = false;
     const card = sessionQueue[sessionIndex];
     const next = sm2Update(card.prev, grade);
 
@@ -4857,7 +4901,8 @@
       last_reviewed: next.last_reviewed
     }, { onConflict: 'user_id,item_key' });
 
-    if(error){ showAlertModal(t('errSaveProgress') + ' ' + error.message); return; }
+    // kembalikan reveal supaya tombol nilai bisa ditekan lagi setelah gagal simpan
+    if(error){ revealed = true; showAlertModal(t('errSaveProgress') + ' ' + error.message); return; }
 
     sessionIndex += 1;
     if(sessionIndex >= sessionQueue.length){
@@ -7669,7 +7714,10 @@
   // only, computed from RPC results already in memory -- never persisted, never touches the RPC/schema.
   // Combined-attempt max is derived from how many real sections exist (2*100 or 3*100), not a hardcoded
   // level lookup, so it can't drift from what the set actually contains.
-  const HSK_PASS_LINE = (max) => max === 200 ? 120 : 180; // HSK1-2 line / HSK3-4 line
+  // 60% dari skor maksimum -- kriteria resmi HSK (120/200 untuk HSK1-2, 180/300 untuk HSK3+).
+  // Dulu ditulis `max === 200 ? 120 : 180`, sehingga grup berisi SATU set (max=100) dapat
+  // batas 180 yang mustahil dicapai: skor sempurna pun dinyatakan TIDAK LULUS.
+  const HSK_PASS_LINE = (max) => Math.round(max * 0.6);
   const SECTION_TABS = [
     { key:'all', label:'Set Test' },
     { key:'reading', label:'Reading' },
@@ -7977,14 +8025,14 @@
       card.className = 'hubCard';
       card.innerHTML = `
         <div class="hubCardCover lv${s.hsk_level}">
-          <span class="hubCardCoverNum">${setCoverNum(s.title, i)}</span>
+          <span class="hubCardCoverNum">${escapeHtml(setCoverNum(s.title, i))}</span>
           ${attempt ? `<span class="mockSetDoneTag">${attempt.score}/${attempt.total_points}</span>` : ''}
         </div>
         <div class="hubCardBody">
-          <div class="hubCardTitle">${s.title}</div>
-          <div class="mockSetMeta">HSK ${s.hsk_level} · ${SECTION_LABEL[s.section] || s.section}<br>${s.total_questions} ${t('soal')} · ${minutes} ${t('menit')}</div>
+          <div class="hubCardTitle">${escapeHtml(s.title)}</div>
+          <div class="mockSetMeta">HSK ${s.hsk_level} · ${escapeHtml(SECTION_LABEL[s.section] || s.section)}<br>${s.total_questions} ${t('soal')} · ${minutes} ${t('menit')}</div>
           ${attempt ? `<div class="mockSetScore">${t('terakhir')} ${formatMockDate(attempt.created_at)}</div>` : ''}
-          <button class="mockSetBtn" data-set="${s.set_id}">${attempt ? t('ulangi') : t('mulai')}</button>
+          <button class="mockSetBtn" data-set="${escapeHtml(s.set_id)}">${attempt ? t('ulangi') : t('mulai')}</button>
         </div>`;
       wrap.appendChild(card);
     });
@@ -8029,10 +8077,10 @@
           ${allAttempted ? `<span class="mockSetDoneTag">\u2713</span>` : ''}
         </div>
         <div class="hubCardBody">
-          <div class="hubCardTitle">${code}</div>
-          <div class="mockSetMeta">HSK ${lv} · ${sectionLabels}<br>${totalQuestions} ${t('soal')} · ${totalMinutes} ${t('menit')}</div>
+          <div class="hubCardTitle">${escapeHtml(code)}</div>
+          <div class="mockSetMeta">HSK ${lv} · ${escapeHtml(sectionLabels)}<br>${totalQuestions} ${t('soal')} · ${totalMinutes} ${t('menit')}</div>
           ${scoreLine}
-          <button class="mockSetBtn" data-group="${code}">${allAttempted ? t('ulangi') : t('mulai')}</button>
+          <button class="mockSetBtn" data-group="${escapeHtml(code)}">${allAttempted ? t('ulangi') : t('mulai')}</button>
         </div>`;
       wrap.appendChild(card);
     });
@@ -8346,6 +8394,13 @@
   let attemptIndex = 0;
   let attemptDeadline = null;
   let attemptTimerInterval = null;
+  /* Kunci re-entrant submit. Dulu timer baru dihentikan SETELAH modal "masih ada soal
+     kosong" ditutup, jadi kalau waktu habis selagi modal terbuka, updateAttemptTimer
+     memanggil submitAttempt(true) dan tercatat DUA baris test_attempts untuk satu sesi.
+     Sekarang timer dimatikan lebih dulu dan pemanggilan kedua langsung ditolak.
+     Dideklarasikan di sini (bukan dekat submitAttempt) supaya berada di atas
+     startAttempt()/startCombinedAttempt() yang me-resetnya di pintu masuk. */
+  let attemptSubmitting = false;
   let attemptShowPinyin = false;
   let attemptShowTranslation = false;
   let attemptGroupSets = null;              // != null kalau ini exam gabungan (tab Semua)
@@ -8361,6 +8416,7 @@
     // startCombinedAttempt() (confirmed -- only 2 places in this file remove('hidden') on
     // attemptCard), so resetting here covers retake, Mock List, and any future entry path.
     $('attemptSubmitBtn').disabled = false;
+    attemptSubmitting = false;            // alasan sama: reset di pintu masuk
     const { data: setRow, error: setErr } = await sb
       .from('test_sets').select('set_id,hsk_level,section,title,time_limit_seconds,total_questions')
       .eq('set_id', setId).single();
@@ -8402,6 +8458,7 @@
   async function startCombinedAttempt(code, groupSetsRaw){
     // See startAttempt()'s identical line -- entry-point reset, DECISIONS_NEEDED #46.
     $('attemptSubmitBtn').disabled = false;
+    attemptSubmitting = false;
     const groupSets = groupSetsRaw.slice().sort((a,b) => sectionRank(a.section) - sectionRank(b.section));
     const setIds = groupSets.map(s => s.set_id);
 
@@ -8469,10 +8526,13 @@
   }
 
   function startAttemptTimer(seconds){
-    attemptDeadline = Date.now() + seconds * 1000;
-    updateAttemptTimer();
+    // stopAttemptTimer() HARUS pertama: dulu updateAttemptTimer() dipanggil duluan, dan kalau
+    // sisa waktu sudah <=0 (mis. time_limit_seconds null/0) ia memanggil stopAttemptTimer()
+    // SEBELUM setInterval terpasang -> interval yatim yang auto-submit untuk kedua kalinya.
     stopAttemptTimer();
+    attemptDeadline = Date.now() + (Number(seconds) || 0) * 1000;
     attemptTimerInterval = setInterval(updateAttemptTimer, 1000);
+    updateAttemptTimer();
   }
 
   function stopAttemptTimer(){
@@ -8583,7 +8643,7 @@
       const trans = (attemptShowTranslation && c.id) ? `<span class="choiceTrans">${c.id}</span>` : '';
       return `<button type="button" class="choiceItem${active}" data-key="${c.key}">
         <span class="choiceKey">${c.key}</span>
-        <span class="choiceHanzi">${c.hanzi}</span>
+        <span class="choiceHanzi">${escapeHtml(c.hanzi)}</span>
         ${pinyin}${trans}
       </button>`;
     }).join('');
@@ -8792,12 +8852,14 @@
   }
 
   async function submitAttempt(force){
+    if(attemptSubmitting) return;
+    attemptSubmitting = true;
+    stopAttemptTimer();
     const unanswered = attemptQuestions.filter(q => !isQuestionAnswered(q)).length;
     if(!force && unanswered > 0){
       const ok = await showConfirmModal(t('confirmUnanswered').replace('{count}', unanswered));
-      if(!ok) return;
+      if(!ok){ attemptSubmitting = false; startAttemptTimer(Math.max(0, Math.round((attemptDeadline - Date.now())/1000))); return; }
     }
-    stopAttemptTimer();
     $('attemptSubmitBtn').disabled = true;
 
     // Semua esai (essay_text non-kosong) digrading sekali di sini, paralel -- jumlahnya kecil
@@ -8830,6 +8892,7 @@
         if(error){
           showAlertModal(t('errSubmitFailedNamed').replace('{title}', s.title) + ' ' + error.message);
           $('attemptSubmitBtn').disabled = false;
+          attemptSubmitting = false;          // lepas kunci: murid harus bisa mencoba submit lagi
           const remain = Math.max(0, Math.round((attemptDeadline - Date.now()) / 1000));
           if(remain > 0) startAttemptTimer(remain);
           return;
@@ -8887,6 +8950,7 @@
     if(error){
       showAlertModal(t('errSubmitFailed') + ' ' + error.message);
       $('attemptSubmitBtn').disabled = false;
+      attemptSubmitting = false;            // lepas kunci: submit boleh dicoba lagi
       const remain = Math.max(0, Math.round((attemptDeadline - Date.now()) / 1000));
       if(remain > 0) startAttemptTimer(remain);
       return;
@@ -9098,7 +9162,7 @@
     let html = `<div class="reviewHead"><span>${t('questionNumber').replace('{n}', item.order_index)}</span>${badge}</div>`;
 
     if(!q || !q.payload){
-      html += `<div class="reviewExplain"><span class="reviewExplainLabel">${t('explanationLabel')}</span>${item.explanation || '-'}</div>`;
+      html += `<div class="reviewExplain"><span class="reviewExplainLabel">${t('explanationLabel')}</span>${escapeHtml(item.explanation || '-')}</div>`;
       return html;
     }
 
@@ -9137,7 +9201,7 @@
       html += buildReviewImageMatchChoices(p.image_choices, item.user_answer, item.correct_answer);
     }
 
-    html += `<div class="reviewExplain"><span class="reviewExplainLabel">${t('explanationLabel')}</span>${item.explanation || '-'}</div>`;
+    html += `<div class="reviewExplain"><span class="reviewExplainLabel">${t('explanationLabel')}</span>${escapeHtml(item.explanation || '-')}</div>`;
     return html;
   }
 
@@ -9165,7 +9229,7 @@
       const mark = c.key === userKey ? t('yourAnswer') : (c.key === correctKey ? t('correctAnswerLabel') : '');
       return `<div class="reviewChoice${cls}">
         <span class="reviewChoiceKey">${c.key}</span>
-        <span class="choiceHanzi">${c.hanzi}</span>
+        <span class="choiceHanzi">${escapeHtml(c.hanzi)}</span>
         ${pinyin}${trans}
         <span class="reviewMark">${mark}</span>
       </div>`;
@@ -9177,7 +9241,7 @@
     const segMap = new Map(segments.map(s => [s.key, s]));
     const describe = (keys) => (keys || []).map(k => {
       const s = segMap.get(k);
-      if(!s) return k;
+      if(!s) return escapeHtml(k);
       const pinyin = s.pinyin ? ` (${s.pinyin})` : '';
       const trans = s.id ? ` · ${s.id}` : '';
       return `${s.hanzi || s.text}${pinyin}${trans}`;

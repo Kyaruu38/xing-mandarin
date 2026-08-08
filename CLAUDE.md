@@ -132,6 +132,41 @@ desktop ikut berubah karena aturan ditulis di luar media query.
 **Batas ukuran SQL Editor Supabase.** File di atas ~250 KB ditolak dengan "Query is too
 large". 211 KB masih lolos, 272 KB gagal. Pecah file besar jadi beberapa bagian.
 
+**Komentar CSS jangan mengandung `*/` di dalam teksnya.** Pernah kejadian: komentar
+berisi `--shadow-*/dst` menutup dirinya lebih awal, sehingga deklarasi di baris
+berikutnya (`--dv4-panel`) ikut tertelan dan tidak pernah terdefinisi di tema terang —
+semua kartu dashboard kehilangan background. Tulis `--shadow-* / dst` (pakai spasi).
+
+**Override di dalam `@media` harus ditulis SETELAH aturan dasarnya.** Specificity-nya
+sama, jadi yang belakangan menang. `.adminListHead`/`.adminRow` pernah punya override
+mobile di blok media yang posisinya lebih awal dari aturan dasar, jadi tabel admin tetap
+6 kolom di HP.
+
+**Elemen `position:fixed` baru harus dicek terhadap `.bottomNav`.** Nav mobile ada di
+`bottom:0` dengan `z-index:20`. Banner update pernah dipasang di `bottom:18px` dengan
+`z-index:9999` sehingga menutupi seluruh nav *dan menelan sentuhannya*. Aturan sekarang:
+di bawah 760px naikkan ke `bottom:calc(78px + env(safe-area-inset-bottom))`, dan pakai
+z-index di bawah modal overlay (200).
+
+**`position:sticky` + `z-index` membuat stacking context.** `.mobileHeader` punya
+`z-index:20`; dropdown di dalamnya tidak akan pernah bisa melewati nilai itu di level
+root, berapa pun z-index-nya. Kalau seri dengan `.bottomNav` (juga 20), nav menang karena
+lebih belakang di DOM — tombol Keluar jadi tidak bisa diklik di layar pendek.
+
+**Warna emas `--gold` jangan dipakai sebagai warna TEKS.** Di tema terang kontrasnya
+cuma ~1,7:1 di atas panel krem. Pakai `--gold-ink` (gelap di terang, emas di gelap).
+
+**`git diff --stat` tidak berguna untuk `grammar-data.js`.** Seluruh data ada dalam satu
+baris raksasa, jadi menambah 44 poin pun terbaca "6 baris berubah". Verifikasi dengan
+menghitung `"hsk":` di dalamnya, bukan jumlah baris.
+
+**Entitlement level TIDAK dijaga RLS (belum).** `test_sets`/`question_bank`/`vocab` hanya
+dipagari di JavaScript sampai `sql/13_security_hardening.sql` di-COMMIT. Selama belum,
+jangan anggap konten level tinggi aman dari akun paket rendah.
+
+**Halaman login membaca `vocab` SEBELUM user login** (kartu Kata Hari Ini, `hsk_level<=3`,
+role anon). Jangan pernah mencabut SELECT anon pada `vocab` sepenuhnya — persempit saja.
+
 **`Success. No rows returned` bukan jaminan berhasil.** Pesan ini sama persis baik saat
 `UPDATE` mengenai ribuan baris maupun saat tidak mengenai apa pun. Selalu verifikasi dengan
 `SELECT count(*)`. Pernah kejadian migrasi masih `ROLLBACK` sehingga semua file arti/contoh

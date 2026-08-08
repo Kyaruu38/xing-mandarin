@@ -2060,6 +2060,7 @@
       --gr-pop:cubic-bezier(.34,1.56,.64,1); --gr-ease:cubic-bezier(.22,1,.36,1);
       --gr-c1a:#2FA37B; --gr-c1b:#48D1A0; --gr-c2a:#4A86D8; --gr-c2b:#63ABF5;
       --gr-c3a:#E0713F; --gr-c3b:#FA9A5E; --gr-c4a:#8B6FD4; --gr-c4b:#AC8DF5;
+      --gr-c5a:#C24E72; --gr-c5b:#E2769B; --gr-c6a:#1F7A8C; --gr-c6b:#39A7BC;
     }
     [data-theme="light"]{
       --gr-pill:#FFFFFF; --gr-hairline:rgba(28,42,94,.07);
@@ -2910,7 +2911,7 @@
           <section id="grView1">
             <div class="gr-crumb"><span id="grCrumb1Label">MATERIALS · GRAMMAR</span></div>
             <h1 class="gr-h1"><span id="grShelfTitleA">Rak</span> <em id="grShelfTitleB">Tata Bahasa</em></h1>
-            <p class="gr-lead" id="grShelfLead">Empat buku, satu per level. Baca sebab, kumpulin stempelnya.</p>
+            <p class="gr-lead" id="grShelfLead">Enam buku, satu per level. Baca sebab, kumpulin stempelnya.</p>
             <div class="gr-hero" id="grHero"></div>
             <div class="gr-shelf" id="grShelf"></div>
             <button type="button" class="practiceExit" id="grExitBtn">Kembali ke Materi</button>
@@ -3290,7 +3291,7 @@
      Kalau keduanya beda, user yang masih buka tab lama bakal dikasih
      banner "ada versi baru".
      ============================================================ */
-  const APP_VERSION = '4.0';
+  const APP_VERSION = '4.1';
 
   const SUPABASE_URL  = 'https://xzgvhzmmqbijpbrhagjf.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6Z3Zoem1tcWJpanBicmhhZ2pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0OTA4NjMsImV4cCI6MjA5OTA2Njg2M30.9OtBJIBDDUhhSsvtz9Pql12hWToGzmULOGh7Tj-vzNs';
@@ -3527,7 +3528,7 @@
           hubCardVocabTitle:'Deck Kosakata', hubCardVocabMeta:'Flashcard per level',
           hubCardGrammarTitle:'Grammar', hubCardGrammarMeta:'Pola kalimat per level',
           grCrumbMaterials:'MATERIALS · GRAMMAR', grShelfTitleA:'Rak', grShelfTitleB:'Tata Bahasa',
-          grShelfLead:'Empat buku, satu per level. Baca sebab, kumpulin stempelnya.',
+          grShelfLead:'Enam buku, satu per level. Baca sebab, kumpulin stempelnya.',
           grAllBooks:'Semua buku', grSearchPlaceholder:'Cari bab…', grNoResults:'Gak ketemu. Coba kata kunci lain.',
           grLevelTag:'LEVEL {n}', grChapCountLabel:'bab pola kalimat',
           grBookTitlePrefix:'Buku', grBookLeadDone:'Semua {n} bab kelar. Rapi banget.',
@@ -3700,7 +3701,7 @@
           hubCardVocabTitle:'Vocab Deck', hubCardVocabMeta:'Flashcard deck, per level',
           hubCardGrammarTitle:'Grammar', hubCardGrammarMeta:'Sentence patterns, per level',
           grCrumbMaterials:'MATERIALS · GRAMMAR', grShelfTitleA:'Grammar', grShelfTitleB:'Shelf',
-          grShelfLead:'Four books, one per level. Read the why, collect the stamps.',
+          grShelfLead:'Six books, one per level. Read the why, collect the stamps.',
           grAllBooks:'All books', grSearchPlaceholder:'Search chapters…', grNoResults:'No matches. Try another keyword.',
           grLevelTag:'LEVEL {n}', grChapCountLabel:'sentence pattern chapters',
           grBookTitlePrefix:'Book', grBookLeadDone:'All {n} chapters done. Nicely done.',
@@ -3873,7 +3874,7 @@
           hubCardVocabTitle:'词汇卡组', hubCardVocabMeta:'按级别分类的记忆卡组',
           hubCardGrammarTitle:'语法', hubCardGrammarMeta:'按级别分类的句型',
           grCrumbMaterials:'学习材料 · 语法', grShelfTitleA:'语法', grShelfTitleB:'书架',
-          grShelfLead:'四本书，每个级别一本。理解原因，收集印章。',
+          grShelfLead:'六本书，每个级别一本。理解原因，收集印章。',
           grAllBooks:'所有书', grSearchPlaceholder:'搜索章节…', grNoResults:'没有找到，换个关键词试试。',
           grLevelTag:'第 {n} 级', grChapCountLabel:'个句型章节',
           grBookTitlePrefix:'书', grBookLeadDone:'全部 {n} 章已完成，真棒。',
@@ -6965,9 +6966,11 @@
     const DATA = window.GRAMMAR_DATA || [];
     const TH = {
       1:['var(--gr-c1a)','var(--gr-c1b)','一'], 2:['var(--gr-c2a)','var(--gr-c2b)','二'],
-      3:['var(--gr-c3a)','var(--gr-c3b)','三'], 4:['var(--gr-c4a)','var(--gr-c4b)','四']
+      3:['var(--gr-c3a)','var(--gr-c3b)','三'], 4:['var(--gr-c4a)','var(--gr-c4b)','四'],
+      5:['var(--gr-c5a)','var(--gr-c5b)','五'], 6:['var(--gr-c6a)','var(--gr-c6b)','六']
     };
-    const MASC = {1:'mascot-wave.png', 2:'mascot-sit.png', 3:'mascot-study.png', 4:'mascot-desk.png'};
+    const MASC = {1:'mascot-wave.png', 2:'mascot-sit.png', 3:'mascot-study.png',
+                  4:'mascot-desk.png', 5:'mascot-exam.png', 6:'mascot-study.png'};
     const DONE_KEY = 'xingGrammarDone';
 
     function grLoadDone(){
@@ -7023,7 +7026,7 @@
         : grPick(greetPool);
       $('grHero').innerHTML = grMascotHtml(1) + '<div class="gr-bub">' + escapeHtml(greetText) + '</div>';
 
-      $('grShelf').innerHTML = [1,2,3,4].map(function(n){
+      $('grShelf').innerHTML = [1,2,3,4,5,6].map(function(n){
         const th = TH[n], a = th[0], b = th[1], gl = th[2];
         const stat = grPct(n), d = stat[0], tt = stat[1], p = stat[2];
         const stones = grByLevel(n).map(x =>

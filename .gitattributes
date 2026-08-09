@@ -1,0 +1,28 @@
+# Semua file teks disimpan DAN di-checkout dengan LF, di sistem operasi mana pun.
+#
+# KENAPA INI ADA
+# Dulu repo ini pernah di-checkout dengan CRLF (git for Windows, core.autocrlf=true).
+# Isinya lalu ditulis ulang jadi LF, tapi stat cache di .git/index masih menyimpan
+# ukuran versi CRLF-nya. Akibatnya `git status` melaporkan belasan file sebagai
+# "modified" padahal SHA-1 isinya persis sama dengan HEAD -- `git diff` kosong.
+# Berkas ini mengunci akhir baris supaya kejadian itu tidak bisa terulang.
+#
+# CATATAN: menambahkan berkas ini TIDAK mengubah isi satu file pun. Sudah dicek:
+# nol blob di HEAD yang mengandung CR, jadi tidak ada renormalisasi yang tertunda.
+* text=auto eol=lf
+
+# Biner: jangan disentuh sama sekali.
+*.png  binary
+*.ico  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.webp binary
+*.mp3  binary
+*.wav  binary
+*.woff binary
+*.woff2 binary
+*.ttf  binary
+*.zip  binary
+*.docx binary
+*.pdf  binary

@@ -1370,6 +1370,19 @@
     .browseHanzi{font-size:20px; font-weight:700; width:44px; flex-shrink:0; font-family:var(--hanzi-font)}
     .browsePinyin{width:76px; flex-shrink:0; color:var(--gold-ink)}
     .browseMeaning{flex:1; color:var(--text)}
+    /* Deck bidang (Bisnis/Percakapan): tema muncul sebagai pill kecil di ujung baris.
+       Cuma dirender buat baris vocab_track -- markup baris HSK 1-6 nol perubahan. */
+    .browseTheme{
+      flex-shrink:0; font-size:10px; font-weight:700; letter-spacing:.02em;
+      padding:3px 8px; border-radius:999px;
+      background:rgba(var(--text-rgb),.06); color:var(--muted);
+    }
+    /* Di layar sempit pill-nya turun ke baris berikutnya, bukan mendesak arti sampai
+       kepotong. Baris HSK tetap satu baris karena nggak punya .browseTheme. */
+    @media (max-width:480px){
+      .browseItem{ flex-wrap:wrap; }
+      .browseTheme{ margin-left:54px; }
+    }
     .browseCount{font-size:11px; color:var(--muted); text-align:center; margin:10px 0 0}
     .browseStrokeBtn{
       flex-shrink:0; width:30px; height:30px; margin-top:0; padding:0; border-radius:50%; border:none;
@@ -3327,7 +3340,7 @@
      Kalau keduanya beda, user yang masih buka tab lama bakal dikasih
      banner "ada versi baru".
      ============================================================ */
-  const APP_VERSION = '4.4';
+  const APP_VERSION = '4.5';
 
   const SUPABASE_URL  = 'https://xzgvhzmmqbijpbrhagjf.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6Z3Zoem1tcWJpanBicmhhZ2pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0OTA4NjMsImV4cCI6MjA5OTA2Njg2M30.9OtBJIBDDUhhSsvtz9Pql12hWToGzmULOGh7Tj-vzNs';
@@ -3391,6 +3404,26 @@
 
   function isLevelAllowed(lv){
     return userPackageLevels.includes(lv);
+  }
+
+  // Deck bidang (Bisnis / Percakapan) tinggal di tabel public.vocab_track, sumbunya BIDANG,
+  // bukan level HSK -- makanya nggak bisa ikut PACKAGE_LEVELS di atas. Peta ini cermin
+  // persis fungsi allowed_tracks() di database (sql/20_track_business_convo.sql): kalau
+  // salah satu diubah, ubah dua-duanya.
+  // Ini murni buat TAMPILAN (chip-nya kekunci atau nggak). Pemagaran yang sebenarnya tetap
+  // RLS di server, jadi mengakali peta ini lewat devtools nggak mengeluarkan satu baris pun.
+  const PACKAGE_TRACKS = {
+    hsk_1_4:  [],
+    hsk_5:    [],
+    hsk_6:    [],
+    business: ['business'],
+    convo:    ['convo'],
+    vip:      ['business','convo']
+  };
+  let userPackageTracks = [];
+
+  function isTrackAllowed(tr){
+    return userPackageTracks.includes(tr);
   }
 
   // Label badge paket di dashboard -- TETAP, nggak ikut language switcher.
@@ -3586,6 +3619,8 @@
           hubCardWritingTitle:'Writing', hubCardWritingMeta:'Ruang latihan menulis bebas',
           hubCardMockTitle:'Mock Paper', hubCardMockMeta:'Mock test lengkap',
           errLevelLocked:'Level ini di luar paket kamu. Hubungi admin untuk upgrade paket.',
+          trackBusinessLabel:'Bisnis', trackConvoLabel:'Percakapan',
+          errTrackLocked:'Kosakata ini ada di paket Business/Conversation. Hubungi admin kalau mau ditambahkan.',
           pinyinLabel:'Pinyin', translationLabel:'Terjemahan',
           questionProgress:'Soal {current} / {total}', prevBtn:'‹ Sebelumnya', nextBtn:'Berikutnya ›',
           questionNavigator:'Navigator soal', legendAnswered:'Terjawab', legendCurrent:'Sekarang',
@@ -3759,6 +3794,8 @@
           hubCardWritingTitle:'Writing', hubCardWritingMeta:'Free write workspace',
           hubCardMockTitle:'Mock Paper', hubCardMockMeta:'Full mock tests',
           errLevelLocked:'This level isn\'t included in your package. Please contact admin to upgrade.',
+          trackBusinessLabel:'Business', trackConvoLabel:'Conversation',
+          errTrackLocked:'These words come with the Business/Conversation package. Contact admin if you\'d like them added.',
           pinyinLabel:'Pinyin', translationLabel:'Translation',
           questionProgress:'Question {current} / {total}', prevBtn:'‹ Previous', nextBtn:'Next ›',
           questionNavigator:'Question navigator', legendAnswered:'Answered', legendCurrent:'Current',
@@ -3932,6 +3969,8 @@
           hubCardWritingTitle:'写作', hubCardWritingMeta:'自由写作练习区',
           hubCardMockTitle:'模拟试卷', hubCardMockMeta:'完整模拟考试',
           errLevelLocked:'该级别不在您的套餐内，请联系管理员升级套餐。',
+          trackBusinessLabel:'商务', trackConvoLabel:'日常会话',
+          errTrackLocked:'这部分词汇属于商务 / 日常会话套餐，需要的话请联系管理员。',
           pinyinLabel:'拼音', translationLabel:'翻译',
           questionProgress:'第 {current} / {total} 题', prevBtn:'‹ 上一题', nextBtn:'下一题 ›',
           questionNavigator:'题目导航', legendAnswered:'已作答', legendCurrent:'当前',
@@ -4478,6 +4517,7 @@
     applyStaticI18n();
 
     userPackageLevels = PACKAGE_LEVELS[profile.package] || PACKAGE_LEVELS.hsk_1_4;
+    userPackageTracks = PACKAGE_TRACKS[profile.package] || [];
 
     const pkg = PACKAGE_BADGE_LABEL[profile.package] ? profile.package : 'hsk_1_4';
     $('packageBadgeText').textContent = PACKAGE_BADGE_LABEL[pkg];
@@ -5277,6 +5317,8 @@
      BROWSE / MATERI — KAMUS (Task 4)
      ========================================================== */
   let browseLevel = null;
+  // null = lagi lihat level HSK; 'business'/'convo' = lagi lihat deck bidang.
+  let browseTrack = null;
   let browseCache = [];
   let browseFiltered = [];
   let browseShown = 0;
@@ -5398,6 +5440,7 @@
       }
       wrap.appendChild(b);
     }
+    appendTrackChips(wrap);                // Bisnis / Percakapan -- deck bidang
     appendLevelSoonChip(wrap, 'button');   // HSK 7-9 -- coming soon
     if(hasAnyAllowed){
       loadBrowseLevel(defaultLevel);
@@ -5408,8 +5451,70 @@
     }
   }
 
+  /* Chip deck bidang di ujung picker Kamus. Sengaja pakai pola locked-visible yang sama
+     dengan level HSK di luar paket (kelihatan, bisa diklik, memunculkan pesan) -- bukan
+     disembunyikan. Yang belum punya paketnya jadi tahu barangnya ada. */
+  const BROWSE_TRACKS = [
+    { key:'business', labelKey:'trackBusinessLabel' },
+    { key:'convo',    labelKey:'trackConvoLabel' }
+  ];
+
+  function appendTrackChips(wrap){
+    if(!wrap) return;
+    BROWSE_TRACKS.forEach(tr=>{
+      const locked = !isTrackAllowed(tr.key);
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'levelBtn' + (locked ? ' locked' : '');
+      b.textContent = (locked ? '\uD83D\uDD12 ' : '') + t(tr.labelKey);
+      b.addEventListener('click', ()=>{
+        if(locked){
+          const el = $('browseLevelLockedMsg');
+          el.textContent = t('errTrackLocked');
+          el.className = 'msg lock';
+          return;
+        }
+        hideBrowseLockedMsg();
+        [...wrap.children].forEach(c=>c.classList.remove('active'));
+        b.classList.add('active');
+        loadBrowseTrack(tr.key);
+      });
+      wrap.appendChild(b);
+    });
+  }
+
+  /* Kembaran loadBrowseLevel() buat tabel vocab_track. Dipisah, bukan ditambal jadi satu
+     fungsi bercabang, karena tabel, kolom, dan urutannya beda semua -- menggabungkannya
+     cuma bikin jalur HSK yang sudah jalan ikut kena risiko. Bentuk browseCache-nya sengaja
+     dibikin sama persis supaya applyBrowseFilter()/renderBrowseChunk() nggak perlu tahu
+     lagi dilihat yang mana. */
+  async function loadBrowseTrack(track){
+    browseTrack = track;
+    browseLevel = null;
+    $('browseList').innerHTML = `<p class="emptyState">${t('loading')}</p>`;
+    $('browseCount').textContent = '';
+    $('browseMoreBtn').classList.add('hidden');
+    let data;
+    try{
+      const res = await sb
+        .from('vocab_track')
+        .select('hanzi,pinyin,meaning_en,meaning_id,theme,example_zh,example_id')
+        .eq('track', track)
+        .order('sort_order', { ascending:true });
+      if(res.error) throw res.error;
+      data = res.data;
+    }catch(e){ showAlertModal(t('errFetchWordList') + ' ' + e.message); return; }
+    browseCache = (data||[]).map(v => ({
+      ...v,
+      _search: stripDiacritics(v.hanzi + ' ' + v.pinyin + ' ' + v.meaning_en + ' ' +
+                               (v.meaning_id||'') + ' ' + (v.theme||''))
+    }));
+    applyBrowseFilter();
+  }
+
   async function loadBrowseLevel(level){
     browseLevel = level;
+    browseTrack = null;
     $('browseList').innerHTML = `<p class="emptyState">${t('loading')}</p>`;
     $('browseCount').textContent = '';
     $('browseMoreBtn').classList.add('hidden');
@@ -5450,7 +5555,8 @@
       item.className = 'browseItem';
       item.innerHTML = `<span class="browseHanzi">${v.hanzi}</span>
         <span class="browsePinyin">${v.pinyin}</span>
-        <span class="browseMeaning">${v.meaning_id || v.meaning_en}</span>`;
+        <span class="browseMeaning">${v.meaning_id || v.meaning_en}</span>` +
+        (v.theme ? `<span class="browseTheme">${escapeHTML(v.theme)}</span>` : '');
       wrap.appendChild(item);
     });
     browseShown += next.length;

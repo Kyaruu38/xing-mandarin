@@ -1,0 +1,213 @@
+{
+  "no": 4,
+  "title_en": "Meetings & Scheduling",
+  "title_id": "Rapat dan Penjadwalan",
+  "note": "",
+  "objectives": [
+    "Membuat janji rapat lewat telepon maupun chat.",
+    "Mengatur, mengubah, dan membatalkan jadwal.",
+    "Membuka rapat dan menyebutkan agenda.",
+    "Menutup rapat dan meringkas hasilnya.",
+    "Mengonfirmasi waktu dan tempat supaya tidak salah."
+  ],
+  "primer": [],
+  "vocab": [
+    ["会议","huìyì","meeting","rapat"],
+    ["开会","kāihuì","to hold a meeting","mengadakan rapat"],
+    ["安排","ānpái","to arrange, to schedule","mengatur, menjadwalkan"],
+    ["日程","rìchéng","schedule, agenda","jadwal"],
+    ["议程","yìchéng","agenda","agenda"],
+    ["约","yuē","to make an appointment","membuat janji"],
+    ["时间","shíjiān","time","waktu"],
+    ["地点","dìdiǎn","venue, location","tempat"],
+    ["参加","cānjiā","to attend","menghadiri"],
+    ["出席","chūxí","to be present","hadir"],
+    ["缺席","quēxí","to be absent","tidak hadir"],
+    ["推迟","tuīchí","to postpone","menunda"],
+    ["提前","tíqián","to move up, in advance","memajukan, lebih awal"],
+    ["取消","qǔxiāo","to cancel","membatalkan"],
+    ["改","gǎi","to change","mengubah"],
+    ["方便","fāngbiàn","convenient","nyaman, memungkinkan"],
+    ["有空","yǒu kòng","to be free","ada waktu luang"],
+    ["没空","méi kòng","to be busy, not free","tidak ada waktu"],
+    ["合适","héshì","suitable","cocok"],
+    ["准时","zhǔnshí","on time","tepat waktu"],
+    ["大约","dàyuē","approximately","kira-kira"],
+    ["小时","xiǎoshí","hour","jam (durasi)"],
+    ["分钟","fēnzhōng","minute","menit (durasi)"],
+    ["下周","xià zhōu","next week","minggu depan"],
+    ["上周","shàng zhōu","last week","minggu lalu"],
+    ["今天下午","jīntiān xiàwǔ","this afternoon","siang ini"],
+    ["记录","jìlù","minutes; to record","notulen; mencatat"],
+    ["主持","zhǔchí","to chair, to host","memimpin"],
+    ["发言","fāyán","to speak, to take the floor","berbicara, menyampaikan"],
+    ["讨论","tǎolùn","to discuss","membahas"],
+    ["决定","juédìng","to decide; decision","memutuskan; keputusan"],
+    ["总结","zǒngjié","to summarize; summary","merangkum; rangkuman"],
+    ["下次","xià cì","next time","lain kali"],
+    ["通知","tōngzhī","to notify; notice","memberi tahu; pemberitahuan"],
+    ["确定","quèdìng","to confirm, to finalize","memastikan"],
+    ["议题","yìtí","agenda item, topic","topik bahasan"],
+    ["首先","shǒuxiān","first of all","pertama-tama"],
+    ["其次","qícì","secondly","kedua"],
+    ["最后","zuìhòu","lastly","terakhir"],
+    ["会议室","huìyìshì","meeting room","ruang rapat"],
+    ["线上","xiànshàng","online","daring"],
+    ["链接","liànjiē","link","tautan"],
+    ["日历","rìlì","calendar","kalender"],
+    ["提醒","tíxǐng","to remind","mengingatkan"]
+  ],
+  "expressions": [
+    ["您明天上午有空吗？","Nín míngtiān shàngwǔ yǒu kòng ma?","Are you free tomorrow morning?","Besok pagi Anda ada waktu?"],
+    ["我们约在下午三点，可以吗？","Wǒmen yuē zài xiàwǔ sān diǎn, kěyǐ ma?","Shall we set it for three in the afternoon?","Kita janjian jam tiga siang, boleh?"],
+    ["这个时间对您方便吗？","Zhège shíjiān duì nín fāngbiàn ma?","Is this time convenient for you?","Waktu ini nyaman untuk Anda?"],
+    ["不好意思，会议要推迟到下周二。","Bù hǎoyìsi, huìyì yào tuīchí dào xià zhōu’èr.","Sorry, the meeting has to be postponed to next Tuesday.","Maaf, rapatnya harus diundur ke Selasa depan."],
+    ["今天的会议一共有三个议题。","Jīntiān de huìyì yígòng yǒu sān ge yìtí.","Today’s meeting has three agenda items in total.","Rapat hari ini ada tiga topik bahasan."],
+    ["我们开始吧。","Wǒmen kāishǐ ba.","Let’s begin.","Kita mulai ya."],
+    ["谁还有问题？","Shéi hái yǒu wèntí?","Does anyone else have questions?","Ada yang masih punya pertanyaan?"],
+    ["今天就到这儿，谢谢大家。","Jīntiān jiù dào zhèr, xièxie dàjiā.","That’s all for today, thank you everyone.","Hari ini sampai di sini, terima kasih semuanya."],
+    ["我会把会议记录发给大家。","Wǒ huì bǎ huìyì jìlù fā gěi dàjiā.","I’ll send the minutes to everyone.","Notulennya akan saya kirim ke semua."]
+  ],
+  "dialogues": [
+    {
+      "situasi": "Membuat janji rapat lewat telepon dengan klien.",
+      "lines": [
+        ["A","王经理，您明天上午有空吗？","Wáng jīnglǐ, nín míngtiān shàngwǔ yǒu kòng ma?","Manager Wang, are you free tomorrow morning?","Pak Wang, besok pagi ada waktu?"],
+        ["B","上午我有个会。下午可以吗？","Shàngwǔ wǒ yǒu ge huì. Xiàwǔ kěyǐ ma?","I have a meeting in the morning. Would the afternoon work?","Pagi saya ada rapat. Siang bisa?"],
+        ["A","可以。下午三点方便吗？","Kěyǐ. Xiàwǔ sān diǎn fāngbiàn ma?","Sure. Is three in the afternoon convenient?","Bisa. Jam tiga siang nyaman?"],
+        ["B","三点合适。在哪儿？","Sān diǎn héshì. Zài nǎr?","Three works. Where?","Jam tiga cocok. Di mana?"],
+        ["A","在我们公司三楼的会议室。我一会儿发日历提醒给您。","Zài wǒmen gōngsī sān lóu de huìyìshì. Wǒ yíhuìr fā rìlì tíxǐng gěi nín.","In our meeting room on the third floor. I’ll send you a calendar invite shortly.","Di ruang rapat lantai tiga kantor kami. Nanti saya kirim undangan kalender."]
+      ]
+    },
+    {
+      "situasi": "Rapat harus diundur karena ada yang tidak bisa hadir.",
+      "lines": [
+        ["A","不好意思，明天的会议要推迟。","Bù hǎoyìsi, míngtiān de huìyì yào tuīchí.","Sorry, tomorrow’s meeting has to be postponed.","Maaf, rapat besok harus diundur."],
+        ["B","为什么？","Wèishénme?","Why?","Kenapa?"],
+        ["A","因为李经理明天出差，不能参加。","Yīnwèi Lǐ jīnglǐ míngtiān chūchāi, bù néng cānjiā.","Because Manager Li is travelling tomorrow and can’t attend.","Karena Pak Li besok dinas luar, tidak bisa hadir."],
+        ["B","那改到什么时候？","Nà gǎi dào shénme shíhou?","Then when will it be moved to?","Jadi diubah ke kapan?"],
+        ["A","下周二上午十点，可以吗？","Xià zhōu’èr shàngwǔ shí diǎn, kěyǐ ma?","Next Tuesday at ten in the morning, is that all right?","Selasa depan jam sepuluh pagi, boleh?"],
+        ["B","可以，我改一下日程。","Kěyǐ, wǒ gǎi yíxià rìchéng.","That’s fine, I’ll adjust my schedule.","Boleh, saya ubah jadwal saya."]
+      ]
+    },
+    {
+      "situasi": "Membuka rapat dan menyebutkan agenda.",
+      "lines": [
+        ["A","大家都到了吗？我们开始吧。","Dàjiā dōu dào le ma? Wǒmen kāishǐ ba.","Is everyone here? Let’s begin.","Semua sudah datang? Kita mulai ya."],
+        ["B","张丽还没到，她说迟到五分钟。","Zhāng Lì hái méi dào, tā shuō chídào wǔ fēnzhōng.","Zhang Li isn’t here yet; she said she’d be five minutes late.","Zhang Li belum datang, katanya telat lima menit."],
+        ["A","没关系，我们先开始。今天一共有三个议题。","Méi guānxi, wǒmen xiān kāishǐ. Jīntiān yígòng yǒu sān ge yìtí.","That’s fine, we’ll start first. There are three agenda items today.","Tidak apa-apa, kita mulai duluan. Hari ini ada tiga topik."],
+        ["A","首先是上个月的销售数据，其次是新项目的进度，最后是下个月的计划。","Shǒuxiān shì shàng ge yuè de xiāoshòu shùjù, qícì shì xīn xiàngmù de jìndù, zuìhòu shì xià ge yuè de jìhuà.","First, last month’s sales figures; second, the new project’s progress; finally, next month’s plan.","Pertama data penjualan bulan lalu, kedua progres proyek baru, terakhir rencana bulan depan."],
+        ["B","好的，明白。","Hǎo de, míngbai.","Understood.","Baik, paham."]
+      ]
+    },
+    {
+      "situasi": "Menutup rapat dan meringkas keputusan.",
+      "lines": [
+        ["A","时间差不多了，我总结一下。","Shíjiān chàbuduō le, wǒ zǒngjié yíxià.","We’re nearly out of time; let me summarize.","Waktunya hampir habis, saya rangkum sebentar."],
+        ["A","第一，销售数据下个星期一发给我。第二，新项目下个月一号开始。","Dì yī, xiāoshòu shùjù xià ge xīngqīyī fā gěi wǒ. Dì èr, xīn xiàngmù xià ge yuè yī hào kāishǐ.","First, send me the sales figures next Monday. Second, the new project starts on the first of next month.","Pertama, data penjualan dikirim ke saya Senin depan. Kedua, proyek baru mulai tanggal satu bulan depan."],
+        ["B","没问题。","Méi wèntí.","No problem.","Tidak masalah."],
+        ["A","谁还有问题？","Shéi hái yǒu wèntí?","Any other questions?","Ada yang masih punya pertanyaan?"],
+        ["B","没有了。","Méiyǒu le.","None.","Sudah tidak ada."],
+        ["A","好，今天就到这儿。我会把会议记录发给大家，辛苦了。","Hǎo, jīntiān jiù dào zhèr. Wǒ huì bǎ huìyì jìlù fā gěi dàjiā, xīnkǔ le.","All right, that’s it for today. I’ll send the minutes to everyone. Thanks for your work.","Baik, hari ini sampai di sini. Notulennya saya kirim ke semua, terima kasih."]
+      ]
+    }
+  ],
+  "reading": {
+    "title_zh": "会议通知",
+    "title_id": "Pemberitahuan Rapat",
+    "zh": "各位同事：下周二上午十点，我们在三楼会议室开月度会议。会议大约一个半小时。今天的议题一共有三个：首先是上个月的销售数据，其次是新项目的进度，最后是下个月的计划。请销售部和采购部的负责人准时参加。如果那天没空，请提前一天通知我。李经理下周出差，所以他线上参加，链接我会提前发给大家。会议记录会在当天下午发出。谢谢！",
+    "py": "Gèwèi tóngshì: Xià zhōu’èr shàngwǔ shí diǎn, wǒmen zài sān lóu huìyìshì kāi yuèdù huìyì. Huìyì dàyuē yí ge bàn xiǎoshí. Jīntiān de yìtí yígòng yǒu sān ge: shǒuxiān shì shàng ge yuè de xiāoshòu shùjù, qícì shì xīn xiàngmù de jìndù, zuìhòu shì xià ge yuè de jìhuà. Qǐng xiāoshòubù hé cǎigòubù de fùzérén zhǔnshí cānjiā. Rúguǒ nà tiān méi kòng, qǐng tíqián yì tiān tōngzhī wǒ. Lǐ jīnglǐ xià zhōu chūchāi, suǒyǐ tā xiànshàng cānjiā, liànjiē wǒ huì tíqián fā gěi dàjiā. Huìyì jìlù huì zài dàngtiān xiàwǔ fāchū. Xièxie!",
+    "en": "Dear colleagues: Next Tuesday at ten in the morning we will hold the monthly meeting in the third-floor meeting room. The meeting will run about an hour and a half. There are three agenda items: first, last month’s sales figures; second, the new project’s progress; finally, next month’s plan. Heads of the sales and purchasing departments are asked to attend on time. If you are not available that day, please notify me one day in advance. Manager Li is travelling next week, so he will join online; I will send the link ahead of time. The minutes will be circulated that same afternoon. Thank you!",
+    "id": "Rekan-rekan sekalian: Selasa depan pukul sepuluh pagi kita mengadakan rapat bulanan di ruang rapat lantai tiga. Rapat berlangsung kira-kira satu setengah jam. Ada tiga topik bahasan: pertama data penjualan bulan lalu, kedua progres proyek baru, terakhir rencana bulan depan. Penanggung jawab departemen penjualan dan pembelian mohon hadir tepat waktu. Kalau hari itu berhalangan, tolong beri tahu saya sehari sebelumnya. Pak Li minggu depan dinas luar, jadi beliau ikut secara daring, tautannya akan saya kirim lebih awal. Notulen akan dikirim sore harinya. Terima kasih!"
+  },
+  "grammar": [
+    {
+      "point": "吧 ba — mengajak, bukan memerintah",
+      "penjelasan": "吧 di akhir kalimat mengubah perintah menjadi ajakan atau saran. Dalam rapat, perbedaannya besar: 我们开始 terdengar seperti pengumuman sepihak, 我们开始吧 terdengar seperti mengajak semua orang ikut.",
+      "pola": "kalimat + 吧",
+      "contoh": [
+        ["我们开始吧。","Wǒmen kāishǐ ba.","Kita mulai ya."],
+        ["改到下周二吧。","Gǎi dào xià zhōu’èr ba.","Diubah ke Selasa depan saja ya."],
+        ["你先休息一下吧。","Nǐ xiān xiūxi yíxià ba.","Istirahat dulu saja."]
+      ],
+      "tips": "吧 juga dipakai untuk menebak: 您是王经理吧？(Anda Pak Wang, kan?). Nadanya lebih lembut daripada 吗 karena kamu sudah cukup yakin."
+    },
+    {
+      "point": "首先…其次…最后… — menyusun agenda",
+      "penjelasan": "Rangkaian ini sepupu dari 先…然后…最后… di Chapter 3, tapi lebih formal dan dipakai untuk menyusun daftar, bukan urutan waktu. Cocok untuk agenda rapat, poin presentasi, dan alasan berlapis.",
+      "pola": "首先 + poin①，其次 + poin②，最后 + poin③",
+      "contoh": [
+        ["首先是销售数据，其次是项目进度，最后是下个月的计划。","Shǒuxiān shì xiāoshòu shùjù, qícì shì xiàngmù jìndù, zuìhòu shì xià ge yuè de jìhuà.","Pertama data penjualan, kedua progres proyek, terakhir rencana bulan depan."]
+      ],
+      "tips": "Untuk daftar bernomor yang lebih tegas, pakai 第一…第二…第三… seperti waktu meringkas keputusan rapat. 首先 lebih halus, 第一 lebih tegas."
+    },
+    {
+      "point": "把 bǎ — memindahkan objek ke depan kata kerja",
+      "penjelasan": "Kalimat 把 dipakai ketika kamu memberi tahu apa yang DILAKUKAN pada suatu benda, khususnya kalau benda itu berpindah tempat atau berubah keadaan. Objeknya naik ke depan kata kerja, dan kata kerjanya harus diikuti sesuatu — tidak boleh berdiri sendiri.",
+      "pola": "Subjek + 把 + objek + kata kerja + hasil/arah/penerima",
+      "contoh": [
+        ["我会把会议记录发给大家。","Wǒ huì bǎ huìyì jìlù fā gěi dàjiā.","Notulennya akan saya kirim ke semua."],
+        ["请把文件放在桌子上。","Qǐng bǎ wénjiàn fàng zài zhuōzi shàng.","Tolong taruh dokumennya di atas meja."],
+        ["他把时间改到下周了。","Tā bǎ shíjiān gǎi dào xià zhōu le.","Dia sudah mengubah waktunya ke minggu depan."]
+      ],
+      "tips": "我把文件发 salah — kata kerja 发 harus punya lanjutan seperti 给大家 atau 了. Kalau kalimatmu terasa menggantung, biasanya itu sebabnya."
+    },
+    {
+      "point": "Durasi diletakkan SESUDAH kata kerja, bukan sebelum",
+      "penjelasan": "Ini jebakan klasik. Waktu KAPAN sesuatu terjadi diletakkan sebelum kata kerja (Chapter 0). Tapi BERAPA LAMA sesuatu berlangsung diletakkan sesudahnya. Dua aturan yang berlawanan, dan sering tertukar.",
+      "pola": "Subjek + (kapan) + kata kerja + (berapa lama)",
+      "contoh": [
+        ["会议大约一个半小时。","Huìyì dàyuē yí ge bàn xiǎoshí.","Rapatnya kira-kira satu setengah jam."],
+        ["我们开了两个小时的会。","Wǒmen kāi le liǎng ge xiǎoshí de huì.","Kami rapat dua jam."],
+        ["她说迟到五分钟。","Tā shuō chídào wǔ fēnzhōng.","Katanya telat lima menit."]
+      ],
+      "tips": "Perhatikan 点 versus 小时 dan 分 versus 分钟. 两点 itu pukul dua, 两个小时 itu selama dua jam. Salah satu huruf saja bisa mengubah janji rapat."
+    }
+  ],
+  "exercises": {
+    "listening_tf": [
+      ["月度会议在三楼会议室开。","B"],
+      ["李经理下周会到公司参加会议。","S"]
+    ],
+    "listening_mc": [
+      {"q":"会议大约多长时间？","c":["一个小时","一个半小时","两个小时"],"a":"B"},
+      {"q":"如果那天没空，要怎么做？","c":["不用说","提前一天通知","当天早上说"],"a":"B"}
+    ],
+    "listening_open": [
+      ["会议记录什么时候发出？","当天下午。"]
+    ],
+    "reading_match": {
+      "soal": ["您明天上午有空吗？","会议为什么推迟？","这个时间对您方便吗？","谁还有问题？","会议记录什么时候发？"],
+      "pilihan": ["A. 因为李经理出差。","B. 上午我有个会，下午可以吗？","C. 当天下午发给大家。","D. 没有了。","E. 三点合适。"],
+      "kunci": ["B","A","E","D","C"]
+    },
+    "reading_mc": [
+      {"q":"月度会议的第二个议题是什么？","c":["销售数据","新项目的进度","下个月的计划"],"a":"B"},
+      {"q":"哪个句子是对的？","c":["我把文件发。","我把文件发给你。","我发把文件给你。"],"a":"B"},
+      {"q":"“我们开了两个小时的会”里，“两个小时”是：","c":["开会的时间点","开会的长度","开会的地点"],"a":"B"}
+    ],
+    "reading_order": {
+      "kalimat": ["A. 发会议记录。","B. 发会议通知。","C. 开月度会议。"],
+      "kunci": "B → C → A"
+    },
+    "writing_rearrange": [
+      [["吧","开始","我们"],"我们开始吧。"],
+      [["发给","会议记录","把","我","大家","会"],"我会把会议记录发给大家。"],
+      [["下周二","推迟","会议","到","要"],"会议要推迟到下周二。"],
+      [["方便","这个","您","吗","对","时间","？"],"这个时间对您方便吗？"]
+    ],
+    "writing_create": {
+      "kata": ["安排","推迟","参加","首先"],
+      "contoh_jawaban": ["我来安排会议时间。","会议推迟到下周三。","下午的会我不能参加。","首先我们看上个月的数据。"]
+    },
+    "speaking_roleplay": {
+      "situasi": "Kamu harus mengundur rapat besok karena satu peserta penting mendadak dinas luar, lalu mencari waktu pengganti.",
+      "tujuan": "Menyampaikan pengunduran beserta alasannya, menawarkan waktu baru, dan mengonfirmasi tempatnya.",
+      "wajib": ["推迟","因为","有空","方便","确定"]
+    },
+    "speaking_video": {
+      "tema": "Buka sebuah rapat: sapa peserta, sebutkan tiga agenda, dan perkirakan durasinya.",
+      "wajib": ["开始吧","议题","首先","其次","最后"]
+    }
+  }
+}

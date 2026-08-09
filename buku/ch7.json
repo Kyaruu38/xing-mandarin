@@ -1,0 +1,218 @@
+{
+  "no": 7,
+  "title_en": "Customer Handling",
+  "title_id": "Melayani Pelanggan",
+  "note": "",
+  "objectives": [
+    "Menjelaskan produk beserta keunggulannya secara ringkas.",
+    "Menjawab pertanyaan pelanggan tentang spesifikasi dan penggunaan.",
+    "Menjelaskan harga, diskon, dan syaratnya.",
+    "Menjelaskan ketersediaan stok dan waktu tunggu.",
+    "Menangani komplain sederhana tanpa memperkeruh suasana."
+  ],
+  "primer": [],
+  "vocab": [
+    ["客户","kèhù","client, customer","klien, pelanggan"],
+    ["产品","chǎnpǐn","product","produk"],
+    ["型号","xínghào","model number","tipe, model"],
+    ["规格","guīgé","specification","spesifikasi"],
+    ["尺寸","chǐcùn","size, dimensions","ukuran"],
+    ["颜色","yánsè","colour","warna"],
+    ["材料","cáiliào","material","bahan"],
+    ["功能","gōngnéng","function, feature","fungsi, fitur"],
+    ["特点","tèdiǎn","characteristic, selling point","ciri khas"],
+    ["耐用","nàiyòng","durable","awet"],
+    ["性价比","xìngjiàbǐ","value for money","rasio harga-kualitas"],
+    ["保修","bǎoxiū","warranty","garansi"],
+    ["价格","jiàgé","price","harga"],
+    ["报价","bàojià","quotation; to quote","penawaran harga"],
+    ["单价","dānjià","unit price","harga satuan"],
+    ["总价","zǒngjià","total price","harga total"],
+    ["含税","hánshuì","tax included","sudah termasuk pajak"],
+    ["不含","bù hán","not including","belum termasuk"],
+    ["折扣","zhékòu","discount","diskon"],
+    ["优惠","yōuhuì","preferential, better price","harga khusus"],
+    ["最低","zuì dī","lowest","paling rendah"],
+    ["库存","kùcún","stock","stok"],
+    ["有货","yǒu huò","in stock","ada barang"],
+    ["缺货","quē huò","out of stock","stok habis"],
+    ["现货","xiànhuò","goods in stock, ready stock","barang ready"],
+    ["补货","bǔ huò","to restock","mengisi ulang stok"],
+    ["数量","shùliàng","quantity","jumlah"],
+    ["起订量","qǐdìngliàng","minimum order quantity","minimum pemesanan"],
+    ["交货","jiāohuò","delivery","pengiriman barang"],
+    ["等","děng","to wait","menunggu"],
+    ["投诉","tóusù","to complain; complaint","komplain"],
+    ["问题","wèntí","problem","masalah"],
+    ["坏了","huài le","broken","rusak"],
+    ["少了","shǎo le","short, missing","kurang"],
+    ["发错","fā cuò","sent the wrong item","salah kirim"],
+    ["退货","tuìhuò","to return goods","retur"],
+    ["换货","huànhuò","to exchange goods","tukar barang"],
+    ["赔","péi","to compensate","mengganti rugi"],
+    ["核实","héshí","to verify","memverifikasi"],
+    ["照片","zhàopiàn","photo","foto"],
+    ["理解","lǐjiě","to understand (a feeling)","memahami"],
+    ["抱歉","bàoqiàn","apologies","mohon maaf"],
+    ["解决","jiějué","to resolve","menyelesaikan"],
+    ["方案","fāng’àn","solution, plan","solusi"]
+  ],
+  "expressions": [
+    ["这个型号最大的特点是耐用。","Zhège xínghào zuì dà de tèdiǎn shì nàiyòng.","The main selling point of this model is durability.","Keunggulan utama tipe ini adalah keawetannya."],
+    ["单价是三百块，含税。","Dānjià shì sānbǎi kuài, hánshuì.","The unit price is three hundred, tax included.","Harga satuannya tiga ratus, sudah termasuk pajak."],
+    ["这个价格不含运费。","Zhège jiàgé bù hán yùnfèi.","This price does not include freight.","Harga ini belum termasuk ongkos kirim."],
+    ["如果订五百个以上，可以给您九折。","Rúguǒ dìng wǔbǎi ge yǐshàng, kěyǐ gěi nín jiǔ zhé.","For orders over five hundred, we can offer ten percent off.","Kalau pesan di atas lima ratus, kami bisa kasih diskon sepuluh persen."],
+    ["这个型号现在有现货。","Zhège xínghào xiànzài yǒu xiànhuò.","This model is in stock right now.","Tipe ini sekarang ada barang ready."],
+    ["不好意思，这个颜色暂时缺货。","Bù hǎoyìsi, zhège yánsè zànshí quē huò.","Sorry, this colour is temporarily out of stock.","Maaf, warna ini sementara stoknya habis."],
+    ["大概要等两个星期。","Dàgài yào děng liǎng ge xīngqī.","It will take about two weeks.","Kira-kira harus menunggu dua minggu."],
+    ["非常抱歉给您带来麻烦。","Fēicháng bàoqiàn gěi nín dàilái máfan.","We’re very sorry for the trouble.","Kami mohon maaf sudah merepotkan Anda."],
+    ["我先核实一下，今天下午给您答复。","Wǒ xiān héshí yíxià, jīntiān xiàwǔ gěi nín dáfù.","Let me verify first and get back to you this afternoon.","Saya cek dulu, siang ini saya kabari."]
+  ],
+  "dialogues": [
+    {
+      "situasi": "Pelanggan menanyakan spesifikasi produk di pameran.",
+      "lines": [
+        ["A","这个型号有什么特点？","Zhège xínghào yǒu shénme tèdiǎn?","What are the features of this model?","Tipe ini keunggulannya apa?"],
+        ["B","最大的特点是耐用，可以用五年以上。","Zuì dà de tèdiǎn shì nàiyòng, kěyǐ yòng wǔ nián yǐshàng.","The main one is durability — it lasts over five years.","Yang paling utama keawetannya, bisa dipakai lebih dari lima tahun."],
+        ["A","有几种尺寸？","Yǒu jǐ zhǒng chǐcùn?","How many sizes are there?","Ada berapa ukuran?"],
+        ["B","一共三种。这是规格表，您看一下。","Yígòng sān zhǒng. Zhè shì guīgébiǎo, nín kàn yíxià.","Three in total. Here’s the spec sheet, please take a look.","Total tiga. Ini tabel spesifikasinya, silakan dilihat."],
+        ["A","保修多久？","Bǎoxiū duō jiǔ?","How long is the warranty?","Garansinya berapa lama?"],
+        ["B","两年保修。","Liǎng nián bǎoxiū.","A two-year warranty.","Garansi dua tahun."]
+      ]
+    },
+    {
+      "situasi": "Menjelaskan harga dan diskon.",
+      "lines": [
+        ["A","这个多少钱？","Zhège duōshao qián?","How much is this?","Ini berapa harganya?"],
+        ["B","单价三百块，含税。","Dānjià sānbǎi kuài, hánshuì.","Three hundred per piece, tax included.","Satuannya tiga ratus, sudah termasuk pajak."],
+        ["A","运费呢？","Yùnfèi ne?","And shipping?","Kalau ongkos kirim?"],
+        ["B","这个价格不含运费，运费另算。","Zhège jiàgé bù hán yùnfèi, yùnfèi lìng suàn.","This price excludes freight; freight is calculated separately.","Harga ini belum termasuk ongkos kirim, ongkirnya dihitung terpisah."],
+        ["A","如果我订五百个呢？","Rúguǒ wǒ dìng wǔbǎi ge ne?","What if I order five hundred?","Kalau saya pesan lima ratus?"],
+        ["B","五百个以上可以给您九折，也就是二百七十块一个。","Wǔbǎi ge yǐshàng kěyǐ gěi nín jiǔ zhé, yě jiùshì èrbǎi qīshí kuài yí ge.","Over five hundred we can give ten percent off, so two hundred seventy each.","Di atas lima ratus bisa diskon sepuluh persen, jadi dua ratus tujuh puluh per buah."],
+        ["A","好，我考虑一下。","Hǎo, wǒ kǎolǜ yíxià.","All right, I’ll think about it.","Baik, saya pertimbangkan."]
+      ]
+    },
+    {
+      "situasi": "Pelanggan menanyakan stok dan waktu tunggu.",
+      "lines": [
+        ["A","黑色的还有货吗？","Hēisè de hái yǒu huò ma?","Do you still have the black one in stock?","Yang hitam masih ada stok?"],
+        ["B","不好意思，黑色的暂时缺货。","Bù hǎoyìsi, hēisè de zànshí quē huò.","Sorry, black is temporarily out of stock.","Maaf, yang hitam sementara habis."],
+        ["A","什么时候能补货？","Shénme shíhou néng bǔ huò?","When will it be restocked?","Kapan bisa restock?"],
+        ["B","大概要等两个星期。白色和灰色现在有现货。","Dàgài yào děng liǎng ge xīngqī. Báisè hé huīsè xiànzài yǒu xiànhuò.","About two weeks. White and grey are in stock now.","Kira-kira dua minggu. Yang putih dan abu-abu sekarang ready."],
+        ["A","那我先订白色的，黑色的下个月再说。","Nà wǒ xiān dìng báisè de, hēisè de xià ge yuè zài shuō.","Then I’ll order white first and deal with black next month.","Kalau begitu saya pesan yang putih dulu, yang hitam bulan depan saja."],
+        ["B","好的，起订量是一百个，可以吗？","Hǎo de, qǐdìngliàng shì yìbǎi ge, kěyǐ ma?","All right, the minimum order is one hundred; is that all right?","Baik, minimum pemesanan seratus buah, boleh?"]
+      ]
+    },
+    {
+      "situasi": "Menangani komplain barang kurang dan rusak.",
+      "lines": [
+        ["A","你好，货到了，但是少了两箱，还有一箱坏了。","Nǐ hǎo, huò dào le, dànshì shǎo le liǎng xiāng, hái yǒu yì xiāng huài le.","Hello, the goods arrived, but two boxes are missing and one is damaged.","Halo, barangnya sampai, tapi kurang dua dus dan satu dus rusak."],
+        ["B","非常抱歉给您带来麻烦。我理解您的心情。","Fēicháng bàoqiàn gěi nín dàilái máfan. Wǒ lǐjiě nín de xīnqíng.","We’re very sorry for the trouble. I understand how you feel.","Kami mohon maaf sudah merepotkan. Saya paham perasaan Anda."],
+        ["A","这批货客户已经在等了。","Zhè pī huò kèhù yǐjīng zài děng le.","The client is already waiting for this shipment.","Barang ini kliennya sudah menunggu."],
+        ["B","麻烦您拍几张照片发给我，我先核实一下。","Máfan nín pāi jǐ zhāng zhàopiàn fā gěi wǒ, wǒ xiān héshí yíxià.","Could you take a few photos and send them to me? I’ll verify first.","Boleh tolong difoto lalu dikirim ke saya? Saya verifikasi dulu."],
+        ["A","照片我发微信给你了。","Zhàopiàn wǒ fā Wēixìn gěi nǐ le.","I’ve sent the photos on WeChat.","Fotonya sudah saya kirim lewat WeChat."],
+        ["B","收到。今天下午我给您答复。坏的那箱我们换货，少的两箱明天补发。","Shōudào. Jīntiān xiàwǔ wǒ gěi nín dáfù. Huài de nà xiāng wǒmen huànhuò, shǎo de liǎng xiāng míngtiān bǔ fā.","Received. I’ll reply this afternoon. We’ll replace the damaged box and ship the two missing boxes tomorrow.","Sudah diterima. Siang ini saya kabari. Dus yang rusak kami tukar, dua dus yang kurang besok kami kirim susulan."],
+        ["A","好，麻烦你了。","Hǎo, máfan nǐ le.","All right, thank you.","Baik, terima kasih ya."]
+      ]
+    }
+  ],
+  "reading": {
+    "title_zh": "一次投诉的处理",
+    "title_id": "Menangani Satu Komplain",
+    "zh": "上个星期五，一个老客户打电话来说货有问题：一共二十箱，到的时候少了两箱，还有一箱坏了。客户很着急，因为他的客户在等这批货。\n我先说了抱歉，然后请他拍照片发给我。照片收到以后，我跟仓库核实，发现是装车的时候少装了两箱，坏的那箱是运输的问题。\n下午我给客户回电话，告诉他我们的方案：坏的一箱换货，少的两箱第二天补发，运费我们出。客户听了以后说没关系，还说下个月要再订一批。\n处理投诉最重要的不是价格，是速度和态度。客户要的是一个清楚的方案，不是很多解释。",
+    "py": "Shàng ge xīngqīwǔ, yí ge lǎo kèhù dǎ diànhuà lái shuō huò yǒu wèntí: yígòng èrshí xiāng, dào de shíhou shǎo le liǎng xiāng, hái yǒu yì xiāng huài le. Kèhù hěn zháojí, yīnwèi tā de kèhù zài děng zhè pī huò.\nWǒ xiān shuō le bàoqiàn, ránhòu qǐng tā pāizhào fā gěi wǒ. Zhàopiàn shōudào yǐhòu, wǒ gēn cāngkù héshí, fāxiàn shì zhuāngchē de shíhou shǎo zhuāng le liǎng xiāng, huài de nà xiāng shì yùnshū de wèntí.\nXiàwǔ wǒ gěi kèhù huí diànhuà, gàosu tā wǒmen de fāng’àn: huài de yì xiāng huànhuò, shǎo de liǎng xiāng dì èr tiān bǔ fā, yùnfèi wǒmen chū. Kèhù tīng le yǐhòu shuō méi guānxi, hái shuō xià ge yuè yào zài dìng yì pī.\nChǔlǐ tóusù zuì zhòngyào de bú shì jiàgé, shì sùdù hé tàidù. Kèhù yào de shì yí ge qīngchu de fāng’àn, bú shì hěn duō jiěshì.",
+    "en": "Last Friday a long-standing client called to say there was a problem with the shipment: of twenty boxes, two were missing on arrival and one was damaged. The client was anxious, because his own customer was waiting for the goods.\nI apologised first, then asked him to take photos and send them to me. After receiving the photos, I checked with the warehouse and found that two boxes had not been loaded, while the damaged box was a transport issue.\nIn the afternoon I called the client back and told him our solution: replace the damaged box, ship the two missing boxes the next day, and cover the freight ourselves. After hearing this the client said it was fine, and even said he would place another order next month.\nThe most important thing in handling a complaint is not price — it is speed and attitude. What a client wants is one clear solution, not a lot of explanation.",
+    "id": "Jumat lalu seorang pelanggan lama menelepon dan bilang ada masalah dengan barangnya: dari dua puluh dus, saat sampai kurang dua dus dan satu dus rusak. Pelanggan itu panik karena kliennya sendiri sedang menunggu barang tersebut.\nSaya minta maaf dulu, lalu meminta dia memotret dan mengirimkannya ke saya. Setelah fotonya diterima, saya cek ke gudang dan ternyata waktu muat ada dua dus yang tidak terangkut, sedangkan dus yang rusak adalah masalah pengiriman.\nSiangnya saya telepon balik pelanggan itu dan menyampaikan solusi kami: dus yang rusak ditukar, dua dus yang kurang dikirim keesokan harinya, ongkos kirim ditanggung kami. Setelah mendengar itu pelanggan bilang tidak apa-apa, bahkan bilang bulan depan mau pesan lagi.\nDalam menangani komplain, yang paling penting bukan harga, tapi kecepatan dan sikap. Yang pelanggan mau adalah satu solusi yang jelas, bukan banyak penjelasan."
+  },
+  "grammar": [
+    {
+      "point": "Cara menyebut diskon: 打折 dan 九折",
+      "penjelasan": "Ini konsep yang sering terbalik. Angka dalam 折 menunjukkan berapa persen yang DIBAYAR, bukan berapa yang dipotong. 九折 berarti membayar sembilan puluh persen, jadi diskonnya sepuluh persen. 八五折 berarti membayar delapan puluh lima persen, diskon lima belas persen.",
+      "pola": "打 + angka + 折   |   给您 + angka + 折",
+      "contoh": [
+        ["可以给您九折。","Kěyǐ gěi nín jiǔ zhé.","Bisa saya kasih diskon sepuluh persen."],
+        ["这个产品打八五折。","Zhège chǎnpǐn dǎ bā wǔ zhé.","Produk ini diskon lima belas persen."],
+        ["最低八折，不能再低了。","Zuì dī bā zhé, bù néng zài dī le.","Paling rendah diskon dua puluh persen, tidak bisa lebih."]
+      ],
+      "tips": "Kalau ragu, sebut angkanya langsung: 便宜百分之十 (lebih murah sepuluh persen). Salah membaca 折 di meja negosiasi bisa berarti selisih puluhan juta."
+    },
+    {
+      "point": "如果…就… — menawarkan syarat",
+      "penjelasan": "Kerangka wajib untuk menjual: sebutkan syaratnya dulu di klausa 如果, lalu imbalannya di klausa kedua yang biasanya diawali 就 atau 可以. Menyebut imbalan tanpa syarat membuat harga terlihat bisa ditawar terus.",
+      "pola": "如果 + syarat，就/可以 + hasil",
+      "contoh": [
+        ["如果订五百个以上，可以给您九折。","Rúguǒ dìng wǔbǎi ge yǐshàng, kěyǐ gěi nín jiǔ zhé.","Kalau pesan di atas lima ratus, bisa kami kasih diskon sepuluh persen."],
+        ["如果这个星期下单，我们就免运费。","Rúguǒ zhège xīngqī xiàdān, wǒmen jiù miǎn yùnfèi.","Kalau order minggu ini, ongkos kirim kami gratiskan."]
+      ],
+      "tips": "如果 boleh dihilangkan kalau syaratnya sudah jelas dari konteks: 订五百个就打九折. Yang tidak boleh dihilangkan adalah 就 — tanpa itu kalimatnya kehilangan hubungan sebab-akibat."
+    },
+    {
+      "point": "了 sebagai perubahan keadaan pada komplain",
+      "penjelasan": "Dalam laporan kerusakan, 了 menandai bahwa keadaan sudah berubah dari normal menjadi bermasalah. 坏 sendiri berarti “rusak” sebagai sifat, 坏了 berarti “jadi rusak”. Ini yang membedakan mendeskripsikan barang dengan melaporkan kejadian.",
+      "pola": "benda + kata sifat/kerja + 了",
+      "contoh": [
+        ["一箱坏了。","Yì xiāng huài le.","Satu dus rusak."],
+        ["少了两箱。","Shǎo le liǎng xiāng.","Kurang dua dus."],
+        ["货到了。","Huò dào le.","Barangnya sudah sampai."]
+      ],
+      "tips": "Untuk komplain, sebutkan angkanya di belakang: 少了两箱, bukan 两箱少了. Yang pertama melaporkan kekurangan, yang kedua terdengar seperti mendeskripsikan dua dus tertentu."
+    },
+    {
+      "point": "Urutan menangani komplain: minta maaf, pahami, verifikasi, tawarkan solusi",
+      "penjelasan": "Ini bukan aturan tata bahasa melainkan urutan kalimat yang diharapkan. Membalik urutannya — misalnya langsung menjelaskan penyebab sebelum minta maaf — dibaca sebagai membela diri, dan itu yang paling sering membuat komplain kecil membesar.",
+      "pola": "非常抱歉… → 我理解您的… → 我先核实一下… → 我们的方案是…",
+      "contoh": [
+        ["非常抱歉给您带来麻烦。","Fēicháng bàoqiàn gěi nín dàilái máfan.","Kami mohon maaf sudah merepotkan Anda."],
+        ["我理解您的心情。","Wǒ lǐjiě nín de xīnqíng.","Saya paham perasaan Anda."],
+        ["我先核实一下，今天下午给您答复。","Wǒ xiān héshí yíxià, jīntiān xiàwǔ gěi nín dáfù.","Saya verifikasi dulu, siang ini saya kabari."]
+      ],
+      "tips": "Selalu sebutkan KAPAN kamu akan menjawab, bukan cuma bahwa kamu akan menjawab. 我给您答复 masih menggantung; 今天下午给您答复 menutup kegelisahan pelanggan."
+    }
+  ],
+  "exercises": {
+    "listening_tf": [
+      ["客户一共收到二十箱货。","S"],
+      ["运费由卖方出。","B"]
+    ],
+    "listening_mc": [
+      {"q":"少了两箱的原因是什么？","c":["运输问题","装车时少装了","客户数错了"],"a":"B"},
+      {"q":"坏的那一箱怎么处理？","c":["退货","换货","打折"],"a":"B"}
+    ],
+    "listening_open": [
+      ["少的两箱什么时候补发？","第二天。"]
+    ],
+    "reading_match": {
+      "soal": ["这个型号有什么特点？","黑色的还有货吗？","如果我订五百个呢？","保修多久？","货少了两箱。"],
+      "pilihan": ["A. 可以给您九折。","B. 两年。","C. 最大的特点是耐用。","D. 非常抱歉，我先核实一下。","E. 不好意思，暂时缺货。"],
+      "kunci": ["C","E","A","B","D"]
+    },
+    "reading_mc": [
+      {"q":"作者认为处理投诉最重要的是什么？","c":["价格","速度和态度","解释原因"],"a":"B"},
+      {"q":"“打九折”的意思是：","c":["便宜百分之九十","付百分之九十","便宜九块"],"a":"B"},
+      {"q":"客户听完方案以后怎么样？","c":["很生气","要退货","说下个月再订一批"],"a":"C"}
+    ],
+    "reading_order": {
+      "kalimat": ["A. 跟仓库核实。","B. 客户打电话投诉。","C. 给客户回电话说方案。"],
+      "kunci": "B → A → C"
+    },
+    "writing_rearrange": [
+      [["坏了","一箱","少了","两箱","，"],"少了两箱，一箱坏了。"],
+      [["九折","五百个","如果","可以","以上","给您","订","，"],"如果订五百个以上，可以给您九折。"],
+      [["不含","价格","运费","这个"],"这个价格不含运费。"],
+      [["答复","下午","给您","今天","我","核实一下","先","，"],"我先核实一下，今天下午给您答复。"]
+    ],
+    "writing_create": {
+      "kata": ["缺货","优惠","核实","抱歉"],
+      "contoh_jawaban": ["黑色的暂时缺货。","订一千个可以再优惠一点。","我核实一下数量。","非常抱歉，是我们的问题。"]
+    },
+    "speaking_roleplay": {
+      "situasi": "Pelanggan menelepon marah karena barang datang kurang satu dus dan warnanya salah, padahal dia sudah menjanjikannya ke kliennya.",
+      "tujuan": "Minta maaf, tunjukkan pemahaman, minta bukti foto, lalu tawarkan solusi berikut waktunya.",
+      "wajib": ["抱歉","理解","核实","换货","今天下午"]
+    },
+    "speaking_video": {
+      "tema": "Jual satu produk dari tempat kerjamu dalam satu menit: ciri khas, harga, syarat diskon, dan stok.",
+      "wajib": ["特点","单价","含税","如果…就","有货"]
+    }
+  }
+}

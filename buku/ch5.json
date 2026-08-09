@@ -1,0 +1,215 @@
+{
+  "no": 5,
+  "title_en": "Business Discussion",
+  "title_id": "Diskusi Bisnis",
+  "note": "",
+  "objectives": [
+    "Menyampaikan pendapat dengan pembuka yang wajar.",
+    "Menyetujui dengan berbagai tingkat kehangatan.",
+    "Tidak setuju secara sopan tanpa mematikan pembicaraan.",
+    "Memberikan saran dan usulan alternatif.",
+    "Bertanya di tengah rapat tanpa memotong dengan kasar."
+  ],
+  "primer": [],
+  "vocab": [
+    ["意见","yìjiàn","opinion","pendapat"],
+    ["看法","kànfǎ","view, standpoint","pandangan"],
+    ["觉得","juéde","to feel, to think","merasa, berpendapat"],
+    ["认为","rènwéi","to believe, to hold that","berpendapat (formal)"],
+    ["同意","tóngyì","to agree","setuju"],
+    ["赞成","zànchéng","to be in favour of","mendukung"],
+    ["反对","fǎnduì","to oppose","menentang"],
+    ["建议","jiànyì","to suggest; suggestion","menyarankan; saran"],
+    ["提议","tíyì","to propose; proposal","mengusulkan; usulan"],
+    ["方案","fāng’àn","plan, proposal","skema, rencana"],
+    ["办法","bànfǎ","method, way","cara"],
+    ["问题","wèntí","problem, question","masalah, pertanyaan"],
+    ["解决","jiějué","to solve","menyelesaikan"],
+    ["考虑","kǎolǜ","to consider","mempertimbangkan"],
+    ["讨论","tǎolùn","to discuss","mendiskusikan"],
+    ["补充","bǔchōng","to add (a point)","menambahkan"],
+    ["打断","dǎduàn","to interrupt","memotong pembicaraan"],
+    ["插一句","chā yí jù","to cut in briefly","menyela sebentar"],
+    ["可能","kěnéng","maybe, possibly","mungkin"],
+    ["也许","yěxǔ","perhaps","barangkali"],
+    ["应该","yīnggāi","should","seharusnya"],
+    ["最好","zuì hǎo","it would be best","sebaiknya"],
+    ["不过","búguò","however","tapi"],
+    ["但是","dànshì","but","tetapi"],
+    ["虽然","suīrán","although","meskipun"],
+    ["其实","qíshí","actually","sebenarnya"],
+    ["比较","bǐjiào","relatively, fairly","relatif, agak"],
+    ["有道理","yǒu dàolǐ","that makes sense","masuk akal"],
+    ["同感","tónggǎn","I feel the same","sependapat"],
+    ["风险","fēngxiǎn","risk","risiko"],
+    ["成本","chéngběn","cost","biaya"],
+    ["效率","xiàolǜ","efficiency","efisiensi"],
+    ["质量","zhìliàng","quality","kualitas"],
+    ["时间表","shíjiānbiǎo","timeline","linimasa"],
+    ["优点","yōudiǎn","advantage","kelebihan"],
+    ["缺点","quēdiǎn","drawback","kekurangan"],
+    ["从…来看","cóng…lái kàn","from the perspective of…","dilihat dari…"],
+    ["另外","lìngwài","besides, in addition","selain itu"],
+    ["总的来说","zǒng de lái shuō","overall","secara keseluruhan"],
+    ["支持","zhīchí","to support","mendukung"],
+    ["修改","xiūgǎi","to revise","merevisi"],
+    ["试试","shìshi","to give it a try","coba dulu"],
+    ["先这样","xiān zhèyàng","let’s leave it like this for now","untuk sekarang begini dulu"],
+    ["再看看","zài kànkan","let’s see how it goes","lihat nanti"]
+  ],
+  "expressions": [
+    ["我觉得这个方案可以试试。","Wǒ juéde zhège fāng’àn kěyǐ shìshi.","I think this plan is worth a try.","Saya rasa rencana ini bisa dicoba."],
+    ["从成本来看，第二个方案比较好。","Cóng chéngběn lái kàn, dì èr ge fāng’àn bǐjiào hǎo.","From a cost perspective, the second plan is better.","Dilihat dari biaya, rencana kedua lebih baik."],
+    ["您说得很有道理。","Nín shuō de hěn yǒu dàolǐ.","What you said makes a lot of sense.","Yang Anda katakan sangat masuk akal."],
+    ["我基本同意，不过有一点想补充。","Wǒ jīběn tóngyì, búguò yǒu yì diǎn xiǎng bǔchōng.","I basically agree, though I’d like to add one point.","Saya pada dasarnya setuju, cuma ada satu hal yang ingin saya tambahkan."],
+    ["我有不同的看法。","Wǒ yǒu bù tóng de kànfǎ.","I see it differently.","Saya punya pandangan yang berbeda."],
+    ["我建议我们先做一个小测试。","Wǒ jiànyì wǒmen xiān zuò yí ge xiǎo cèshì.","I suggest we run a small test first.","Saya sarankan kita coba tes kecil dulu."],
+    ["不好意思，我插一句。","Bù hǎoyìsi, wǒ chā yí jù.","Sorry, may I cut in briefly?","Maaf, saya menyela sebentar."],
+    ["这个问题我们下次再讨论，好吗？","Zhège wèntí wǒmen xià cì zài tǎolùn, hǎo ma?","Shall we discuss this next time?","Masalah ini kita bahas lain kali, gimana?"],
+    ["总的来说，我支持这个方向。","Zǒng de lái shuō, wǒ zhīchí zhège fāngxiàng.","Overall, I support this direction.","Secara keseluruhan, saya mendukung arah ini."]
+  ],
+  "dialogues": [
+    {
+      "situasi": "Membahas dua pilihan pemasok dalam rapat tim.",
+      "lines": [
+        ["A","这两个供应商，你们觉得选哪个？","Zhè liǎng ge gōngyìngshāng, nǐmen juéde xuǎn nǎge?","Which of these two suppliers do you think we should choose?","Dari dua pemasok ini, menurut kalian pilih yang mana?"],
+        ["B","我觉得第一个比较好，质量很稳定。","Wǒ juéde dì yī ge bǐjiào hǎo, zhìliàng hěn wěndìng.","I think the first one is better; the quality is consistent.","Saya rasa yang pertama lebih baik, kualitasnya stabil."],
+        ["C","您说得有道理，不过从成本来看，第二个便宜百分之十五。","Nín shuō de yǒu dàolǐ, búguò cóng chéngběn lái kàn, dì èr ge piányi bǎi fēn zhī shíwǔ.","That makes sense, but cost-wise the second is fifteen percent cheaper.","Masuk akal, tapi dari sisi biaya yang kedua lebih murah lima belas persen."],
+        ["A","那风险呢？","Nà fēngxiǎn ne?","And the risk?","Kalau risikonya?"],
+        ["C","第二个我们没合作过，所以有一点风险。","Dì èr ge wǒmen méi hézuò guo, suǒyǐ yǒu yì diǎn fēngxiǎn.","We’ve never worked with the second one, so there’s some risk.","Yang kedua kita belum pernah kerja sama, jadi ada sedikit risiko."],
+        ["B","我建议先给第二个一个小订单，试试看。","Wǒ jiànyì xiān gěi dì èr ge yí ge xiǎo dìngdān, shìshi kàn.","I suggest giving the second one a small order first as a trial.","Saya sarankan kasih pesanan kecil dulu ke yang kedua, kita coba."],
+        ["A","这个办法不错，就这样吧。","Zhège bànfǎ búcuò, jiù zhèyàng ba.","That’s a good approach, let’s do that.","Cara ini bagus, ya sudah begitu saja."]
+      ]
+    },
+    {
+      "situasi": "Tidak setuju dengan usulan atasan, tapi tetap sopan.",
+      "lines": [
+        ["A","我想下个月就开始新项目。","Wǒ xiǎng xià ge yuè jiù kāishǐ xīn xiàngmù.","I’d like to start the new project next month.","Saya ingin proyek baru mulai bulan depan."],
+        ["B","不好意思，我有不同的看法。","Bù hǎoyìsi, wǒ yǒu bù tóng de kànfǎ.","Sorry, I see it differently.","Maaf, saya punya pandangan berbeda."],
+        ["A","你说。","Nǐ shuō.","Go ahead.","Silakan."],
+        ["B","虽然时间表上可以，但是我们的人不够。我担心质量会受影响。","Suīrán shíjiānbiǎo shàng kěyǐ, dànshì wǒmen de rén bú gòu. Wǒ dānxīn zhìliàng huì shòu yǐngxiǎng.","The timeline allows it, but we don’t have enough people. I’m worried quality will suffer.","Secara linimasa memang bisa, tapi orang kita kurang. Saya khawatir kualitasnya terpengaruh."],
+        ["A","那你的建议是？","Nà nǐ de jiànyì shì?","So what do you suggest?","Jadi saran kamu?"],
+        ["B","最好推迟两个星期，先招两个人。","Zuì hǎo tuīchí liǎng ge xīngqī, xiān zhāo liǎng ge rén.","It would be best to delay two weeks and hire two people first.","Sebaiknya diundur dua minggu, rekrut dua orang dulu."],
+        ["A","我考虑一下。","Wǒ kǎolǜ yíxià.","I’ll think about it.","Saya pertimbangkan."]
+      ]
+    },
+    {
+      "situasi": "Menyela sopan untuk menambahkan informasi.",
+      "lines": [
+        ["A","这个月的效率比上个月高了百分之八。","Zhège yuè de xiàolǜ bǐ shàng ge yuè gāo le bǎi fēn zhī bā.","Efficiency is eight percent higher than last month.","Efisiensi bulan ini delapan persen lebih tinggi dari bulan lalu."],
+        ["B","不好意思，我插一句。","Bù hǎoyìsi, wǒ chā yí jù.","Sorry, may I cut in?","Maaf, saya menyela sebentar."],
+        ["A","请说。","Qǐng shuō.","Please.","Silakan."],
+        ["B","我想补充一点：这个月的订单也比较少，所以数字看起来好。","Wǒ xiǎng bǔchōng yì diǎn: zhège yuè de dìngdān yě bǐjiào shǎo, suǒyǐ shùzì kàn qǐlai hǎo.","I’d like to add one point: orders were also fewer this month, so the number looks good.","Saya mau menambahkan: pesanan bulan ini juga lebih sedikit, jadi angkanya kelihatan bagus."],
+        ["A","这一点很重要，谢谢你的补充。","Zhè yì diǎn hěn zhòngyào, xièxie nǐ de bǔchōng.","That’s an important point, thank you for adding it.","Poin ini penting, terima kasih tambahannya."]
+      ]
+    },
+    {
+      "situasi": "Menutup diskusi yang belum selesai.",
+      "lines": [
+        ["A","大家的意见都不一样。","Dàjiā de yìjiàn dōu bù yíyàng.","Everyone has a different opinion.","Pendapat semua orang berbeda-beda."],
+        ["B","其实我们都同意方向，只是时间表有问题。","Qíshí wǒmen dōu tóngyì fāngxiàng, zhǐshì shíjiānbiǎo yǒu wèntí.","Actually we all agree on the direction; it’s the timeline that’s the issue.","Sebenarnya kita semua setuju arahnya, cuma linimasanya yang bermasalah."],
+        ["A","那这样吧：方向先定下来，时间表下次再讨论，好吗？","Nà zhèyàng ba: fāngxiàng xiān dìng xiàlai, shíjiānbiǎo xià cì zài tǎolùn, hǎo ma?","Then let’s do this: fix the direction now and discuss the timeline next time, all right?","Kalau begitu begini: arahnya kita kunci dulu, linimasanya dibahas lain kali, gimana?"],
+        ["B","可以，我先做两个方案，下次给大家看。","Kěyǐ, wǒ xiān zuò liǎng ge fāng’àn, xià cì gěi dàjiā kàn.","Sure, I’ll prepare two options and show everyone next time.","Boleh, saya siapkan dua opsi dulu, lain kali saya tunjukkan."],
+        ["A","好，就先这样。","Hǎo, jiù xiān zhèyàng.","Good, let’s leave it there for now.","Baik, untuk sekarang begitu dulu."]
+      ]
+    }
+  ],
+  "reading": {
+    "title_zh": "一次没有结论的会",
+    "title_id": "Rapat yang Belum Ada Kesimpulannya",
+    "zh": "昨天下午我们讨论了新项目的时间表。经理认为下个月就可以开始，因为客户在等我们的回复。但是我有不同的看法。虽然时间表上可以，但是我们部门只有四个人，如果同时做两个项目，质量可能会受影响。我建议推迟两个星期，先招两个人。张丽同意我的看法，她说成本虽然高一点，可是风险小得多。最后经理说他要考虑一下，这个问题下次会议再讨论。总的来说，大家其实都同意方向，只是时间表还没定下来。",
+    "py": "Zuótiān xiàwǔ wǒmen tǎolùn le xīn xiàngmù de shíjiānbiǎo. Jīnglǐ rènwéi xià ge yuè jiù kěyǐ kāishǐ, yīnwèi kèhù zài děng wǒmen de huífù. Dànshì wǒ yǒu bù tóng de kànfǎ. Suīrán shíjiānbiǎo shàng kěyǐ, dànshì wǒmen bùmén zhǐ yǒu sì ge rén, rúguǒ tóngshí zuò liǎng ge xiàngmù, zhìliàng kěnéng huì shòu yǐngxiǎng. Wǒ jiànyì tuīchí liǎng ge xīngqī, xiān zhāo liǎng ge rén. Zhāng Lì tóngyì wǒ de kànfǎ, tā shuō chéngběn suīrán gāo yì diǎn, kěshì fēngxiǎn xiǎo de duō. Zuìhòu jīnglǐ shuō tā yào kǎolǜ yíxià, zhège wèntí xià cì huìyì zài tǎolùn. Zǒng de lái shuō, dàjiā qíshí dōu tóngyì fāngxiàng, zhǐshì shíjiānbiǎo hái méi dìng xiàlai.",
+    "en": "Yesterday afternoon we discussed the timeline for the new project. The manager believed we could start next month, because the client is waiting for our reply. But I saw it differently. The timeline allows it, yet our department has only four people; if we run two projects at once, quality may suffer. I suggested delaying two weeks and hiring two people first. Zhang Li agreed with me, saying the cost would be slightly higher but the risk far smaller. In the end the manager said he would think it over and that we would return to it at the next meeting. Overall, everyone actually agrees on the direction; it is the timeline that has not been settled.",
+    "id": "Kemarin siang kami membahas linimasa proyek baru. Manajer berpendapat bulan depan sudah bisa mulai, karena klien menunggu jawaban kami. Tapi saya punya pandangan berbeda. Secara linimasa memang bisa, tapi departemen kami cuma empat orang; kalau mengerjakan dua proyek sekaligus, kualitas bisa terpengaruh. Saya menyarankan diundur dua minggu dan merekrut dua orang dulu. Zhang Li setuju dengan saya, katanya biayanya memang sedikit lebih tinggi tapi risikonya jauh lebih kecil. Akhirnya manajer bilang akan dipertimbangkan, dan masalah ini dibahas lagi di rapat berikutnya. Secara keseluruhan, sebenarnya semua setuju arahnya, cuma linimasanya yang belum ditetapkan."
+  },
+  "grammar": [
+    {
+      "point": "觉得 juéde dan 认为 rènwéi — dua bobot pendapat",
+      "penjelasan": "Keduanya berarti “berpendapat”, tapi 觉得 lebih personal dan lebih lunak, sedangkan 认为 lebih formal dan terdengar seperti kesimpulan yang sudah dipikirkan. Dalam rapat, memakai 我觉得 membuat pendapatmu lebih mudah dibantah tanpa konflik — itu justru sering yang kamu inginkan.",
+      "pola": "Subjek + 觉得/认为 + kalimat lengkap",
+      "contoh": [
+        ["我觉得这个方案可以试试。","Wǒ juéde zhège fāng’àn kěyǐ shìshi.","Saya rasa rencana ini bisa dicoba."],
+        ["经理认为下个月就可以开始。","Jīnglǐ rènwéi xià ge yuè jiù kěyǐ kāishǐ.","Manajer berpendapat bulan depan sudah bisa mulai."]
+      ],
+      "tips": "Yang mengikuti 觉得 adalah kalimat utuh, bukan kata benda. 我觉得这个方案 belum selesai — harus ada penilaiannya: 我觉得这个方案很好."
+    },
+    {
+      "point": "虽然…但是… — mengakui dulu, baru menyanggah",
+      "penjelasan": "Ini kerangka paling aman untuk tidak setuju di lingkungan kerja Tiongkok: akui dulu sisi benarnya lawan bicara di klausa 虽然, baru sampaikan keberatanmu di klausa 但是. Sama seperti 因为…所以…, kedua bagian lazim dipakai bersamaan.",
+      "pola": "虽然 + fakta yang diakui，但是/可是 + keberatan",
+      "contoh": [
+        ["虽然时间表上可以，但是我们的人不够。","Suīrán shíjiānbiǎo shàng kěyǐ, dànshì wǒmen de rén bú gòu.","Secara linimasa memang bisa, tapi orang kita kurang."],
+        ["成本虽然高一点，可是风险小得多。","Chéngběn suīrán gāo yì diǎn, kěshì fēngxiǎn xiǎo de duō.","Biayanya memang sedikit lebih tinggi, tapi risikonya jauh lebih kecil."]
+      ],
+      "tips": "虽然 boleh berdiri sebelum subjek atau sesudahnya — 虽然成本高 dan 成本虽然高 dua-duanya benar. Yang tidak boleh adalah menghilangkan 但是 lalu berhenti di tengah."
+    },
+    {
+      "point": "A 比 B + kata sifat — membandingkan",
+      "penjelasan": "Perbandingan Mandarin tidak mengubah bentuk kata sifatnya. Cukup selipkan 比 di antara dua hal yang dibandingkan. Untuk menyebut selisihnya, letakkan angka atau ukuran SESUDAH kata sifat.",
+      "pola": "A + 比 + B + kata sifat (+ selisih)",
+      "contoh": [
+        ["第二个比第一个便宜。","Dì èr ge bǐ dì yī ge piányi.","Yang kedua lebih murah dari yang pertama."],
+        ["这个月的效率比上个月高了百分之八。","Zhège yuè de xiàolǜ bǐ shàng ge yuè gāo le bǎi fēn zhī bā.","Efisiensi bulan ini delapan persen lebih tinggi dari bulan lalu."],
+        ["风险小得多。","Fēngxiǎn xiǎo de duō.","Risikonya jauh lebih kecil."]
+      ],
+      "tips": "JANGAN pakai 很 di kalimat 比. 这个比那个很好 salah. Untuk mempertegas gunakan 得多 (jauh lebih) atau 一点儿 (sedikit lebih), diletakkan sesudah kata sifat."
+    },
+    {
+      "point": "Melunakkan penolakan: 不好意思 + 我有不同的看法",
+      "penjelasan": "Menolak langsung dengan 不对 atau 我反对 terdengar sangat keras dan jarang dipakai kecuali situasinya memang serius. Pola yang lazim adalah tiga langkah: minta maaf ringan, sebut bahwa pandanganmu berbeda, lalu jelaskan alasannya — bukan menyalahkan pendapat lawan bicara.",
+      "pola": "不好意思，+ 我有不同的看法 / 我基本同意，不过… + alasan + 我建议…",
+      "contoh": [
+        ["我基本同意，不过有一点想补充。","Wǒ jīběn tóngyì, búguò yǒu yì diǎn xiǎng bǔchōng.","Saya pada dasarnya setuju, cuma ada satu yang ingin saya tambahkan."],
+        ["不好意思，我有不同的看法。","Bù hǎoyìsi, wǒ yǒu bù tóng de kànfǎ.","Maaf, saya punya pandangan berbeda."],
+        ["我建议我们先做一个小测试。","Wǒ jiànyì wǒmen xiān zuò yí ge xiǎo cèshì.","Saya sarankan kita coba tes kecil dulu."]
+      ],
+      "tips": "Selalu tutup penolakanmu dengan usulan konkret. Menolak tanpa memberi jalan keluar dianggap tidak membantu, dan itu berlaku di hampir semua budaya kerja."
+    }
+  ],
+  "exercises": {
+    "listening_tf": [
+      ["经理想下个月就开始新项目。","B"],
+      ["张丽反对说话人的看法。","S"]
+    ],
+    "listening_mc": [
+      {"q":"说话人为什么担心质量？","c":["供应商不好","部门只有四个人","客户要求太高"],"a":"B"},
+      {"q":"最后会议的结果是什么？","c":["决定推迟","决定下个月开始","还要再讨论"],"a":"C"}
+    ],
+    "listening_open": [
+      ["说话人建议推迟多久？","两个星期。"]
+    ],
+    "reading_match": {
+      "soal": ["您觉得选哪个供应商？","那风险呢？","不好意思，我插一句。","这个问题下次再讨论，好吗？","您说得很有道理。"],
+      "pilihan": ["A. 可以，我先做两个方案。","B. 我觉得第一个比较好。","C. 谢谢，不过我还有一点担心。","D. 请说。","E. 我们没合作过，有一点风险。"],
+      "kunci": ["B","E","D","A","C"]
+    },
+    "reading_mc": [
+      {"q":"张丽为什么支持推迟？","c":["成本比较低","风险小得多","客户要求"],"a":"B"},
+      {"q":"哪个句子是对的？","c":["这个比那个很便宜。","这个比那个便宜得多。","这个很比那个便宜。"],"a":"B"},
+      {"q":"在会上不同意上司时，最合适的开头是：","c":["你说得不对。","我反对。","不好意思，我有不同的看法。"],"a":"C"}
+    ],
+    "reading_order": {
+      "kalimat": ["A. 经理说要考虑一下。","B. 经理说下个月可以开始。","C. 说话人建议推迟两个星期。"],
+      "kunci": "B → C → A"
+    },
+    "writing_rearrange": [
+      [["看法","我","不同的","有"],"我有不同的看法。"],
+      [["但是","可以","虽然","不够","我们的","时间表上","人"],"虽然时间表上可以，但是我们的人不够。"],
+      [["便宜","比","第一个","第二个"],"第二个比第一个便宜。"],
+      [["建议","先","我","小测试","做","一个","我们"],"我建议我们先做一个小测试。"]
+    ],
+    "writing_create": {
+      "kata": ["觉得","建议","虽然","比"],
+      "contoh_jawaban": ["我觉得这个价格有点高。","我建议我们先看数据。","虽然时间很紧，但是我们可以做完。","今年的成本比去年低。"]
+    },
+    "speaking_roleplay": {
+      "situasi": "Dalam rapat, atasanmu mengusulkan memakai pemasok baru yang lebih murah. Kamu setuju sebagian, tapi khawatir soal kualitas.",
+      "tujuan": "Mengakui sisi benarnya, menyampaikan keberatan dengan alasan, lalu menawarkan jalan tengah yang konkret.",
+      "wajib": ["我觉得","虽然…但是","比","建议","试试"]
+    },
+    "speaking_video": {
+      "tema": "Bandingkan dua cara kerja di tempatmu, lalu sampaikan mana yang kamu dukung dan kenapa.",
+      "wajib": ["从…来看","比","优点","缺点","总的来说"]
+    }
+  }
+}

@@ -1,0 +1,215 @@
+{
+  "no": 6,
+  "title_en": "Business Communication",
+  "title_id": "Komunikasi Kerja: Telepon, Chat, dan Email",
+  "note": "",
+  "objectives": [
+    "Menerima dan melakukan panggilan telepon kerja.",
+    "Menulis pesan chat kerja yang singkat tapi jelas.",
+    "Menulis email bisnis sederhana dengan pembuka dan penutup yang benar.",
+    "Melakukan follow up tanpa terdengar mendesak.",
+    "Mengonfirmasi penugasan supaya tidak ada yang terlewat."
+  ],
+  "primer": [],
+  "vocab": [
+    ["打电话","dǎ diànhuà","to make a phone call","menelepon"],
+    ["接电话","jiē diànhuà","to answer the phone","mengangkat telepon"],
+    ["喂","wéi","hello (on the phone)","halo (di telepon)"],
+    ["请问您是哪位","qǐngwèn nín shì nǎ wèi","who’s calling, please","boleh tahu ini siapa"],
+    ["转","zhuǎn","to transfer (a call)","menyambungkan"],
+    ["分机","fēnjī","extension","ekstensi"],
+    ["占线","zhànxiàn","the line is busy","saluran sibuk"],
+    ["留言","liúyán","to leave a message","meninggalkan pesan"],
+    ["回电","huídiàn","to call back","menelepon balik"],
+    ["听不清","tīng bu qīng","can’t hear clearly","tidak terdengar jelas"],
+    ["信号","xìnhào","signal","sinyal"],
+    ["挂","guà","to hang up","menutup telepon"],
+    ["微信","Wēixìn","WeChat","WeChat"],
+    ["消息","xiāoxi","message","pesan"],
+    ["发给","fā gěi","to send to","kirim ke"],
+    ["收到","shōudào","to receive","menerima, sudah terima"],
+    ["回复","huífù","to reply","membalas"],
+    ["附件","fùjiàn","attachment","lampiran"],
+    ["邮件","yóujiàn","email","email"],
+    ["主题","zhǔtí","subject line","subjek"],
+    ["尊敬的","zūnjìng de","dear (formal)","yang terhormat"],
+    ["您好","nín hǎo","hello (letter opening)","dengan hormat"],
+    ["此致敬礼","cǐzhì jìnglǐ","yours sincerely","hormat kami"],
+    ["祝好","zhù hǎo","best regards","salam"],
+    ["跟进","gēnjìn","to follow up","menindaklanjuti"],
+    ["催","cuī","to urge, to chase","menagih, mengejar"],
+    ["提醒一下","tíxǐng yíxià","just a reminder","sekadar mengingatkan"],
+    ["尽快","jǐnkuài","as soon as possible","secepatnya"],
+    ["截止","jiézhǐ","deadline","batas waktu"],
+    ["之前","zhīqián","before","sebelum"],
+    ["之后","zhīhòu","after","setelah"],
+    ["安排好","ānpái hǎo","to have it arranged","sudah diatur"],
+    ["处理","chǔlǐ","to handle","menangani"],
+    ["负责","fùzé","to be responsible for","bertanggung jawab"],
+    ["确认一下","quèrèn yíxià","let me confirm","saya konfirmasi"],
+    ["麻烦您","máfan nín","may I trouble you","mohon bantuannya"],
+    ["辛苦","xīnkǔ","thanks for the effort","terima kasih atas kerja kerasnya"],
+    ["方便的话","fāngbiàn de huà","if convenient","kalau memungkinkan"],
+    ["随时","suíshí","any time","kapan saja"],
+    ["以上","yǐshàng","the above","demikian di atas"],
+    ["请查收","qǐng cháshōu","please check the attachment","mohon diperiksa"],
+    ["期待","qīdài","to look forward to","menantikan"],
+    ["回音","huíyīn","reply","kabar balasan"],
+    ["打扰","dǎrǎo","to disturb","mengganggu"]
+  ],
+  "expressions": [
+    ["喂，您好，这里是星汉贸易。","Wéi, nín hǎo, zhèlǐ shì Xīnghàn màoyì.","Hello, this is Xinghan Trading.","Halo, ini Xinghan Trading."],
+    ["请问您找哪位？","Qǐngwèn nín zhǎo nǎ wèi?","Who would you like to speak to?","Anda mencari siapa ya?"],
+    ["请稍等，我帮您转过去。","Qǐng shāo děng, wǒ bāng nín zhuǎn guòqu.","One moment, I’ll transfer you.","Mohon tunggu, saya sambungkan."],
+    ["不好意思，他现在不在，需要留言吗？","Bù hǎoyìsi, tā xiànzài bú zài, xūyào liúyán ma?","Sorry, he’s not in. Would you like to leave a message?","Maaf, beliau sedang tidak ada. Mau titip pesan?"],
+    ["信号不太好，我听不清，可以再说一遍吗？","Xìnhào bú tài hǎo, wǒ tīng bu qīng, kěyǐ zài shuō yí biàn ma?","The signal is poor, I can’t hear you. Could you repeat that?","Sinyalnya kurang bagus, saya tidak dengar jelas. Bisa diulang?"],
+    ["文件我已经发给您了，请查收。","Wénjiàn wǒ yǐjīng fā gěi nín le, qǐng cháshōu.","I’ve sent you the document, please check.","Dokumennya sudah saya kirim, mohon diperiksa."],
+    ["收到，谢谢。","Shōudào, xièxie.","Received, thank you.","Sudah diterima, terima kasih."],
+    ["打扰一下，提醒一下上周的报价。","Dǎrǎo yíxià, tíxǐng yíxià shàng zhōu de bàojià.","Sorry to bother you — just a reminder about last week’s quotation.","Maaf mengganggu, sekadar mengingatkan soal penawaran minggu lalu."],
+    ["期待您的回音。","Qīdài nín de huíyīn.","I look forward to your reply.","Menantikan kabar dari Anda."]
+  ],
+  "dialogues": [
+    {
+      "situasi": "Menerima telepon masuk dan menyambungkan.",
+      "lines": [
+        ["A","喂，您好，这里是星汉贸易。","Wéi, nín hǎo, zhèlǐ shì Xīnghàn màoyì.","Hello, this is Xinghan Trading.","Halo, ini Xinghan Trading."],
+        ["B","您好，我找采购部的陈晓。","Nín hǎo, wǒ zhǎo cǎigòubù de Chén Xiǎo.","Hello, I’d like to speak to Chen Xiao in purchasing.","Halo, saya cari Chen Xiao dari bagian pembelian."],
+        ["A","请问您是哪位？","Qǐngwèn nín shì nǎ wèi?","May I ask who’s calling?","Boleh tahu ini siapa?"],
+        ["B","我是广州华丰的李经理。","Wǒ shì Guǎngzhōu Huáfēng de Lǐ jīnglǐ.","This is Manager Li from Huafeng, Guangzhou.","Saya Pak Li dari Huafeng, Guangzhou."],
+        ["A","请稍等，我帮您转过去。","Qǐng shāo děng, wǒ bāng nín zhuǎn guòqu.","One moment, I’ll transfer you.","Mohon tunggu, saya sambungkan."],
+        ["A","不好意思，他的电话占线，需要留言吗？","Bù hǎoyìsi, tā de diànhuà zhànxiàn, xūyào liúyán ma?","Sorry, his line is busy. Would you like to leave a message?","Maaf, teleponnya sedang sibuk. Mau titip pesan?"],
+        ["B","麻烦您让他回个电话，谢谢。","Máfan nín ràng tā huí ge diànhuà, xièxie.","Please ask him to call me back, thank you.","Tolong minta beliau telepon balik ya, terima kasih."]
+      ]
+    },
+    {
+      "situasi": "Sinyal buruk saat menelepon supplier.",
+      "lines": [
+        ["A","李经理，货什么时候发？","Lǐ jīnglǐ, huò shénme shíhou fā?","Manager Li, when will the goods ship?","Pak Li, barangnya dikirim kapan?"],
+        ["B","下……五……","Xià… wǔ…","Nex… day…","Ming… Jum…"],
+        ["A","不好意思，信号不太好，我听不清。可以再说一遍吗？","Bù hǎoyìsi, xìnhào bú tài hǎo, wǒ tīng bu qīng. Kěyǐ zài shuō yí biàn ma?","Sorry, the signal is bad and I can’t hear you. Could you say that again?","Maaf, sinyalnya kurang bagus, saya tidak dengar jelas. Bisa diulang?"],
+        ["B","下个星期五发。","Xià ge xīngqīwǔ fā.","We ship next Friday.","Dikirim Jumat depan."],
+        ["A","下个星期五，对吗？那我确认一下：一共十二箱。","Xià ge xīngqīwǔ, duì ma? Nà wǒ quèrèn yíxià: yígòng shí’èr xiāng.","Next Friday, correct? Let me confirm: twelve boxes in total.","Jumat depan, benar? Saya konfirmasi: totalnya dua belas dus."],
+        ["B","对。我一会儿发微信给你确认。","Duì. Wǒ yíhuìr fā Wēixìn gěi nǐ quèrèn.","Right. I’ll send you a WeChat message to confirm shortly.","Betul. Nanti saya kirim WeChat untuk konfirmasi."]
+      ]
+    },
+    {
+      "situasi": "Percakapan chat kerja yang singkat.",
+      "lines": [
+        ["A","王经理，报价单我发给您了，请查收。","Wáng jīnglǐ, bàojiàdān wǒ fā gěi nín le, qǐng cháshōu.","Manager Wang, I’ve sent you the quotation, please check.","Pak Wang, surat penawaran sudah saya kirim, mohon diperiksa."],
+        ["B","收到。附件里有运费吗？","Shōudào. Fùjiàn lǐ yǒu yùnfèi ma?","Received. Does the attachment include shipping?","Sudah diterima. Di lampirannya ada ongkos kirim?"],
+        ["A","有，第二页。","Yǒu, dì èr yè.","Yes, on page two.","Ada, di halaman dua."],
+        ["B","好的，我今天下午回复你。","Hǎo de, wǒ jīntiān xiàwǔ huífù nǐ.","All right, I’ll reply this afternoon.","Oke, siang ini saya balas."],
+        ["A","好的，辛苦您了。","Hǎo de, xīnkǔ nín le.","Thank you for your time.","Baik, terima kasih ya."]
+      ]
+    },
+    {
+      "situasi": "Follow up penawaran yang belum dibalas.",
+      "lines": [
+        ["A","李经理，打扰一下。","Lǐ jīnglǐ, dǎrǎo yíxià.","Manager Li, sorry to bother you.","Pak Li, maaf mengganggu."],
+        ["B","没关系，什么事？","Méi guānxi, shénme shì?","No problem, what is it?","Tidak apa-apa, ada apa?"],
+        ["A","提醒一下上周的报价，不知道您那边有结果了吗？","Tíxǐng yíxià shàng zhōu de bàojià, bù zhīdào nín nàbiān yǒu jiéguǒ le ma?","Just a reminder about last week’s quotation — has there been any decision on your side?","Sekadar mengingatkan soal penawaran minggu lalu, apakah dari sana sudah ada hasil?"],
+        ["B","不好意思，我们还在讨论。","Bù hǎoyìsi, wǒmen hái zài tǎolùn.","Sorry, we’re still discussing it.","Maaf, kami masih membahasnya."],
+        ["A","没关系。方便的话，这个星期五之前给我回音就可以。","Méi guānxi. Fāngbiàn de huà, zhège xīngqīwǔ zhīqián gěi wǒ huíyīn jiù kěyǐ.","That’s fine. If convenient, a reply before Friday would be enough.","Tidak apa-apa. Kalau memungkinkan, sebelum Jumat ini saja kabarnya."],
+        ["B","好，我尽快回复你。","Hǎo, wǒ jǐnkuài huífù nǐ.","All right, I’ll get back to you as soon as I can.","Baik, saya balas secepatnya."]
+      ]
+    }
+  ],
+  "reading": {
+    "title_zh": "一封询价邮件",
+    "title_id": "Sepucuk Email Permintaan Penawaran",
+    "zh": "主题：关于轮胎的询价\n\n尊敬的李经理：\n\n您好！我是印尼星汉贸易的陈晓，负责采购。上个月我们在广州展会上见过面。\n\n我们打算采购一批轮胎，具体要求在附件里，请查收。麻烦您报一下价格，包括运费和交货时间。如果数量增加到五百条，价格能不能再优惠一点？\n\n因为我们的客户等着回复，方便的话，请在这个星期五之前给我回音。\n\n以上，期待您的回复。\n\n祝好\n陈晓\n星汉贸易 采购部",
+    "py": "Zhǔtí: guānyú lúntāi de xúnjià\n\nZūnjìng de Lǐ jīnglǐ:\n\nNín hǎo! Wǒ shì Yìnní Xīnghàn màoyì de Chén Xiǎo, fùzé cǎigòu. Shàng ge yuè wǒmen zài Guǎngzhōu zhǎnhuì shàng jiàn guo miàn.\n\nWǒmen dǎsuàn cǎigòu yì pī lúntāi, jùtǐ yāoqiú zài fùjiàn lǐ, qǐng cháshōu. Máfan nín bào yíxià jiàgé, bāokuò yùnfèi hé jiāohuò shíjiān. Rúguǒ shùliàng zēngjiā dào wǔbǎi tiáo, jiàgé néng bu néng zài yōuhuì yìdiǎnr?\n\nYīnwèi wǒmen de kèhù děng zhe huífù, fāngbiàn de huà, qǐng zài zhège xīngqīwǔ zhīqián gěi wǒ huíyīn.\n\nYǐshàng, qīdài nín de huífù.\n\nZhù hǎo\nChén Xiǎo\nXīnghàn màoyì cǎigòubù",
+    "en": "Subject: Enquiry regarding tyres\n\nDear Manager Li,\n\nHello. This is Chen Xiao from Xinghan Trading in Indonesia, responsible for purchasing. We met last month at the Guangzhou trade fair.\n\nWe intend to purchase a batch of tyres; the detailed requirements are in the attachment, please check. Could you quote a price including freight and delivery time? If the quantity increases to five hundred pieces, would a better price be possible?\n\nBecause our client is waiting for a reply, a response before this Friday would be appreciated if convenient.\n\nThat is all. I look forward to hearing from you.\n\nBest regards,\nChen Xiao\nPurchasing Department, Xinghan Trading",
+    "id": "Subjek: Permintaan penawaran ban\n\nYang terhormat Bapak Li,\n\nDengan hormat. Saya Chen Xiao dari Xinghan Trading Indonesia, bagian pembelian. Bulan lalu kita sempat bertemu di pameran dagang Guangzhou.\n\nKami berencana membeli sejumlah ban; rincian permintaannya ada di lampiran, mohon diperiksa. Mohon dikirimkan penawaran harga termasuk ongkos kirim dan waktu pengiriman. Kalau jumlahnya naik menjadi lima ratus buah, apakah harganya bisa lebih baik lagi?\n\nKarena klien kami menunggu jawaban, kalau memungkinkan mohon kabarnya sebelum Jumat ini.\n\nDemikian, menantikan balasan Anda.\n\nSalam,\nChen Xiao\nDepartemen Pembelian, Xinghan Trading"
+  },
+  "grammar": [
+    {
+      "point": "Kerangka email bisnis Mandarin",
+      "penjelasan": "Email bisnis Mandarin punya urutan yang cukup baku, dan menyimpang darinya langsung terasa tidak profesional. Sapaan diakhiri titik dua, bukan koma. Baris pertama isi selalu dimulai dengan 您好 sebagai paragraf terpisah. Penutup diletakkan di baris sendiri, lalu nama dan jabatan.",
+      "pola": "主题：… ／ 尊敬的 + jabatan： ／ 您好！ ／ isi ／ 以上，期待您的回复。 ／ 祝好 ／ nama + departemen",
+      "contoh": [
+        ["尊敬的李经理：","Zūnjìng de Lǐ jīnglǐ:","Yang terhormat Bapak Li: (pakai titik dua)"],
+        ["以上，期待您的回复。","Yǐshàng, qīdài nín de huífù.","Demikian, menantikan balasan Anda."],
+        ["祝好","Zhù hǎo","Salam (penutup santai-formal)"]
+      ],
+      "tips": "此致敬礼 lebih formal dan biasanya dipakai untuk surat resmi ke instansi. Untuk email dagang sehari-hari, 祝好 sudah cukup dan tidak terasa kaku."
+    },
+    {
+      "point": "已经…了 — sesuatu sudah selesai",
+      "penjelasan": "了 di akhir kalimat menandai perubahan keadaan atau selesainya tindakan. Ditambah 已经 di depan kata kerja, artinya menjadi tegas: sudah dilakukan, tidak perlu ditanyakan lagi. Dalam komunikasi kerja ini penting supaya lawan bicara tahu bola sudah di pihaknya.",
+      "pola": "Subjek + 已经 + kata kerja + (objek) + 了",
+      "contoh": [
+        ["文件我已经发给您了。","Wénjiàn wǒ yǐjīng fā gěi nín le.","Dokumennya sudah saya kirim ke Anda."],
+        ["我已经跟供应商确认了。","Wǒ yǐjīng gēn gōngyìngshāng quèrèn le.","Saya sudah konfirmasi ke pemasok."]
+      ],
+      "tips": "Bentuk negatifnya BUKAN 没已经, melainkan 还没…: 我还没发 (saya belum kirim). Kalau memakai 没, 了 harus hilang."
+    },
+    {
+      "point": "在 + kata kerja — sedang berlangsung",
+      "penjelasan": "Untuk menyatakan sesuatu sedang berlangsung, letakkan 在 (atau 正在) tepat sebelum kata kerja. Ini berbeda dengan 在 sebagai penanda tempat di Chapter 1, yang selalu diikuti nama tempat.",
+      "pola": "Subjek + 在/正在 + kata kerja",
+      "contoh": [
+        ["我们还在讨论。","Wǒmen hái zài tǎolùn.","Kami masih membahasnya."],
+        ["他正在开会，等一下回你。","Tā zhèngzài kāihuì, děng yíxià huí nǐ.","Dia sedang rapat, sebentar lagi membalasmu."],
+        ["客户在等我们的回复。","Kèhù zài děng wǒmen de huífù.","Klien sedang menunggu jawaban kami."]
+      ],
+      "tips": "Kalau setelah 在 muncul nama tempat, artinya letak. Kalau muncul kata kerja, artinya sedang. 我在公司 (saya di kantor) versus 我在工作 (saya sedang bekerja)."
+    },
+    {
+      "point": "Melunakkan tagihan: 提醒一下 dan 方便的话",
+      "penjelasan": "Menagih jawaban itu wajar, tapi 催 terdengar mendesak dan bisa merusak hubungan. Dua pelunak yang lazim: 提醒一下 (sekadar mengingatkan) untuk membuka, dan 方便的话 (kalau memungkinkan) sebelum menyebut tenggat. Keduanya membiarkan lawan bicara menjaga muka.",
+      "pola": "打扰一下 + 提醒一下 + hal yang ditagih + 方便的话，请在 + waktu + 之前…",
+      "contoh": [
+        ["提醒一下上周的报价。","Tíxǐng yíxià shàng zhōu de bàojià.","Sekadar mengingatkan soal penawaran minggu lalu."],
+        ["方便的话，请在星期五之前给我回音。","Fāngbiàn de huà, qǐng zài xīngqīwǔ zhīqián gěi wǒ huíyīn.","Kalau memungkinkan, mohon kabarnya sebelum Jumat."]
+      ],
+      "tips": "Sebutkan alasan tenggatnya, seperti 因为客户等着回复. Tenggat yang punya alasan terasa sebagai informasi, sedangkan tenggat tanpa alasan terasa sebagai tekanan."
+    }
+  ],
+  "exercises": {
+    "listening_tf": [
+      ["陈晓负责采购。","B"],
+      ["陈晓和李经理没见过面。","S"]
+    ],
+    "listening_mc": [
+      {"q":"陈晓要李经理报什么？","c":["只有价格","价格、运费和交货时间","只有交货时间"],"a":"B"},
+      {"q":"如果数量增加到五百条，陈晓希望怎么样？","c":["价格更优惠","交货更快","付款更晚"],"a":"A"}
+    ],
+    "listening_open": [
+      ["陈晓希望什么时候之前收到回音？","这个星期五之前。"]
+    ],
+    "reading_match": {
+      "soal": ["请问您是哪位？","文件发给您了，请查收。","信号不太好，我听不清。","不知道您那边有结果了吗？","他的电话占线。"],
+      "pilihan": ["A. 收到，谢谢。","B. 不好意思，我们还在讨论。","C. 我是广州华丰的李经理。","D. 那需要留言吗？","E. 我再说一遍。"],
+      "kunci": ["C","A","E","B","D"]
+    },
+    "reading_mc": [
+      {"q":"这封邮件的主要目的是什么？","c":["询价","投诉","邀请开会"],"a":"A"},
+      {"q":"哪个句子是对的？","c":["我没已经发。","我还没发。","我已经没发。"],"a":"B"},
+      {"q":"“他正在开会”的意思是：","c":["他在会议室里","他现在开会中","他要去开会"],"a":"B"}
+    ],
+    "reading_order": {
+      "kalimat": ["A. 陈晓发邮件询价。","B. 陈晓和李经理在展会上见面。","C. 陈晓提醒李经理回复。"],
+      "kunci": "B → A → C"
+    },
+    "writing_rearrange": [
+      [["发给","文件","了","我","您","已经"],"文件我已经发给您了。"],
+      [["讨论","我们","在","还"],"我们还在讨论。"],
+      [["之前","请","回音","给我","星期五","这个"],"请在这个星期五之前给我回音。"],
+      [["一遍","可以","吗","再","说","？"],"可以再说一遍吗？"]
+    ],
+    "writing_create": {
+      "kata": ["查收","提醒一下","尽快","方便的话"],
+      "contoh_jawaban": ["报价单在附件里，请查收。","提醒一下明天的会议。","我会尽快回复您。","方便的话，请今天下午给我电话。"]
+    },
+    "speaking_roleplay": {
+      "situasi": "Kamu menelepon pemasok untuk menagih jadwal kirim yang belum pasti, tapi sinyalnya buruk dan orangnya sedang rapat.",
+      "tujuan": "Memperkenalkan diri di telepon, menyampaikan keperluan, minta diulang saat tidak jelas, lalu menitipkan pesan.",
+      "wajib": ["喂","我是","听不清","留言","尽快"]
+    },
+    "speaking_video": {
+      "tema": "Bacakan isi email permintaan penawaran yang kamu tulis sendiri, seolah sedang menjelaskannya lewat telepon.",
+      "wajib": ["询价","附件","运费","交货时间","期待"]
+    }
+  }
+}

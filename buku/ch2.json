@@ -1,0 +1,214 @@
+{
+  "no": 2,
+  "title_en": "Daily Office Communication",
+  "title_id": "Komunikasi Sehari-hari di Kantor",
+  "note": "",
+  "objectives": [
+    "Menyapa rekan kerja dan atasan sesuai waktu dan tingkat kesopanan.",
+    "Menanyakan kabar dan menjawabnya secara wajar.",
+    "Meminta bantuan tanpa terdengar memerintah.",
+    "Meminta izin untuk keluar, terlambat, atau meninggalkan pekerjaan sebentar.",
+    "Menanyakan letak ruangan, orang, dan barang di kantor.",
+    "Berterima kasih dan meminta maaf dengan bobot yang tepat."
+  ],
+  "primer": [],
+  "vocab": [
+    ["早上好","zǎoshang hǎo","good morning","selamat pagi"],
+    ["下午好","xiàwǔ hǎo","good afternoon","selamat siang"],
+    ["最近","zuìjìn","lately, recently","belakangan ini"],
+    ["怎么样","zěnmeyàng","how is it going","bagaimana"],
+    ["忙","máng","busy","sibuk"],
+    ["累","lèi","tired","lelah"],
+    ["还行","hái xíng","not bad, OK","lumayan"],
+    ["帮","bāng","to help","membantu"],
+    ["帮忙","bāngmáng","to lend a hand","membantu, menolong"],
+    ["帮我","bāng wǒ","help me","bantu saya"],
+    ["可以","kěyǐ","can, may","boleh, bisa"],
+    ["能","néng","to be able to","dapat, mampu"],
+    ["请","qǐng","please; to invite","tolong; mempersilakan"],
+    ["一下","yíxià","a moment, briefly","sebentar"],
+    ["麻烦","máfan","to trouble someone; troublesome","merepotkan; merepotkan"],
+    ["不好意思","bù hǎoyìsi","excuse me, sorry (light)","maaf (ringan), nggak enak hati"],
+    ["请假","qǐngjià","to ask for leave","minta izin tidak masuk"],
+    ["迟到","chídào","to be late","terlambat"],
+    ["早退","zǎotuì","to leave early","pulang lebih awal"],
+    ["出去","chūqu","to go out","keluar"],
+    ["回来","huílai","to come back","kembali"],
+    ["马上","mǎshàng","right away","segera"],
+    ["等一下","děng yíxià","wait a moment","tunggu sebentar"],
+    ["哪儿","nǎr","where","di mana"],
+    ["这儿","zhèr","here","di sini"],
+    ["那儿","nàr","there","di sana"],
+    ["办公室","bàngōngshì","office room","ruang kantor"],
+    ["会议室","huìyìshì","meeting room","ruang rapat"],
+    ["洗手间","xǐshǒujiān","restroom","toilet"],
+    ["前台","qiántái","reception desk","resepsionis"],
+    ["楼上","lóushàng","upstairs","lantai atas"],
+    ["楼下","lóuxià","downstairs","lantai bawah"],
+    ["旁边","pángbiān","beside, next to","di sebelah"],
+    ["里面","lǐmiàn","inside","di dalam"],
+    ["电脑","diànnǎo","computer","komputer"],
+    ["文件","wénjiàn","document, file","dokumen, berkas"],
+    ["打印","dǎyìn","to print","mencetak"],
+    ["复印","fùyìn","to photocopy","memfotokopi"],
+    ["发","fā","to send","mengirim"],
+    ["拿","ná","to take, to fetch","mengambil"],
+    ["找","zhǎo","to look for","mencari"],
+    ["用","yòng","to use","memakai"],
+    ["没问题","méi wèntí","no problem","tidak masalah"],
+    ["辛苦了","xīnkǔ le","thanks for your hard work","terima kasih sudah bekerja keras"]
+  ],
+  "expressions": [
+    ["早上好，王经理。","Zǎoshang hǎo, Wáng jīnglǐ.","Good morning, Manager Wang.","Selamat pagi, Pak Wang."],
+    ["最近工作怎么样？","Zuìjìn gōngzuò zěnmeyàng?","How’s work lately?","Belakangan ini kerjaan gimana?"],
+    ["还行，就是有点儿忙。","Hái xíng, jiùshì yǒudiǎnr máng.","Not bad, just a bit busy.","Lumayan, cuma agak sibuk."],
+    ["麻烦您帮我看一下这个文件。","Máfan nín bāng wǒ kàn yíxià zhège wénjiàn.","Could I trouble you to take a look at this document?","Boleh minta tolong lihat dokumen ini sebentar?"],
+    ["我可以用一下打印机吗？","Wǒ kěyǐ yòng yíxià dǎyìnjī ma?","May I use the printer for a moment?","Boleh saya pakai printernya sebentar?"],
+    ["不好意思，我今天要早退一个小时。","Bù hǎoyìsi, wǒ jīntiān yào zǎotuì yí ge xiǎoshí.","Sorry, I need to leave an hour early today.","Maaf, hari ini saya harus pulang sejam lebih awal."],
+    ["请问会议室在哪儿？","Qǐngwèn huìyìshì zài nǎr?","Excuse me, where is the meeting room?","Permisi, ruang rapat di mana ya?"],
+    ["麻烦您了，谢谢。","Máfan nín le, xièxie.","Sorry to trouble you, thank you.","Maaf merepotkan, terima kasih."],
+    ["辛苦了，明天见。","Xīnkǔ le, míngtiān jiàn.","Thanks for today, see you tomorrow.","Terima kasih kerja kerasnya, sampai besok."]
+  ],
+  "dialogues": [
+    {
+      "situasi": "Berpapasan dengan atasan di pagi hari.",
+      "lines": [
+        ["A","早上好，王经理。","Zǎoshang hǎo, Wáng jīnglǐ.","Good morning, Manager Wang.","Selamat pagi, Pak Wang."],
+        ["B","早，陈晓。最近怎么样？","Zǎo, Chén Xiǎo. Zuìjìn zěnmeyàng?","Morning, Chen Xiao. How have you been?","Pagi, Chen Xiao. Belakangan ini gimana?"],
+        ["A","还行，就是有点儿忙。","Hái xíng, jiùshì yǒudiǎnr máng.","Not bad, just a bit busy.","Lumayan, cuma agak sibuk."],
+        ["B","辛苦了。上午的报告做完了吗？","Xīnkǔ le. Shàngwǔ de bàogào zuò wán le ma?","Thanks for the hard work. Is this morning’s report done?","Terima kasih kerja kerasnya. Laporan pagi ini sudah selesai?"],
+        ["A","快好了，十点前发给您。","Kuài hǎo le, shí diǎn qián fā gěi nín.","Almost. I’ll send it to you before ten.","Hampir selesai, sebelum jam sepuluh saya kirim."]
+      ]
+    },
+    {
+      "situasi": "Minta tolong rekan kerja mencetak dokumen.",
+      "lines": [
+        ["A","张丽，麻烦你帮我一个忙，可以吗？","Zhāng Lì, máfan nǐ bāng wǒ yí ge máng, kěyǐ ma?","Zhang Li, could you help me with something?","Zhang Li, boleh minta tolong sebentar?"],
+        ["B","可以，什么事？","Kěyǐ, shénme shì?","Sure, what is it?","Boleh, ada apa?"],
+        ["A","这个文件能帮我打印五份吗？","Zhège wénjiàn néng bāng wǒ dǎyìn wǔ fèn ma?","Could you print five copies of this document for me?","Dokumen ini bisa tolong dicetak lima rangkap?"],
+        ["B","没问题。什么时候要？","Méi wèntí. Shénme shíhou yào?","No problem. When do you need it?","Tidak masalah. Kapan dibutuhkan?"],
+        ["A","下午两点开会要用。麻烦你了。","Xiàwǔ liǎng diǎn kāihuì yào yòng. Máfan nǐ le.","For the two o’clock meeting. Thanks for the trouble.","Buat rapat jam dua siang. Maaf merepotkan."]
+      ]
+    },
+    {
+      "situasi": "Meminta izin datang terlambat.",
+      "lines": [
+        ["A","王经理，不好意思，我明天可能会迟到。","Wáng jīnglǐ, bù hǎoyìsi, wǒ míngtiān kěnéng huì chídào.","Manager Wang, sorry, I may be late tomorrow.","Pak Wang, maaf, besok saya mungkin terlambat."],
+        ["B","怎么了？","Zěnme le?","What’s the matter?","Kenapa?"],
+        ["A","我早上要去银行办事，大概十点到公司。","Wǒ zǎoshang yào qù yínháng bànshì, dàgài shí diǎn dào gōngsī.","I have to go to the bank in the morning; I’ll be at the office around ten.","Pagi saya harus ke bank, kira-kira jam sepuluh sampai kantor."],
+        ["B","可以，你先跟人事部说一下。","Kěyǐ, nǐ xiān gēn rénshìbù shuō yíxià.","That’s fine, just let HR know first.","Boleh, kasih tahu HRD dulu ya."],
+        ["A","好的，谢谢您。","Hǎo de, xièxie nín.","All right, thank you.","Baik, terima kasih."]
+      ]
+    },
+    {
+      "situasi": "Tamu menanyakan letak ruangan.",
+      "lines": [
+        ["A","请问，会议室在哪儿？","Qǐngwèn, huìyìshì zài nǎr?","Excuse me, where is the meeting room?","Permisi, ruang rapat di mana ya?"],
+        ["B","在楼上，三楼。","Zài lóushàng, sān lóu.","Upstairs, on the third floor.","Di lantai atas, lantai tiga."],
+        ["A","洗手间呢？","Xǐshǒujiān ne?","And the restroom?","Kalau toilet?"],
+        ["B","洗手间在会议室旁边。","Xǐshǒujiān zài huìyìshì pángbiān.","The restroom is next to the meeting room.","Toilet ada di sebelah ruang rapat."],
+        ["A","谢谢您。","Xièxie nín.","Thank you.","Terima kasih."]
+      ]
+    }
+  ],
+  "reading": {
+    "title_zh": "办公室的一个上午",
+    "title_id": "Satu Pagi di Kantor",
+    "zh": "今天早上我八点半到公司。我先跟同事打招呼，然后开电脑看邮件。九点，张丽来找我，她请我帮她打印会议文件。我说没问题，十分钟就好了。十点，王经理问我报告做完了没有。我说快好了，中午前发给他。下午我要去客户那儿，所以我跟经理请了两个小时的假。经理说可以，但是回来以后要跟他说一下。",
+    "py": "Jīntiān zǎoshang wǒ bā diǎn bàn dào gōngsī. Wǒ xiān gēn tóngshì dǎ zhāohu, ránhòu kāi diànnǎo kàn yóujiàn. Jiǔ diǎn, Zhāng Lì lái zhǎo wǒ, tā qǐng wǒ bāng tā dǎyìn huìyì wénjiàn. Wǒ shuō méi wèntí, shí fēnzhōng jiù hǎo le. Shí diǎn, Wáng jīnglǐ wèn wǒ bàogào zuò wán le méiyǒu. Wǒ shuō kuài hǎo le, zhōngwǔ qián fā gěi tā. Xiàwǔ wǒ yào qù kèhù nàr, suǒyǐ wǒ gēn jīnglǐ qǐng le liǎng ge xiǎoshí de jià. Jīnglǐ shuō kěyǐ, dànshì huílai yǐhòu yào gēn tā shuō yíxià.",
+    "en": "I arrived at the office at half past eight this morning. First I greeted my colleagues, then turned on my computer to check email. At nine, Zhang Li came to find me and asked me to help print the meeting documents. I said no problem, it would take ten minutes. At ten, Manager Wang asked whether my report was finished. I said it was nearly done and I would send it to him before noon. In the afternoon I have to visit a client, so I asked the manager for two hours of leave. He said that was fine, but I should report to him once I’m back.",
+    "id": "Tadi pagi saya sampai kantor pukul setengah sembilan. Saya menyapa rekan-rekan dulu, lalu menyalakan komputer untuk cek email. Pukul sembilan Zhang Li datang menghampiri saya, minta tolong dicetakkan dokumen rapat. Saya bilang tidak masalah, sepuluh menit selesai. Pukul sepuluh Pak Wang menanyakan laporan saya sudah selesai atau belum. Saya bilang hampir, sebelum tengah hari saya kirim. Siangnya saya harus ke tempat klien, jadi saya minta izin dua jam ke manajer. Manajer bilang boleh, tapi setelah kembali harus lapor."
+  },
+  "grammar": [
+    {
+      "point": "请 / 麻烦 / 帮 — tiga tingkat kesopanan saat minta tolong",
+      "penjelasan": "Ketiganya bisa diterjemahkan “tolong”, tapi bobotnya berbeda. 帮 paling netral, dipakai antar rekan setingkat. 请 lebih formal, terdengar seperti mempersilakan. 麻烦 paling sopan karena secara harfiah berarti “merepotkan Anda” — pilih ini untuk atasan atau klien.",
+      "pola": "帮 + orang + kata kerja   |   请 + orang + kata kerja   |   麻烦 + orang + kata kerja",
+      "contoh": [
+        ["帮我拿一下文件。","Bāng wǒ ná yíxià wénjiàn.","Tolong ambilkan dokumennya. (ke rekan)"],
+        ["请您稍等。","Qǐng nín shāo děng.","Mohon tunggu sebentar. (formal)"],
+        ["麻烦您帮我看一下。","Máfan nín bāng wǒ kàn yíxià.","Boleh minta tolong dilihat sebentar? (paling sopan)"]
+      ],
+      "tips": "麻烦 dan 帮 boleh dipakai bersamaan seperti contoh ketiga, dan justru itu bentuk paling aman untuk atasan. 请 sendirian ke atasan bisa terdengar seperti memerintah."
+    },
+    {
+      "point": "一下 yíxià — pelunak yang bikin permintaan tidak terdengar memerintah",
+      "penjelasan": "一下 diletakkan setelah kata kerja dan artinya “sebentar saja”. Fungsi sebenarnya bukan soal durasi, tapi soal nada: kalimat yang sama tanpa 一下 terdengar seperti instruksi, dengan 一下 terdengar seperti permintaan.",
+      "pola": "kata kerja + 一下",
+      "contoh": [
+        ["看一下","kàn yíxià","lihat sebentar"],
+        ["等一下","děng yíxià","tunggu sebentar"],
+        ["您来一下我的办公室。","Nín lái yíxià wǒ de bàngōngshì.","Mampir sebentar ke ruangan saya."]
+      ],
+      "tips": "Bandingkan 你看 (Lihat!) dengan 你看一下 (Coba lihat sebentar). Bedanya cuma dua suku kata, tapi yang pertama bisa bikin rekan kerja tersinggung."
+    },
+    {
+      "point": "可以 / 能 — dua cara minta izin dan menyatakan kemampuan",
+      "penjelasan": "可以 tentang izin: boleh atau tidak boleh. 能 tentang kemampuan atau kemungkinan: bisa atau tidak bisa. Dalam praktik keduanya sering tumpang tindih, tapi kalau kamu meminta izin, 可以 selalu aman.",
+      "pola": "Subjek + 可以/能 + kata kerja + 吗？",
+      "contoh": [
+        ["我可以用一下你的电脑吗？","Wǒ kěyǐ yòng yíxià nǐ de diànnǎo ma?","Boleh saya pakai komputermu sebentar? (izin)"],
+        ["你今天能加班吗？","Nǐ jīntiān néng jiābān ma?","Hari ini kamu bisa lembur? (kemampuan/kesediaan)"],
+        ["对不起，我不能去。","Duìbuqǐ, wǒ bù néng qù.","Maaf, saya tidak bisa datang."]
+      ],
+      "tips": "Untuk menolak permintaan izin, jangan pakai 不可以 — itu terdengar keras seperti melarang. Lebih halus: 不好意思，现在有人在用."
+    },
+    {
+      "point": "在 + tempat — menanyakan dan menyebut letak",
+      "penjelasan": "Untuk menanyakan letak sesuatu, susunannya benda dulu, baru 在, baru kata tanya 哪儿. Perhatikan bahwa kata tanya tetap berada di posisi jawabannya — Mandarin tidak memindahkan kata tanya ke depan kalimat seperti bahasa Inggris.",
+      "pola": "benda/orang + 在 + 哪儿？→ benda/orang + 在 + tempat",
+      "contoh": [
+        ["会议室在哪儿？","Huìyìshì zài nǎr?","Ruang rapat di mana?"],
+        ["会议室在三楼。","Huìyìshì zài sān lóu.","Ruang rapat di lantai tiga."],
+        ["洗手间在会议室旁边。","Xǐshǒujiān zài huìyìshì pángbiān.","Toilet di sebelah ruang rapat."]
+      ],
+      "tips": "Kata letak seperti 旁边, 里面, 楼上 diletakkan SESUDAH tempat acuannya, kebalikan dari bahasa Indonesia. “Di sebelah ruang rapat” jadi 会议室旁边, bukan 旁边会议室."
+    }
+  ],
+  "exercises": {
+    "listening_tf": [
+      ["陈晓今天八点半到公司。","B"],
+      ["王经理请陈晓打印文件。","S"]
+    ],
+    "listening_mc": [
+      {"q":"张丽找陈晓做什么？","c":["打印文件","开会","请假"],"a":"A"},
+      {"q":"陈晓下午请了多久的假？","c":["一个小时","两个小时","半天"],"a":"B"}
+    ],
+    "listening_open": [
+      ["陈晓什么时候把报告发给王经理？","中午前。"]
+    ],
+    "reading_match": {
+      "soal": ["麻烦你帮我打印一下。","请问洗手间在哪儿？","最近工作怎么样？","不好意思，我明天要迟到。","辛苦了。"],
+      "pilihan": ["A. 还行，就是有点儿忙。","B. 没问题，什么时候要？","C. 没关系，你跟人事部说一下。","D. 在会议室旁边。","E. 您也辛苦了。"],
+      "kunci": ["B","D","A","C","E"]
+    },
+    "reading_mc": [
+      {"q":"陈晓下午为什么请假？","c":["身体不舒服","要去客户那儿","要去银行"],"a":"B"},
+      {"q":"哪个说法对上司最有礼貌？","c":["帮我看看","请你看看","麻烦您帮我看一下"],"a":"C"},
+      {"q":"“洗手间在会议室旁边”里，会议室是：","c":["要找的地方","参照的地方","两个都不是"],"a":"B"}
+    ],
+    "reading_order": {
+      "kalimat": ["A. 王经理问报告做完了没有。","B. 陈晓到公司开电脑看邮件。","C. 张丽请陈晓打印文件。"],
+      "kunci": "B → C → A"
+    },
+    "writing_rearrange": [
+      [["帮","一下","看","麻烦","您","我"],"麻烦您帮我看一下。"],
+      [["在","会议室","哪儿","？"],"会议室在哪儿？"],
+      [["电脑","可以","用","我","吗","一下","你的","？"],"我可以用一下你的电脑吗？"],
+      [["旁边","洗手间","会议室","在"],"洗手间在会议室旁边。"]
+    ],
+    "writing_create": {
+      "kata": ["麻烦","一下","请假","旁边"],
+      "contoh_jawaban": ["麻烦您等一下。","请帮我看一下这个文件。","我明天想请一天假。","打印机在我的办公室旁边。"]
+    },
+    "speaking_roleplay": {
+      "situasi": "Kamu butuh bantuan rekan kerja untuk memfotokopi berkas rapat, tapi dia kelihatan sedang sibuk.",
+      "tujuan": "Menyapa, meminta bantuan dengan sopan, menyebut kapan berkas dibutuhkan, dan berterima kasih.",
+      "wajib": ["麻烦","帮","一下","什么时候","谢谢"]
+    },
+    "speaking_video": {
+      "tema": "Ceritakan satu pagi di kantormu, dari datang sampai istirahat siang.",
+      "wajib": ["早上","同事","帮","请假","辛苦了"]
+    }
+  }
+}

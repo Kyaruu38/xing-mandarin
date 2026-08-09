@@ -1,0 +1,807 @@
+{
+ "no": 10,
+ "title_en": "Import & Export",
+ "title_id": "Ekspor dan Impor",
+ "note": "Chapter ini paling padat istilah. Jangan hafal semuanya sekaligus — kuasai dulu alur prosesnya di bagian bacaan, kosakatanya akan menempel sendiri.",
+ "objectives": [
+  "Menyebut para pihak dalam rantai ekspor-impor dan perannya.",
+  "Membaca dan membicarakan dokumen dagang utama.",
+  "Menjelaskan alur proses dari pesanan sampai barang diterima.",
+  "Menanyakan status pengiriman dan dokumen.",
+  "Memahami istilah dasar Incoterm yang paling sering dipakai."
+ ],
+ "primer": [
+  {
+   "h": "Alur ekspor-impor dalam satu paragraf",
+   "p": "Pembeli mengirim permintaan penawaran, penjual membalas dengan penawaran harga. Kalau cocok, pembeli menerbitkan purchase order dan membayar uang muka. Pabrik memproduksi, lalu barang dikemas dan didaftarkan dalam packing list. Barang dikirim ke pelabuhan, diurus bea cukai ekspor, dimuat ke kontainer, dan perusahaan pelayaran menerbitkan bill of lading. Penjual mengirim invoice dan dokumen ke pembeli, pembeli melunasi sisanya. Sesampainya di pelabuhan tujuan, barang diurus bea cukai impor, baru dikirim ke gudang. Semua istilah di chapter ini menempel di salah satu langkah tadi."
+  }
+ ],
+ "vocab": [
+  [
+   "进口",
+   "jìnkǒu",
+   "to import",
+   "impor"
+  ],
+  [
+   "出口",
+   "chūkǒu",
+   "to export",
+   "ekspor"
+  ],
+  [
+   "供应商",
+   "gōngyìngshāng",
+   "supplier",
+   "pemasok"
+  ],
+  [
+   "工厂",
+   "gōngchǎng",
+   "factory",
+   "pabrik"
+  ],
+  [
+   "买方",
+   "mǎifāng",
+   "buyer",
+   "pihak pembeli"
+  ],
+  [
+   "卖方",
+   "màifāng",
+   "seller",
+   "pihak penjual"
+  ],
+  [
+   "货代",
+   "huòdài",
+   "freight forwarder",
+   "forwarder"
+  ],
+  [
+   "船公司",
+   "chuán gōngsī",
+   "shipping line",
+   "perusahaan pelayaran"
+  ],
+  [
+   "订单",
+   "dìngdān",
+   "purchase order, PO",
+   "purchase order"
+  ],
+  [
+   "发票",
+   "fāpiào",
+   "invoice",
+   "invoice"
+  ],
+  [
+   "装箱单",
+   "zhuāngxiāngdān",
+   "packing list",
+   "packing list"
+  ],
+  [
+   "提单",
+   "tídān",
+   "bill of lading, B/L",
+   "bill of lading"
+  ],
+  [
+   "产地证",
+   "chǎndìzhèng",
+   "certificate of origin",
+   "surat keterangan asal"
+  ],
+  [
+   "合同",
+   "hétong",
+   "contract",
+   "kontrak"
+  ],
+  [
+   "报关",
+   "bàoguān",
+   "customs declaration",
+   "pemberitahuan pabean"
+  ],
+  [
+   "清关",
+   "qīngguān",
+   "customs clearance",
+   "proses bea cukai"
+  ],
+  [
+   "海关",
+   "hǎiguān",
+   "customs",
+   "bea cukai"
+  ],
+  [
+   "关税",
+   "guānshuì",
+   "import duty",
+   "bea masuk"
+  ],
+  [
+   "检验",
+   "jiǎnyàn",
+   "inspection",
+   "pemeriksaan"
+  ],
+  [
+   "集装箱",
+   "jízhuāngxiāng",
+   "container",
+   "kontainer"
+  ],
+  [
+   "整柜",
+   "zhěngguì",
+   "full container load, FCL",
+   "satu kontainer penuh"
+  ],
+  [
+   "拼柜",
+   "pīnguì",
+   "less than container load, LCL",
+   "kontainer gabungan"
+  ],
+  [
+   "装柜",
+   "zhuāngguì",
+   "to load the container",
+   "memuat kontainer"
+  ],
+  [
+   "毛重",
+   "máozhòng",
+   "gross weight",
+   "berat kotor"
+  ],
+  [
+   "净重",
+   "jìngzhòng",
+   "net weight",
+   "berat bersih"
+  ],
+  [
+   "体积",
+   "tǐjī",
+   "volume, CBM",
+   "volume"
+  ],
+  [
+   "唛头",
+   "màtóu",
+   "shipping mark",
+   "shipping mark"
+  ],
+  [
+   "港口",
+   "gǎngkǒu",
+   "port",
+   "pelabuhan"
+  ],
+  [
+   "装货港",
+   "zhuānghuògǎng",
+   "port of loading",
+   "pelabuhan muat"
+  ],
+  [
+   "目的港",
+   "mùdìgǎng",
+   "port of destination",
+   "pelabuhan tujuan"
+  ],
+  [
+   "海运",
+   "hǎiyùn",
+   "sea freight",
+   "pengiriman laut"
+  ],
+  [
+   "空运",
+   "kōngyùn",
+   "air freight",
+   "pengiriman udara"
+  ],
+  [
+   "船期",
+   "chuánqī",
+   "sailing schedule",
+   "jadwal kapal"
+  ],
+  [
+   "开船",
+   "kāichuán",
+   "vessel departs",
+   "kapal berangkat"
+  ],
+  [
+   "到港",
+   "dàogǎng",
+   "to arrive at port",
+   "tiba di pelabuhan"
+  ],
+  [
+   "提货",
+   "tíhuò",
+   "to pick up the goods",
+   "mengambil barang"
+  ],
+  [
+   "仓库",
+   "cāngkù",
+   "warehouse",
+   "gudang"
+  ],
+  [
+   "运输",
+   "yùnshū",
+   "transport",
+   "pengangkutan"
+  ],
+  [
+   "保险",
+   "bǎoxiǎn",
+   "insurance",
+   "asuransi"
+  ],
+  [
+   "延误",
+   "yánwù",
+   "delay",
+   "keterlambatan"
+  ],
+  [
+   "跟单",
+   "gēndān",
+   "to follow up on an order",
+   "memantau order"
+  ],
+  [
+   "预计到港时间",
+   "yùjì dàogǎng shíjiān",
+   "ETA",
+   "perkiraan tiba"
+  ],
+  [
+   "单据",
+   "dānjù",
+   "documents",
+   "dokumen"
+  ],
+  [
+   "齐了",
+   "qí le",
+   "complete, all in",
+   "sudah lengkap"
+  ]
+ ],
+ "expressions": [
+  [
+   "这批货走海运还是空运？",
+   "Zhè pī huò zǒu hǎiyùn háishi kōngyùn?",
+   "Will this shipment go by sea or by air?",
+   "Barang ini lewat laut atau udara?"
+  ],
+  [
+   "整柜还是拼柜？",
+   "Zhěngguì háishi pīnguì?",
+   "Full container or LCL?",
+   "Satu kontainer penuh atau gabungan?"
+  ],
+  [
+   "装货港是广州，目的港是雅加达。",
+   "Zhuānghuògǎng shì Guǎngzhōu, mùdìgǎng shì Yǎjiādá.",
+   "Port of loading is Guangzhou, port of destination is Jakarta.",
+   "Pelabuhan muat Guangzhou, pelabuhan tujuan Jakarta."
+  ],
+  [
+   "船期是这个星期五，预计到港时间是二十号。",
+   "Chuánqī shì zhège xīngqīwǔ, yùjì dàogǎng shíjiān shì èrshí hào.",
+   "The vessel sails this Friday; ETA is the twentieth.",
+   "Jadwal kapal Jumat ini, perkiraan tiba tanggal dua puluh."
+  ],
+  [
+   "单据齐了吗？发票、装箱单和提单。",
+   "Dānjù qí le ma? Fāpiào, zhuāngxiāngdān hé tídān.",
+   "Are the documents complete? Invoice, packing list and B/L.",
+   "Dokumennya sudah lengkap? Invoice, packing list, dan bill of lading."
+  ],
+  [
+   "产地证还没办好，可能会延误两天。",
+   "Chǎndìzhèng hái méi bàn hǎo, kěnéng huì yánwù liǎng tiān.",
+   "The certificate of origin isn’t ready; it may delay us two days.",
+   "Surat keterangan asal belum jadi, mungkin telat dua hari."
+  ],
+  [
+   "清关大概要三个工作日。",
+   "Qīngguān dàgài yào sān ge gōngzuòrì.",
+   "Customs clearance takes about three working days.",
+   "Proses bea cukai kira-kira tiga hari kerja."
+  ],
+  [
+   "关税由买方承担。",
+   "Guānshuì yóu mǎifāng chéngdān.",
+   "Import duty is borne by the buyer.",
+   "Bea masuk ditanggung pihak pembeli."
+  ],
+  [
+   "到港以后我们安排提货。",
+   "Dàogǎng yǐhòu wǒmen ānpái tíhuò.",
+   "We’ll arrange pickup once it arrives.",
+   "Setelah tiba di pelabuhan kami atur pengambilannya."
+  ]
+ ],
+ "dialogues": [
+  {
+   "situasi": "Menentukan cara kirim dengan forwarder.",
+   "lines": [
+    [
+     "A",
+     "这批货走海运还是空运？",
+     "Zhè pī huò zǒu hǎiyùn háishi kōngyùn?",
+     "Sea or air for this shipment?",
+     "Barang ini lewat laut atau udara?"
+    ],
+    [
+     "B",
+     "海运。一共二十立方，整柜还是拼柜？",
+     "Hǎiyùn. Yígòng èrshí lìfāng, zhěngguì háishi pīnguì?",
+     "Sea. Twenty cubic metres in total — full container or LCL?",
+     "Laut. Totalnya dua puluh kubik, satu kontainer penuh atau gabungan?"
+    ],
+    [
+     "A",
+     "二十立方，一个二十尺柜够吗？",
+     "Èrshí lìfāng, yí ge èrshí chǐ guì gòu ma?",
+     "Twenty cubic metres — is a twenty-foot container enough?",
+     "Dua puluh kubik, satu kontainer dua puluh kaki cukup?"
+    ],
+    [
+     "B",
+     "够。装货港是广州，目的港是雅加达，对吗？",
+     "Gòu. Zhuānghuògǎng shì Guǎngzhōu, mùdìgǎng shì Yǎjiādá, duì ma?",
+     "Enough. Loading port Guangzhou, destination Jakarta, correct?",
+     "Cukup. Pelabuhan muat Guangzhou, tujuan Jakarta, benar?"
+    ],
+    [
+     "A",
+     "对。船期什么时候？",
+     "Duì. Chuánqī shénme shíhou?",
+     "Right. When does it sail?",
+     "Betul. Jadwal kapalnya kapan?"
+    ],
+    [
+     "B",
+     "这个星期五开船，预计到港时间是二十号。",
+     "Zhège xīngqīwǔ kāichuán, yùjì dàogǎng shíjiān shì èrshí hào.",
+     "It sails this Friday; ETA the twentieth.",
+     "Jumat ini berangkat, perkiraan tiba tanggal dua puluh."
+    ]
+   ]
+  },
+  {
+   "situasi": "Memeriksa kelengkapan dokumen sebelum kapal berangkat.",
+   "lines": [
+    [
+     "A",
+     "单据齐了吗？",
+     "Dānjù qí le ma?",
+     "Are the documents complete?",
+     "Dokumennya sudah lengkap?"
+    ],
+    [
+     "B",
+     "发票和装箱单好了，提单要等开船以后才能出。",
+     "Fāpiào hé zhuāngxiāngdān hǎo le, tídān yào děng kāichuán yǐhòu cái néng chū.",
+     "Invoice and packing list are ready; the B/L can only be issued after departure.",
+     "Invoice dan packing list sudah, bill of lading baru bisa keluar setelah kapal berangkat."
+    ],
+    [
+     "A",
+     "产地证呢？我们清关要用。",
+     "Chǎndìzhèng ne? Wǒmen qīngguān yào yòng.",
+     "And the certificate of origin? We need it for clearance.",
+     "Kalau surat keterangan asal? Kami butuh buat bea cukai."
+    ],
+    [
+     "B",
+     "还没办好，大概还要两天。",
+     "Hái méi bàn hǎo, dàgài hái yào liǎng tiān.",
+     "Not ready yet, about two more days.",
+     "Belum jadi, kira-kira dua hari lagi."
+    ],
+    [
+     "A",
+     "那会不会影响清关？",
+     "Nà huì bu huì yǐngxiǎng qīngguān?",
+     "Will that affect clearance?",
+     "Itu akan mengganggu proses bea cukai?"
+    ],
+    [
+     "B",
+     "不会，货到港前寄到就行。",
+     "Bú huì, huò dào gǎng qián jì dào jiù xíng.",
+     "No, as long as it arrives before the goods do.",
+     "Tidak, asal sampai sebelum barangnya tiba."
+    ]
+   ]
+  },
+  {
+   "situasi": "Menanyakan status pengiriman yang tertunda.",
+   "lines": [
+    [
+     "A",
+     "李经理，这批货有点延误。",
+     "Lǐ jīnglǐ, zhè pī huò yǒudiǎn yánwù.",
+     "Manager Li, this shipment is a little delayed.",
+     "Pak Li, pengiriman ini agak telat."
+    ],
+    [
+     "B",
+     "延误多久？为什么？",
+     "Yánwù duō jiǔ? Wèishénme?",
+     "How long, and why?",
+     "Telat berapa lama? Kenapa?"
+    ],
+    [
+     "A",
+     "三天。原来的船满了，我们改到下一班。",
+     "Sān tiān. Yuánlái de chuán mǎn le, wǒmen gǎi dào xià yì bān.",
+     "Three days. The original vessel was full so we moved to the next sailing.",
+     "Tiga hari. Kapal yang semula penuh, kami pindah ke jadwal berikutnya."
+    ],
+    [
+     "B",
+     "那预计到港时间改成几号？",
+     "Nà yùjì dàogǎng shíjiān gǎi chéng jǐ hào?",
+     "So what’s the new ETA?",
+     "Berarti perkiraan tibanya jadi tanggal berapa?"
+    ],
+    [
+     "A",
+     "二十三号。清关三个工作日，二十六号可以提货。",
+     "Èrshísān hào. Qīngguān sān ge gōngzuòrì, èrshíliù hào kěyǐ tíhuò.",
+     "The twenty-third. Clearance takes three working days, so pickup on the twenty-sixth.",
+     "Tanggal dua puluh tiga. Bea cukai tiga hari kerja, tanggal dua puluh enam bisa ambil barang."
+    ],
+    [
+     "B",
+     "好，我通知客户。",
+     "Hǎo, wǒ tōngzhī kèhù.",
+     "All right, I’ll inform the client.",
+     "Baik, saya kabari kliennya."
+    ]
+   ]
+  },
+  {
+   "situasi": "Membahas siapa menanggung apa.",
+   "lines": [
+    [
+     "A",
+     "这个报价是FOB还是CIF？",
+     "Zhège bàojià shì FOB háishi CIF?",
+     "Is this quotation FOB or CIF?",
+     "Penawaran ini FOB atau CIF?"
+    ],
+    [
+     "B",
+     "FOB广州。运费和保险由你们安排。",
+     "FOB Guǎngzhōu. Yùnfèi hé bǎoxiǎn yóu nǐmen ānpái.",
+     "FOB Guangzhou. You arrange freight and insurance.",
+     "FOB Guangzhou. Ongkos kirim dan asuransi kalian yang atur."
+    ],
+    [
+     "A",
+     "如果做CIF雅加达，价格差多少？",
+     "Rúguǒ zuò CIF Yǎjiādá, jiàgé chà duōshao?",
+     "If we do CIF Jakarta, what’s the price difference?",
+     "Kalau CIF Jakarta, selisih harganya berapa?"
+    ],
+    [
+     "B",
+     "大概每立方加十五美元。",
+     "Dàgài měi lìfāng jiā shíwǔ měiyuán.",
+     "About fifteen dollars more per cubic metre.",
+     "Kira-kira tambah lima belas dolar per kubik."
+    ],
+    [
+     "A",
+     "关税呢？",
+     "Guānshuì ne?",
+     "And import duty?",
+     "Kalau bea masuk?"
+    ],
+    [
+     "B",
+     "关税一直由买方承担，这个不变。",
+     "Guānshuì yìzhí yóu mǎifāng chéngdān, zhège bú biàn.",
+     "Import duty is always borne by the buyer; that doesn’t change.",
+     "Bea masuk selalu ditanggung pembeli, itu tidak berubah."
+    ]
+   ]
+  }
+ ],
+ "reading": {
+  "title_zh": "一批货的旅程",
+  "title_id": "Perjalanan Satu Batch Barang",
+  "zh": "三月一号，我们给广州的工厂下了订单，同时付了三成定金。工厂说生产要二十五天。\n三月二十六号，货做好了。工厂发来装箱单：一共四百八十箱，毛重六吨，净重五吨八，体积二十立方。我们订了一个二十尺的整柜，装货港广州，目的港雅加达。\n三月二十九号装柜，三十号报关，三十一号开船。开船以后船公司出了提单，工厂把发票、装箱单、提单和产地证一起发给我们，我们付了尾款。\n四月十二号货到港。我们的货代开始清关，用了三个工作日。关税由我们承担，一共两千多万印尼盾。四月十六号我们去港口提货，当天下午到了仓库。\n从下单到进仓库，一共四十六天。这里面最容易出问题的不是运输，是单据。单据不齐，货到了也提不出来。",
+  "py": "Sān yuè yī hào, wǒmen gěi Guǎngzhōu de gōngchǎng xià le dìngdān, tóngshí fù le sān chéng dìngjīn. Gōngchǎng shuō shēngchǎn yào èrshíwǔ tiān.\nSān yuè èrshíliù hào, huò zuò hǎo le. Gōngchǎng fā lái zhuāngxiāngdān: yígòng sìbǎi bāshí xiāng, máozhòng liù dūn, jìngzhòng wǔ dūn bā, tǐjī èrshí lìfāng. Wǒmen dìng le yí ge èrshí chǐ de zhěngguì, zhuānghuògǎng Guǎngzhōu, mùdìgǎng Yǎjiādá.\nSān yuè èrshíjiǔ hào zhuāngguì, sānshí hào bàoguān, sānshíyī hào kāichuán. Kāichuán yǐhòu chuán gōngsī chū le tídān, gōngchǎng bǎ fāpiào, zhuāngxiāngdān, tídān hé chǎndìzhèng yìqǐ fā gěi wǒmen, wǒmen fù le wěikuǎn.\nSì yuè shí’èr hào huò dào gǎng. Wǒmen de huòdài kāishǐ qīngguān, yòng le sān ge gōngzuòrì. Guānshuì yóu wǒmen chéngdān, yígòng liǎngqiān duō wàn yìnnídùn. Sì yuè shíliù hào wǒmen qù gǎngkǒu tíhuò, dàngtiān xiàwǔ dào le cāngkù.\nCóng xiàdān dào jìn cāngkù, yígòng sìshíliù tiān. Zhè lǐmiàn zuì róngyì chū wèntí de bú shì yùnshū, shì dānjù. Dānjù bù qí, huò dào le yě tí bu chūlai.",
+  "en": "On March 1st we placed the order with the Guangzhou factory and paid a thirty percent deposit. The factory said production would take twenty-five days.\nOn March 26th the goods were ready. The factory sent the packing list: four hundred eighty cartons in total, gross weight six tonnes, net weight five point eight tonnes, volume twenty cubic metres. We booked one twenty-foot full container, loading port Guangzhou, destination port Jakarta.\nThe container was loaded on March 29th, customs declared on the 30th, and the vessel sailed on the 31st. After departure the shipping line issued the bill of lading, and the factory sent us the invoice, packing list, B/L and certificate of origin together; we paid the balance.\nThe goods arrived on April 12th. Our forwarder began clearance, which took three working days. Import duty was on us, over twenty million rupiah in total. On April 16th we collected the goods at the port, and they reached the warehouse that afternoon.\nFrom order to warehouse, forty-six days in all. The part most likely to go wrong is not the transport — it is the documents. With incomplete documents, goods can arrive and still not be released.",
+  "id": "Tanggal 1 Maret kami mengeluarkan purchase order ke pabrik di Guangzhou sekaligus membayar uang muka tiga puluh persen. Pabrik bilang produksinya butuh dua puluh lima hari.\nTanggal 26 Maret barangnya jadi. Pabrik mengirim packing list: total empat ratus delapan puluh karton, berat kotor enam ton, berat bersih lima koma delapan ton, volume dua puluh kubik. Kami memesan satu kontainer penuh dua puluh kaki, pelabuhan muat Guangzhou, pelabuhan tujuan Jakarta.\nTanggal 29 Maret kontainer dimuat, tanggal 30 pemberitahuan pabean, tanggal 31 kapal berangkat. Setelah berangkat perusahaan pelayaran menerbitkan bill of lading, dan pabrik mengirimkan invoice, packing list, bill of lading, serta surat keterangan asal sekaligus; kami melunasi sisanya.\nTanggal 12 April barang tiba di pelabuhan. Forwarder kami mulai mengurus bea cukai, memakan tiga hari kerja. Bea masuk ditanggung kami, totalnya dua puluh juta rupiah lebih. Tanggal 16 April kami mengambil barang di pelabuhan, sore harinya sampai gudang.\nDari pemesanan sampai masuk gudang, totalnya empat puluh enam hari. Yang paling gampang bermasalah di sini bukan pengangkutannya, tapi dokumennya. Kalau dokumen tidak lengkap, barang sudah sampai pun tidak bisa dikeluarkan."
+ },
+ "grammar": [
+  {
+   "point": "A 还是 B — pertanyaan pilihan",
+   "penjelasan": "还是 memisahkan dua kemungkinan dalam satu pertanyaan. Karena kalimatnya sudah menawarkan pilihan, 吗 tidak boleh ditambahkan. Ini pertanyaan yang paling sering kamu ucapkan di bidang ekspor-impor.",
+   "pola": "A + 还是 + B？",
+   "contoh": [
+    [
+     "走海运还是空运？",
+     "Zǒu hǎiyùn háishi kōngyùn?",
+     "Lewat laut atau udara?"
+    ],
+    [
+     "整柜还是拼柜？",
+     "Zhěngguì háishi pīnguì?",
+     "Kontainer penuh atau gabungan?"
+    ],
+    [
+     "这个报价是FOB还是CIF？",
+     "Zhège bàojià shì FOB háishi CIF?",
+     "Penawaran ini FOB atau CIF?"
+    ]
+   ],
+   "tips": "Untuk “atau” dalam pernyataan, bukan pertanyaan, gunakan 或者. 走海运或者空运都可以 (lewat laut atau udara sama-sama boleh). Tertukar di sini adalah kesalahan yang sangat umum."
+  },
+  {
+   "point": "由 yóu + pihak + 承担 — menyatakan siapa menanggung apa",
+   "penjelasan": "由 menunjukkan pelaku yang bertanggung jawab, dan sangat lazim dalam kontrak. Struktur ini membuat kalimat terdengar resmi dan tidak menuduh, karena fokusnya pada pembagian tugas, bukan pada orangnya.",
+   "pola": "hal + 由 + pihak + 承担/负责/安排",
+   "contoh": [
+    [
+     "关税由买方承担。",
+     "Guānshuì yóu mǎifāng chéngdān.",
+     "Bea masuk ditanggung pihak pembeli."
+    ],
+    [
+     "运费和保险由你们安排。",
+     "Yùnfèi hé bǎoxiǎn yóu nǐmen ānpái.",
+     "Ongkos kirim dan asuransi pihak Anda yang atur."
+    ],
+    [
+     "清关由货代负责。",
+     "Qīngguān yóu huòdài fùzé.",
+     "Proses bea cukai jadi tanggung jawab forwarder."
+    ]
+   ],
+   "tips": "Jangan tertukar dengan 有 yǒu (punya). Bunyinya beda nada, tapi di chat sering salah ketik — dan 关税有买方承担 tidak berarti apa-apa."
+  },
+  {
+   "point": "…以后 dan 才 — urutan yang tidak bisa dibalik",
+   "penjelasan": "以后 diletakkan SESUDAH peristiwa acuan, kebalikan dari bahasa Indonesia. 才 menekankan bahwa sesuatu baru bisa terjadi setelah syaratnya terpenuhi, dan sering muncul bersama 要…才能.",
+   "pola": "peristiwa + 以后，+ akibat   |   要 + syarat + 才能 + hasil",
+   "contoh": [
+    [
+     "开船以后船公司出提单。",
+     "Kāichuán yǐhòu chuán gōngsī chū tídān.",
+     "Setelah kapal berangkat, pelayaran menerbitkan bill of lading."
+    ],
+    [
+     "提单要等开船以后才能出。",
+     "Tídān yào děng kāichuán yǐhòu cái néng chū.",
+     "Bill of lading baru bisa keluar setelah kapal berangkat."
+    ],
+    [
+     "到港以后我们安排提货。",
+     "Dào gǎng yǐhòu wǒmen ānpái tíhuò.",
+     "Setelah tiba di pelabuhan kami atur pengambilannya."
+    ]
+   ],
+   "tips": "以前 bekerja dengan cara yang sama: 开船以前 (sebelum kapal berangkat). Kata acuannya selalu di depan, penandanya di belakang."
+  },
+  {
+   "point": "Pelengkap kemungkinan: 提不出来 / 办得好",
+   "penjelasan": "Menyisipkan 得 atau 不 di antara kata kerja dan pelengkapnya menyatakan bisa atau tidak bisa mencapai hasilnya. Ini berbeda dari 能, yang bicara soal izin atau kemampuan umum; bentuk ini bicara soal apakah tindakannya berhasil.",
+   "pola": "kata kerja + 得/不 + pelengkap hasil",
+   "contoh": [
+    [
+     "单据不齐，货提不出来。",
+     "Dānjù bù qí, huò tí bu chūlai.",
+     "Dokumen tidak lengkap, barangnya tidak bisa dikeluarkan."
+    ],
+    [
+     "这个星期办得好吗？",
+     "Zhège xīngqī bàn de hǎo ma?",
+     "Minggu ini bisa selesai diurus?"
+    ],
+    [
+     "我听不懂。",
+     "Wǒ tīng bu dǒng.",
+     "Saya tidak menangkap maksudnya."
+    ]
+   ],
+   "tips": "提不出来 dan 不能提 tidak sama. Yang pertama berarti secara fisik tidak keluar karena ada halangan; yang kedua berarti tidak diperbolehkan. Di pelabuhan, bedanya sangat nyata."
+  }
+ ],
+ "exercises": {
+  "listening_tf": [
+   [
+    "这批货走空运。",
+    "S"
+   ],
+   [
+    "关税由买方承担。",
+    "B"
+   ]
+  ],
+  "listening_mc": [
+   {
+    "q": "提单什么时候才能出？",
+    "c": [
+     "装柜以后",
+     "报关以后",
+     "开船以后"
+    ],
+    "a": "C"
+   },
+   {
+    "q": "清关用了几个工作日？",
+    "c": [
+     "两个",
+     "三个",
+     "四个"
+    ],
+    "a": "B"
+   }
+  ],
+  "listening_open": [
+   [
+    "从下单到进仓库一共多少天？",
+    "四十六天。"
+   ]
+  ],
+  "reading_match": {
+   "soal": [
+    "这批货走海运还是空运？",
+    "单据齐了吗？",
+    "关税由哪边承担？",
+    "预计到港时间是几号？",
+    "产地证还没办好。"
+   ],
+   "pilihan": [
+    "A. 二十号。",
+    "B. 由买方承担。",
+    "C. 海运，二十立方。",
+    "D. 没关系，货到港前寄到就行。",
+    "E. 发票和装箱单好了，提单要等开船。"
+   ],
+   "kunci": [
+    "C",
+    "E",
+    "B",
+    "A",
+    "D"
+   ]
+  },
+  "reading_mc": [
+   {
+    "q": "作者认为整个流程里最容易出问题的是什么？",
+    "c": [
+     "运输",
+     "单据",
+     "生产"
+    ],
+    "a": "B"
+   },
+   {
+    "q": "哪个句子是对的？",
+    "c": [
+     "走海运还是空运吗？",
+     "走海运还是空运？",
+     "走海运或者空运？"
+    ],
+    "a": "B"
+   },
+   {
+    "q": "“货提不出来”的意思是：",
+    "c": [
+     "不允许提货",
+     "实际上拿不到货",
+     "不想提货"
+    ],
+    "a": "B"
+   }
+  ],
+  "reading_order": {
+   "kalimat": [
+    "A. 报关。",
+    "B. 装柜。",
+    "C. 开船。"
+   ],
+   "kunci": "B → A → C"
+  },
+  "writing_rearrange": [
+   [
+    [
+     "还是",
+     "走",
+     "空运",
+     "海运",
+     "？"
+    ],
+    "走海运还是空运？"
+   ],
+   [
+    [
+     "承担",
+     "买方",
+     "由",
+     "关税"
+    ],
+    "关税由买方承担。"
+   ],
+   [
+    [
+     "才能",
+     "开船",
+     "提单",
+     "出",
+     "以后"
+    ],
+    "提单开船以后才能出。"
+   ],
+   [
+    [
+     "提不出来",
+     "不齐",
+     "货",
+     "单据",
+     "，"
+    ],
+    "单据不齐，货提不出来。"
+   ]
+  ],
+  "writing_create": {
+   "kata": [
+    "清关",
+    "延误",
+    "目的港",
+    "由…承担"
+   ],
+   "contoh_jawaban": [
+    "清关大概要三个工作日。",
+    "这批货延误了三天。",
+    "目的港是雅加达。",
+    "运费由卖方承担。"
+   ]
+  },
+  "speaking_roleplay": {
+   "situasi": "Kliennya menelepon menanyakan kenapa barangnya belum sampai, padahal sudah lewat perkiraan tiba.",
+   "tujuan": "Menjelaskan sampai tahap mana barangnya, sebutkan penyebab keterlambatan, dan berikan tanggal baru untuk pengambilan.",
+   "wajib": [
+    "延误",
+    "预计到港时间",
+    "清关",
+    "提货",
+    "单据"
+   ]
+  },
+  "speaking_video": {
+   "tema": "Jelaskan alur satu pengiriman impor dari pemesanan sampai masuk gudang.",
+   "wajib": [
+    "下单",
+    "装柜",
+    "报关",
+    "开船",
+    "清关"
+   ]
+  }
+ }
+}

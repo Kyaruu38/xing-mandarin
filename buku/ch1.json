@@ -1,0 +1,213 @@
+{
+  "no": 1,
+  "title_en": "Professional Self Introduction",
+  "title_id": "Memperkenalkan Diri secara Profesional",
+  "note": "",
+  "objectives": [
+    "Memperkenalkan nama, jabatan, dan perusahaan sendiri.",
+    "Menyebutkan departemen dan tanggung jawab pekerjaan.",
+    "Menceritakan latar belakang pendidikan secara singkat.",
+    "Menyebutkan lama pengalaman kerja.",
+    "Menyerahkan dan menerima kartu nama dengan sopan."
+  ],
+  "primer": [],
+  "vocab": [
+    ["我","wǒ","I, me","saya"],
+    ["您","nín","you (polite)","Anda"],
+    ["叫","jiào","to be called","bernama, dipanggil"],
+    ["名字","míngzi","name","nama"],
+    ["姓","xìng","surname; to be surnamed","marga; bermarga"],
+    ["是","shì","to be","adalah"],
+    ["的","de","possessive / modifier particle","partikel kepemilikan"],
+    ["公司","gōngsī","company","perusahaan"],
+    ["工作","gōngzuò","work; to work","pekerjaan; bekerja"],
+    ["职位","zhíwèi","position, job title","jabatan"],
+    ["部门","bùmén","department","departemen"],
+    ["经理","jīnglǐ","manager","manajer"],
+    ["总经理","zǒngjīnglǐ","general manager","direktur, GM"],
+    ["主管","zhǔguǎn","supervisor","supervisor"],
+    ["助理","zhùlǐ","assistant","asisten"],
+    ["同事","tóngshì","colleague","rekan kerja"],
+    ["老板","lǎobǎn","boss","atasan, bos"],
+    ["员工","yuángōng","employee, staff","karyawan"],
+    ["销售部","xiāoshòubù","sales department","departemen penjualan"],
+    ["市场部","shìchǎngbù","marketing department","departemen pemasaran"],
+    ["财务部","cáiwùbù","finance department","departemen keuangan"],
+    ["人事部","rénshìbù","HR department","departemen personalia"],
+    ["采购部","cǎigòubù","purchasing department","departemen pembelian"],
+    ["生产部","shēngchǎnbù","production department","departemen produksi"],
+    ["负责","fùzé","to be in charge of","bertanggung jawab atas"],
+    ["主要","zhǔyào","mainly, chiefly","terutama"],
+    ["在","zài","at, in","di"],
+    ["做","zuò","to do","melakukan, mengerjakan"],
+    ["大学","dàxué","university","universitas"],
+    ["专业","zhuānyè","major, field of study","jurusan"],
+    ["毕业","bìyè","to graduate","lulus"],
+    ["经验","jīngyàn","experience","pengalaman"],
+    ["年","nián","year","tahun"],
+    ["以前","yǐqián","before, previously","sebelumnya"],
+    ["现在","xiànzài","now","sekarang"],
+    ["印尼","Yìnní","Indonesia","Indonesia"],
+    ["中国","Zhōngguó","China","Tiongkok"],
+    ["人","rén","person","orang"],
+    ["认识","rènshi","to get to know","berkenalan, mengenal"],
+    ["高兴","gāoxìng","glad, pleased","senang"],
+    ["名片","míngpiàn","business card","kartu nama"],
+    ["这","zhè","this","ini"],
+    ["那","nà","that","itu"],
+    ["多久","duō jiǔ","how long","berapa lama"],
+    ["请多关照","qǐng duō guānzhào","please take good care of me","mohon bimbingannya"]
+  ],
+  "expressions": [
+    ["我叫王明，是印尼人。","Wǒ jiào Wáng Míng, shì Yìnní rén.","My name is Wang Ming, I’m Indonesian.","Nama saya Wang Ming, saya orang Indonesia."],
+    ["我在星汉公司工作。","Wǒ zài Xīnghàn gōngsī gōngzuò.","I work at Xinghan Company.","Saya bekerja di Perusahaan Xinghan."],
+    ["我是销售部的经理。","Wǒ shì xiāoshòubù de jīnglǐ.","I’m the sales department manager.","Saya manajer departemen penjualan."],
+    ["我主要负责印尼市场。","Wǒ zhǔyào fùzé Yìnní shìchǎng.","I’m mainly in charge of the Indonesian market.","Saya terutama menangani pasar Indonesia."],
+    ["我有三年工作经验。","Wǒ yǒu sān nián gōngzuò jīngyàn.","I have three years of work experience.","Saya punya pengalaman kerja tiga tahun."],
+    ["这是我的名片，请多关照。","Zhè shì wǒ de míngpiàn, qǐng duō guānzhào.","Here is my card. I look forward to working with you.","Ini kartu nama saya, mohon bimbingannya."],
+    ["很高兴认识您。","Hěn gāoxìng rènshi nín.","Pleased to meet you.","Senang bertemu dengan Anda."],
+    ["以后请多多指教。","Yǐhòu qǐng duōduō zhǐjiào.","I hope you’ll guide me going forward.","Ke depannya mohon arahannya."]
+  ],
+  "dialogues": [
+    {
+      "situasi": "Hari pertama kerja, diperkenalkan ke satu tim.",
+      "lines": [
+        ["A","大家好，我叫李伟。","Dàjiā hǎo, wǒ jiào Lǐ Wěi.","Hello everyone, my name is Li Wei.","Halo semuanya, nama saya Li Wei."],
+        ["B","你好，李伟。你在哪个部门？","Nǐ hǎo, Lǐ Wěi. Nǐ zài nǎge bùmén?","Hi Li Wei. Which department are you in?","Halo, Li Wei. Kamu di departemen mana?"],
+        ["A","我在销售部，是新来的助理。","Wǒ zài xiāoshòubù, shì xīn lái de zhùlǐ.","I’m in sales, the new assistant.","Saya di departemen penjualan, asisten baru."],
+        ["B","欢迎欢迎。我叫张丽，是市场部的。","Huānyíng huānyíng. Wǒ jiào Zhāng Lì, shì shìchǎngbù de.","Welcome. I’m Zhang Li, from marketing.","Selamat datang. Saya Zhang Li, dari departemen pemasaran."],
+        ["A","很高兴认识您，请多关照。","Hěn gāoxìng rènshi nín, qǐng duō guānzhào.","Pleased to meet you, I look forward to working together.","Senang bertemu dengan Anda, mohon bimbingannya."]
+      ]
+    },
+    {
+      "situasi": "Bertukar kartu nama dengan klien di pameran dagang.",
+      "lines": [
+        ["A","您好，这是我的名片。","Nín hǎo, zhè shì wǒ de míngpiàn.","Hello, this is my business card.","Halo, ini kartu nama saya."],
+        ["B","谢谢。王经理，您在哪家公司工作？","Xièxie. Wáng jīnglǐ, nín zài nǎ jiā gōngsī gōngzuò?","Thank you. Manager Wang, which company do you work for?","Terima kasih. Pak Wang, Anda bekerja di perusahaan mana?"],
+        ["A","我在星汉贸易公司，负责出口。","Wǒ zài Xīnghàn màoyì gōngsī, fùzé chūkǒu.","I’m with Xinghan Trading, in charge of exports.","Saya di Xinghan Trading, menangani ekspor."],
+        ["B","太好了，我们正好需要印尼的供应商。","Tài hǎo le, wǒmen zhènghǎo xūyào Yìnní de gōngyìngshāng.","Perfect, we happen to need Indonesian suppliers.","Kebetulan sekali, kami memang sedang cari pemasok dari Indonesia."],
+        ["A","那我们可以聊一聊。","Nà wǒmen kěyǐ liáo yi liáo.","Then let’s talk.","Kalau begitu kita bisa bicara lebih lanjut."]
+      ]
+    },
+    {
+      "situasi": "Wawancara kerja singkat, ditanya latar belakang.",
+      "lines": [
+        ["A","请介绍一下你自己。","Qǐng jièshào yíxià nǐ zìjǐ.","Please introduce yourself.","Silakan perkenalkan diri Anda."],
+        ["B","我叫陈晓，2023年从印尼大学毕业，专业是国际贸易。","Wǒ jiào Chén Xiǎo, èr líng èr sān nián cóng Yìnní dàxué bìyè, zhuānyè shì guójì màoyì.","My name is Chen Xiao. I graduated from Universitas Indonesia in 2023, majoring in international trade.","Nama saya Chen Xiao. Saya lulus dari Universitas Indonesia tahun 2023, jurusan perdagangan internasional."],
+        ["A","你有多久的工作经验？","Nǐ yǒu duō jiǔ de gōngzuò jīngyàn?","How much work experience do you have?","Berapa lama pengalaman kerja Anda?"],
+        ["B","两年。以前我在一家物流公司做采购。","Liǎng nián. Yǐqián wǒ zài yì jiā wùliú gōngsī zuò cǎigòu.","Two years. I previously did purchasing at a logistics company.","Dua tahun. Sebelumnya saya bagian pembelian di perusahaan logistik."],
+        ["A","好的，谢谢你。","Hǎo de, xièxie nǐ.","All right, thank you.","Baik, terima kasih."]
+      ]
+    },
+    {
+      "situasi": "Memperkenalkan atasan kepada tamu perusahaan.",
+      "lines": [
+        ["A","王总，这位是印尼来的陈经理。","Wáng zǒng, zhè wèi shì Yìnní lái de Chén jīnglǐ.","Mr. Wang, this is Manager Chen from Indonesia.","Pak Wang, ini Pak Chen dari Indonesia."],
+        ["B","陈经理您好，欢迎您。","Chén jīnglǐ nín hǎo, huānyíng nín.","Hello Manager Chen, welcome.","Halo Pak Chen, selamat datang."],
+        ["C","王总您好。这是我们公司的资料。","Wáng zǒng nín hǎo. Zhè shì wǒmen gōngsī de zīliào.","Hello Mr. Wang. Here is our company profile.","Halo Pak Wang. Ini profil perusahaan kami."],
+        ["B","谢谢。您负责哪个部分？","Xièxie. Nín fùzé nǎge bùfen?","Thank you. Which area are you responsible for?","Terima kasih. Anda menangani bagian yang mana?"],
+        ["C","我负责采购和物流。","Wǒ fùzé cǎigòu hé wùliú.","I handle purchasing and logistics.","Saya menangani pembelian dan logistik."]
+      ]
+    }
+  ],
+  "reading": {
+    "title_zh": "自我介绍",
+    "title_id": "Perkenalan Diri",
+    "zh": "我叫陈晓，我是印尼人。我2023年从印尼大学毕业，专业是国际贸易。现在我在星汉贸易公司工作，是采购部的助理。我主要负责联系中国的供应商。我有两年工作经验。我的同事都很好，我的老板姓王，是采购部的经理。我很高兴在这里工作。",
+    "py": "Wǒ jiào Chén Xiǎo, wǒ shì Yìnní rén. Wǒ èr líng èr sān nián cóng Yìnní dàxué bìyè, zhuānyè shì guójì màoyì. Xiànzài wǒ zài Xīnghàn màoyì gōngsī gōngzuò, shì cǎigòubù de zhùlǐ. Wǒ zhǔyào fùzé liánxì Zhōngguó de gōngyìngshāng. Wǒ yǒu liǎng nián gōngzuò jīngyàn. Wǒ de tóngshì dōu hěn hǎo, wǒ de lǎobǎn xìng Wáng, shì cǎigòubù de jīnglǐ. Wǒ hěn gāoxìng zài zhèlǐ gōngzuò.",
+    "en": "My name is Chen Xiao and I am Indonesian. I graduated from Universitas Indonesia in 2023 with a major in international trade. I now work at Xinghan Trading as an assistant in the purchasing department. My main responsibility is contacting Chinese suppliers. I have two years of work experience. My colleagues are all very kind, and my boss, Manager Wang, heads the purchasing department. I am happy working here.",
+    "id": "Nama saya Chen Xiao, saya orang Indonesia. Saya lulus dari Universitas Indonesia tahun 2023, jurusan perdagangan internasional. Sekarang saya bekerja di Xinghan Trading sebagai asisten di departemen pembelian. Tugas utama saya menghubungi pemasok dari Tiongkok. Saya punya pengalaman kerja dua tahun. Rekan-rekan kerja saya baik semua, atasan saya bermarga Wang, manajer departemen pembelian. Saya senang bekerja di sini."
+  },
+  "grammar": [
+    {
+      "point": "A 是 B — kalimat identitas, dan cara menyangkalnya",
+      "penjelasan": "是 menghubungkan dua kata benda: “A adalah B”. Ini satu-satunya cara menyatakan identitas atau jabatan. Untuk menyangkal, letakkan 不 tepat sebelum 是 — dan ingat 不 berubah bunyi jadi bú karena 是 bernada empat.",
+      "pola": "Subjek + 是 + kata benda   |   Subjek + 不是 + kata benda",
+      "contoh": [
+        ["我是销售部的经理。","Wǒ shì xiāoshòubù de jīnglǐ.","Saya manajer departemen penjualan."],
+        ["他不是我们公司的员工。","Tā bú shì wǒmen gōngsī de yuángōng.","Dia bukan karyawan perusahaan kami."],
+        ["这是我的名片。","Zhè shì wǒ de míngpiàn.","Ini kartu nama saya."]
+      ],
+      "tips": "是 TIDAK dipakai di depan kata sifat. “Saya senang” bukan 我是高兴, tapi 我很高兴. Kata sifat dalam Mandarin sudah mengandung fungsi predikat, jadi tidak butuh penghubung."
+    },
+    {
+      "point": "在 + tempat + kata kerja — menyebut di mana sesuatu dilakukan",
+      "penjelasan": "Berbeda dengan bahasa Indonesia yang menaruh keterangan tempat di belakang (“bekerja di Jakarta”), Mandarin menaruhnya di depan kata kerja. 在 dan tempatnya adalah satu paket yang mendahului aksi.",
+      "pola": "Subjek + 在 + tempat + kata kerja",
+      "contoh": [
+        ["我在星汉公司工作。","Wǒ zài Xīnghàn gōngsī gōngzuò.","Saya bekerja di Perusahaan Xinghan."],
+        ["他在会议室等您。","Tā zài huìyìshì děng nín.","Dia menunggu Anda di ruang rapat."],
+        ["我们在楼下见面。","Wǒmen zài lóuxià jiànmiàn.","Kita bertemu di lantai bawah."]
+      ],
+      "tips": "Kalau 在 berdiri sendiri sebagai kata kerja, artinya “berada di”: 王经理在办公室 berarti Manajer Wang ada di kantor. Bedanya ada tidaknya kata kerja kedua."
+    },
+    {
+      "point": "的 de — perekat kepemilikan dan keterangan",
+      "penjelasan": "的 menempel setelah pemilik atau penjelas, dan sebelum benda yang dijelaskan. Urutannya kebalikan dari bahasa Indonesia: yang menjelaskan selalu duluan.",
+      "pola": "pemilik/penjelas + 的 + benda",
+      "contoh": [
+        ["我的名片","wǒ de míngpiàn","kartu nama saya"],
+        ["公司的资料","gōngsī de zīliào","dokumen perusahaan"],
+        ["负责出口的同事","fùzé chūkǒu de tóngshì","rekan kerja yang menangani ekspor"]
+      ],
+      "tips": "的 sering dihilangkan kalau hubungannya sangat dekat, terutama keluarga dan tempat kerja: 我妈妈, 我们公司. Menambahkan 的 di situ tidak salah, hanya terdengar agak kaku."
+    },
+    {
+      "point": "姓 xìng dan 叫 jiào — dua cara menyebut nama",
+      "penjelasan": "姓 hanya dipakai untuk marga, 叫 dipakai untuk nama panggilan atau nama lengkap. Di lingkungan kerja, menanyakan marga dianggap lebih sopan daripada langsung menanyakan nama lengkap.",
+      "pola": "我姓 + marga   |   我叫 + nama lengkap",
+      "contoh": [
+        ["我姓王。","Wǒ xìng Wáng.","Marga saya Wang."],
+        ["我叫王明。","Wǒ jiào Wáng Míng.","Nama saya Wang Ming."],
+        ["请问您贵姓？","Qǐngwèn nín guìxìng?","Boleh tahu marga Anda?"]
+      ],
+      "tips": "Jawaban untuk 您贵姓？cukup 我姓王, jangan 我贵姓王 — 贵 itu bentuk hormat yang hanya dipakai saat bertanya, tidak dipakai untuk diri sendiri."
+    }
+  ],
+  "exercises": {
+    "listening_tf": [
+      ["陈晓是中国人。","S"],
+      ["陈晓在采购部工作。","B"]
+    ],
+    "listening_mc": [
+      {"q":"陈晓的专业是什么？","c":["国际贸易","市场营销","财务"],"a":"A"},
+      {"q":"陈晓的老板姓什么？","c":["陈","李","王"],"a":"C"}
+    ],
+    "listening_open": [
+      ["陈晓有几年工作经验？","两年。"]
+    ],
+    "reading_match": {
+      "soal": ["请问您贵姓？","您在哪个部门？","这是您的名片吗？","您有多久工作经验？","很高兴认识您。"],
+      "pilihan": ["A. 我也很高兴。","B. 我姓陈。","C. 三年。","D. 是的，请多关照。","E. 我在销售部。"],
+      "kunci": ["B","E","D","C","A"]
+    },
+    "reading_mc": [
+      {"q":"陈晓主要负责什么？","c":["联系中国的供应商","管理财务","招聘新员工"],"a":"A"},
+      {"q":"下面哪个句子是对的？","c":["我工作在星汉公司","我在星汉公司工作","我在工作星汉公司"],"a":"B"},
+      {"q":"“我不是经理”里的“不”读作：","c":["bù","bú","bu"],"a":"B"}
+    ],
+    "reading_order": {
+      "kalimat": ["A. 陈晓在星汉公司工作。","B. 陈晓从印尼大学毕业。","C. 陈晓在物流公司做采购。"],
+      "kunci": "B → C → A"
+    },
+    "writing_rearrange": [
+      [["工作","我","公司","在","星汉"],"我在星汉公司工作。"],
+      [["的","经理","是","销售部","我"],"我是销售部的经理。"],
+      [["名片","这","我的","是"],"这是我的名片。"],
+      [["两年","经验","我","工作","有"],"我有两年工作经验。"]
+    ],
+    "writing_create": {
+      "kata": ["负责","部门","毕业","经验"],
+      "contoh_jawaban": ["我负责印尼市场。","你在哪个部门工作？","我2023年毕业。","他有五年工作经验。"]
+    },
+    "speaking_roleplay": {
+      "situasi": "Kamu bertemu calon pemasok dari Tiongkok di pameran dagang. Kalian baru saling menyapa.",
+      "tujuan": "Memperkenalkan diri, menyebut perusahaan dan bagian yang kamu tangani, lalu bertukar kartu nama.",
+      "wajib": ["我叫","在…工作","负责","名片","请多关照"]
+    },
+    "speaking_video": {
+      "tema": "Perkenalkan dirimu sebagai profesional dalam satu menit.",
+      "wajib": ["姓","公司","部门","负责","经验"]
+    }
+  }
+}

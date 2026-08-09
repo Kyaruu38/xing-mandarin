@@ -1,0 +1,212 @@
+{
+  "no": 8,
+  "title_en": "Business Negotiation",
+  "title_id": "Negosiasi Bisnis",
+  "note": "",
+  "objectives": [
+    "Membuka negosiasi harga tanpa langsung menyebut angka.",
+    "Meminta dan menawar diskon dengan syarat yang masuk akal.",
+    "Membahas cara dan tempo pembayaran.",
+    "Menyepakati waktu dan tanggung jawab pengiriman.",
+    "Menutup kesepakatan atau menundanya dengan pintu tetap terbuka."
+  ],
+  "primer": [],
+  "vocab": [
+    ["谈","tán","to talk, to negotiate","berunding"],
+    ["谈判","tánpàn","negotiation","negosiasi"],
+    ["条件","tiáojiàn","terms, conditions","syarat"],
+    ["合作","hézuò","to cooperate","kerja sama"],
+    ["长期","chángqī","long-term","jangka panjang"],
+    ["订单","dìngdān","order","pesanan"],
+    ["下单","xiàdān","to place an order","memesan"],
+    ["批","pī","batch","batch, kelompok"],
+    ["降价","jiàngjià","to lower the price","menurunkan harga"],
+    ["让步","ràngbù","to concede","memberi kelonggaran"],
+    ["空间","kōngjiān","room (for negotiation)","ruang"],
+    ["底线","dǐxiàn","bottom line","batas bawah"],
+    ["成本","chéngběn","cost","biaya pokok"],
+    ["利润","lìrùn","profit","keuntungan"],
+    ["预算","yùsuàn","budget","anggaran"],
+    ["超过","chāoguò","to exceed","melebihi"],
+    ["付款","fùkuǎn","payment","pembayaran"],
+    ["定金","dìngjīn","deposit","uang muka"],
+    ["尾款","wěikuǎn","balance payment","pelunasan"],
+    ["分期","fēnqī","by instalments","dicicil"],
+    ["预付","yùfù","to prepay","bayar di muka"],
+    ["电汇","diànhuì","wire transfer, T/T","transfer bank"],
+    ["信用证","xìnyòngzhèng","letter of credit, L/C","letter of credit"],
+    ["发票","fāpiào","invoice","faktur"],
+    ["账期","zhàngqī","payment term","tempo pembayaran"],
+    ["交货期","jiāohuòqī","delivery time","waktu pengiriman"],
+    ["发货","fāhuò","to ship out","mengirim barang"],
+    ["到货","dàohuò","goods arrive","barang tiba"],
+    ["运费","yùnfèi","freight","ongkos kirim"],
+    ["承担","chéngdān","to bear (a cost)","menanggung"],
+    ["责任","zérèn","responsibility","tanggung jawab"],
+    ["合同","hétong","contract","kontrak"],
+    ["签","qiān","to sign","menandatangani"],
+    ["盖章","gàizhāng","to stamp, to seal","membubuhkan stempel"],
+    ["双方","shuāngfāng","both parties","kedua pihak"],
+    ["接受","jiēshòu","to accept","menerima"],
+    ["为难","wéinán","to put someone in a difficult spot","menyulitkan"],
+    ["实在","shízài","really, honestly","sungguh"],
+    ["尽量","jǐnliàng","to do one’s best","sebisa mungkin"],
+    ["争取","zhēngqǔ","to strive for","mengupayakan"],
+    ["请示","qǐngshì","to ask a superior","meminta persetujuan atasan"],
+    ["回去商量","huíqu shāngliang","to discuss it back at the office","dibahas dulu di kantor"],
+    ["成交","chéngjiāo","deal is closed","deal"],
+    ["双赢","shuāngyíng","win-win","sama-sama untung"]
+  ],
+  "expressions": [
+    ["我们希望能长期合作。","Wǒmen xīwàng néng chángqī hézuò.","We hope for a long-term partnership.","Kami berharap bisa kerja sama jangka panjang."],
+    ["这个价格超过我们的预算了。","Zhège jiàgé chāoguò wǒmen de yùsuàn le.","This price is over our budget.","Harga ini melebihi anggaran kami."],
+    ["价格上还有空间吗？","Jiàgé shàng hái yǒu kōngjiān ma?","Is there any room on the price?","Untuk harga masih ada ruang?"],
+    ["实在不好意思，这已经是我们的底线了。","Shízài bù hǎoyìsi, zhè yǐjīng shì wǒmen de dǐxiàn le.","I’m really sorry, this is already our bottom line.","Mohon maaf sekali, ini sudah batas bawah kami."],
+    ["如果您能接受预付三成，我可以再降百分之三。","Rúguǒ nín néng jiēshòu yùfù sān chéng, wǒ kěyǐ zài jiàng bǎi fēn zhī sān.","If you can prepay thirty percent, I can come down another three percent.","Kalau Anda bisa bayar muka tiga puluh persen, saya bisa turun tiga persen lagi."],
+    ["付款方式是三成定金，七成见提单付。","Fùkuǎn fāngshì shì sān chéng dìngjīn, qī chéng jiàn tídān fù.","Payment terms: thirty percent deposit, seventy percent against B/L.","Cara bayar: uang muka tiga puluh persen, tujuh puluh persen saat dokumen keluar."],
+    ["运费由哪边承担？","Yùnfèi yóu nǎ biān chéngdān?","Which side bears the freight?","Ongkos kirim ditanggung pihak mana?"],
+    ["这一点我要请示一下老板。","Zhè yì diǎn wǒ yào qǐngshì yíxià lǎobǎn.","I’ll need to check this with my boss.","Untuk poin ini saya harus tanya atasan dulu."],
+    ["那我们就这么定了，明天签合同。","Nà wǒmen jiù zhème dìng le, míngtiān qiān hétong.","Then let’s settle on that; we’ll sign tomorrow.","Kalau begitu kita sepakat begitu, besok tanda tangan kontrak."]
+  ],
+  "dialogues": [
+    {
+      "situasi": "Membuka negosiasi harga untuk pesanan besar pertama.",
+      "lines": [
+        ["A","李经理，我们希望能长期合作。","Lǐ jīnglǐ, wǒmen xīwàng néng chángqī hézuò.","Manager Li, we hope for a long-term partnership.","Pak Li, kami berharap bisa kerja sama jangka panjang."],
+        ["B","我们也是。您看条件怎么样？","Wǒmen yě shì. Nín kàn tiáojiàn zěnmeyàng?","So do we. How do the terms look to you?","Kami juga. Menurut Anda syaratnya bagaimana?"],
+        ["A","产品没问题，不过这个价格超过我们的预算了。","Chǎnpǐn méi wèntí, búguò zhège jiàgé chāoguò wǒmen de yùsuàn le.","The product is fine, but the price is over our budget.","Produknya tidak masalah, cuma harganya melebihi anggaran kami."],
+        ["B","您的预算大概是多少？","Nín de yùsuàn dàgài shì duōshao?","Roughly what is your budget?","Anggaran Anda kira-kira berapa?"],
+        ["A","二百六十块一个。价格上还有空间吗？","Èrbǎi liùshí kuài yí ge. Jiàgé shàng hái yǒu kōngjiān ma?","Two hundred sixty each. Is there room on price?","Dua ratus enam puluh per buah. Untuk harga masih ada ruang?"],
+        ["B","实在不好意思，二百六十太低了，我们的成本都不够。","Shízài bù hǎoyìsi, èrbǎi liùshí tài dī le, wǒmen de chéngběn dōu bú gòu.","I’m sorry, two hundred sixty is too low; it doesn’t even cover our cost.","Mohon maaf, dua ratus enam puluh terlalu rendah, biaya pokok kami saja tidak tertutup."]
+      ]
+    },
+    {
+      "situasi": "Menukar diskon dengan syarat pembayaran.",
+      "lines": [
+        ["A","那我们各让一步。二百八十，可以吗？","Nà wǒmen gè ràng yí bù. Èrbǎi bāshí, kěyǐ ma?","Then let’s each give a little. Two hundred eighty, all right?","Kalau begitu kita sama-sama mengalah. Dua ratus delapan puluh, bisa?"],
+        ["B","二百八十我很为难。不过，如果您能接受预付三成，我可以做二百八十五。","Èrbǎi bāshí wǒ hěn wéinán. Búguò, rúguǒ nín néng jiēshòu yùfù sān chéng, wǒ kěyǐ zuò èrbǎi bāshíwǔ.","Two eighty puts me in a tough spot. But if you can prepay thirty percent, I can do two eighty-five.","Dua ratus delapan puluh berat buat saya. Tapi kalau Anda bisa bayar muka tiga puluh persen, saya bisa dua ratus delapan puluh lima."],
+        ["A","预付三成没问题，但是运费要您那边承担。","Yùfù sān chéng méi wèntí, dànshì yùnfèi yào nín nàbiān chéngdān.","Thirty percent prepayment is fine, but freight should be on your side.","Bayar muka tiga puluh persen tidak masalah, tapi ongkos kirim ditanggung pihak Anda."],
+        ["B","运费我要请示一下老板。","Yùnfèi wǒ yào qǐngshì yíxià lǎobǎn.","I’ll need to check about the freight with my boss.","Soal ongkos kirim saya harus tanya atasan dulu."],
+        ["A","好，我等您消息。","Hǎo, wǒ děng nín xiāoxi.","All right, I’ll wait to hear from you.","Baik, saya tunggu kabarnya."]
+      ]
+    },
+    {
+      "situasi": "Menyepakati cara pembayaran dan waktu kirim.",
+      "lines": [
+        ["A","付款方式怎么安排？","Fùkuǎn fāngshì zěnme ānpái?","How shall we arrange payment?","Cara pembayarannya bagaimana?"],
+        ["B","三成定金，七成见提单付，电汇。","Sān chéng dìngjīn, qī chéng jiàn tídān fù, diànhuì.","Thirty percent deposit, seventy percent against the bill of lading, by wire transfer.","Uang muka tiga puluh persen, tujuh puluh persen saat bill of lading keluar, lewat transfer bank."],
+        ["A","账期能不能长一点？我们习惯三十天。","Zhàngqī néng bu néng cháng yìdiǎnr? Wǒmen xíguàn sānshí tiān.","Could the payment term be longer? We usually work with thirty days.","Tempo pembayarannya bisa lebih panjang? Kami biasanya tiga puluh hari."],
+        ["B","第一次合作不行，第二批订单可以谈。","Dì yī cì hézuò bù xíng, dì èr pī dìngdān kěyǐ tán.","Not for a first order, but we can discuss it from the second batch.","Untuk kerja sama pertama belum bisa, tapi mulai batch kedua bisa dibicarakan."],
+        ["A","可以理解。交货期呢？","Kěyǐ lǐjiě. Jiāohuòqī ne?","Understandable. And delivery time?","Bisa dipahami. Kalau waktu pengiriman?"],
+        ["B","收到定金以后二十五天发货。","Shōudào dìngjīn yǐhòu èrshíwǔ tiān fāhuò.","Twenty-five days after we receive the deposit.","Dua puluh lima hari setelah uang muka kami terima."]
+      ]
+    },
+    {
+      "situasi": "Menutup kesepakatan.",
+      "lines": [
+        ["A","老板同意运费我们承担一半。","Lǎobǎn tóngyì yùnfèi wǒmen chéngdān yíbàn.","My boss agreed we’ll cover half the freight.","Atasan saya setuju ongkos kirim kami tanggung setengah."],
+        ["B","那我们就这么定了：二百八十五一个，预付三成，运费各一半。","Nà wǒmen jiù zhème dìng le: èrbǎi bāshíwǔ yí ge, yùfù sān chéng, yùnfèi gè yíbàn.","Then let’s settle on that: two eighty-five each, thirty percent prepaid, freight split evenly.","Kalau begitu kita sepakat: dua ratus delapan puluh lima per buah, bayar muka tiga puluh persen, ongkir dibagi dua."],
+        ["A","对。我今天下午把合同发给您，您看一下。","Duì. Wǒ jīntiān xiàwǔ bǎ hétong fā gěi nín, nín kàn yíxià.","Right. I’ll send you the contract this afternoon for review.","Betul. Siang ini kontraknya saya kirim, tolong dicek."],
+        ["B","好的。没问题的话，明天签字盖章。","Hǎo de. Méi wèntí de huà, míngtiān qiānzì gàizhāng.","Good. If there are no issues, we’ll sign and stamp tomorrow.","Baik. Kalau tidak ada masalah, besok tanda tangan dan stempel."],
+        ["A","合作愉快，希望双赢。","Hézuò yúkuài, xīwàng shuāngyíng.","Pleasure doing business — here’s to a win-win.","Senang bekerja sama, semoga sama-sama untung."]
+      ]
+    }
+  ],
+  "reading": {
+    "title_zh": "一次成功的谈判",
+    "title_id": "Satu Negosiasi yang Berhasil",
+    "zh": "上个月我们跟广州的一家工厂谈一批轮胎的订单。他们第一次报价是三百块一个，比我们的预算高。我没有马上还价，先问他们成本里面运费占多少，然后才说我们的预算是二百六十。\n对方说二百六十太低了，成本都不够。我知道这是真的，所以我换了一个方向：不谈价格，谈条件。我说如果他们能降到二百八十五，我们可以预付三成，而且下半年再订一批。\n对方很有兴趣，但是运费的问题他要请示老板。第二天他回复我，老板同意运费双方各承担一半。这样算下来，我们比预算只高了一点点，他们的利润也保住了。\n谈判不是谁赢谁输。价格只有一个数字，条件却有很多。谈不下价格的时候，就去谈条件。",
+    "py": "Shàng ge yuè wǒmen gēn Guǎngzhōu de yì jiā gōngchǎng tán yì pī lúntāi de dìngdān. Tāmen dì yī cì bàojià shì sānbǎi kuài yí ge, bǐ wǒmen de yùsuàn gāo. Wǒ méiyǒu mǎshàng huánjià, xiān wèn tāmen chéngběn lǐmiàn yùnfèi zhàn duōshao, ránhòu cái shuō wǒmen de yùsuàn shì èrbǎi liùshí.\nDuìfāng shuō èrbǎi liùshí tài dī le, chéngběn dōu bú gòu. Wǒ zhīdào zhè shì zhēn de, suǒyǐ wǒ huàn le yí ge fāngxiàng: bù tán jiàgé, tán tiáojiàn. Wǒ shuō rúguǒ tāmen néng jiàng dào èrbǎi bāshíwǔ, wǒmen kěyǐ yùfù sān chéng, érqiě xiàbànnián zài dìng yì pī.\nDuìfāng hěn yǒu xìngqù, dànshì yùnfèi de wèntí tā yào qǐngshì lǎobǎn. Dì èr tiān tā huífù wǒ, lǎobǎn tóngyì yùnfèi shuāngfāng gè chéngdān yíbàn. Zhèyàng suàn xiàlai, wǒmen bǐ yùsuàn zhǐ gāo le yìdiǎndiǎn, tāmen de lìrùn yě bǎo zhù le.\nTánpàn bú shì shéi yíng shéi shū. Jiàgé zhǐ yǒu yí ge shùzì, tiáojiàn què yǒu hěn duō. Tán bu xià jiàgé de shíhou, jiù qù tán tiáojiàn.",
+    "en": "Last month we negotiated a tyre order with a factory in Guangzhou. Their first quotation was three hundred per piece, above our budget. I didn’t counter immediately; first I asked how much of their cost was freight, and only then said our budget was two hundred sixty.\nThey said two sixty was too low and wouldn’t even cover cost. I knew that was true, so I changed direction: stop discussing price, discuss terms. I said that if they could come down to two eighty-five, we could prepay thirty percent and place another batch in the second half of the year.\nThey were interested, but the freight question had to go to their boss. The next day he replied that the boss agreed to split freight evenly between both sides. Adding it all up, we ended only slightly above budget and their margin was protected.\nA negotiation is not about who wins and who loses. Price is only one number; terms are many. When the price won’t move, move to the terms.",
+    "id": "Bulan lalu kami menegosiasikan pesanan ban dengan sebuah pabrik di Guangzhou. Penawaran pertama mereka tiga ratus per buah, di atas anggaran kami. Saya tidak langsung menawar; saya tanya dulu berapa porsi ongkos kirim dalam biaya pokok mereka, baru menyebut anggaran kami dua ratus enam puluh.\nPihak sana bilang dua ratus enam puluh terlalu rendah, biaya pokok saja tidak tertutup. Saya tahu itu benar, jadi saya ganti arah: berhenti membahas harga, beralih ke syarat. Saya bilang kalau mereka bisa turun ke dua ratus delapan puluh lima, kami bisa bayar muka tiga puluh persen, dan semester berikutnya pesan satu batch lagi.\nMereka tertarik, tapi soal ongkos kirim harus ditanyakan ke atasannya. Keesokan harinya dia membalas: atasannya setuju ongkos kirim ditanggung dua pihak masing-masing setengah. Kalau dihitung, kami cuma sedikit di atas anggaran dan margin mereka tetap terjaga.\nNegosiasi bukan soal siapa menang siapa kalah. Harga cuma satu angka, tapi syarat ada banyak. Kalau harga tidak bisa turun, pindahkan pembicaraannya ke syarat."
+  },
+  "grammar": [
+    {
+      "point": "成 chéng — menyebut persentase dalam kelipatan sepuluh",
+      "penjelasan": "Dalam perdagangan Tiongkok, persentase pembayaran hampir selalu disebut dengan 成, bukan 百分之. Satu 成 sama dengan sepuluh persen. 三成 berarti tiga puluh persen. Ini terdengar jauh lebih natural dan lebih cepat diucapkan di meja negosiasi.",
+      "pola": "angka + 成 = angka × 10%",
+      "contoh": [
+        ["三成定金","sān chéng dìngjīn","uang muka tiga puluh persen"],
+        ["七成见提单付","qī chéng jiàn tídān fù","tujuh puluh persen dibayar saat bill of lading keluar"],
+        ["利润只有一成。","Lìrùn zhǐ yǒu yì chéng.","Marginnya cuma sepuluh persen."]
+      ],
+      "tips": "Jangan tertukar dengan 折 di Chapter 7. 三成 itu tiga puluh persen dari total, sedangkan 三折 berarti membayar tiga puluh persen alias diskon tujuh puluh persen. Dua kata, dua sistem."
+    },
+    {
+      "point": "各 gè — masing-masing pihak",
+      "penjelasan": "各 diletakkan sebelum kata kerja dan berarti “masing-masing”. Dalam negosiasi ini kata yang paling sering menyelamatkan kebuntuan, karena membingkai kompromi sebagai adil bagi kedua belah pihak.",
+      "pola": "双方 / 我们 + 各 + kata kerja",
+      "contoh": [
+        ["我们各让一步。","Wǒmen gè ràng yí bù.","Kita sama-sama mengalah selangkah."],
+        ["运费双方各承担一半。","Yùnfèi shuāngfāng gè chéngdān yíbàn.","Ongkos kirim ditanggung kedua pihak masing-masing setengah."]
+      ],
+      "tips": "各让一步 adalah idiom baku dan sebaiknya dihafal utuh. Mengucapkannya menandakan kamu siap kompromi tanpa harus menyebut angka lebih dulu — posisi yang menguntungkan."
+    },
+    {
+      "point": "Menolak tanpa menutup pintu: 实在 + 不好意思 + alasan",
+      "penjelasan": "Menolak harga dengan 不行 saja terasa memutus. Pola yang lazim menaruh 实在 (sungguh) di depan permintaan maaf untuk menandakan keterbatasan yang nyata, bukan keengganan, lalu menyebut alasan yang bisa diperiksa seperti biaya pokok.",
+      "pola": "实在不好意思，+ angka/permintaan + 太…了，+ alasan",
+      "contoh": [
+        ["实在不好意思，二百六十太低了，我们的成本都不够。","Shízài bù hǎoyìsi, èrbǎi liùshí tài dī le, wǒmen de chéngběn dōu bú gòu.","Mohon maaf sekali, dua ratus enam puluh terlalu rendah, biaya pokok kami saja tidak tertutup."],
+        ["这个我很为难。","Zhège wǒ hěn wéinán.","Yang ini sulit buat saya."]
+      ],
+      "tips": "我很为难 sangat berguna: artinya kamu tidak menolak, tapi memberi tahu bahwa permintaan itu membuatmu sulit. Lawan bicara yang paham budaya akan otomatis menawarkan kompromi."
+    },
+    {
+      "point": "Menunda keputusan dengan sopan: 请示 dan 回去商量",
+      "penjelasan": "Berkata “tidak bisa memutuskan sekarang” bukan kelemahan dalam negosiasi Tiongkok — justru cara baku untuk membeli waktu tanpa menolak. Dua ungkapannya: 请示 (meminta persetujuan atasan) dan 回去商量 (dibahas dulu di kantor).",
+      "pola": "这一点我要请示一下老板。 ／ 我回去商量一下，明天回复您。",
+      "contoh": [
+        ["运费我要请示一下老板。","Yùnfèi wǒ yào qǐngshì yíxià lǎobǎn.","Soal ongkos kirim saya harus tanya atasan dulu."],
+        ["我回去商量一下，明天给您答复。","Wǒ huíqu shāngliang yíxià, míngtiān gěi nín dáfù.","Saya bahas dulu di kantor, besok saya kabari."]
+      ],
+      "tips": "Selalu sebutkan kapan kamu akan menjawab. 请示 tanpa tenggat terdengar seperti menghindar; 请示 dengan tenggat terdengar seperti proses."
+    }
+  ],
+  "exercises": {
+    "listening_tf": [
+      ["工厂第一次报价是三百块一个。","B"],
+      ["最后运费全部由工厂承担。","S"]
+    ],
+    "listening_mc": [
+      {"q":"说话人为什么不马上还价？","c":["不知道价格","先问成本结构","没有预算"],"a":"B"},
+      {"q":"最后成交价是多少？","c":["二百六十","二百八十","二百八十五"],"a":"C"}
+    ],
+    "listening_open": [
+      ["买方答应预付多少？","三成。"]
+    ],
+    "reading_match": {
+      "soal": ["价格上还有空间吗？","付款方式怎么安排？","账期能不能长一点？","运费由哪边承担？","那我们就这么定了。"],
+      "pilihan": ["A. 三成定金，七成见提单付。","B. 好，明天签字盖章。","C. 第一次合作不行，第二批可以谈。","D. 实在不好意思，这是底线了。","E. 双方各承担一半。"],
+      "kunci": ["D","A","C","E","B"]
+    },
+    "reading_mc": [
+      {"q":"作者认为谈不下价格的时候应该怎么办？","c":["换供应商","去谈条件","放弃订单"],"a":"B"},
+      {"q":"“三成定金”是多少？","c":["百分之三","百分之三十","百分之七十"],"a":"B"},
+      {"q":"“我很为难”的意思最接近：","c":["我拒绝","这让我很难办","我不明白"],"a":"B"}
+    ],
+    "reading_order": {
+      "kalimat": ["A. 老板同意运费各承担一半。","B. 工厂报价三百块一个。","C. 买方提出预付三成换降价。"],
+      "kunci": "B → C → A"
+    },
+    "writing_rearrange": [
+      [["预算","超过","了","我们的","这个","价格"],"这个价格超过我们的预算了。"],
+      [["一步","我们","让","各"],"我们各让一步。"],
+      [["承担","运费","一半","双方","各"],"运费双方各承担一半。"],
+      [["请示","老板","一下","我","要","这一点"],"这一点我要请示一下老板。"]
+    ],
+    "writing_create": {
+      "kata": ["预算","定金","让步","长期合作"],
+      "contoh_jawaban": ["我们的预算是三十万。","请先付三成定金。","价格上我们已经让步了。","希望以后能长期合作。"]
+    },
+    "speaking_roleplay": {
+      "situasi": "Pemasok menawarkan harga sepuluh persen di atas anggaranmu dan bilang itu sudah harga terbaik.",
+      "tujuan": "Menyampaikan bahwa harganya melebihi anggaran, menawar lewat syarat (bayar muka, volume, ongkir), lalu menutup atau menunda dengan sopan.",
+      "wajib": ["预算","空间","如果…就","各让一步","请示"]
+    },
+    "speaking_video": {
+      "tema": "Ceritakan satu negosiasi yang pernah kamu alami: posisi awal kedua pihak dan bagaimana akhirnya bertemu.",
+      "wajib": ["报价","条件","让步","定金","成交"]
+    }
+  }
+}

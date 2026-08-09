@@ -1,0 +1,210 @@
+{
+  "no": 3,
+  "title_en": "Asking Questions & Giving Information",
+  "title_id": "Bertanya dan Memberi Informasi",
+  "note": "",
+  "objectives": [
+    "Menggunakan enam kata tanya inti Mandarin dengan susunan yang benar.",
+    "Menjelaskan isi pekerjaan sendiri secara ringkas.",
+    "Menceritakan aktivitas kerja hari ini, kemarin, dan besok.",
+    "Mengonfirmasi informasi supaya tidak salah paham.",
+    "Menanyakan ulang bagian yang belum jelas tanpa terdengar menyalahkan."
+  ],
+  "primer": [],
+  "vocab": [
+    ["什么","shénme","what","apa"],
+    ["谁","shéi","who","siapa"],
+    ["哪个","nǎge","which","yang mana"],
+    ["为什么","wèishénme","why","kenapa"],
+    ["怎么","zěnme","how","bagaimana"],
+    ["什么时候","shénme shíhou","when","kapan"],
+    ["吗","ma","question particle","partikel kalimat tanya"],
+    ["呢","ne","and how about…?","kalau…?"],
+    ["问","wèn","to ask","bertanya"],
+    ["回答","huídá","to answer","menjawab"],
+    ["告诉","gàosu","to tell","memberi tahu"],
+    ["知道","zhīdào","to know","tahu"],
+    ["明白","míngbai","to understand","paham"],
+    ["清楚","qīngchu","clear","jelas"],
+    ["确认","quèrèn","to confirm","mengonfirmasi"],
+    ["意思","yìsi","meaning","maksud, arti"],
+    ["情况","qíngkuàng","situation","situasi, kondisi"],
+    ["内容","nèiróng","content","isi"],
+    ["项目","xiàngmù","project","proyek"],
+    ["任务","rènwu","task","tugas"],
+    ["报告","bàogào","report","laporan"],
+    ["数据","shùjù","data","data"],
+    ["进度","jìndù","progress","progres"],
+    ["完成","wánchéng","to complete","menyelesaikan"],
+    ["开始","kāishǐ","to start","memulai"],
+    ["结束","jiéshù","to end","berakhir"],
+    ["负责人","fùzérén","person in charge","penanggung jawab"],
+    ["每天","měi tiān","every day","setiap hari"],
+    ["常常","chángcháng","often","sering"],
+    ["有时候","yǒu shíhou","sometimes","kadang-kadang"],
+    ["先","xiān","first","lebih dulu"],
+    ["然后","ránhòu","then, after that","lalu"],
+    ["最后","zuìhòu","finally","terakhir"],
+    ["因为","yīnwèi","because","karena"],
+    ["所以","suǒyǐ","so, therefore","jadi"],
+    ["如果","rúguǒ","if","kalau"],
+    ["需要","xūyào","to need","memerlukan"],
+    ["重要","zhòngyào","important","penting"],
+    ["具体","jùtǐ","specific, in detail","spesifik, rinci"],
+    ["大概","dàgài","roughly, about","kira-kira"],
+    ["一共","yígòng","in total","total"],
+    ["再说一遍","zài shuō yí biàn","say it again","ulangi sekali lagi"],
+    ["也就是说","yě jiùshì shuō","in other words","dengan kata lain"],
+    ["对不对","duì bu duì","is that right","benar tidak"]
+  ],
+  "expressions": [
+    ["请问，这个项目的负责人是谁？","Qǐngwèn, zhège xiàngmù de fùzérén shì shéi?","Excuse me, who is in charge of this project?","Permisi, penanggung jawab proyek ini siapa?"],
+    ["我每天主要做三件事。","Wǒ měi tiān zhǔyào zuò sān jiàn shì.","There are three main things I do every day.","Setiap hari saya mengerjakan tiga hal utama."],
+    ["您的意思是明天发，对不对？","Nín de yìsi shì míngtiān fā, duì bu duì?","You mean it will be sent tomorrow, is that right?","Maksud Anda dikirim besok, benar begitu?"],
+    ["不好意思，这一点我还不太清楚。","Bù hǎoyìsi, zhè yì diǎn wǒ hái bú tài qīngchu.","Sorry, I’m not quite clear on this point yet.","Maaf, bagian ini saya masih belum terlalu jelas."],
+    ["可以说得具体一点儿吗？","Kěyǐ shuō de jùtǐ yìdiǎnr ma?","Could you be a bit more specific?","Bisa dijelaskan lebih rinci?"],
+    ["也就是说，我们下周开始。","Yě jiùshì shuō, wǒmen xià zhōu kāishǐ.","In other words, we start next week.","Dengan kata lain, kita mulai minggu depan."],
+    ["我确认一下：一共十二箱，对吗？","Wǒ quèrèn yíxià: yígòng shí’èr xiāng, duì ma?","Let me confirm: twelve boxes in total, correct?","Saya konfirmasi: totalnya dua belas dus, benar?"],
+    ["我明白了，谢谢您的说明。","Wǒ míngbai le, xièxie nín de shuōmíng.","I understand, thank you for explaining.","Saya paham, terima kasih penjelasannya."]
+  ],
+  "dialogues": [
+    {
+      "situasi": "Karyawan baru menanyakan siapa penanggung jawab sebuah proyek.",
+      "lines": [
+        ["A","请问，这个项目的负责人是谁？","Qǐngwèn, zhège xiàngmù de fùzérén shì shéi?","Excuse me, who is in charge of this project?","Permisi, penanggung jawab proyek ini siapa?"],
+        ["B","是销售部的李经理。","Shì xiāoshòubù de Lǐ jīnglǐ.","Manager Li from sales.","Pak Li dari departemen penjualan."],
+        ["A","项目什么时候开始？","Xiàngmù shénme shíhou kāishǐ?","When does the project start?","Proyeknya mulai kapan?"],
+        ["B","下个月一号。","Xià ge yuè yī hào.","On the first of next month.","Tanggal satu bulan depan."],
+        ["A","好的，我知道了，谢谢。","Hǎo de, wǒ zhīdào le, xièxie.","All right, got it, thank you.","Baik, saya sudah tahu, terima kasih."]
+      ]
+    },
+    {
+      "situasi": "Menjelaskan isi pekerjaan kepada rekan dari departemen lain.",
+      "lines": [
+        ["A","你在采购部具体做什么？","Nǐ zài cǎigòubù jùtǐ zuò shénme?","What exactly do you do in purchasing?","Di departemen pembelian kamu spesifiknya ngerjain apa?"],
+        ["B","我每天主要做三件事。","Wǒ měi tiān zhǔyào zuò sān jiàn shì.","There are three main things I do every day.","Setiap hari saya mengerjakan tiga hal utama."],
+        ["A","哪三件？","Nǎ sān jiàn?","Which three?","Tiga apa saja?"],
+        ["B","先看订单，然后联系供应商，最后做报告。","Xiān kàn dìngdān, ránhòu liánxì gōngyìngshāng, zuìhòu zuò bàogào.","First I check the orders, then contact suppliers, and finally write reports.","Pertama cek pesanan, lalu hubungi pemasok, terakhir bikin laporan."],
+        ["A","这样啊，那你常常跟中国的供应商联系吗？","Zhèyàng a, nà nǐ chángcháng gēn Zhōngguó de gōngyìngshāng liánxì ma?","I see. So do you often deal with Chinese suppliers?","Oh begitu. Berarti kamu sering berhubungan dengan pemasok Tiongkok?"],
+        ["B","对，几乎每天。","Duì, jīhū měi tiān.","Yes, almost every day.","Iya, hampir setiap hari."]
+      ]
+    },
+    {
+      "situasi": "Mengonfirmasi jumlah dan tanggal kirim lewat telepon.",
+      "lines": [
+        ["A","我确认一下：一共十二箱，对吗？","Wǒ quèrèn yíxià: yígòng shí’èr xiāng, duì ma?","Let me confirm: twelve boxes in total, correct?","Saya konfirmasi: totalnya dua belas dus, benar?"],
+        ["B","对，十二箱。","Duì, shí’èr xiāng.","Correct, twelve boxes.","Benar, dua belas dus."],
+        ["A","您的意思是这个星期五发货，对不对？","Nín de yìsi shì zhège xīngqīwǔ fāhuò, duì bu duì?","You mean you’ll ship this Friday, is that right?","Maksud Anda dikirim Jumat ini, benar begitu?"],
+        ["B","不好意思，是下个星期五。","Bù hǎoyìsi, shì xià ge xīngqīwǔ.","Sorry, it’s next Friday.","Maaf, Jumat minggu depan."],
+        ["A","明白了。那我改一下时间表。","Míngbai le. Nà wǒ gǎi yíxià shíjiānbiǎo.","Understood. I’ll update the schedule then.","Paham. Kalau begitu saya ubah jadwalnya."]
+      ]
+    },
+    {
+      "situasi": "Menanyakan ulang bagian yang belum jelas dalam rapat.",
+      "lines": [
+        ["A","不好意思，最后一点我还不太清楚。","Bù hǎoyìsi, zuìhòu yì diǎn wǒ hái bú tài qīngchu.","Sorry, I’m still not clear on the last point.","Maaf, poin terakhir saya masih belum terlalu jelas."],
+        ["B","哪一点？","Nǎ yì diǎn?","Which point?","Poin yang mana?"],
+        ["A","为什么这个月的数据比上个月低？","Wèishénme zhège yuè de shùjù bǐ shàng ge yuè dī?","Why is this month’s data lower than last month’s?","Kenapa data bulan ini lebih rendah dari bulan lalu?"],
+        ["B","因为有两个客户推迟了订单，所以数据低了。","Yīnwèi yǒu liǎng ge kèhù tuīchí le dìngdān, suǒyǐ shùjù dī le.","Because two clients postponed their orders, the numbers went down.","Karena dua klien menunda pesanan, jadi angkanya turun."],
+        ["A","原来是这样，谢谢您的说明。","Yuánlái shì zhèyàng, xièxie nín de shuōmíng.","I see. Thank you for explaining.","Oh ternyata begitu, terima kasih penjelasannya."]
+      ]
+    }
+  ],
+  "reading": {
+    "title_zh": "我的工作内容",
+    "title_id": "Isi Pekerjaan Saya",
+    "zh": "我在采购部工作，我的工作不难，但是很重要。我每天先看订单，然后联系供应商，最后做报告。如果订单有问题，我要马上告诉经理。有时候供应商发来的数据不太清楚，我就打电话确认一下。上个月我们有一个新项目，负责人是李经理。因为那个项目很急，所以我们常常加班。这个月项目结束了，大家都轻松多了。",
+    "py": "Wǒ zài cǎigòubù gōngzuò, wǒ de gōngzuò bù nán, dànshì hěn zhòngyào. Wǒ měi tiān xiān kàn dìngdān, ránhòu liánxì gōngyìngshāng, zuìhòu zuò bàogào. Rúguǒ dìngdān yǒu wèntí, wǒ yào mǎshàng gàosu jīnglǐ. Yǒu shíhou gōngyìngshāng fā lái de shùjù bú tài qīngchu, wǒ jiù dǎ diànhuà quèrèn yíxià. Shàng ge yuè wǒmen yǒu yí ge xīn xiàngmù, fùzérén shì Lǐ jīnglǐ. Yīnwèi nàge xiàngmù hěn jí, suǒyǐ wǒmen chángcháng jiābān. Zhège yuè xiàngmù jiéshù le, dàjiā dōu qīngsōng duō le.",
+    "en": "I work in the purchasing department. My job is not difficult, but it is important. Every day I first review the orders, then contact suppliers, and finally write reports. If there is a problem with an order, I have to tell the manager immediately. Sometimes the data suppliers send isn’t very clear, so I call to confirm. Last month we had a new project led by Manager Li. Because that project was urgent, we often worked overtime. This month the project has ended and everyone feels much more relaxed.",
+    "id": "Saya bekerja di departemen pembelian. Pekerjaan saya tidak sulit, tapi penting. Setiap hari saya cek pesanan dulu, lalu menghubungi pemasok, terakhir membuat laporan. Kalau ada masalah dengan pesanan, saya harus segera memberi tahu manajer. Kadang data yang dikirim pemasok kurang jelas, jadi saya telepon untuk konfirmasi. Bulan lalu kami punya proyek baru, penanggung jawabnya Pak Li. Karena proyek itu mendesak, kami sering lembur. Bulan ini proyeknya selesai dan semua orang jauh lebih santai."
+  },
+  "grammar": [
+    {
+      "point": "Kata tanya tidak pindah ke depan kalimat",
+      "penjelasan": "Ini perbedaan paling besar antara Mandarin dan bahasa Indonesia maupun Inggris. Untuk membuat kalimat tanya, kamu tidak mengubah susunan apa pun — cukup ganti bagian yang ingin ditanyakan dengan kata tanyanya, di posisi yang sama.",
+      "pola": "他去 北京 → 他去 哪儿？   |   这是 报告 → 这是 什么？",
+      "contoh": [
+        ["负责人是谁？","Fùzérén shì shéi?","Penanggung jawabnya siapa? (bukan 谁是负责人 kalau yang ditanya identitasnya)"],
+        ["项目什么时候开始？","Xiàngmù shénme shíhou kāishǐ?","Proyeknya mulai kapan?"],
+        ["你在采购部做什么？","Nǐ zài cǎigòubù zuò shénme?","Di departemen pembelian kamu ngerjain apa?"]
+      ],
+      "tips": "Karena kalimatnya sudah jelas bertanya, JANGAN tambahkan 吗 di akhir. 你去哪儿吗？salah. 吗 hanya untuk pertanyaan ya-tidak."
+    },
+    {
+      "point": "先…然后…最后… — merangkai urutan kerja",
+      "penjelasan": "Rangkaian ini dipakai untuk menjelaskan alur pekerjaan langkah demi langkah. Ketiganya diletakkan sebelum kata kerja, bukan di awal kalimat, karena posisinya sama dengan keterangan waktu.",
+      "pola": "Subjek + 先 + kerja①，然后 + kerja②，最后 + kerja③",
+      "contoh": [
+        ["我先看订单，然后联系供应商，最后做报告。","Wǒ xiān kàn dìngdān, ránhòu liánxì gōngyìngshāng, zuìhòu zuò bàogào.","Saya cek pesanan dulu, lalu hubungi pemasok, terakhir bikin laporan."],
+        ["请先确认数量，然后发货。","Qǐng xiān quèrèn shùliàng, ránhòu fāhuò.","Tolong konfirmasi jumlahnya dulu, baru dikirim."]
+      ],
+      "tips": "先 harus menempel pada kata kerja: 我先看 benar, 先我看 salah. Ini kesalahan yang sering muncul karena bahasa Indonesia membolehkan “pertama saya…”."
+    },
+    {
+      "point": "因为…所以… — sebab dan akibat, dua-duanya dipakai",
+      "penjelasan": "Berbeda dengan bahasa Indonesia yang memilih salah satu (“karena hujan, saya telat” atau “hujan, jadi saya telat”), Mandarin lazim memakai keduanya sekaligus dalam satu kalimat. Menghilangkan salah satunya tidak salah, tapi memakai keduanya terdengar lebih rapi dan lebih formal.",
+      "pola": "因为 + sebab，所以 + akibat",
+      "contoh": [
+        ["因为那个项目很急，所以我们常常加班。","Yīnwèi nàge xiàngmù hěn jí, suǒyǐ wǒmen chángcháng jiābān.","Karena proyek itu mendesak, jadi kami sering lembur."],
+        ["因为客户推迟了订单，所以数据低了。","Yīnwèi kèhù tuīchí le dìngdān, suǒyǐ shùjù dī le.","Karena klien menunda pesanan, jadi angkanya turun."]
+      ],
+      "tips": "Kalau ditanya 为什么, jawabannya cukup mulai dengan 因为 saja — 所以 tidak perlu diulang karena akibatnya sudah ada di pertanyaan."
+    },
+    {
+      "point": "…，对不对？ / …，对吗？ — mengonfirmasi tanpa terdengar menuduh",
+      "penjelasan": "Ditempelkan di akhir pernyataan untuk minta konfirmasi. Bedanya dengan bertanya biasa: kamu sudah punya dugaan dan hanya ingin dipastikan. Ini alat paling berguna di dunia kerja karena mencegah salah paham soal jumlah, tanggal, dan harga.",
+      "pola": "pernyataan + ，对不对？/ 对吗？",
+      "contoh": [
+        ["一共十二箱，对吗？","Yígòng shí’èr xiāng, duì ma?","Totalnya dua belas dus, benar?"],
+        ["您的意思是下周五发货，对不对？","Nín de yìsi shì xià zhōu wǔ fāhuò, duì bu duì?","Maksud Anda dikirim Jumat depan, benar begitu?"]
+      ],
+      "tips": "Biasakan mengulang isinya, bukan cuma bilang 好的. Dalam perdagangan, 我确认一下… + 对吗？adalah kalimat yang paling sering menyelamatkan pengiriman."
+    }
+  ],
+  "exercises": {
+    "listening_tf": [
+      ["说话人在销售部工作。","S"],
+      ["订单有问题的时候，他要马上告诉经理。","B"]
+    ],
+    "listening_mc": [
+      {"q":"他每天最后做什么？","c":["看订单","联系供应商","做报告"],"a":"C"},
+      {"q":"上个月为什么常常加班？","c":["人不够","项目很急","经理要求"],"a":"B"}
+    ],
+    "listening_open": [
+      ["新项目的负责人是谁？","李经理。"]
+    ],
+    "reading_match": {
+      "soal": ["这个项目的负责人是谁？","项目什么时候开始？","为什么数据低了？","一共十二箱，对吗？","这一点我还不太清楚。"],
+      "pilihan": ["A. 因为两个客户推迟了订单。","B. 下个月一号。","C. 对，十二箱。","D. 是销售部的李经理。","E. 哪一点？我再说一遍。"],
+      "kunci": ["D","B","A","C","E"]
+    },
+    "reading_mc": [
+      {"q":"数据不清楚的时候他会怎么做？","c":["自己猜","打电话确认","等经理问"],"a":"B"},
+      {"q":"下面哪个句子是对的？","c":["你去哪儿吗？","你去哪儿？","哪儿你去？"],"a":"B"},
+      {"q":"“先”应该放在哪里？","c":["先我看订单","我先看订单","我看先订单"],"a":"B"}
+    ],
+    "reading_order": {
+      "kalimat": ["A. 做报告。","B. 看订单。","C. 联系供应商。"],
+      "kunci": "B → C → A"
+    },
+    "writing_rearrange": [
+      [["是","负责人","谁","这个","项目","的","？"],"这个项目的负责人是谁？"],
+      [["然后","我","看","先","订单","联系","供应商"],"我先看订单，然后联系供应商。"],
+      [["所以","很急","项目","因为","加班","我们","常常"],"因为项目很急，所以我们常常加班。"],
+      [["对吗","十二箱","一共","？"],"一共十二箱，对吗？"]
+    ],
+    "writing_create": {
+      "kata": ["什么时候","因为","确认","具体"],
+      "contoh_jawaban": ["会议什么时候开始？","因为下雨，所以我迟到了。","我确认一下发货时间。","请说得具体一点儿。"]
+    },
+    "speaking_roleplay": {
+      "situasi": "Rekan dari departemen lain menanyakan apa saja pekerjaanmu sehari-hari, dan kamu juga ingin memastikan satu tanggal yang tadi dia sebut.",
+      "tujuan": "Menjelaskan alur kerja harianmu berurutan, lalu mengonfirmasi satu informasi.",
+      "wajib": ["先","然后","最后","确认","对不对"]
+    },
+    "speaking_video": {
+      "tema": "Jelaskan isi pekerjaanmu dan satu hal yang paling sering bikin repot.",
+      "wajib": ["每天","主要","因为","所以","有时候"]
+    }
+  }
+}

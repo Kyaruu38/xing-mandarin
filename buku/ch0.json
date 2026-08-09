@@ -1,0 +1,209 @@
+{
+  "no": 0,
+  "title_en": "Mandarin Fundamental",
+  "title_id": "Dasar Bahasa Mandarin",
+  "note": "Chapter ini untuk yang belum pernah belajar Mandarin sama sekali. Kalau kamu sudah bisa membaca pinyin dan menyebut angka, langsung saja ke Chapter 1.",
+  "objectives": [
+    "Membaca pinyin dan mengucapkan empat nada dengan benar.",
+    "Memahami cara kerja hanzi dan urutan goresan dasar.",
+    "Menyebut angka, tanggal, hari, dan jam.",
+    "Menyebut harga dan nomor telepon.",
+    "Menggunakan sapaan dasar di lingkungan kerja."
+  ],
+  "primer": [
+    {"h": "Pinyin: cara menuliskan bunyi", "p": "Hanzi tidak memberi tahu cara membacanya. Karena itu setiap suku kata Mandarin punya ejaan latin resmi yang disebut pinyin. Satu suku kata selalu terdiri dari tiga bagian: konsonan awal (shengmu), vokal (yunmu), dan nada. Contohnya 商 shang: sh adalah konsonan awal, ang vokalnya, dan garis datar di atas a menandai nada pertama."},
+    {"h": "Empat nada", "p": "Nada di Mandarin bukan hiasan. Nada mengubah arti. Suku kata ma bisa berarti ibu, rami, kuda, atau memarahi, tergantung nadanya saja. Nada satu (ā) datar dan tinggi, seperti nada tut telepon. Nada dua (á) naik, seperti waktu kita bertanya \"hah?\". Nada tiga (ǎ) turun lalu naik lagi, paling rendah dari semuanya. Nada empat (à) jatuh tegas, seperti waktu kita bilang \"nih!\". Ada juga nada netral yang ditulis tanpa tanda, dibaca pendek dan ringan."},
+    {"h": "Dua aturan nada yang wajib diingat", "p": "Kalau dua nada tiga berdampingan, yang pertama dibaca sebagai nada dua. 你好 ditulis nǐ hǎo tapi dibaca ní hǎo. Lalu 不 bù berubah jadi bú kalau diikuti nada empat: 不是 dibaca bú shì, bukan bù shì."},
+    {"h": "Membaca hanzi", "p": "Hanzi dibangun dari komponen yang berulang. Banyak karakter punya bagian yang menunjukkan arti dan bagian yang menunjukkan bunyi. 妈 mā (ibu) misalnya: sisi kirinya 女 (perempuan) memberi petunjuk arti, sisi kanannya 马 mǎ memberi petunjuk bunyi. Begitu kamu hafal seratusan komponen dasar, karakter baru jadi jauh lebih mudah dikenali. Urutan menulisnya juga ada aturannya: dari atas ke bawah, dari kiri ke kanan, garis mendatar sebelum garis tegak."},
+    {"h": "Angka: sistemnya rapi", "p": "Angka Mandarin sangat teratur. Sebelas adalah sepuluh-satu 十一, dua puluh adalah dua-sepuluh 二十, dua puluh satu adalah dua-sepuluh-satu 二十一. Yang perlu diperhatikan cuma satuan besar: setelah 百 (ratus) dan 千 (ribu), Mandarin melompat ke 万 (sepuluh ribu), bukan ke “juta”. Jadi 100.000 dibaca 十万 (sepuluh × sepuluh ribu) dan 1.000.000 dibaca 一百万 (seratus × sepuluh ribu). Ini yang paling sering bikin salah waktu menyebut harga."},
+    {"h": "Waktu: selalu dari yang besar ke yang kecil", "p": "Tanggal ditulis tahun-bulan-hari: 2026年3月15号. Jam ditulis bagian hari dulu baru angkanya: 下午2点30分 untuk pukul 14.30. Urutan ini berlaku untuk alamat juga, dari negara sampai nomor rumah. Sekali terbiasa, seluruh sistem waktu Mandarin jadi tertebak."}
+  ],
+  "vocab": [
+    ["零","líng","zero","nol"],
+    ["一","yī","one","satu"],
+    ["二","èr","two","dua"],
+    ["三","sān","three","tiga"],
+    ["四","sì","four","empat"],
+    ["五","wǔ","five","lima"],
+    ["六","liù","six","enam"],
+    ["七","qī","seven","tujuh"],
+    ["八","bā","eight","delapan"],
+    ["九","jiǔ","nine","sembilan"],
+    ["十","shí","ten","sepuluh"],
+    ["百","bǎi","hundred","ratus"],
+    ["千","qiān","thousand","ribu"],
+    ["万","wàn","ten thousand","sepuluh ribu"],
+    ["两","liǎng","two (before a measure word)","dua (sebelum kata bantu bilangan)"],
+    ["年","nián","year","tahun"],
+    ["月","yuè","month","bulan"],
+    ["号","hào","date (spoken)","tanggal (lisan)"],
+    ["日","rì","date (written)","tanggal (tulisan resmi)"],
+    ["星期","xīngqī","week","minggu"],
+    ["今天","jīntiān","today","hari ini"],
+    ["明天","míngtiān","tomorrow","besok"],
+    ["昨天","zuótiān","yesterday","kemarin"],
+    ["点","diǎn","o’clock","pukul"],
+    ["分","fēn","minute","menit"],
+    ["半","bàn","half","setengah"],
+    ["上午","shàngwǔ","morning (before noon)","pagi sampai menjelang siang"],
+    ["中午","zhōngwǔ","noon","tengah hari"],
+    ["下午","xiàwǔ","afternoon","siang sampai sore"],
+    ["晚上","wǎnshang","evening","malam"],
+    ["现在","xiànzài","now","sekarang"],
+    ["钱","qián","money","uang"],
+    ["块","kuài","unit of currency (spoken)","satuan mata uang (lisan)"],
+    ["元","yuán","yuan (written)","yuan (tulisan)"],
+    ["人民币","rénmínbì","renminbi, RMB","renminbi, mata uang Tiongkok"],
+    ["印尼盾","yìnídùn","Indonesian rupiah","rupiah"],
+    ["多少","duōshao","how many, how much","berapa (jumlah besar)"],
+    ["几","jǐ","how many (small number)","berapa (jumlah kecil)"],
+    ["电话","diànhuà","telephone","telepon"],
+    ["号码","hàomǎ","number","nomor"],
+    ["你好","nǐ hǎo","hello","halo"],
+    ["您好","nín hǎo","hello (polite)","halo (sopan)"],
+    ["谢谢","xièxie","thank you","terima kasih"],
+    ["不客气","bú kèqi","you’re welcome","sama-sama"],
+    ["对不起","duìbuqǐ","sorry","maaf"],
+    ["没关系","méi guānxi","it’s all right","tidak apa-apa"],
+    ["请问","qǐngwèn","excuse me, may I ask","permisi, boleh bertanya"],
+    ["再见","zàijiàn","goodbye","sampai jumpa"]
+  ],
+  "expressions": [
+    ["您好，很高兴认识您。","Nín hǎo, hěn gāoxìng rènshi nín.","Hello, pleased to meet you.","Halo, senang bertemu dengan Anda."],
+    ["请问，现在几点？","Qǐngwèn, xiànzài jǐ diǎn?","Excuse me, what time is it now?","Permisi, sekarang pukul berapa?"],
+    ["今天几号？","Jīntiān jǐ hào?","What is today’s date?","Hari ini tanggal berapa?"],
+    ["您的电话号码是多少？","Nín de diànhuà hàomǎ shì duōshao?","What is your phone number?","Nomor telepon Anda berapa?"],
+    ["这个多少钱？","Zhège duōshao qián?","How much is this?","Ini berapa harganya?"],
+    ["请再说一遍。","Qǐng zài shuō yí biàn.","Please say that again.","Tolong diulangi sekali lagi."],
+    ["请说慢一点儿。","Qǐng shuō màn yìdiǎnr.","Please speak a little slower.","Tolong bicara sedikit lebih pelan."],
+    ["不好意思，我听不懂。","Bù hǎoyìsi, wǒ tīng bu dǒng.","Sorry, I don’t understand.","Maaf, saya tidak menangkap maksudnya."]
+  ],
+  "dialogues": [
+    {
+      "situasi": "Hari pertama masuk kantor. Bertemu resepsionis di lobi.",
+      "lines": [
+        ["A","您好！","Nín hǎo!","Hello!","Halo!"],
+        ["B","您好，请问您找哪位？","Nín hǎo, qǐngwèn nín zhǎo nǎ wèi?","Hello, who are you here to see?","Halo, Anda mencari siapa ya?"],
+        ["A","我找王经理。","Wǒ zhǎo Wáng jīnglǐ.","I’m here to see Manager Wang.","Saya mencari Manajer Wang."],
+        ["B","好的，请稍等。","Hǎo de, qǐng shāo děng.","All right, one moment please.","Baik, mohon tunggu sebentar."],
+        ["A","谢谢。","Xièxie.","Thank you.","Terima kasih."]
+      ]
+    },
+    {
+      "situasi": "Menanyakan jam rapat kepada rekan kerja.",
+      "lines": [
+        ["A","请问，会议几点开始？","Qǐngwèn, huìyì jǐ diǎn kāishǐ?","Excuse me, what time does the meeting start?","Permisi, rapatnya mulai pukul berapa?"],
+        ["B","下午2点。","Xiàwǔ liǎng diǎn.","Two in the afternoon.","Pukul dua siang."],
+        ["A","现在几点了？","Xiànzài jǐ diǎn le?","What time is it now?","Sekarang sudah pukul berapa?"],
+        ["B","现在1点半。","Xiànzài yī diǎn bàn.","It’s half past one.","Sekarang pukul setengah dua."],
+        ["A","好，我知道了，谢谢。","Hǎo, wǒ zhīdào le, xièxie.","Got it, thanks.","Oke, saya mengerti, terima kasih."]
+      ]
+    },
+    {
+      "situasi": "Menentukan tanggal kirim barang lewat telepon.",
+      "lines": [
+        ["A","请问今天几号？","Qǐngwèn jīntiān jǐ hào?","What’s the date today?","Hari ini tanggal berapa ya?"],
+        ["B","今天三月十五号。","Jīntiān sān yuè shíwǔ hào.","Today is March 15th.","Hari ini tanggal 15 Maret."],
+        ["A","货什么时候到？","Huò shénme shíhou dào?","When will the goods arrive?","Barangnya sampai kapan?"],
+        ["B","三月二十号到。","Sān yuè èrshí hào dào.","They arrive on March 20th.","Sampai tanggal 20 Maret."],
+        ["A","好的，谢谢您。","Hǎo de, xièxie nín.","All right, thank you.","Baik, terima kasih."]
+      ]
+    },
+    {
+      "situasi": "Bertukar nomor telepon setelah bertemu klien.",
+      "lines": [
+        ["A","这是我的名片。","Zhè shì wǒ de míngpiàn.","This is my business card.","Ini kartu nama saya."],
+        ["B","谢谢。您的电话号码是多少？","Xièxie. Nín de diànhuà hàomǎ shì duōshao?","Thank you. What’s your phone number?","Terima kasih. Nomor telepon Anda berapa?"],
+        ["A","0812三五七九二四八。","Líng bā yāo èr sān wǔ qī jiǔ èr sì bā.","0812 357 924 8.","0812 357 924 8."],
+        ["B","我记下来了。对了，请再说一遍后面四个数字。","Wǒ jì xiàlai le. Duìle, qǐng zài shuō yí biàn hòumiàn sì ge shùzì.","I’ve written it down. Actually, could you repeat the last four digits?","Sudah saya catat. Oh iya, tolong ulangi empat angka terakhirnya."],
+        ["A","九二四八。","Jiǔ èr sì bā.","Nine two four eight.","Sembilan dua empat delapan."]
+      ]
+    }
+  ],
+  "reading": {
+    "title_zh": "我的一天",
+    "title_id": "Satu Hari Saya",
+    "zh": "我叫李强。我今年二十八岁。我早上七点起床，八点半到公司。上午9点我开会，下午2点我见客户。今天是三月十五号，星期五。星期六和星期天我不上班。晚上六点半我下班，七点到家。",
+    "py": "Wǒ jiào Lǐ Qiáng. Wǒ jīnnián èrshíbā suì. Wǒ zǎoshang qī diǎn qǐchuáng, bā diǎn bàn dào gōngsī. Shàngwǔ jiǔ diǎn wǒ kāihuì, xiàwǔ liǎng diǎn wǒ jiàn kèhù. Jīntiān shì sān yuè shíwǔ hào, xīngqīwǔ. Xīngqīliù hé xīngqītiān wǒ bú shàngbān. Wǎnshang liù diǎn bàn wǒ xiàbān, qī diǎn dào jiā.",
+    "en": "My name is Li Qiang. I am twenty-eight this year. I get up at seven in the morning and reach the office at half past eight. At nine I have a meeting, and at two in the afternoon I meet a client. Today is March 15th, a Friday. I don’t work on Saturday and Sunday. I finish work at half past six in the evening and get home at seven.",
+    "id": "Nama saya Li Qiang. Tahun ini saya dua puluh delapan tahun. Saya bangun pukul tujuh pagi dan sampai kantor pukul setengah sembilan. Pukul sembilan pagi saya rapat, pukul dua siang saya bertemu klien. Hari ini tanggal 15 Maret, hari Jumat. Sabtu dan Minggu saya tidak masuk kerja. Pukul setengah tujuh malam saya pulang kerja, pukul tujuh sampai rumah."
+  },
+  "grammar": [
+    {
+      "point": "Urutan waktu: dari satuan besar ke satuan kecil",
+      "penjelasan": "Bahasa Indonesia menyebut waktu dari yang kecil dulu: “15 Maret 2026”. Mandarin kebalikannya, selalu dari yang paling besar. Aturan yang sama berlaku untuk jam dan untuk alamat.",
+      "pola": "年 → 月 → 号 → 星期 → 上午/下午 → 点 → 分",
+      "contoh": [
+        ["2026年3月15号下午2点30分","2026 nián sān yuè shíwǔ hào xiàwǔ liǎng diǎn sānshí fēn","15 Maret 2026, pukul 14.30"],
+        ["星期一上午9点","xīngqīyī shàngwǔ jiǔ diǎn","Senin pukul 9 pagi"]
+      ],
+      "tips": "Waktu diletakkan SEBELUM kata kerja, bukan sesudahnya. 我明天开会 benar; 我开会明天 salah. Ini kesalahan nomor satu penutur bahasa Indonesia di bulan-bulan pertama."
+    },
+    {
+      "point": "几 jǐ dan 多少 duōshao — dua cara bertanya “berapa”",
+      "penjelasan": "Keduanya berarti “berapa”, tapi tidak bisa saling menggantikan. 几 dipakai kalau jawabannya diperkirakan kecil, di bawah sepuluh, dan wajib diikuti kata bantu bilangan. 多少 dipakai kalau jawabannya bisa besar atau tidak terduga, dan tidak perlu kata bantu.",
+      "pola": "几 + kata bantu + benda   |   多少 + (kata bantu) + benda",
+      "contoh": [
+        ["你们部门有几个人？","Nǐmen bùmén yǒu jǐ ge rén?","Departemen kalian ada berapa orang? (dikira sedikit)"],
+        ["你们公司有多少人？","Nǐmen gōngsī yǒu duōshao rén?","Perusahaan kalian ada berapa orang? (bisa ratusan)"],
+        ["现在几点？","Xiànzài jǐ diǎn?","Sekarang pukul berapa? (jam selalu pakai 几)"]
+      ],
+      "tips": "Harga selalu pakai 多少钱, tidak pernah 几钱 — karena harga dianggap angka yang tidak terbatas."
+    },
+    {
+      "point": "二 'èr' dan 两 'liǎng' — dua-duanya berarti dua",
+      "penjelasan": "二 dipakai untuk menghitung dan membaca angka: nomor telepon, tanggal, nomor urut. 两 dipakai kalau angka dua itu menempel pada benda atau satuan, yaitu ketika diikuti kata bantu bilangan.",
+      "pola": "二 → angka lepas   |   两 + kata bantu + benda",
+      "contoh": [
+        ["二月二号","èr yuè èr hào","2 Februari (tanggal: pakai 二)"],
+        ["两个客户","liǎng ge kèhù","dua klien (ada kata bantu 个: pakai 两)"],
+        ["下午两点","xiàwǔ liǎng diǎn","pukul dua siang (点 itu kata bantu)"]
+      ],
+      "tips": "Pukul dua itu 两点, bukan 二点. Tapi tanggal dua tetap 二号. Hafalkan dua contoh ini saja, sisanya mengikuti."
+    }
+  ],
+  "exercises": {
+    "listening_tf": [
+      ["李强今年二十八岁。","B"],
+      ["李强星期六上班。","S"]
+    ],
+    "listening_mc": [
+      {"q":"李强几点到公司？","c":["七点","八点半","九点"],"a":"B"},
+      {"q":"下午2点李强做什么？","c":["开会","见客户","下班"],"a":"B"}
+    ],
+    "listening_open": [
+      ["李强晚上几点到家？","七点。"]
+    ],
+    "reading_match": {
+      "soal": ["请问现在几点？","这个多少钱？","今天几号？","您的电话号码是多少？","对不起。"],
+      "pilihan": ["A. 三月十五号。","B. 三点半。","C. 没关系。","D. 五十块。","E. 0812三五七九。"],
+      "kunci": ["B","D","A","E","C"]
+    },
+    "reading_mc": [
+      {"q":"李强星期几不上班？","c":["星期五","星期六和星期天","星期一"],"a":"B"},
+      {"q":"下面哪个是对的？","c":["我开会明天","明天我开会","我明天开会"],"a":"C"}
+    ],
+    "reading_order": {
+      "kalimat": ["A. 李强见客户。","B. 李强到公司。","C. 李强下班。"],
+      "kunci": "B → A → C"
+    },
+    "writing_rearrange": [
+      [["开会","我","下午","两点"],"我下午两点开会。"],
+      [["几点","现在","？"],"现在几点？"],
+      [["多少钱","这个","？"],"这个多少钱？"]
+    ],
+    "writing_create": {
+      "kata": ["星期","下午","多少","两"],
+      "contoh_jawaban": ["星期一下午我有会。","这个多少钱？","我们部门有两个人。"]
+    },
+    "speaking_roleplay": {
+      "situasi": "Kamu baru sampai di kantor klien di Guangzhou. Resepsionis menyapamu.",
+      "tujuan": "Menyapa, menyebutkan siapa yang kamu cari, dan menanyakan jam rapat.",
+      "wajib": ["您好","请问","几点","谢谢"]
+    },
+    "speaking_video": {
+      "tema": "Perkenalkan jadwal kerjamu dalam satu menit.",
+      "wajib": ["上午","下午","点","星期","现在"]
+    }
+  }
+}

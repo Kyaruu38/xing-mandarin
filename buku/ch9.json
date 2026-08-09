@@ -1,0 +1,212 @@
+{
+  "no": 9,
+  "title_en": "Simple Business Presentation",
+  "title_id": "Presentasi Bisnis Sederhana",
+  "note": "",
+  "objectives": [
+    "Membuka presentasi dan menyebutkan susunan isinya.",
+    "Memperkenalkan perusahaan dalam satu menit.",
+    "Memperkenalkan produk dan menjelaskan keunggulannya dengan angka.",
+    "Menyampaikan rencana sederhana untuk periode berikutnya.",
+    "Menjawab pertanyaan audiens, termasuk yang belum bisa dijawab."
+  ],
+  "primer": [],
+  "vocab": [
+    ["介绍","jièshào","to introduce","memperkenalkan"],
+    ["演讲","yǎnjiǎng","presentation, speech","presentasi"],
+    ["幻灯片","huàndēngpiàn","slide","salindia"],
+    ["第一部分","dì yī bùfen","part one","bagian pertama"],
+    ["成立","chénglì","to be founded","berdiri"],
+    ["总部","zǒngbù","headquarters","kantor pusat"],
+    ["分公司","fēngōngsī","branch office","kantor cabang"],
+    ["工厂","gōngchǎng","factory","pabrik"],
+    ["规模","guīmó","scale, size","skala"],
+    ["行业","hángyè","industry","industri"],
+    ["市场","shìchǎng","market","pasar"],
+    ["份额","fèn’é","share","pangsa"],
+    ["营业额","yíngyè’é","turnover, revenue","omzet"],
+    ["增长","zēngzhǎng","to grow; growth","tumbuh; pertumbuhan"],
+    ["百分之","bǎi fēn zhī","percent","persen"],
+    ["主打产品","zhǔdǎ chǎnpǐn","flagship product","produk andalan"],
+    ["优势","yōushì","advantage, strength","keunggulan"],
+    ["竞争","jìngzhēng","competition","persaingan"],
+    ["对手","duìshǒu","competitor","pesaing"],
+    ["比如说","bǐrú shuō","for example","misalnya"],
+    ["数据","shùjù","figures, data","data"],
+    ["图表","túbiǎo","chart","grafik"],
+    ["显示","xiǎnshì","to show","menunjukkan"],
+    ["说明","shuōmíng","to explain; explanation","menjelaskan; penjelasan"],
+    ["重点","zhòngdiǎn","key point","poin utama"],
+    ["计划","jìhuà","plan","rencana"],
+    ["目标","mùbiāo","target, goal","target"],
+    ["实现","shíxiàn","to achieve","mencapai"],
+    ["预计","yùjì","to project, to estimate","memperkirakan"],
+    ["下一步","xià yí bù","next step","langkah berikutnya"],
+    ["总结","zǒngjié","to conclude","menyimpulkan"],
+    ["以上","yǐshàng","that concludes; the above","demikian"],
+    ["提问","tíwèn","to ask a question","bertanya"],
+    ["回答","huídá","to answer","menjawab"],
+    ["补充说明","bǔchōng shuōmíng","further clarification","penjelasan tambahan"],
+    ["会后","huì hòu","after the meeting","setelah acara"],
+    ["资料","zīliào","material, document","materi"],
+    ["联系方式","liánxì fāngshì","contact details","kontak"],
+    ["感谢","gǎnxiè","to thank","berterima kasih"],
+    ["各位","gèwèi","everyone (formal)","hadirin sekalian"],
+    ["首先","shǒuxiān","first of all","pertama-tama"],
+    ["接下来","jiē xiàlai","next","selanjutnya"],
+    ["简单来说","jiǎndān lái shuō","simply put","singkatnya"],
+    ["清楚了吗","qīngchu le ma","is that clear","sudah jelas?"]
+  ],
+  "expressions": [
+    ["各位好，我是星汉贸易的陈晓。","Gèwèi hǎo, wǒ shì Xīnghàn màoyì de Chén Xiǎo.","Hello everyone, I’m Chen Xiao from Xinghan Trading.","Hadirin sekalian, saya Chen Xiao dari Xinghan Trading."],
+    ["今天我的介绍一共有三个部分。","Jīntiān wǒ de jièshào yígòng yǒu sān ge bùfen.","My presentation today has three parts.","Presentasi saya hari ini terdiri dari tiga bagian."],
+    ["我们公司成立于2015年，总部在雅加达。","Wǒmen gōngsī chénglì yú èr líng yī wǔ nián, zǒngbù zài Yǎjiādá.","Our company was founded in 2015, headquartered in Jakarta.","Perusahaan kami berdiri tahun 2015, kantor pusat di Jakarta."],
+    ["这是我们的主打产品。","Zhè shì wǒmen de zhǔdǎ chǎnpǐn.","This is our flagship product.","Ini produk andalan kami."],
+    ["跟同类产品比，我们的优势是价格和交货速度。","Gēn tónglèi chǎnpǐn bǐ, wǒmen de yōushì shì jiàgé hé jiāohuò sùdù.","Compared with similar products, our advantages are price and delivery speed.","Dibanding produk sejenis, keunggulan kami ada di harga dan kecepatan kirim."],
+    ["这个图表显示，去年营业额增长了百分之十八。","Zhège túbiǎo xiǎnshì, qùnián yíngyè’é zēngzhǎng le bǎi fēn zhī shíbā.","This chart shows that revenue grew eighteen percent last year.","Grafik ini menunjukkan omzet tahun lalu tumbuh delapan belas persen."],
+    ["简单来说，我们的目标是三年内进入前五名。","Jiǎndān lái shuō, wǒmen de mùbiāo shì sān nián nèi jìnrù qián wǔ míng.","Simply put, our goal is to reach the top five within three years.","Singkatnya, target kami masuk lima besar dalam tiga tahun."],
+    ["以上就是我的介绍，谢谢各位。","Yǐshàng jiùshì wǒ de jièshào, xièxie gèwèi.","That concludes my presentation, thank you all.","Demikian presentasi saya, terima kasih semuanya."],
+    ["这个问题我现在没有具体数字，会后发资料给您。","Zhège wèntí wǒ xiànzài méiyǒu jùtǐ shùzì, huì hòu fā zīliào gěi nín.","I don’t have exact figures right now; I’ll send you the material afterwards.","Untuk pertanyaan ini saya belum punya angka pastinya, setelah acara saya kirim materinya."]
+  ],
+  "dialogues": [
+    {
+      "situasi": "Membuka presentasi di depan calon mitra.",
+      "lines": [
+        ["A","各位好，我是星汉贸易的陈晓，负责采购和市场。","Gèwèi hǎo, wǒ shì Xīnghàn màoyì de Chén Xiǎo, fùzé cǎigòu hé shìchǎng.","Hello everyone, I’m Chen Xiao from Xinghan Trading, in charge of purchasing and marketing.","Hadirin sekalian, saya Chen Xiao dari Xinghan Trading, menangani pembelian dan pemasaran."],
+        ["A","今天我的介绍一共有三个部分：首先是公司简介，接下来是产品，最后是明年的计划。","Jīntiān wǒ de jièshào yígòng yǒu sān ge bùfen: shǒuxiān shì gōngsī jiǎnjiè, jiē xiàlai shì chǎnpǐn, zuìhòu shì míngnián de jìhuà.","My presentation has three parts: first the company, next our products, and finally next year’s plan.","Presentasi saya ada tiga bagian: pertama profil perusahaan, lalu produk, terakhir rencana tahun depan."],
+        ["A","大概二十分钟，有问题可以最后提问。","Dàgài èrshí fēnzhōng, yǒu wèntí kěyǐ zuìhòu tíwèn.","It will take about twenty minutes; questions at the end, please.","Kira-kira dua puluh menit, pertanyaan bisa disampaikan di akhir."],
+        ["B","好的，请开始。","Hǎo de, qǐng kāishǐ.","All right, please go ahead.","Baik, silakan mulai."]
+      ]
+    },
+    {
+      "situasi": "Memperkenalkan perusahaan dengan angka.",
+      "lines": [
+        ["A","我们公司成立于2015年，总部在雅加达。","Wǒmen gōngsī chénglì yú èr líng yī wǔ nián, zǒngbù zài Yǎjiādá.","Our company was founded in 2015, headquartered in Jakarta.","Perusahaan kami berdiri tahun 2015, kantor pusat di Jakarta."],
+        ["A","现在一共有一百二十个员工，在泗水和棉兰有两家分公司。","Xiànzài yígòng yǒu yìbǎi èrshí ge yuángōng, zài Sìshuǐ hé Miánlán yǒu liǎng jiā fēngōngsī.","We now have one hundred twenty employees and branches in Surabaya and Medan.","Sekarang ada seratus dua puluh karyawan, dengan dua cabang di Surabaya dan Medan."],
+        ["B","你们主要做哪个行业？","Nǐmen zhǔyào zuò nǎge hángyè?","Which industry do you mainly serve?","Kalian terutama di industri apa?"],
+        ["A","轮胎和汽车配件。这个图表显示，去年营业额增长了百分之十八。","Lúntāi hé qìchē pèijiàn. Zhège túbiǎo xiǎnshì, qùnián yíngyè’é zēngzhǎng le bǎi fēn zhī shíbā.","Tyres and auto parts. This chart shows revenue grew eighteen percent last year.","Ban dan suku cadang mobil. Grafik ini menunjukkan omzet tahun lalu tumbuh delapan belas persen."],
+        ["B","增长的主要原因是什么？","Zēngzhǎng de zhǔyào yuányīn shì shénme?","What was the main reason for the growth?","Penyebab utama pertumbuhannya apa?"],
+        ["A","主要是因为我们开了棉兰的分公司。","Zhǔyào shì yīnwèi wǒmen kāi le Miánlán de fēngōngsī.","Mainly because we opened the Medan branch.","Terutama karena kami membuka cabang Medan."]
+      ]
+    },
+    {
+      "situasi": "Memperkenalkan produk dan keunggulannya.",
+      "lines": [
+        ["A","接下来是产品。这是我们的主打产品。","Jiē xiàlai shì chǎnpǐn. Zhè shì wǒmen de zhǔdǎ chǎnpǐn.","Next, our products. This is our flagship.","Selanjutnya produk. Ini produk andalan kami."],
+        ["A","跟同类产品比，我们的优势有两个：价格低百分之十，交货只要二十五天。","Gēn tónglèi chǎnpǐn bǐ, wǒmen de yōushì yǒu liǎng ge: jiàgé dī bǎi fēn zhī shí, jiāohuò zhǐ yào èrshíwǔ tiān.","Compared with similar products we have two advantages: ten percent lower price and delivery in only twenty-five days.","Dibanding produk sejenis, keunggulan kami ada dua: harga sepuluh persen lebih rendah dan pengiriman cuma dua puluh lima hari."],
+        ["B","竞争对手一般要多久？","Jìngzhēng duìshǒu yìbān yào duō jiǔ?","How long do competitors usually take?","Pesaing biasanya berapa lama?"],
+        ["A","一般四十到四十五天。","Yìbān sìshí dào sìshíwǔ tiān.","Usually forty to forty-five days.","Biasanya empat puluh sampai empat puluh lima hari."],
+        ["B","质量呢？有测试报告吗？","Zhìliàng ne? Yǒu cèshì bàogào ma?","And quality? Is there a test report?","Kualitasnya? Ada laporan uji?"],
+        ["A","有，会后我把报告发给您。","Yǒu, huì hòu wǒ bǎ bàogào fā gěi nín.","Yes, I’ll send you the report after the session.","Ada, setelah acara laporannya saya kirim."]
+      ]
+    },
+    {
+      "situasi": "Menutup presentasi dan menjawab pertanyaan sulit.",
+      "lines": [
+        ["A","最后是明年的计划。简单来说，我们的目标是三年内进入行业前五名。","Zuìhòu shì míngnián de jìhuà. Jiǎndān lái shuō, wǒmen de mùbiāo shì sān nián nèi jìnrù hángyè qián wǔ míng.","Finally, next year’s plan. Simply put, our goal is to reach the industry’s top five within three years.","Terakhir rencana tahun depan. Singkatnya, target kami masuk lima besar industri dalam tiga tahun."],
+        ["A","以上就是我的介绍，谢谢各位。有问题吗？","Yǐshàng jiùshì wǒ de jièshào, xièxie gèwèi. Yǒu wèntí ma?","That concludes my presentation, thank you. Any questions?","Demikian presentasi saya, terima kasih. Ada pertanyaan?"],
+        ["B","你们现在的市场份额是多少？","Nǐmen xiànzài de shìchǎng fèn’é shì duōshao?","What is your current market share?","Pangsa pasar kalian sekarang berapa?"],
+        ["A","这个问题我现在没有具体数字，会后我发资料给您，可以吗？","Zhège wèntí wǒ xiànzài méiyǒu jùtǐ shùzì, huì hòu wǒ fā zīliào gěi nín, kěyǐ ma?","I don’t have the exact figure right now; may I send you the material afterwards?","Untuk itu saya belum punya angka pastinya, setelah acara saya kirim materinya, boleh?"],
+        ["B","可以。谢谢。","Kěyǐ. Xièxie.","Sure. Thank you.","Boleh. Terima kasih."],
+        ["A","感谢各位的时间，我的联系方式在最后一页。","Gǎnxiè gèwèi de shíjiān, wǒ de liánxì fāngshì zài zuìhòu yí yè.","Thank you for your time; my contact details are on the last page.","Terima kasih atas waktunya, kontak saya ada di halaman terakhir."]
+      ]
+    }
+  ],
+  "reading": {
+    "title_zh": "公司介绍",
+    "title_id": "Profil Perusahaan",
+    "zh": "各位好，我是星汉贸易的陈晓。今天我的介绍一共有三个部分：首先是公司简介，接下来是产品，最后是明年的计划。\n我们公司成立于2015年，总部在雅加达，现在一共有一百二十个员工，在泗水和棉兰有两家分公司。我们主要做轮胎和汽车配件。去年的营业额增长了百分之十八，主要原因是我们开了棉兰的分公司。\n这是我们的主打产品。跟同类产品比，我们的优势有两个：第一，价格低百分之十；第二，交货只要二十五天，竞争对手一般要四十天以上。质量方面我们有测试报告，会后可以发给大家。\n明年我们计划在万隆再开一家分公司，同时把交货期缩短到二十天。简单来说，我们的目标是三年内进入行业前五名。\n以上就是我的介绍，谢谢各位。",
+    "py": "Gèwèi hǎo, wǒ shì Xīnghàn màoyì de Chén Xiǎo. Jīntiān wǒ de jièshào yígòng yǒu sān ge bùfen: shǒuxiān shì gōngsī jiǎnjiè, jiē xiàlai shì chǎnpǐn, zuìhòu shì míngnián de jìhuà.\nWǒmen gōngsī chénglì yú èr líng yī wǔ nián, zǒngbù zài Yǎjiādá, xiànzài yígòng yǒu yìbǎi èrshí ge yuángōng, zài Sìshuǐ hé Miánlán yǒu liǎng jiā fēngōngsī. Wǒmen zhǔyào zuò lúntāi hé qìchē pèijiàn. Qùnián de yíngyè’é zēngzhǎng le bǎi fēn zhī shíbā, zhǔyào yuányīn shì wǒmen kāi le Miánlán de fēngōngsī.\nZhè shì wǒmen de zhǔdǎ chǎnpǐn. Gēn tónglèi chǎnpǐn bǐ, wǒmen de yōushì yǒu liǎng ge: dì yī, jiàgé dī bǎi fēn zhī shí; dì èr, jiāohuò zhǐ yào èrshíwǔ tiān, jìngzhēng duìshǒu yìbān yào sìshí tiān yǐshàng. Zhìliàng fāngmiàn wǒmen yǒu cèshì bàogào, huì hòu kěyǐ fā gěi dàjiā.\nMíngnián wǒmen jìhuà zài Wànlóng zài kāi yì jiā fēngōngsī, tóngshí bǎ jiāohuòqī suōduǎn dào èrshí tiān. Jiǎndān lái shuō, wǒmen de mùbiāo shì sān nián nèi jìnrù hángyè qián wǔ míng.\nYǐshàng jiùshì wǒ de jièshào, xièxie gèwèi.",
+    "en": "Hello everyone, I’m Chen Xiao from Xinghan Trading. My presentation today has three parts: first the company, next our products, and finally next year’s plan.\nOur company was founded in 2015 and is headquartered in Jakarta. We now have one hundred twenty employees and two branches, in Surabaya and Medan. We mainly deal in tyres and auto parts. Last year’s revenue grew by eighteen percent, mainly because we opened the Medan branch.\nThis is our flagship product. Compared with similar products we have two advantages: first, the price is ten percent lower; second, delivery takes only twenty-five days, whereas competitors usually need over forty. On quality, we have test reports which can be sent to you afterwards.\nNext year we plan to open another branch in Bandung and at the same time shorten delivery to twenty days. Simply put, our goal is to enter the industry’s top five within three years.\nThat concludes my presentation. Thank you all.",
+    "id": "Hadirin sekalian, saya Chen Xiao dari Xinghan Trading. Presentasi saya hari ini ada tiga bagian: pertama profil perusahaan, lalu produk, terakhir rencana tahun depan.\nPerusahaan kami berdiri tahun 2015, kantor pusat di Jakarta, sekarang total seratus dua puluh karyawan, dengan dua cabang di Surabaya dan Medan. Kami terutama bergerak di ban dan suku cadang mobil. Omzet tahun lalu tumbuh delapan belas persen, terutama karena kami membuka cabang Medan.\nIni produk andalan kami. Dibanding produk sejenis, keunggulan kami ada dua: pertama, harga sepuluh persen lebih rendah; kedua, pengiriman hanya dua puluh lima hari, sementara pesaing biasanya butuh lebih dari empat puluh hari. Soal kualitas kami punya laporan uji, setelah acara bisa kami kirimkan.\nTahun depan kami berencana membuka satu cabang lagi di Bandung, sekaligus memangkas waktu kirim menjadi dua puluh hari. Singkatnya, target kami masuk lima besar industri dalam tiga tahun.\nDemikian presentasi saya, terima kasih semuanya."
+  },
+  "grammar": [
+    {
+      "point": "成立于 + tahun — bentuk formal untuk “didirikan pada”",
+      "penjelasan": "于 adalah partikel klasik yang bertahan di bahasa formal dan berarti “pada”. Dipakai dalam profil perusahaan, dokumen resmi, dan presentasi. Dalam percakapan sehari-hari orang cukup bilang 2015年成立的.",
+      "pola": "…成立于 + tahun/tempat",
+      "contoh": [
+        ["我们公司成立于2015年。","Wǒmen gōngsī chénglì yú èr líng yī wǔ nián.","Perusahaan kami berdiri tahun 2015."],
+        ["工厂位于广州。","Gōngchǎng wèiyú Guǎngzhōu.","Pabriknya berlokasi di Guangzhou."]
+      ],
+      "tips": "位于 (berlokasi di) adalah saudara kembarnya untuk tempat. Dua kata ini langsung menaikkan kesan formal profil perusahaanmu tanpa perlu kalimat panjang."
+    },
+    {
+      "point": "跟 A 比，B… — membandingkan dengan pembanding di depan",
+      "penjelasan": "Berbeda dengan 比 di Chapter 5 yang menaruh pembanding di tengah, pola 跟…比 menaruhnya di awal sebagai latar. Cocok untuk presentasi karena audiens tahu dulu apa acuannya, baru mendengar klaimmu.",
+      "pola": "跟 + pembanding + 比，+ subjek + penilaian",
+      "contoh": [
+        ["跟同类产品比，我们的价格低百分之十。","Gēn tónglèi chǎnpǐn bǐ, wǒmen de jiàgé dī bǎi fēn zhī shí.","Dibanding produk sejenis, harga kami sepuluh persen lebih rendah."],
+        ["跟去年比，今年增长了百分之十八。","Gēn qùnián bǐ, jīnnián zēngzhǎng le bǎi fēn zhī shíbā.","Dibanding tahun lalu, tahun ini tumbuh delapan belas persen."]
+      ],
+      "tips": "Selalu ikuti klaim perbandingan dengan angka. 我们比较好 tanpa angka terdengar kosong; 我们低百分之十 tidak bisa dibantah kecuali dengan angka lain."
+    },
+    {
+      "point": "把 + objek + 缩短/提高/降低 + 到 — menyatakan perubahan target",
+      "penjelasan": "Kalimat 把 dari Chapter 4 kembali muncul di presentasi rencana. Polanya: benda yang diubah naik ke depan kata kerja, lalu 到 menunjukkan sampai angka berapa. Ini cara baku menyampaikan target yang terukur.",
+      "pola": "把 + hal + 缩短/提高/降低 + 到 + angka",
+      "contoh": [
+        ["把交货期缩短到二十天。","Bǎ jiāohuòqī suōduǎn dào èrshí tiān.","Memangkas waktu kirim menjadi dua puluh hari."],
+        ["把成本降低到二百块。","Bǎ chéngběn jiàngdī dào èrbǎi kuài.","Menurunkan biaya pokok menjadi dua ratus."],
+        ["把市场份额提高到百分之十五。","Bǎ shìchǎng fèn’é tígāo dào bǎi fēn zhī shíwǔ.","Menaikkan pangsa pasar menjadi lima belas persen."]
+      ],
+      "tips": "到 menyebut titik akhir, bukan besar perubahannya. 缩短到二十天 berarti hasilnya dua puluh hari; kalau maksudmu berkurang dua puluh hari, itu 缩短了二十天."
+    },
+    {
+      "point": "Menjawab pertanyaan yang belum bisa dijawab",
+      "penjelasan": "Mengarang angka di depan calon mitra adalah cara tercepat kehilangan kepercayaan. Pola yang aman punya tiga bagian: akui belum punya datanya, janjikan pengirimannya, dan minta persetujuan. Ini justru terbaca sebagai profesional, bukan tidak siap.",
+      "pola": "这个问题我现在没有具体数字，+ 会后我发资料给您，+ 可以吗？",
+      "contoh": [
+        ["这个问题我现在没有具体数字。","Zhège wèntí wǒ xiànzài méiyǒu jùtǐ shùzì.","Untuk pertanyaan ini saya belum punya angka pastinya."],
+        ["会后我发资料给您，可以吗？","Huì hòu wǒ fā zīliào gěi nín, kěyǐ ma?","Setelah acara saya kirim materinya, boleh?"]
+      ],
+      "tips": "Kata kuncinya 具体 (spesifik). Kamu tidak bilang tidak tahu — kamu bilang tidak punya angka yang cukup rinci untuk disebutkan sekarang. Bedanya besar di telinga audiens."
+    }
+  ],
+  "exercises": {
+    "listening_tf": [
+      ["星汉贸易成立于2015年。","B"],
+      ["公司现在有三家分公司。","S"]
+    ],
+    "listening_mc": [
+      {"q":"去年营业额增长的主要原因是什么？","c":["价格降低","开了棉兰分公司","换了产品"],"a":"B"},
+      {"q":"明年计划在哪里开分公司？","c":["泗水","棉兰","万隆"],"a":"C"}
+    ],
+    "listening_open": [
+      ["他们计划把交货期缩短到多少天？","二十天。"]
+    ],
+    "reading_match": {
+      "soal": ["你们主要做哪个行业？","竞争对手一般要多久？","有测试报告吗？","你们现在的市场份额是多少？","增长的主要原因是什么？"],
+      "pilihan": ["A. 有，会后发给您。","B. 一般四十到四十五天。","C. 轮胎和汽车配件。","D. 主要是因为开了棉兰分公司。","E. 现在没有具体数字，会后发资料给您。"],
+      "kunci": ["C","B","A","E","D"]
+    },
+    "reading_mc": [
+      {"q":"这次介绍一共有几个部分？","c":["两个","三个","四个"],"a":"B"},
+      {"q":"“把交货期缩短到二十天”的意思是：","c":["少了二十天","最后是二十天","多了二十天"],"a":"B"},
+      {"q":"被问到没有数据的问题时，最合适的回答是：","c":["我不知道。","大概百分之十吧。","现在没有具体数字，会后发资料给您。"],"a":"C"}
+    ],
+    "reading_order": {
+      "kalimat": ["A. 介绍明年的计划。","B. 介绍公司简介。","C. 介绍主打产品。"],
+      "kunci": "B → C → A"
+    },
+    "writing_rearrange": [
+      [["成立","2015年","于","我们公司"],"我们公司成立于2015年。"],
+      [["百分之十","比","我们的","跟","低","价格","同类产品","，"],"跟同类产品比，我们的价格低百分之十。"],
+      [["二十天","缩短","把","到","交货期"],"把交货期缩短到二十天。"],
+      [["介绍","以上","我的","就是"],"以上就是我的介绍。"]
+    ],
+    "writing_create": {
+      "kata": ["成立于","优势","增长","目标"],
+      "contoh_jawaban": ["这家工厂成立于2010年。","我们最大的优势是交货快。","今年营业额增长了百分之十。","我们的目标是明年开三家分公司。"]
+    },
+    "speaking_roleplay": {
+      "situasi": "Kamu punya lima menit untuk memperkenalkan perusahaanmu ke calon mitra dari Tiongkok yang belum pernah mendengar namanya.",
+      "tujuan": "Membuka dengan susunan isi, menyebut angka perusahaan, satu keunggulan yang terukur, lalu menutup dan membuka sesi tanya jawab.",
+      "wajib": ["各位好","三个部分","成立于","跟…比","以上"]
+    },
+    "speaking_video": {
+      "tema": "Perkenalkan satu produk atau layanan tempatmu bekerja dalam satu menit, lengkap dengan satu angka.",
+      "wajib": ["主打产品","优势","百分之","比如说","简单来说"]
+    }
+  }
+}

@@ -3340,7 +3340,7 @@
      Kalau keduanya beda, user yang masih buka tab lama bakal dikasih
      banner "ada versi baru".
      ============================================================ */
-  const APP_VERSION = '4.5';
+  const APP_VERSION = '4.8';
 
   const SUPABASE_URL  = 'https://xzgvhzmmqbijpbrhagjf.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6Z3Zoem1tcWJpanBicmhhZ2pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0OTA4NjMsImV4cCI6MjA5OTA2Njg2M30.9OtBJIBDDUhhSsvtz9Pql12hWToGzmULOGh7Tj-vzNs';
@@ -3576,6 +3576,8 @@
           gradeAgain:'Lupa', gradeHard:'Susah', gradeGood:'Oke', gradeEasy:'Gampang',
           exampleSentence:'Contoh Kalimat', doneBack:'Selesai / Kembali',
           flashcardTitle:'Flashcard & SRS', deckLabel:'Deck · Kosakata HSK {level}',
+          deckLabelTrack:'Deck · Kosakata {track}',
+          emptyNoDueTrack:'Deck ini sudah kamu selesaikan hari ini. Balik lagi besok ya.',
           chipNew:'Baru', chipLearning:'Belajar', chipReview:'Ulang',
           cardProgress:'Kartu {n} / {total}', flipHint:'Ketuk "Lihat jawaban" kalau udah siap',
           intervalOneDay:'1 hari', intervalDays:'{n} hari',
@@ -3751,6 +3753,8 @@
           gradeAgain:'Forgot', gradeHard:'Hard', gradeGood:'Good', gradeEasy:'Easy',
           exampleSentence:'Example Sentence', doneBack:'Done / Back',
           flashcardTitle:'Flashcard & SRS', deckLabel:'Deck · HSK {level} Vocabulary',
+          deckLabelTrack:'Deck · {track} Vocabulary',
+          emptyNoDueTrack:'You\'re done with this deck for today. Come back tomorrow.',
           chipNew:'New', chipLearning:'Learning', chipReview:'Review',
           cardProgress:'Card {n} / {total}', flipHint:'Tap "Show answer" when you\'re ready',
           intervalOneDay:'1 day', intervalDays:'{n} days',
@@ -3926,6 +3930,8 @@
           gradeAgain:'忘记', gradeHard:'困难', gradeGood:'良好', gradeEasy:'简单',
           exampleSentence:'例句', doneBack:'完成 / 返回',
           flashcardTitle:'闪卡与SRS', deckLabel:'卡组 · HSK {level} 词汇',
+          deckLabelTrack:'卡组 · {track}词汇',
+          emptyNoDueTrack:'今天这组已经复习完了，明天再来吧。',
           chipNew:'新词', chipLearning:'学习中', chipReview:'复习',
           cardProgress:'卡片 {n} / {total}', flipHint:'准备好了就点"显示答案"',
           intervalOneDay:'1 天', intervalDays:'{n} 天',
@@ -4703,9 +4709,16 @@
   // Materials hub and should exit back there, not to the dashboard.
   let practiceOrigin = 'dash';
   let survivalModeActive = false;
+  /* null = sesi kartu HSK biasa (dipandu practiceLevel); 'business'/'convo' = sesi
+     deck bidang yang kartunya ditarik dari public.vocab_track. Dua sumber kata yang
+     berbeda, tapi SATU catatan hafalan: gradeCard() tetap menulis ke user_mastery
+     dengan item_key = hanzi, jadi kata yang sama tidak pernah dihitung dua kali
+     walau muncul di dua deck. */
+  let practiceTrack = null;
 
   function openPractice(){
     practiceOrigin = 'dash';
+    practiceTrack = null;
     // Reset wajib: keluar dari Survival Kit lewat sidebar/bottom-nav tidak melewati
     // backToDash(), jadi flag-nya bisa tersangkut dan bikin flashcard biasa memakai
     // label + audio Survival.
@@ -4750,6 +4763,123 @@
       });
       wrap.appendChild(b);
     });
+    appendPracticeTrackChips(wrap);
+  }
+
+  /* Chip deck bidang di layar Latihan. Beda dengan picker Kamus: di sini level yang
+     di luar paket memang DISEMBUNYIKAN (lihat renderLevelPicker di atas -- cuma
+     userPackageLevels yang dirender), jadi chip bidang pun cuma muncul kalau paketnya
+     memang punya. Konsisten dengan layar ini, bukan dengan Kamus. */
+  function appendPracticeTrackChips(wrap){
+    if(!wrap) return;
+    BROWSE_TRACKS.forEach(tr=>{
+      if(!isTrackAllowed(tr.key)) return;
+      const b = document.createElement('div');
+      b.className = 'levelBtn';
+      b.textContent = t(tr.labelKey);
+      b.addEventListener('click', ()=>{
+        [...wrap.children].forEach(c=>c.classList.remove('active'));
+        b.classList.add('active');
+        startTrackSession(tr.key);
+      });
+      wrap.appendChild(b);
+    });
+  }
+
+  /* Kembaran startSession() untuk deck bidang. Dipisah, bukan ditambal jadi satu fungsi
+     bercabang, karena tabel dan penyaringnya beda -- menggabungkannya cuma menaruh jalur
+     HSK yang sudah jalan ke dalam risiko.
+
+     Satu hal yang sengaja dibedakan: kartu jatuh tempo disaring supaya hanya kata yang
+     ADA di deck ini yang ikut. Tanpa saringan itu, membuka deck Bisnis akan menyeret
+     seluruh kata HSK yang kebetulan jatuh tempo hari ini, dan sesinya jadi bukan sesi
+     Bisnis lagi. */
+  async function startTrackSession(track){
+    practiceTrack = track;
+    practiceLevel = null;
+    survivalModeActive = false;
+    $('practiceCard').classList.remove('hidden');
+
+    let deck;
+    try{
+      const res = await sb
+        .from('vocab_track')
+        .select('hanzi,pinyin,meaning_en,meaning_id,theme,chapter')
+        .eq('track', track)
+        .order('chapter',    { ascending:true, nullsFirst:true })
+        .order('sort_order', { ascending:true });
+      if(res.error) throw res.error;
+      deck = res.data || [];
+    }catch(e){ showAlertModal(t('errFetchNewWords') + ' ' + e.message); return; }
+
+    if(deck.length === 0){
+      $('levelPickerView').classList.add('hidden');
+      $('sessionView').classList.add('hidden');
+      $('practiceCard').classList.remove('sessionActive');
+      $('emptyView').classList.remove('hidden');
+      $('emptyMsg').textContent = t('comingSoon');
+      return;
+    }
+
+    const deckMap = new Map(deck.map(v=>[v.hanzi, v]));
+
+    let seenRows;
+    try{
+      seenRows = await fetchAllRanged((from,to)=> sb
+        .from('user_mastery').select('item_key')
+        .eq('user_id', currentUser).eq('item_type', 'word')
+        .order('item_key', { ascending:true })
+        .range(from, to), VOCAB_BATCH_SIZE);
+    }catch(e){ showAlertModal(t('errFetchProgress') + ' ' + e.message); return; }
+    const seenSet = new Set((seenRows||[]).map(r=>r.item_key));
+
+    const { data: dueRows, error: dueErr } = await sb
+      .from('user_mastery').select('*')
+      .eq('user_id', currentUser).eq('item_type', 'word')
+      .lte('srs_due', todayStr())
+      .order('srs_due', { ascending:true })
+      .limit(DUE_LIMIT);
+    if(dueErr){ showAlertModal(t('errFetchDueCards') + ' ' + dueErr.message); return; }
+
+    const dueCards = (dueRows||[])
+      .map(r=>{
+        const v = deckMap.get(r.item_key);
+        return v ? { ...v, isDue:true, prev:r } : null;
+      })
+      .filter(Boolean);
+
+    const newCards = deck
+      .filter(v => !seenSet.has(v.hanzi))
+      .slice(0, NEW_LIMIT)
+      .map(v => ({ ...v, isDue:false, prev:null }));
+
+    sessionQueue = [...dueCards, ...newCards];
+    sessionIndex = 0;
+    sessionStats = { correct:0, total:0 };
+
+    deckCounts = { new: newCards.length, learning: 0, review: 0 };
+    dueCards.forEach(c=>{
+      const reps = c.prev?.srs_reps ?? 0;
+      if(reps < LEARNING_REPS_THRESHOLD) deckCounts.learning += 1;
+      else deckCounts.review += 1;
+    });
+
+    if(sessionQueue.length === 0){
+      $('levelPickerView').classList.add('hidden');
+      $('sessionView').classList.add('hidden');
+      $('practiceCard').classList.remove('sessionActive');
+      $('emptyView').classList.remove('hidden');
+      $('emptyMsg').textContent = t('emptyNoDueTrack');
+      return;
+    }
+
+    $('levelPickerView').classList.add('hidden');
+    $('emptyView').classList.add('hidden');
+    $('sessionView').classList.remove('hidden');
+    $('practiceCard').classList.add('sessionActive');
+    renderDeckLabel();
+    renderDeckChips();
+    renderCard();
   }
 
   // Due-review ditarik LINTAS SEMUA LEVEL (time-critical, bukan level-critical).
@@ -4757,6 +4887,7 @@
   // lihat catatan Task 2 — optimize belakangan kalau ada user yang mentok).
   async function startSession(level){
     practiceLevel = level;
+    practiceTrack = null;
     $('practiceCard').classList.remove('hidden');
 
     let seenRows;
@@ -4841,7 +4972,13 @@
 
   function renderDeckLabel(){
     const el = $('sessionLevelLabel');
-    if(!el || practiceLevel == null) return;
+    if(!el) return;
+    if(practiceTrack){
+      el.textContent = t('deckLabelTrack').replace('{track}',
+        t(practiceTrack === 'business' ? 'trackBusinessLabel' : 'trackConvoLabel'));
+      return;
+    }
+    if(practiceLevel == null) return;
     el.textContent = t('deckLabel').replace('{level}', practiceLevel);
   }
 
@@ -4871,7 +5008,9 @@
     $('sessionProgressFill').style.width = (((sessionIndex+1) / sessionQueue.length) * 100) + '%';
     $('cardBadge').textContent = survivalModeActive
       ? t(SURVIVAL_THEME_LABEL_KEY[card.beginner_theme] || 'hubCardSurvivalTitle')
-      : 'HSK ' + practiceLevel + ' · ' + card.hanzi;
+      : practiceTrack
+        ? (card.theme || t(practiceTrack === 'business' ? 'trackBusinessLabel' : 'trackConvoLabel'))
+        : 'HSK ' + practiceLevel + ' · ' + card.hanzi;
     $('cardHanzi').textContent = card.hanzi;
     $('cardPinyin').textContent = card.pinyin;
     $('cardMeaning').innerHTML = (card.meaning_id || card.meaning_en) + (card.pos ? ' · <span class="pos">' + card.pos + '</span>' : '');
@@ -5496,10 +5635,14 @@
     $('browseMoreBtn').classList.add('hidden');
     let data;
     try{
+      /* Urut per bab dulu, baru urutan di dalam bab. Deck Business sekarang
+         mengikuti urutan buku (Bab 0 -> Bab 10); deck Convo belum punya buku
+         jadi chapter-nya NULL dan jatuh di depan dengan urutan temanya sendiri. */
       const res = await sb
         .from('vocab_track')
-        .select('hanzi,pinyin,meaning_en,meaning_id,theme,example_zh,example_id')
+        .select('hanzi,pinyin,meaning_en,meaning_id,theme,chapter,example_zh,example_id')
         .eq('track', track)
+        .order('chapter',    { ascending:true, nullsFirst:true })
         .order('sort_order', { ascending:true });
       if(res.error) throw res.error;
       data = res.data;
@@ -5553,9 +5696,13 @@
     next.forEach(v=>{
       const item = document.createElement('div');
       item.className = 'browseItem';
-      item.innerHTML = `<span class="browseHanzi">${v.hanzi}</span>
-        <span class="browsePinyin">${v.pinyin}</span>
-        <span class="browseMeaning">${v.meaning_id || v.meaning_en}</span>` +
+      /* Semua isi baris di-escape. Sebelum ini hanzi/pinyin/arti masuk mentah ke
+         innerHTML -- aman selama isinya cuma dari tabel vocab yang kita kontrol,
+         tapi itu jaminan yang bergantung pada kedisiplinan pengisi data, bukan
+         pada kode. Sekarang dijamin kodenya. */
+      item.innerHTML = `<span class="browseHanzi">${escapeHTML(v.hanzi)}</span>
+        <span class="browsePinyin">${escapeHTML(v.pinyin)}</span>
+        <span class="browseMeaning">${escapeHTML(v.meaning_id || v.meaning_en)}</span>` +
         (v.theme ? `<span class="browseTheme">${escapeHTML(v.theme)}</span>` : '');
       wrap.appendChild(item);
     });
@@ -9695,7 +9842,11 @@
   $('cardStrokeBtn').addEventListener('click', ()=>{
     const card = sessionQueue[sessionIndex];
     if(!card) return;
-    openStrokeModal({ hanzi: card.hanzi, pinyin: card.pinyin, meaning: card.meaning_id || card.meaning_en }, practiceLevel);
+    /* Kata deck bidang tidak punya hsk_level, jadi practiceLevel null di sesi itu.
+       Dipakai level target user supaya tab TRACE/TES mengikuti paket yang memang
+       sudah dia punya -- bukan terkunci gara-gara levelnya kebetulan tidak ada. */
+    const lv = practiceLevel ?? currentProfile?.target_level ?? userPackageLevels[0] ?? null;
+    openStrokeModal({ hanzi: card.hanzi, pinyin: card.pinyin, meaning: card.meaning_id || card.meaning_en }, lv);
   });
   $('mockList').addEventListener('click', e=>{
     const setBtn = e.target.closest('button[data-set]');

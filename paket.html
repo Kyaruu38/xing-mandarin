@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="id"><head>
+<!DOCTYPE html><html lang="id" data-theme="dark"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Paket &amp; Harga · Xing Mandarin</title>
 <meta name="description" content="Daftar harga lengkap kelas Mandarin Xing Mandarin: program intensif HSK, kelas grup online, private, semi private, dan onsite.">
@@ -12,8 +12,15 @@
 --shadow-md:0 14px 36px rgba(0,0,0,.4);--shadow-lg:0 28px 70px rgba(0,0,0,.5);
 --radius-lg:22px;--radius-md:16px;--radius-sm:10px;--nav-bg:rgba(8,11,24,.8);
 --f-display:'Baloo 2',cursive;--f-body:'Plus Jakarta Sans',-apple-system,sans-serif;--f-mono:'IBM Plex Mono',monospace;--max:1160px}
+/* Nilai light disalin persis dari blok [data-theme="light"] di index.html.
+   Hanya variabel yang dipakai halaman ini yang ditimpa; --gold, --gold-soft,
+   --navy, --radius-*, dan --f-* memang sama di kedua tema. */
+[data-theme="light"]{--bg:#F7F1DE;--bg2:#FBF6E8;--panel:#FFFFFF;--panel-2:#FCF8EC;--line:#EBE2CB;
+--text:#1C2A5E;--muted:#6B7192;--ok:#2F9E5B;--lucky:#A81818;
+--shadow-md:0 12px 30px rgba(31,42,80,.10);--shadow-lg:0 26px 60px rgba(31,42,80,.16);
+--nav-bg:rgba(247,241,222,.86)}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:var(--f-body);line-height:1.65;-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--f-body);line-height:1.65;-webkit-font-smoothing:antialiased;transition:background .3s ease,color .3s ease}
 .wrap{max-width:var(--max);margin:0 auto;padding:0 20px}
 a{color:inherit}
 h1,h2,h3{font-family:var(--f-display);margin:0;line-height:1.15}
@@ -425,7 +432,17 @@ footer{border-top:1px solid var(--line);padding:28px 0;margin-top:30px}
   var b=document.querySelectorAll('.lang button'), s=localStorage.getItem('xingLang')||'id';
   b.forEach(function(x){ x.classList.toggle('on', x.dataset.lang===s);
     x.addEventListener('click',function(){ localStorage.setItem('xingLang',x.dataset.lang); location.href='/'; }); });
-  var t=document.getElementById('themeTgl');
-  if(t) t.addEventListener('click',function(){ location.href='/'; });
+  /* ---------- theme (production-aligned: data-theme + localStorage xingTheme) ---------- */
+  var tgl = document.getElementById('themeTgl');
+  var saved = localStorage.getItem('xingTheme');
+  var theme = saved || 'dark';
+  function setTheme(th){
+    theme = th === 'dark' ? 'dark' : 'light';
+    localStorage.setItem('xingTheme', theme);
+    document.documentElement.setAttribute('data-theme', theme);
+    tgl.textContent = theme === 'dark' ? '☀️' : '🌙';
+  }
+  setTheme(theme);
+  tgl.addEventListener('click', function(){ setTheme(theme === 'dark' ? 'light' : 'dark'); });
 })();
 </script></body></html>

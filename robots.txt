@@ -1,3 +1,9 @@
+# /app/ SENGAJA tidak di-Disallow.
+# Halaman itu memuat <meta name="robots" content="noindex, nofollow"> di
+# dalamnya, dan Google baru bisa membaca tag itu kalau halamannya boleh
+# dirayapi. Menambahkan Disallow: /app/ justru membuat noindex tidak pernah
+# terbaca, dan URL yang sudah terindeks bisa bertahan di hasil pencarian
+# tanpa cuplikan. Biarkan begini sampai /app/ hilang dari hasil pencarian.
 User-agent: *
 Allow: /
 

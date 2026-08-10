@@ -56,7 +56,19 @@ h1,h2,h3{font-family:var(--f-display);margin:0;line-height:1.15}
 .nav-cta{display:none}
 @media(min-width:900px){.nav-cta{display:inline-flex}}
 @media(max-width:780px){.nav-links{display:none}}
-@media(max-width:520px){.lang{display:none}.logo-word small{display:none}.nav-inner{gap:10px;padding:10px 14px}.logo-img{height:28px}.logo-word{font-size:14px}.btn-sm{padding:7px 12px;font-size:12px}}
+/* Pemilih bahasa DULU disembunyikan di bawah 520px. Itu membuat halaman ini
+   tidak punya jalan sama sekali untuk ganti bahasa di HP, padahal seluruh
+   isinya sekarang diterjemahkan. index.html tidak pernah menyembunyikannya di
+   lebar berapa pun, jadi yang benar adalah mengecilkan, bukan menghilangkan. */
+@media(max-width:520px){.logo-word small{display:none}.nav-inner{gap:8px;padding:10px 12px}.logo-img{height:28px}.logo-word{font-size:14px}.btn-sm{padding:7px 12px;font-size:12px}
+  .lang button{padding:5px 7px;font-size:10.5px}}
+/* Di bawah ~345px, nav berisi logo + wordmark + 3 tombol bahasa + tema + Masuk
+   sudah melebihi lebar layar (di 320px kelebihan 32px untuk bahasa ID).
+   Yang dilepas wordmark-nya, bukan pemilih bahasanya: gambar logo tetap
+   menandai merek, sedangkan tanpa pemilih bahasa halaman ini kehilangan satu-
+   satunya cara berpindah bahasa di HP. Ambang 359px dipilih supaya 360px ke
+   atas (Android terkecil yang umum) tidak ikut terkena. */
+@media(max-width:359px){.logo-word{display:none}}
 /* hero */
 .hero{padding:70px 0 34px;text-align:center;background:radial-gradient(900px 380px at 50% -12%,rgba(242,176,30,.13),transparent 70%)}
 .hero h1{font-size:clamp(30px,6vw,50px)}

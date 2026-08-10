@@ -9,6 +9,9 @@
 <style>
 :root{--bg:#080B18;--bg2:#0E1329;--panel:#101731;--panel-2:#0B1024;--line:rgba(147,155,182,.14);
 --text:#EEF0F8;--muted:#98A0BC;--gold:#F2B01E;--gold-soft:#F7C657;--navy:#1C2A5E;--ok:#43B583;--lucky:#C33C2E;
+/* --gold-text KHUSUS teks emas. --gold tetap untuk background, border, dan
+   gradien; di tema terang --gold cuma 1,91:1 di atas panel putih. */
+--gold-text:#F2B01E;
 --shadow-md:0 14px 36px rgba(0,0,0,.4);--shadow-lg:0 28px 70px rgba(0,0,0,.5);
 --radius-lg:22px;--radius-md:16px;--radius-sm:10px;--nav-bg:rgba(8,11,24,.8);
 --f-display:'Baloo 2',cursive;--f-body:'Plus Jakarta Sans',-apple-system,sans-serif;--f-mono:'IBM Plex Mono',monospace;--max:1160px}
@@ -18,7 +21,7 @@
 [data-theme="light"]{--bg:#F7F1DE;--bg2:#FBF6E8;--panel:#FFFFFF;--panel-2:#FCF8EC;--line:#EBE2CB;
 --text:#1C2A5E;--muted:#6B7192;--ok:#2F9E5B;--lucky:#A81818;
 --shadow-md:0 12px 30px rgba(31,42,80,.10);--shadow-lg:0 26px 60px rgba(31,42,80,.16);
---nav-bg:rgba(247,241,222,.86)}
+--nav-bg:rgba(247,241,222,.86);--gold-text:#8A5A00}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:var(--f-body);line-height:1.65;-webkit-font-smoothing:antialiased;transition:background .3s ease,color .3s ease}
 .wrap{max-width:var(--max);margin:0 auto;padding:0 20px}
@@ -63,11 +66,11 @@ section{padding:44px 0}
 @media(min-width:760px){.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}}
 .card{background:linear-gradient(180deg,var(--panel),var(--panel-2));border:1px solid var(--line);border-radius:var(--radius-lg);padding:22px;box-shadow:var(--shadow-md)}
 .card.hi{border-color:rgba(242,176,30,.42);box-shadow:var(--shadow-lg),0 0 0 1px rgba(242,176,30,.12)}
-.tag{display:inline-block;font-family:var(--f-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:4px 10px;border-radius:999px;background:rgba(242,176,30,.14);color:var(--gold);margin-bottom:12px}
-.tag.red{background:rgba(195,60,46,.18);color:#F09A90}
-.tag.ok{background:rgba(67,181,131,.16);color:#7FD6AE}
+.tag{display:inline-block;font-family:var(--f-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:4px 10px;border-radius:999px;background:rgba(242,176,30,.14);color:var(--gold-text);margin-bottom:12px}
+.tag.red{background:rgba(195,60,46,.18);color:var(--gold-text)}
+.tag.ok{background:rgba(67,181,131,.16);color:var(--gold-text)}
 .pname{font-size:22px;font-weight:700;font-family:var(--f-display)}
-.pdur{color:var(--gold);font-weight:700;font-size:14px;margin-top:2px}
+.pdur{color:var(--gold-text);font-weight:700;font-size:14px;margin-top:2px}
 .psub{color:var(--muted);margin:10px 0 0;font-size:14.5px}
 ul.tick{list-style:none;padding:0;margin:14px 0 0}
 ul.tick li{position:relative;padding-left:22px;margin:7px 0;font-size:14px;color:var(--text)}
@@ -84,7 +87,7 @@ ul.tick.dim li:before{background:var(--muted);opacity:.5}
 .opt.best{border-color:rgba(242,176,30,.45);background:rgba(242,176,30,.05)}
 .opt-name{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
 .opt-price{font-family:var(--f-display);font-size:29px;font-weight:700;margin-top:6px;line-height:1.1}
-.opt.best .opt-price{color:var(--gold)}
+.opt.best .opt-price{color:var(--gold-text)}
 .opt-per{font-size:12.5px;color:var(--muted);margin-top:3px}
 .strike{text-decoration:line-through;color:var(--muted);font-size:15px;font-family:var(--f-body);font-weight:500;margin-right:8px}
 .opt .btn{margin-top:16px;width:100%}
@@ -93,12 +96,12 @@ table{width:100%;border-collapse:collapse;margin-top:12px;font-size:14px}
 th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line)}
 th{font-family:var(--f-mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);font-weight:600}
 td.num{font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
-td.promo{color:var(--gold);font-weight:700}
+td.promo{color:var(--gold-text);font-weight:700}
 tr:last-child td{border-bottom:none}
 /* group card */
 .gcard{display:flex;flex-direction:column}
 .gprice{margin-top:14px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-.gnow{font-family:var(--f-display);font-size:27px;font-weight:700;color:var(--gold)}
+.gnow{font-family:var(--f-display);font-size:27px;font-weight:700;color:var(--gold-text)}
 .note{color:var(--muted);font-size:13px;margin-top:26px;padding-top:18px;border-top:1px solid var(--line)}
 footer{border-top:1px solid var(--line);padding:28px 0;margin-top:30px}
 .foot{display:flex;align-items:center;gap:18px;flex-wrap:wrap;justify-content:space-between}

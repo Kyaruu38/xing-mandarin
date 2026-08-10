@@ -56,7 +56,13 @@
   --bg:#F7F1DE; --bg2:#FBF6E8;
   --panel:#FFFFFF; --panel-2:#FCF8EC;
   --track:#EADFC4; --line:#EBE2CB;
-  --text:#1C2A5E; --muted:#6B7192;
+  /* --muted dulu #6B7192. Diturunkan karena di tema terang nilainya cuma
+     3,95:1 di atas hero (krem tertimpa gradien emas .13) dan 4,22 di krem
+     polos, dua-duanya di bawah ambang 4,5. #5C6280 mempertahankan hue yang
+     sama dan lulus di seluruh permukaan terang: hero 4,95 · krem 5,29 ·
+     panel putih 5,98 · panel-2 5,63. Nilai --muted tema gelap sengaja
+     TIDAK diubah, di sana kontrasnya sudah 6,2 sampai 7,6. */
+  --text:#1C2A5E; --muted:#5C6280;
   --danger:#D64545; --ok:#2F9E5B; --lucky:#A81818;
   --star-core:#D98E00; --star-halo:rgba(242,176,30,.26);
   --halo-card:rgba(242,176,30,.15);

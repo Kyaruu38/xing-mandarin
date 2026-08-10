@@ -49,14 +49,20 @@ bisa ditutup, dan tidak muncul lagi selama sesi itu.
 
 ## Vocab — standar HSK 3.0
 
-Tabel `vocab` sudah sepenuhnya HSK 3.0. Total **6.899 kata**:
+Tabel `vocab` sudah sepenuhnya HSK 3.0. Total **6.901 kata**, level 1-6 berjumlah
+**5.365 kata** (angka yang dipakai hero landing).
+
+Angka di bawah diverifikasi ulang 10 Agustus 2026 lewat
+`select hsk_level, count(*) from public.vocab group by 1` di SQL Editor. Versi
+sebelumnya menulis level 2 = 750 dan level 4 = 972 sehingga totalnya meleset jadi
+6.899. Jangan menyalin angka dari dokumen ini ke halaman publik tanpa query ulang.
 
 | Level | Jumlah | Arti + contoh |
 |-------|--------|---------------|
 | 1     | 506    | lengkap       |
-| 2     | 750    | lengkap       |
+| 2     | 751    | lengkap       |
 | 3     | 953    | lengkap       |
-| 4     | 972    | lengkap       |
+| 4     | 973    | lengkap       |
 | 5     | 1.059  | lengkap       |
 | 6     | 1.123  | lengkap       |
 | 7     | 1.536  | belum (coming soon) |

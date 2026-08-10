@@ -1,8 +1,4 @@
-# Halaman dashboard tidak boleh masuk hasil pencarian.
-# Isinya cuma label antarmuka dalam keadaan belum login (Track, Status,
-# Streak) dan itu yang sempat tampil di Google sebagai deskripsi situs.
 User-agent: *
 Allow: /
-Disallow: /app/
 
 Sitemap: https://xingmandarin.com/sitemap.xml

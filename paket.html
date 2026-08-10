@@ -80,6 +80,14 @@ section{padding:44px 0}
 .sec-head p{color:var(--muted);margin:8px 0 0;max-width:660px}
 .grid{display:grid;gap:16px}
 @media(min-width:760px){.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}}
+/* Kartu di #privategroup memuat tabel harga dengan kolom rupiah white-space:nowrap,
+   jadi lebar min-content-nya 288px (diukur, bukan ditaksir). Dengan .g3 yang langsung
+   jadi 3 kolom mulai 760px, tiap kolom cuma kebagian 229px sehingga halaman melar
+   154px ke samping di rentang 760-930px. Tiga kolom baru benar-benar muat di viewport
+   >=936px; ambangnya dibulatkan ke 960px sebagai margin untuk teks EN dan ZH yang
+   panjangnya berbeda. Seksi #grup memakai .g3 yang sama tapi kartunya tanpa tabel,
+   jadi sengaja TIDAK diikutkan supaya tampilan tabletnya tidak ikut bergeser. */
+@media(min-width:760px) and (max-width:959px){#privategroup .grid.g3{grid-template-columns:repeat(2,1fr)}}
 .card{background:linear-gradient(180deg,var(--panel),var(--panel-2));border:1px solid var(--line);border-radius:var(--radius-lg);padding:22px;box-shadow:var(--shadow-md)}
 .card.hi{border-color:rgba(242,176,30,.42);box-shadow:var(--shadow-lg),0 0 0 1px rgba(242,176,30,.12)}
 .tag{display:inline-block;font-family:var(--f-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:4px 10px;border-radius:999px;background:rgba(242,176,30,.14);color:var(--gold-ink);margin-bottom:12px}

@@ -248,6 +248,9 @@ h2 .hz-in{font-family:var(--f-hanzi);font-weight:900;color:var(--star-core)}
 .sm-now{font-family:var(--f-hanzi);font-weight:900;font-size:10px;fill:#1C2A5E}
 .skymap-foot{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-top:24px;padding-top:20px;box-shadow:0 -1px 0 var(--line);font-size:14px;color:var(--muted)}
 .skymap-foot b{color:var(--star-core)}
+/* Baris sumber angka. flex-basis 100% memaksanya turun ke barisnya sendiri
+   supaya catatan + tombol di atasnya tetap space-between seperti semula. */
+.skymap-src{flex:1 0 100%;font-size:12.5px;line-height:1.55;margin-top:2px}
 /* mobile vertical path */
 .mpath{display:none;position:relative;padding-left:8px}
 .mpath::before{content:'';position:absolute;left:29px;top:24px;bottom:24px;width:1.5px;background:linear-gradient(var(--gold) 52%,var(--track) 52%)}
@@ -546,25 +549,33 @@ footer{box-shadow:0 -1px 0 var(--line);padding:34px 0 max(34px,env(safe-area-ins
         <g class="smstar now" transform="translate(420,108)"><circle class="ring" r="12"/><circle class="h" r="19"/><circle class="c" r="6"/></g>
         <g class="smstar dim" transform="translate(552,138)"><circle class="h" r="13"/><circle class="c" r="3.8"/></g>
         <g class="smstar dim" transform="translate(660,58)"><circle class="h" r="13"/><circle class="c" r="3.8"/></g>
-        <text class="sm-lbl" x="60" y="228" text-anchor="middle">HSK 1</text><text class="sm-sub" x="60" y="243" text-anchor="middle">500 <tspan data-i18n="words">kata</tspan></text>
-        <text class="sm-lbl" x="175" y="178" text-anchor="middle">HSK 2</text><text class="sm-sub" x="175" y="193" text-anchor="middle">1.272 <tspan data-i18n="words">kata</tspan></text>
-        <text class="sm-lbl" x="292" y="208" text-anchor="middle">HSK 3</text><text class="sm-sub" x="292" y="223" text-anchor="middle">2.245 <tspan data-i18n="words">kata</tspan></text>
+        <text class="sm-lbl" x="60" y="228" text-anchor="middle">HSK 1</text><text class="sm-sub" x="60" y="243" text-anchor="middle"><tspan data-i18n="cum">total</tspan> <tspan data-i18n="n500">500</tspan> <tspan data-i18n="words">kata</tspan></text>
+        <text class="sm-lbl" x="175" y="178" text-anchor="middle">HSK 2</text><text class="sm-sub" x="175" y="193" text-anchor="middle"><tspan data-i18n="cum">total</tspan> <tspan data-i18n="n1272">1.272</tspan> <tspan data-i18n="words">kata</tspan></text>
+        <text class="sm-lbl" x="292" y="208" text-anchor="middle">HSK 3</text><text class="sm-sub" x="292" y="223" text-anchor="middle"><tspan data-i18n="cum">total</tspan> <tspan data-i18n="n2245">2.245</tspan> <tspan data-i18n="words">kata</tspan></text>
         <rect x="394" y="62" rx="7" width="52" height="18" fill="#F2B01E"/><text class="sm-now" x="420" y="75" text-anchor="middle">现在</text>
-        <text class="sm-lbl" x="420" y="141" text-anchor="middle">HSK 4</text><text class="sm-sub" x="420" y="156" text-anchor="middle">3.245 <tspan data-i18n="words">kata</tspan></text>
-        <text class="sm-lbl dim" x="552" y="171" text-anchor="middle">HSK 5</text><text class="sm-sub" x="552" y="186" text-anchor="middle">4.316 <tspan data-i18n="words">kata</tspan></text>
-        <text class="sm-lbl dim" x="660" y="91" text-anchor="middle">HSK 6</text><text class="sm-sub" x="660" y="106" text-anchor="middle">5.456 <tspan data-i18n="words">kata</tspan></text>
+        <text class="sm-lbl" x="420" y="141" text-anchor="middle">HSK 4</text><text class="sm-sub" x="420" y="156" text-anchor="middle"><tspan data-i18n="cum">total</tspan> <tspan data-i18n="n3245">3.245</tspan> <tspan data-i18n="words">kata</tspan></text>
+        <text class="sm-lbl dim" x="552" y="171" text-anchor="middle">HSK 5</text><text class="sm-sub" x="552" y="186" text-anchor="middle"><tspan data-i18n="cum">total</tspan> <tspan data-i18n="n4316">4.316</tspan> <tspan data-i18n="words">kata</tspan></text>
+        <text class="sm-lbl dim" x="660" y="91" text-anchor="middle">HSK 6</text><text class="sm-sub" x="660" y="106" text-anchor="middle"><tspan data-i18n="cum">total</tspan> <tspan data-i18n="n5456">5.456</tspan> <tspan data-i18n="words">kata</tspan></text>
       </svg>
       <div class="mpath" aria-hidden="true">
-        <div class="mp-row done"><span class="mp-star">✦</span><div><b>HSK 1</b><span>500 <span data-i18n="words">kata</span></span></div></div>
-        <div class="mp-row done"><span class="mp-star">✦</span><div><b>HSK 2</b><span>1.272 <span data-i18n="words">kata</span></span></div></div>
-        <div class="mp-row done"><span class="mp-star">✦</span><div><b>HSK 3</b><span>2.245 <span data-i18n="words">kata</span></span></div></div>
-        <div class="mp-row now"><span class="mp-star">✦</span><div><b>HSK 4</b><span>3.245 <span data-i18n="words">kata</span></span></div><span class="mp-now">现在</span></div>
-        <div class="mp-row dim"><span class="mp-star">✦</span><div><b>HSK 5</b><span>4.316 <span data-i18n="words">kata</span></span></div></div>
-        <div class="mp-row dim"><span class="mp-star">✦</span><div><b>HSK 6</b><span>5.456 <span data-i18n="words">kata</span></span></div></div>
+        <div class="mp-row done"><span class="mp-star">✦</span><div><b>HSK 1</b><span><span data-i18n="cum">total</span> <span data-i18n="n500">500</span> <span data-i18n="words">kata</span></span></div></div>
+        <div class="mp-row done"><span class="mp-star">✦</span><div><b>HSK 2</b><span><span data-i18n="cum">total</span> <span data-i18n="n1272">1.272</span> <span data-i18n="words">kata</span></span></div></div>
+        <div class="mp-row done"><span class="mp-star">✦</span><div><b>HSK 3</b><span><span data-i18n="cum">total</span> <span data-i18n="n2245">2.245</span> <span data-i18n="words">kata</span></span></div></div>
+        <div class="mp-row now"><span class="mp-star">✦</span><div><b>HSK 4</b><span><span data-i18n="cum">total</span> <span data-i18n="n3245">3.245</span> <span data-i18n="words">kata</span></span></div><span class="mp-now">现在</span></div>
+        <div class="mp-row dim"><span class="mp-star">✦</span><div><b>HSK 5</b><span><span data-i18n="cum">total</span> <span data-i18n="n4316">4.316</span> <span data-i18n="words">kata</span></span></div></div>
+        <div class="mp-row dim"><span class="mp-star">✦</span><div><b>HSK 6</b><span><span data-i18n="cum">total</span> <span data-i18n="n5456">5.456</span> <span data-i18n="words">kata</span></span></div></div>
       </div>
       <div class="skymap-foot">
         <span data-i18n="mapNote">Naik level saat rapormu menunjukkan siap, bukan saat perasaanmu mengatakan siap.</span>
         <a href="#harga" class="btn btn-soft btn-sm" data-i18n="mapBtn">Nyalakan bintang berikutnya →</a>
+        <!-- Dua angka ini dulu terlihat bertentangan dalam satu layar: hero menulis
+             5.365, peta berakhir di 5.456. Keduanya benar tapi mengukur hal berbeda,
+             jadi ditulis berdampingan, bukan disamakan. 5.456 = silabus resmi HSK 3.0
+             (500+772+973+1.000+1.071+1.140). 5.365 = isi tabel vocab level 1-6, sudah
+             diverifikasi lewat SELECT count(*), bukan disalin dari dokumen.
+             Sengaja memakai <strong>, BUKAN <b>: ada aturan .skymap-foot b yang
+             mewarnai teks --star-core, dan di tema terang itu cuma 2,99:1 di panel. -->
+        <small class="skymap-src" data-i18n-html="mapSrc">Angka di peta mengikuti silabus resmi HSK 3.0, yaitu <strong>5.456 kata</strong> sampai HSK 6. Yang sudah tersedia di platform ini <strong>5.365 kata</strong>, semuanya lengkap dengan arti dan contoh kalimat.</small>
       </div>
     </div>
   </div>
@@ -761,6 +772,8 @@ footer{box-shadow:0 -1px 0 var(--line);padding:34px 0 max(34px,env(safe-area-ins
       mapTag:'01 · PETA BELAJARMU', mapH2a:'Enam level. Enam bintang.', mapH2b:'Satu', mapH2c:'milikmu.',
       mapSub:'Setiap level yang kamu selesaikan menyala menjadi bintang di petamu. Yang belum, menunggu giliranmu.',
       mapNote:'Naik level saat rapormu menunjukkan siap, bukan saat perasaanmu mengatakan siap.', mapBtn:'Nyalakan bintang berikutnya →',
+      n500:'500', n1272:'1.272', n2245:'2.245', n3245:'3.245', n4316:'4.316', n5456:'5.456',
+      cum:'total', mapSrc:'Angka di peta mengikuti silabus resmi HSK 3.0, yaitu <strong>5.456 kata</strong> sampai HSK 6. Yang sudah tersedia di platform ini <strong>5.365 kata</strong>, semuanya lengkap dengan arti dan contoh kalimat.',
       featTag:'02 · FITUR UTAMA', featH2:'Semua yang kamu butuhkan untuk siap di hari ujian.',
       f1t:'Simulasi format resmi', f1d:'Timer, seksi, dan bobot skor mengikuti standar Hanban, tidak ada kejutan di hari ujian.',
       f2t:'Penilaian esai dengan AI', f2d:'Esai 看图作文 dinilai per kriteria dalam hitungan detik, lengkap dengan koreksi kalimat.',
@@ -796,6 +809,8 @@ footer{box-shadow:0 -1px 0 var(--line);padding:34px 0 max(34px,env(safe-area-ins
       mapTag:'01 · YOUR STUDY MAP', mapH2a:'Six levels. Six stars.', mapH2b:'One', mapH2c:'of your own.',
       mapSub:'Every level you complete lights up as a star on your map. The rest are waiting for you.',
       mapNote:'Level up when your report says you are ready, not when your feelings do.', mapBtn:'Light the next star →',
+      n500:'500', n1272:'1,272', n2245:'2,245', n3245:'3,245', n4316:'4,316', n5456:'5,456',
+      cum:'total', mapSrc:'The map follows the official HSK 3.0 syllabus: <strong>5,456 words</strong> up to HSK 6. This platform currently carries <strong>5,365 of them</strong>, each with a meaning and an example sentence.',
       featTag:'02 · CORE FEATURES', featH2:'Everything you need to be ready on exam day.',
       f1t:'Official format simulation', f1d:'Timers, sections, and scoring follow the Hanban standard, no surprises on exam day.',
       f2t:'AI essay grading', f2d:'看图作文 essays scored per criterion in seconds, with sentence level corrections.',
@@ -831,6 +846,8 @@ footer{box-shadow:0 -1px 0 var(--line);padding:34px 0 max(34px,env(safe-area-ins
       mapTag:'01 · 你的学习地图', mapH2a:'六个等级，六颗星。', mapH2b:'一个', mapH2c:'属于你。',
       mapSub:'每完成一个等级，就点亮地图上的一颗星。其余的，等你来点亮。',
       mapNote:'当成绩报告显示你准备好了再升级，而不是凭感觉。', mapBtn:'点亮下一颗星 →',
+      n500:'500', n1272:'1,272', n2245:'2,245', n3245:'3,245', n4316:'4,316', n5456:'5,456',
+      cum:'累计', mapSrc:'地图上的数字依据 HSK 3.0 官方大纲：截至 HSK 6 共 <strong>5,456 词</strong>。本平台目前收录其中 <strong>5,365 词</strong>，均附释义与例句。',
       featTag:'02 · 核心功能', featH2:'考试当天所需的一切，都为你准备好了。',
       f1t:'官方格式模拟', f1d:'计时、题型与评分完全遵循汉办标准，考试当天不再有意外。',
       f2t:'AI 作文批改', f2d:'看图作文按评分标准数秒内批改，并附逐句修改建议。',
@@ -996,9 +1013,9 @@ footer{box-shadow:0 -1px 0 var(--line);padding:34px 0 max(34px,env(safe-area-ins
   document.querySelectorAll('.reveal').forEach(function(el){io.observe(el);});
   function runCounter(el){
     var target=parseInt(el.dataset.count,10),prefix=el.dataset.prefix||'';
-    if(reduce){el.textContent=prefix+target.toLocaleString('id-ID');return;}
+    if(reduce){el.textContent=prefix+target.toLocaleString(currentLang==='id'?'id-ID':'en-US');return;}
     var t0=null,dur=1400;
-    function step(ts){if(!t0)t0=ts;var k=Math.min((ts-t0)/dur,1),e=1-Math.pow(1-k,3);el.textContent=prefix+Math.floor(target*e).toLocaleString('id-ID');if(k<1)requestAnimationFrame(step);}
+    function step(ts){if(!t0)t0=ts;var k=Math.min((ts-t0)/dur,1),e=1-Math.pow(1-k,3);el.textContent=prefix+Math.floor(target*e).toLocaleString(currentLang==='id'?'id-ID':'en-US');if(k<1)requestAnimationFrame(step);}
     requestAnimationFrame(step);
   }
   var cio=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){runCounter(e.target);cio.unobserve(e.target);}});},{threshold:.5});

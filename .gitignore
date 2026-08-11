@@ -14,3 +14,6 @@ supabase/.temp/
 # Staging area for landing/paket integration work-in-progress
 incoming/
 _tmp_asset_check/
+
+# Catatan kerja lokal, memuat hal yang tidak untuk publik. Repo ini publik.
+docs/HANDOFF.md

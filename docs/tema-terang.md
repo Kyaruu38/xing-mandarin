@@ -125,8 +125,19 @@ perubahan tampilan tanpa alasan.
 
 ## Yang sengaja TIDAK dikerjakan
 
-- **Overflow 8px di lebar 320px** pada `paket.html` (`div.opt`). Bawaan lama,
-  dibiarkan supaya diff perbaikan overflow tablet tetap sempit.
+- **Overflow horizontal di lebar sempit** pada `paket.html`. Catatan versi
+  sebelumnya menulis "8px di 320px (`div.opt`)"; angka dan penyebabnya dua-duanya
+  meleset. Diukur ulang 11 Agustus 2026 lewat iframe di atas HTTP: **24px di
+  320px, 4px di 340px, hilang di 359px**. Nav-nya bukan pelaku — yang melar
+  `.opt-price` di kartu Business, karena `<span class="strike">Rp1.500.000</span>`
+  yang langsung disambung `Rp1.350.000` tidak punya satu pun titik putus,
+  sehingga `min-content`-nya 263px sementara ruang yang tersedia di 320px cuma
+  236px. Muncul di ketiga bahasa, jadi bukan efek i18n.
+
+  Dibiarkan **sadar**, bukan terlewat: CLAUDE.md mewajibkan 375px, dan di 359px
+  ke atas overflow-nya sudah nol. Kalau nanti mau dikejar, titik masuknya
+  memberi kesempatan patah di antara harga coret dan harga akhir, bukan
+  mengecilkan `.opt-price`.
 - **Ambang 3 kolom `#privategroup` dibulatkan ke 960px**, bukan ke angka hasil
   pengukuran. Dua pengukuran independen memberi lebar `min-content` kartu 288px
   dan 296,8px — selisih 18px pada kebutuhan viewport (936 lawan 942), besar

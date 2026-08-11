@@ -144,6 +144,42 @@ tampilan.
 
 ---
 
+## Gambar konsep (bucket `listening-images`, prefiks `concepts/`)
+
+Enam gambar yang pernah masuk daftar perbaikan (`images_fix.json`) sudah **selesai dan
+sudah tayang**. Diverifikasi 11 Agustus 2026 dengan mencocokkan sha256 berkas di
+`img_out/concepts/` lawan yang diunduh dari Storage: keenamnya **identik**. Jadi kalau nanti
+ada yang menemukan `images_fix.json` lagi, itu daftar kerja yang sudah dieksekusi, bukan
+antrean yang tertinggal.
+
+Lima di antaranya benar: `dadianhua` (satu orang menelepon), `xuexi` (satu orang belajar di
+meja), `zoulu` (satu orang berjalan), `maidongxi` (satu orang di kasir), `kanshu` (satu orang
+duduk membaca).
+
+### `shu.jpg` sengaja dibiarkan berupa buku TERBUKA
+
+Promptnya minta buku tertutup, yang keluar buku terbuka. Diputuskan **tidak diganti**, dan
+ini alasannya supaya tidak dibongkar ulang tanpa informasi baru:
+
+- **Risikonya nyata tapi kecil.** 书 dan 看书 muncul bersama sebagai pilihan di **5 soal**
+  (dihitung, bukan ditaksir: `payload::text like` untuk kedua path pada `question_bank`).
+  Pembedanya jelas dan bukan soal buka/tutup: `kanshu.jpg` ada orangnya, `shu.jpg` benda
+  saja tanpa orang.
+- **Lima percobaan regenerasi, dua strategi prompt, semuanya lebih buruk.** Prompt penuh
+  larangan (`NOT open`, `no visible pages`) menghasilkan foto produk fotorealistik yang
+  bertabrakan dengan gaya set, satu di antaranya malah memuat teks acak padahal promptnya
+  `no text`. Strategi kedua — larangan dibuang, keadaan tertutup digambarkan positif
+  (`front cover facing up`, `spine along the left edge`) — hasilnya bahkan tidak terbaca
+  sebagai buku.
+- **Diagnosisnya:** sufiks gaya `clean flat vector illustration` yang sama tembus untuk lima
+  gambar lain karena semuanya **ada manusianya**. Untuk benda mati, generatornya konsisten
+  jatuh ke fotografi produk.
+
+**Kalau nanti tetap mau diganti, jangan pakai generator ini lagi** — pakai ikon vektor datar
+buatan tangan atau stok. Dan ingat unggahnya butuh `SUPABASE_SERVICE_KEY`.
+
+---
+
 ## Jebakan yang sudah pernah kena — jangan diulang
 
 **Skor dengan rumus berbeda tidak boleh diadu langsung.** Tone Coach versi pertama
@@ -284,11 +320,45 @@ ditolak; `test_sets`/`question_bank`/`profiles` bahkan gagal di level GRANT deng
 `42501`, sebelum RLS sempat dievaluasi. Yang lolos hanya kosakata HSK 1-3 track `hsk`,
 dan itu memang disengaja untuk kartu Kata Hari Ini di layar login.
 
-**Yang BELUM diuji:** semua di atas diuji sebagai anon. Skenario "murid sudah login
-tapi paketnya rendah, lalu mencoba menarik HSK 6" belum pernah dibuktikan secara
-empiris — konstruksinya benar, tapi belum diamati. Untuk menutup itu perlu login
-memakai akun uji berpaket rendah lalu memanggil `/rest/v1/test_sets?hsk_level=eq.6`
-dengan token sesi tersebut.
+**Skenario murid login berpaket rendah: SUDAH diuji, 11 Agustus 2026.** Catatan lama di
+sini menulis skenario ini belum pernah diamati. Sekarang sudah, dan lolos.
+
+Cara mengujinya tanpa password dan tanpa akun uji — ini yang membuatnya bisa diulang
+kapan saja lewat SQL Editor. PostgREST melayani permintaan murid dengan cara memasang
+`request.jwt.claims` lalu menukar peran ke `authenticated`; keduanya bisa ditiru langsung
+di dalam transaksi, sehingga GRANT dan RLS dua-duanya ikut berlaku:
+
+```sql
+begin;
+select set_config('request.jwt.claims',
+  json_build_object('sub', (select id::text from public.profiles
+                            where package = 'convo' and status = 'active' limit 1),
+                    'role','authenticated')::text, true);
+set local role authenticated;
+select count(*) from public.test_sets where hsk_level = 6;   -- dan seterusnya
+rollback;
+```
+
+Hasilnya, murid berpaket `convo` (level 1-4, tanpa track bisnis) lawan angka sebenarnya:
+
+| Yang dicoba | Terlihat oleh murid | Sebenarnya ada |
+|---|---|---|
+| `test_sets` HSK 6 | **0** | 35 |
+| `test_sets` (semua) | 100 | 209, di antaranya 160 published |
+| `test_sets` published level 1-4 | 100 | **100** — cocok persis |
+| `question_bank` | 2.800 | 5.175 |
+| `vocab` HSK 6 | **0** | 1.123 |
+| `vocab` HSK 1 | 506 | 506 — memang haknya |
+| `vocab_track` bisnis | **0** | 484 |
+| `profiles` | **1** (barisnya sendiri) | 14 |
+
+Angka 100 itu kuncinya: bukan 209, bukan 160, tapi persis jumlah set yang published DAN
+level 1-4. Pagarnya benar-benar menyaring, bukan kebetulan lolos.
+
+**Yang uji ini TIDAK bisa lihat:** ini lapis basis data. Lapis HTTP PostgREST tidak ikut
+diuji — tapi PostgREST menyambung persis dengan cara di atas, jadi ini simulasi setia,
+bukan pengganti yang lebih longgar. Yang benar-benar belum diamati cuma satu: permintaan
+sungguhan lewat jaringan dengan token sesi asli.
 
 **Halaman login membaca `vocab` SEBELUM user login** (kartu Kata Hari Ini, `hsk_level<=3`,
 role anon). Jangan pernah mencabut SELECT anon pada `vocab` sepenuhnya — persempit saja.

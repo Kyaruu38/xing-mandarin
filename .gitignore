@@ -17,3 +17,9 @@ _tmp_asset_check/
 
 # Catatan kerja lokal, memuat hal yang tidak untuk publik. Repo ini publik.
 docs/HANDOFF.md
+
+# Konfigurasi lokal Claude Code + area buangan. Dua-duanya memang tidak pernah di-track;
+# ditulis di sini supaya satu `git add -A` yang kelewat tidak memasukkannya ke repo yang
+# PUBLIK ini. Isinya sudah dipindai: tidak ada kunci, tapi tetap bukan untuk umum.
+.claude/
+_to_delete/

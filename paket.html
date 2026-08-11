@@ -53,6 +53,13 @@ h1,h2,h3{font-family:var(--f-display);margin:0;line-height:1.15}
 .btn-soft{border:1px solid var(--line);color:var(--text)}
 .btn-sm{padding:8px 15px;font-size:13px}
 .btn-lg{padding:13px 26px;font-size:15px}
+/* Nav-nya memang mepet di 360-380px: tombol Masuk cuma kebagian 1px kurang dari
+   lebar alaminya. Di ID dan ZH itu tidak kelihatan karena "Masuk" dan "登录"
+   satu token, tidak ada tempat untuk patah. "Sign in" punya spasi, jadi patah
+   jadi dua baris dan nav ikut tinggi 36px -> 56px, persis di 375px yang wajib
+   diuji. Nowrap membuat tombol memakai lebar alaminya; diukur di 320-430px,
+   tidak ada lebar yang jadi luber karenanya (sisa ruang tetap 10-15px). */
+.nav-login{white-space:nowrap}
 .nav-cta{display:none}
 @media(min-width:900px){.nav-cta{display:inline-flex}}
 @media(max-width:780px){.nav-links{display:none}}

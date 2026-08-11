@@ -598,8 +598,12 @@ footer{box-shadow:0 -1px 0 var(--line);padding:34px 0 max(34px,env(safe-area-ins
              jadi ditulis berdampingan, bukan disamakan. 5.456 = silabus resmi HSK 3.0
              (500+772+973+1.000+1.071+1.140). 5.365 = isi tabel vocab level 1-6, sudah
              diverifikasi lewat SELECT count(*), bukan disalin dari dokumen.
-             Sengaja memakai <strong>, BUKAN <b>: ada aturan .skymap-foot b yang
-             mewarnai teks --star-core, dan di tema terang itu cuma 2,99:1 di panel. -->
+             Memakai <strong>, bukan <b>. Waktu baris ini ditulis, aturan
+             .skymap-foot b masih mewarnai teksnya --star-core (#D98E00 di tema
+             terang, kontras 2,69:1 di atas panel putih, di bawah ambang 4,5).
+             Commit token permukaan berikutnya sudah membetulkan aturan itu ke
+             --gold-ink, jadi <b> sebenarnya sudah aman sekarang. <strong>
+             dipertahankan supaya tidak ada perubahan tampilan tanpa alasan. -->
         <small class="skymap-src" data-i18n-html="mapSrc">Angka di peta mengikuti silabus resmi HSK 3.0, yaitu <strong>5.456 kata</strong> sampai HSK 6. Yang sudah tersedia di platform ini <strong>5.365 kata</strong>, semuanya lengkap dengan arti dan contoh kalimat.</small>
       </div>
     </div>

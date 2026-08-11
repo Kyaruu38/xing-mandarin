@@ -205,3 +205,28 @@ role anon). Jangan pernah mencabut SELECT anon pada `vocab` sepenuhnya — perse
 `UPDATE` mengenai ribuan baris maupun saat tidak mengenai apa pun. Selalu verifikasi dengan
 `SELECT count(*)`. Pernah kejadian migrasi masih `ROLLBACK` sehingga semua file arti/contoh
 jalan tanpa efek sama sekali.
+
+**Claude sisi cloud TIDAK boleh menjalankan git di folder ini.** Device bridge bisa menulis
+berkas tapi tidak punya izin `unlink`. Akibatnya `git status` membuat `.git/index.lock`,
+gagal menghapusnya, dan lock-nya nyangkut sehingga SELURUH operasi git terkunci sampai
+dihapus manual dari Windows. Sudah kejadian 10 Agustus 2026 dan sempat disalahartikan
+sebagai editor atau Git GUI yang crash. Kalau terpaksa membaca status dari sisi cloud,
+pakai `git --no-optional-locks`. Pola yang benar: Claude cloud menyiapkan isi berkas,
+Claude Code di mesin sendiri yang menjalankan git.
+
+**`pkill` tidak bisa melihat proses Windows.** Alat Bash di mesin ini menjalankan skrip
+POSIX, jadi `pkill -f 'http.server 8899'` melaporkan sukses sambil tidak membunuh apa pun.
+Server uji tetap hidup dan port tetap terpakai. Pakai `Stop-Process` lewat PowerShell, dan
+cocokkan berdasarkan BARIS PERINTAH (`*http.server <port>*`), bukan nama proses, supaya
+proses lain yang kebetulan bernama python tidak ikut mati.
+
+**Jangan mengukur lebar layout lewat `file://`.** `.logo-img` di `paket.html` memakai
+`width:auto`, jadi kalau `logo-landing.png` tidak ikut tersedia, teks `alt` membuat logo
+terbaca 119px alih-alih 28px dan seluruh pengukuran nav meleset 91px. Sudah kejadian:
+sempat disimpulkan nav overflow padahal tidak. Sajikan lewat HTTP dengan gambar tersedia.
+
+**Kontras jangan pernah dihitung di kepala.** Angka 2,99:1 untuk `--star-core` pernah
+ditulis ke dokumen sebagai hasil ukur padahal cuma taksiran. Nilai sebenarnya 2,69, dan
+2,99 bahkan mustahil: luminansi relatif `#D98E00` adalah 0,341, jadi kontras maksimumnya
+terhadap putih murni pun hanya 2,69. Semua angka kontras harus keluar dari skrip, dan
+idealnya dari piksel tangkapan layar supaya gradien dan `opacity` bertingkat ikut terhitung.

@@ -194,9 +194,37 @@ cuma ~1,7:1 di atas panel krem. Pakai `--gold-ink` (gelap di terang, emas di gel
 baris raksasa, jadi menambah 44 poin pun terbaca "6 baris berubah". Verifikasi dengan
 menghitung `"hsk":` di dalamnya, bukan jumlah baris.
 
-**Entitlement level TIDAK dijaga RLS (belum).** `test_sets`/`question_bank`/`vocab` hanya
-dipagari di JavaScript sampai `sql/13_security_hardening.sql` di-COMMIT. Selama belum,
-jangan anggap konten level tinggi aman dari akun paket rendah.
+**Entitlement level SUDAH dijaga RLS.** Catatan lama di sini menulis sebaliknya dan itu
+sudah tidak benar; diverifikasi ulang 11 Agustus 2026 langsung ke produksi.
+
+Rantainya, dari luar ke dalam:
+
+- `test_sets` SELECT: `is_admin() OR (is_published AND hsk_level = ANY(allowed_levels()))`
+- `question_bank` SELECT: menempel ke baris `test_sets` yang lolos aturan di atas
+- `vocab` SELECT untuk `authenticated`: dipagari `allowed_levels()` dan `allowed_tracks()`
+- `vocab` SELECT untuk `anon`: `track='hsk' AND hsk_level >= 1 AND hsk_level <= 3`
+- `profiles`: hanya `is_admin()` yang boleh INSERT/UPDATE. Tidak ada aturan yang
+  mengizinkan user mengubah profilnya sendiri, jadi paket tidak bisa dinaikkan sendiri.
+
+`allowed_levels()` dan `is_admin()` keduanya `SECURITY DEFINER` dengan
+`SET search_path TO 'public'`, dan identitasnya diambil dari `auth.uid()`. Tidak ada
+jalan melingkar: `is_admin()` membaca `profiles`, dan `profiles` hanya bisa diubah
+`is_admin()`.
+
+Bug `hsk_level <= 3` yang dulu kebobolan karena nol juga `<= 3` **sudah ditambal** —
+policy anon sekarang memuat `hsk_level >= 1`.
+
+Diuji empiris sebagai anon (tanpa login) lewat REST API memakai kunci anon publik:
+kosakata HSK 6, deck non-HSK, `test_sets`, `question_bank`, dan `profiles` semuanya
+ditolak; `test_sets`/`question_bank`/`profiles` bahkan gagal di level GRANT dengan
+`42501`, sebelum RLS sempat dievaluasi. Yang lolos hanya kosakata HSK 1-3 track `hsk`,
+dan itu memang disengaja untuk kartu Kata Hari Ini di layar login.
+
+**Yang BELUM diuji:** semua di atas diuji sebagai anon. Skenario "murid sudah login
+tapi paketnya rendah, lalu mencoba menarik HSK 6" belum pernah dibuktikan secara
+empiris — konstruksinya benar, tapi belum diamati. Untuk menutup itu perlu login
+memakai akun uji berpaket rendah lalu memanggil `/rest/v1/test_sets?hsk_level=eq.6`
+dengan token sesi tersebut.
 
 **Halaman login membaca `vocab` SEBELUM user login** (kartu Kata Hari Ini, `hsk_level<=3`,
 role anon). Jangan pernah mencabut SELECT anon pada `vocab` sepenuhnya — persempit saja.

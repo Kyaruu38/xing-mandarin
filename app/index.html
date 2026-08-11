@@ -1575,6 +1575,39 @@
        states. */
     .hubCard.comingSoon .hubCardCover{ filter:saturate(.6) brightness(.85); }
 
+    /* Kartu terkunci di Materials hub. Aturan .locked yang sudah ada di-scope ke
+       .mockLevelHub, jadi menaikkan scope-nya akan ikut mengubah halaman Simulasi;
+       ini salinan kecil yang di-scope ke .materialsHub saja. Polanya sengaja
+       locked-visible, sama dengan chip deck bidang di Kamus: kartunya tetap terlihat,
+       tetap bisa diklik, dan klik-nya memunculkan pesan -- bukan disembunyikan. */
+    .materialsHub .hubCard.locked .hubCardCover{ filter:saturate(.2) brightness(.55); }
+    .materialsHub .hubCard.locked .hubCardTitle{ color:var(--muted); }
+
+    /* Halaman Audio Buku. Pemutarnya memakai .audioPlayer yang sudah ada (dipakai soal
+       listening), jadi yang ditambah di sini cuma pembungkus per bab dan baris judulnya.
+       Tidak ada komponen kartu baru: .hubCard tetap satu-satunya bentuk kartu. */
+    .bukuBab{ background:var(--panel-2); border:1px solid var(--line); border-radius:14px;
+              padding:16px; margin-bottom:16px; }
+    /* Tiap bab dibungkus <details>. Alasannya hasil ukur, bukan selera: kalau 66 pemutar
+       digelar sekaligus, halamannya 9.723px -- sekitar 11 layar penuh di HP 375px, dan bab 7
+       cuma bisa dicapai setelah menggulir lewat 42 pemutar. Dipakai <details> bawaan, bukan
+       tombol buka-tutup bikinan sendiri, supaya keyboard dan pembaca layar dapat perilaku
+       yang benar tanpa satu baris JS tambahan. */
+    summary.bukuBabHead{ display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+                         min-height:40px; cursor:pointer; list-style:none; }
+    summary.bukuBabHead::-webkit-details-marker{ display:none; }
+    details.bukuBab[open] > summary.bukuBabHead{ margin-bottom:12px; }
+    .bukuBabTanda{ display:inline-block; font-size:11px; color:var(--muted);
+                   transform:rotate(-90deg); transition:transform .15s ease; }
+    details.bukuBab[open] .bukuBabTanda{ transform:rotate(0deg); }
+    .bukuBabNo{ font-size:11.5px; font-weight:800; color:var(--gold-ink); letter-spacing:.06em; }
+    .bukuBabTitle{ font-size:14.5px; font-weight:800; color:var(--text); }
+    .bukuBabMeta{ margin-left:auto; font-size:11.5px; color:var(--muted); font-variant-numeric:tabular-nums; }
+    .bukuTrack{ margin-bottom:14px; }
+    .bukuTrack:last-child{ margin-bottom:0; }
+    .bukuTrackLabel{ font-size:12.5px; font-weight:700; color:var(--text); margin-bottom:3px; }
+    .bukuTrackNote{ font-size:11.5px; line-height:1.6; color:var(--muted); margin-bottom:6px; }
+
     /* mock test list */
     .mocklist{max-width:1200px}
     /* min(320px,100%) supaya state loading/kosong (saat class .mockSetGrid belum dipasang)
@@ -3199,6 +3232,19 @@
             </div>
           </button>
 
+          <!-- Audio buku Business Mandarin Foundation. Dipagari paket 'business'
+               (keputusan Kyaru, 11 Agt 2026: "audio ini cuma buat Business Mandarin").
+               Pemagaran ada di handler klik-nya, bukan di sini, supaya kartunya tetap
+               terlihat oleh yang belum punya paketnya -- pola locked-visible yang sama
+               dengan chip deck bidang di Kamus. -->
+          <button type="button" class="hubCard" id="hubCardBuku" data-card="buku">
+            <div class="hubCardCover listening"><span class="hubCardCoverGlyph">书</span></div>
+            <div class="hubCardBody">
+              <div class="hubCardTitle" id="hubCardBukuTitle">Audio Buku</div>
+              <div class="hubCardMeta" id="hubCardBukuMeta">Dengerin dialog &amp; bacaan per bab</div>
+            </div>
+          </button>
+
           <button type="button" class="hubCard" id="hubCardReading" data-card="reading">
             <div class="hubCardCover reading"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><path d="M4 5.5A2 2 0 0 1 6 3.5h13v15H6a2 2 0 0 0-2 2z"/><path d="M8 5v14"/></svg></div>
             <div class="hubCardBody">
@@ -3273,6 +3319,17 @@
         </div>
 
         <button type="button" id="hubExitBtn" class="practiceExit">Kembali ke Dashboard</button>
+      </div>
+
+      <!-- ============ AUDIO BUKU (Business Mandarin Foundation) — 11 bab, 66 trek.
+           Daftar treknya TIDAK ditulis di sini: di-fetch dari /buku/audio-manifest.json yang
+           dibangun scripts/build_buku_manifest.py langsung dari buku/ch*.json. Kalau bukunya
+           diperbaiki, halaman ini ikut tanpa disentuh. ============ -->
+      <div id="bukuAudioCard" class="pageCard browse hidden">
+        <p class="sub browseTitle" id="bukuAudioHeader">Audio Buku</p>
+        <p class="hubSubtitle" id="bukuAudioSubtitle">—</p>
+        <div id="bukuAudioWrap"></div>
+        <button id="bukuAudioExitBtn" class="practiceExit">Kembali ke Materi</button>
       </div>
 
       <!-- ============ ADMIN — USER MANAGEMENT (v1 + v1.5, DECISIONS_NEEDED #30/#31/#32).
@@ -3380,6 +3437,17 @@
 
   const attemptAudio = new Audio();
   const resultAudio  = new Audio();
+
+  /* Pemutar terpisah buat halaman Audio Buku. Kalau menumpang attemptAudio, memutar trek
+     buku akan memotong audio soal yang lagi dikerjakan -- alasan yang sama kenapa
+     attemptAudio dan resultAudio sudah dipisah sejak awal.
+     Dideklarasikan DI SINI, bukan di blok AUDIO BUKU jauh di bawah, karena
+     applyStaticI18n() menyentuh keduanya dan fungsi itu bisa terpanggil sebelum baris di
+     bawah sempat dieksekusi. const/let tidak ter-hoist seperti function declaration, jadi
+     menaruhnya di bawah akan meledak jadi ReferenceError yang cuma muncul kadang-kadang. */
+  const bukuAudio    = new Audio();
+  let bukuManifest = null;
+  let bukuManifestGagal = false;
 
   const SESSION_KEY = 'xm_session_id';   // simpen id sesi lokal (buat cocokin device)
   let watchChannel = null;
@@ -3597,6 +3665,13 @@
           hubSubtitle:'Semua yang kamu butuhin — deck kosakata, grammar, drill, dan paket mock test.',
           hubSearchPlaceholder:'Cari materi, kata, grammar…',
           hubChipAll:'Semua', hubChipVocab:'Kosakata', hubChipGrammar:'Grammar', hubChipListening:'Listening', hubChipMock:'Mock',
+          hubCardBukuTitle:'Audio Buku', hubCardBukuMeta:'Dengerin dialog & bacaan per bab',
+          bukuAudioHeader:'Audio Buku — Business Mandarin Foundation',
+          bukuAudioSubtitle:'11 bab, 66 trek. Dialog, bacaan, dan latihan listening.',
+          bukuBabFmt:'BAB {n}', bukuDialogFmt:'Dialog {n}', bukuLatihan:'Latihan Listening Bagian A',
+          bukuLoading:'Lagi ngambil daftar audionya…',
+          bukuLoadFail:'Daftar audionya gagal diambil. Coba refresh halamannya.',
+          errBukuLocked:'Audio buku ini bagian dari paket Business Mandarin. Hubungi admin kalau mau ditambahin.',
           hubCardVocabTitle:'Deck Kosakata', hubCardVocabMeta:'Flashcard per level',
           hubCardGrammarTitle:'Grammar', hubCardGrammarMeta:'Pola kalimat per level',
           grCrumbMaterials:'MATERIALS · GRAMMAR', grShelfTitleA:'Rak', grShelfTitleB:'Tata Bahasa',
@@ -3774,6 +3849,13 @@
           hubSubtitle:'Everything you need — decks, grammar, drills & mock papers.',
           hubSearchPlaceholder:'Search materials, words, grammar…',
           hubChipAll:'All', hubChipVocab:'Vocab', hubChipGrammar:'Grammar', hubChipListening:'Listening', hubChipMock:'Mock',
+          hubCardBukuTitle:'Book Audio', hubCardBukuMeta:'Dialogues & readings, per chapter',
+          bukuAudioHeader:'Book Audio — Business Mandarin Foundation',
+          bukuAudioSubtitle:'11 chapters, 66 tracks. Dialogues, readings and listening drills.',
+          bukuBabFmt:'CHAPTER {n}', bukuDialogFmt:'Dialogue {n}', bukuLatihan:'Listening Practice, Part A',
+          bukuLoading:'Loading the audio list…',
+          bukuLoadFail:'Could not load the audio list. Try refreshing the page.',
+          errBukuLocked:'This book audio comes with the Business Mandarin package. Contact admin if you\'d like it added.',
           hubCardVocabTitle:'Vocab Deck', hubCardVocabMeta:'Flashcard deck, per level',
           hubCardGrammarTitle:'Grammar', hubCardGrammarMeta:'Sentence patterns, per level',
           grCrumbMaterials:'MATERIALS · GRAMMAR', grShelfTitleA:'Grammar', grShelfTitleB:'Shelf',
@@ -3951,6 +4033,13 @@
           hubSubtitle:'你需要的一切——词汇卡组、语法、听力练习和模拟试卷。',
           hubSearchPlaceholder:'搜索学习资料、单词、语法…',
           hubChipAll:'全部', hubChipVocab:'词汇', hubChipGrammar:'语法', hubChipListening:'听力', hubChipMock:'模拟',
+          hubCardBukuTitle:'课本音频', hubCardBukuMeta:'按章节收听对话与课文',
+          bukuAudioHeader:'课本音频 — 商务汉语基础',
+          bukuAudioSubtitle:'11 章，66 条音频。对话、课文和听力练习。',
+          bukuBabFmt:'第{n}章', bukuDialogFmt:'对话{n}', bukuLatihan:'听力练习 A 部分',
+          bukuLoading:'正在加载音频列表…',
+          bukuLoadFail:'音频列表加载失败，请刷新页面。',
+          errBukuLocked:'本课本音频属于商务汉语套餐。如需开通，请联系管理员。',
           hubCardVocabTitle:'词汇卡组', hubCardVocabMeta:'按级别分类的记忆卡组',
           hubCardGrammarTitle:'语法', hubCardGrammarMeta:'按级别分类的句型',
           grCrumbMaterials:'学习材料 · 语法', grShelfTitleA:'语法', grShelfTitleB:'书架',
@@ -4213,6 +4302,12 @@
     $('hubCardGrammarMeta').textContent = t('hubCardGrammarMeta');
     $('hubCardListeningTitle').textContent = t('hubCardListeningTitle');
     $('hubCardListeningMeta').textContent = t('hubCardListeningMeta');
+    $('hubCardBukuMeta').textContent = t('hubCardBukuMeta');
+    renderBukuHubLock();   // judul kartu Audio Buku diurus di sana, karena ikut status kunci
+    $('bukuAudioHeader').textContent = t('bukuAudioHeader');
+    $('bukuAudioSubtitle').textContent = t('bukuAudioSubtitle');
+    $('bukuAudioExitBtn').textContent = t('backToMateri');
+    if(bukuManifest) renderBukuAudio();   // label bab/trek ikut bahasa, jadi digambar ulang
     $('hubCardReadingTitle').textContent = t('hubCardReadingTitle');
     $('hubCardReadingMeta').textContent = t('hubCardReadingMeta');
     $('hubCardWritingTitle').textContent = t('hubCardWritingTitle');
@@ -4367,7 +4462,7 @@
 
   /* ---------- navigasi appShell (Task: reskin) ---------- */
   function hideAllPages(){
-    ['dashCard','practiceCard','raportCard','browseCard','radicalsCard','strokePracticeCard','pinyinGuideCard','sandhiGuideCard','toneCoachCard','grammarCard','mockListCard','attemptCard','resultCard','riwayatCard','materialsHubCard','adminCard']
+    ['dashCard','practiceCard','raportCard','browseCard','radicalsCard','strokePracticeCard','pinyinGuideCard','sandhiGuideCard','toneCoachCard','grammarCard','mockListCard','attemptCard','resultCard','riwayatCard','materialsHubCard','bukuAudioCard','adminCard']
       .forEach(id => $(id).classList.add('hidden'));
   }
 
@@ -4525,6 +4620,7 @@
 
     userPackageLevels = PACKAGE_LEVELS[profile.package] || PACKAGE_LEVELS.hsk_1_4;
     userPackageTracks = PACKAGE_TRACKS[profile.package] || [];
+    renderBukuHubLock();   // gembok kartu Audio Buku baru bisa ditentukan setelah paket kebaca
 
     const pkg = PACKAGE_BADGE_LABEL[profile.package] ? profile.package : 'hsk_1_4';
     $('packageBadgeText').textContent = PACKAGE_BADGE_LABEL[pkg];
@@ -8633,6 +8729,128 @@
     resultAudio.addEventListener(ev, ()=> syncAudioPlayers($('resultReview'), resultAudio));
   });
 
+  /* ==========================================================
+     AUDIO BUKU — Business Mandarin Foundation (11 bab, 66 trek)
+
+     Daftar treknya TIDAK ditulis di berkas ini. Di-fetch sekali dari
+     /buku/audio-manifest.json, yang dibangun scripts/build_buku_manifest.py langsung dari
+     buku/ch*.json. Judul bab, situasi tiap dialog, dan durasinya ikut sumbernya, jadi kalau
+     bukunya diperbaiki halaman ini ikut tanpa disentuh.
+
+     Pemutarnya MEMAKAI KOMPONEN YANG SUDAH ADA: renderAudioPlayer() / handleAudioPlayerClick()
+     / syncAudioPlayers() yang sama dengan soal listening.
+
+     SOAL PEMAGARAN, tolong dibaca sebelum mengandalkannya:
+     kartunya dipagari paket 'business', tapi pagar itu TAMPILAN saja. Berkas mp3-nya duduk di
+     bucket listening-audio yang PUBLIC — sama seperti audio soal HSK — jadi siapa pun yang
+     tahu URL-nya bisa memutarnya tanpa login sama sekali. Beda dengan deck kosakata Business
+     yang dipagari beneran oleh RLS di server. Pagar sungguhan buat audio butuh bucket privat
+     + signed URL, dan itu BELUM dikerjakan. Jangan mengira isTrackAllowed() di bawah
+     melakukannya.
+     ========================================================== */
+  ['play','pause','timeupdate','ended','loadedmetadata'].forEach(ev=>{
+    bukuAudio.addEventListener(ev, ()=> syncAudioPlayers($('bukuAudioWrap'), bukuAudio));
+  });
+
+  function bukuDurasi(det){
+    const m = Math.floor(det / 60);
+    const s = Math.round(det % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  }
+
+  // Judul bacaan sengaja TIDAK diterjemahkan: itu judul asli di dalam buku, sama alasannya
+  // dengan nama program di paket.html yang juga dibiarkan apa adanya.
+  function bukuLabelTrek(tr){
+    if(tr.jenis === 'dialog')  return t('bukuDialogFmt').replace('{n}', tr.no);
+    if(tr.jenis === 'latihan') return t('bukuLatihan');
+    return tr.judul_id || '';
+  }
+
+  function bukuCatatanTrek(tr){
+    if(tr.jenis === 'dialog') return tr.situasi || '';
+    if(tr.jenis === 'bacaan') return tr.judul_zh || '';
+    return '';
+  }
+
+  function renderBukuAudio(){
+    const wrap = $('bukuAudioWrap');
+    if(!wrap) return;
+    if(bukuManifestGagal){ wrap.innerHTML = `<p class="emptyState">${t('bukuLoadFail')}</p>`; return; }
+    if(!bukuManifest){ wrap.innerHTML = `<p class="emptyState">${t('bukuLoading')}</p>`; return; }
+
+    wrap.innerHTML = bukuManifest.bab.map(b=>{
+      const judul = currentLang === 'id' ? b.title_id : b.title_en;
+      const total = b.trek.reduce((a, x)=> a + (x.detik || 0), 0);
+      const trek = b.trek.map(tr=>{
+        const catatan = bukuCatatanTrek(tr);
+        const durasi = tr.detik ? ` · ${bukuDurasi(tr.detik)}` : '';
+        return `<div class="bukuTrack">
+          <div class="bukuTrackLabel">${escapeHtml(bukuLabelTrek(tr))}${durasi}</div>
+          ${catatan ? `<div class="bukuTrackNote">${escapeHtml(catatan)}</div>` : ''}
+          ${renderAudioPlayer(tr.path)}
+        </div>`;
+      }).join('');
+      /* Bab 0 dibuka duluan supaya halamannya tidak terlihat seperti daftar kosong; sisanya
+         tertutup. Menggambar ulang (ganti bahasa) memang mengembalikan keadaan buka-tutup ke
+         awal -- dibiarkan, karena ganti bahasa di tengah mendengarkan itu jarang dan
+         menyimpan keadaannya butuh state tersendiri yang tidak sepadan. */
+      return `<details class="bukuBab"${b.no === 0 ? ' open' : ''}>
+        <summary class="bukuBabHead">
+          <span class="bukuBabTanda" aria-hidden="true">▾</span>
+          <span class="bukuBabNo">${escapeHtml(t('bukuBabFmt').replace('{n}', b.no))}</span>
+          <span class="bukuBabTitle">${escapeHtml(judul || '')}</span>
+          <span class="bukuBabMeta">${b.trek.length} · ${bukuDurasi(total)}</span>
+        </summary>
+        ${trek}
+      </details>`;
+    }).join('');
+    syncAudioPlayers(wrap, bukuAudio);   // tombol ▶/⏸ ikut keadaan kalau digambar ulang saat muter
+  }
+
+  async function muatBukuManifest(){
+    if(bukuManifest || bukuManifestGagal) return;
+    try{
+      const res = await fetch('/buku/audio-manifest.json', { cache:'no-cache' });
+      if(!res.ok) throw new Error('HTTP ' + res.status);
+      const j = await res.json();
+      if(!j || !Array.isArray(j.bab) || !j.bab.length) throw new Error('bentuk manifest tidak sesuai');
+      bukuManifest = j;
+    }catch(e){
+      /* Sengaja BUKAN showAlertModal: popup menutupi halaman dan harus ditutup dulu, padahal
+         yang bisa dilakukan user cuma refresh. Empty-state yang bisa dibaca lebih berguna. */
+      bukuManifestGagal = true;
+    }
+    renderBukuAudio();
+  }
+
+  // Judul kartu ikut status kunci, jadi dia yang menulis textContent-nya, bukan
+  // applyStaticI18n() -- kalau dua-duanya menulis, yang belakangan menang dan gemboknya
+  // hilang tiap kali bahasa diganti.
+  function renderBukuHubLock(){
+    const card = $('hubCardBuku');
+    if(!card) return;
+    const locked = !isTrackAllowed('business');
+    card.classList.toggle('locked', locked);
+    $('hubCardBukuTitle').textContent = (locked ? '\uD83D\uDD12 ' : '') + t('hubCardBukuTitle');
+  }
+
+  function openBukuAudio(){
+    setActiveNav('materi');
+    hideAllPages();
+    $('bukuAudioCard').classList.remove('hidden');
+    renderBukuAudio();    // tampilkan status dulu
+    muatBukuManifest();   // sengaja tidak di-await: halaman sudah kelihatan duluan
+  }
+
+  function closeBukuAudio(){
+    bukuAudio.pause();    // tanpa ini audionya terus jalan setelah pindah halaman
+    navTo(openMaterialsHub);
+  }
+
+  $('bukuAudioWrap') && $('bukuAudioWrap').addEventListener('click', e=>{
+    handleAudioPlayerClick(e, bukuAudio);
+  });
+
   // NOTE (buat direview): key TF dikonfirmasi boolean asli ({correct:true}/{correct:false}),
   // sesuai kolom `answer` yang udah ada buat listening_tf/image_tf. Key MC (listening_mc/
   // image_mc) diasumsikan huruf "A"/"B"/"C" konsisten sama choices di reading_mc/fill_blank/
@@ -9828,6 +10046,14 @@
   $('hubCardSandhi').addEventListener('click', ()=> navTo(openSandhiGuide));
   $('sandhiGuideExitBtn').addEventListener('click', closeSandhiGuide);
   $('hubCardSurvival').addEventListener('click', ()=> navTo(openSurvivalKit));
+  $('hubCardBuku').addEventListener('click', ()=>{
+    /* Locked-visible: kartunya ada buat semua orang, yang di luar paket Business dapat
+       pesan, bukan halaman. Ini pagar TAMPILAN -- lihat catatan panjang di blok AUDIO BUKU
+       soal kenapa ini bukan pagar data. */
+    if(!isTrackAllowed('business')){ showAlertModal(t('errBukuLocked')); return; }
+    navTo(openBukuAudio);
+  });
+  $('bukuAudioExitBtn').addEventListener('click', closeBukuAudio);
   $('hubCardToneCoach').addEventListener('click', ()=> navTo(openToneCoach));
   $('toneCoachExitBtn').addEventListener('click', closeToneCoach);
   $('hubCardStroke').addEventListener('click', ()=> navTo(openStrokePractice));

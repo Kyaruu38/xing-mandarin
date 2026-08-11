@@ -1,0 +1,725 @@
+{
+ "_catatan": "Dihasilkan oleh scripts/build_buku_manifest.py dari buku/ch*.json. Jangan disunting tangan -- jalankan ulang skripnya.",
+ "bucket": "listening-audio",
+ "prefiks": "buku",
+ "jumlah_bab": 11,
+ "jumlah_trek": 66,
+ "total_detik": 2930.7,
+ "bab": [
+  {
+   "no": 0,
+   "title_id": "Dasar Bahasa Mandarin",
+   "title_en": "Mandarin Fundamental",
+   "setara_hsk": 1,
+   "trek": [
+    {
+     "jenis": "dialog",
+     "no": 1,
+     "judul_id": "Dialog 1",
+     "situasi": "Hari pertama masuk kantor. Bertemu resepsionis di lobi.",
+     "baris": 5,
+     "path": "buku/bab0/dialog1.mp3",
+     "detik": 17.0
+    },
+    {
+     "jenis": "dialog",
+     "no": 2,
+     "judul_id": "Dialog 2",
+     "situasi": "Menanyakan jam rapat kepada rekan kerja.",
+     "baris": 5,
+     "path": "buku/bab0/dialog2.mp3",
+     "detik": 18.7
+    },
+    {
+     "jenis": "dialog",
+     "no": 3,
+     "judul_id": "Dialog 3",
+     "situasi": "Menentukan tanggal kirim barang lewat telepon.",
+     "baris": 5,
+     "path": "buku/bab0/dialog3.mp3",
+     "detik": 18.3
+    },
+    {
+     "jenis": "dialog",
+     "no": 4,
+     "judul_id": "Dialog 4",
+     "situasi": "Bertukar nomor telepon setelah bertemu klien.",
+     "baris": 5,
+     "path": "buku/bab0/dialog4.mp3",
+     "detik": 25.0
+    },
+    {
+     "jenis": "bacaan",
+     "no": 1,
+     "judul_id": "Satu Hari Saya",
+     "judul_zh": "我的一天",
+     "baris": 1,
+     "path": "buku/bab0/bacaan.mp3",
+     "detik": 26.9
+    },
+    {
+     "jenis": "latihan",
+     "no": 1,
+     "judul_id": "Latihan Listening Bagian A",
+     "isi": {
+      "benar_salah": 2,
+      "pilihan_ganda": 2,
+      "terbuka": 1
+     },
+     "path": "buku/bab0/latihan-a.mp3",
+     "detik": 83.0
+    }
+   ]
+  },
+  {
+   "no": 1,
+   "title_id": "Memperkenalkan Diri secara Profesional",
+   "title_en": "Professional Self Introduction",
+   "setara_hsk": 1,
+   "trek": [
+    {
+     "jenis": "dialog",
+     "no": 1,
+     "judul_id": "Dialog 1",
+     "situasi": "Hari pertama kerja, diperkenalkan ke satu tim.",
+     "baris": 5,
+     "path": "buku/bab1/dialog1.mp3",
+     "detik": 27.2
+    },
+    {
+     "jenis": "dialog",
+     "no": 2,
+     "judul_id": "Dialog 2",
+     "situasi": "Bertukar kartu nama dengan klien di pameran dagang.",
+     "baris": 5,
+     "path": "buku/bab1/dialog2.mp3",
+     "detik": 26.2
+    },
+    {
+     "jenis": "dialog",
+     "no": 3,
+     "judul_id": "Dialog 3",
+     "situasi": "Wawancara kerja singkat, ditanya latar belakang.",
+     "baris": 5,
+     "path": "buku/bab1/dialog3.mp3",
+     "detik": 27.7
+    },
+    {
+     "jenis": "dialog",
+     "no": 4,
+     "judul_id": "Dialog 4",
+     "situasi": "Memperkenalkan atasan kepada tamu perusahaan.",
+     "baris": 5,
+     "path": "buku/bab1/dialog4.mp3",
+     "detik": 25.3
+    },
+    {
+     "jenis": "bacaan",
+     "no": 1,
+     "judul_id": "Perkenalan Diri",
+     "judul_zh": "自我介绍",
+     "baris": 1,
+     "path": "buku/bab1/bacaan.mp3",
+     "detik": 33.8
+    },
+    {
+     "jenis": "latihan",
+     "no": 1,
+     "judul_id": "Latihan Listening Bagian A",
+     "isi": {
+      "benar_salah": 2,
+      "pilihan_ganda": 2,
+      "terbuka": 1
+     },
+     "path": "buku/bab1/latihan-a.mp3",
+     "detik": 107.5
+    }
+   ]
+  },
+  {
+   "no": 2,
+   "title_id": "Komunikasi Sehari-hari di Kantor",
+   "title_en": "Daily Office Communication",
+   "setara_hsk": 2,
+   "trek": [
+    {
+     "jenis": "dialog",
+     "no": 1,
+     "judul_id": "Dialog 1",
+     "situasi": "Berpapasan dengan atasan di pagi hari.",
+     "baris": 5,
+     "path": "buku/bab2/dialog1.mp3",
+     "detik": 24.7
+    },
+    {
+     "jenis": "dialog",
+     "no": 2,
+     "judul_id": "Dialog 2",
+     "situasi": "Minta tolong rekan kerja mencetak dokumen.",
+     "baris": 5,
+     "path": "buku/bab2/dialog2.mp3",
+     "detik": 25.5
+    },
+    {
+     "jenis": "dialog",
+     "no": 3,
+     "judul_id": "Dialog 3",
+     "situasi": "Meminta izin datang terlambat.",
+     "baris": 5,
+     "path": "buku/bab2/dialog3.mp3",
+     "detik": 24.6
+    },
+    {
+     "jenis": "dialog",
+     "no": 4,
+     "judul_id": "Dialog 4",
+     "situasi": "Tamu menanyakan letak ruangan.",
+     "baris": 5,
+     "path": "buku/bab2/dialog4.mp3",
+     "detik": 18.2
+    },
+    {
+     "jenis": "bacaan",
+     "no": 1,
+     "judul_id": "Satu Pagi di Kantor",
+     "judul_zh": "办公室的一个上午",
+     "baris": 1,
+     "path": "buku/bab2/bacaan.mp3",
+     "detik": 39.0
+    },
+    {
+     "jenis": "latihan",
+     "no": 1,
+     "judul_id": "Latihan Listening Bagian A",
+     "isi": {
+      "benar_salah": 2,
+      "pilihan_ganda": 2,
+      "terbuka": 1
+     },
+     "path": "buku/bab2/latihan-a.mp3",
+     "detik": 112.9
+    }
+   ]
+  },
+  {
+   "no": 3,
+   "title_id": "Bertanya dan Memberi Informasi",
+   "title_en": "Asking Questions & Giving Information",
+   "setara_hsk": 2,
+   "trek": [
+    {
+     "jenis": "dialog",
+     "no": 1,
+     "judul_id": "Dialog 1",
+     "situasi": "Karyawan baru menanyakan siapa penanggung jawab sebuah proyek.",
+     "baris": 5,
+     "path": "buku/bab3/dialog1.mp3",
+     "detik": 21.6
+    },
+    {
+     "jenis": "dialog",
+     "no": 2,
+     "judul_id": "Dialog 2",
+     "situasi": "Menjelaskan isi pekerjaan kepada rekan dari departemen lain.",
+     "baris": 6,
+     "path": "buku/bab3/dialog2.mp3",
+     "detik": 29.3
+    },
+    {
+     "jenis": "dialog",
+     "no": 3,
+     "judul_id": "Dialog 3",
+     "situasi": "Mengonfirmasi jumlah dan tanggal kirim lewat telepon.",
+     "baris": 5,
+     "path": "buku/bab3/dialog3.mp3",
+     "detik": 25.8
+    },
+    {
+     "jenis": "dialog",
+     "no": 4,
+     "judul_id": "Dialog 4",
+     "situasi": "Menanyakan ulang bagian yang belum jelas dalam rapat.",
+     "baris": 5,
+     "path": "buku/bab3/dialog4.mp3",
+     "detik": 25.4
+    },
+    {
+     "jenis": "bacaan",
+     "no": 1,
+     "judul_id": "Isi Pekerjaan Saya",
+     "judul_zh": "我的工作内容",
+     "baris": 1,
+     "path": "buku/bab3/bacaan.mp3",
+     "detik": 39.0
+    },
+    {
+     "jenis": "latihan",
+     "no": 1,
+     "judul_id": "Latihan Listening Bagian A",
+     "isi": {
+      "benar_salah": 2,
+      "pilihan_ganda": 2,
+      "terbuka": 1
+     },
+     "path": "buku/bab3/latihan-a.mp3",
+     "detik": 112.4
+    }
+   ]
+  },
+  {
+   "no": 4,
+   "title_id": "Rapat dan Penjadwalan",
+   "title_en": "Meetings & Scheduling",
+   "setara_hsk": 3,
+   "trek": [
+    {
+     "jenis": "dialog",
+     "no": 1,
+     "judul_id": "Dialog 1",
+     "situasi": "Membuat janji rapat lewat telepon dengan klien.",
+     "baris": 5,
+     "path": "buku/bab4/dialog1.mp3",
+     "detik": 24.1
+    },
+    {
+     "jenis": "dialog",
+     "no": 2,
+     "judul_id": "Dialog 2",
+     "situasi": "Rapat harus diundur karena ada yang tidak bisa hadir.",
+     "baris": 6,
+     "path": "buku/bab4/dialog2.mp3",
+     "detik": 21.9
+    },
+    {
+     "jenis": "dialog",
+     "no": 3,
+     "judul_id": "Dialog 3",
+     "situasi": "Membuka rapat dan menyebutkan agenda.",
+     "baris": 5,
+     "path": "buku/bab4/dialog3.mp3",
+     "detik": 27.2
+    },
+    {
+     "jenis": "dialog",
+     "no": 4,
+     "judul_id": "Dialog 4",
+     "situasi": "Menutup rapat dan meringkas keputusan.",
+     "baris": 6,
+     "path": "buku/bab4/dialog4.mp3",
+     "detik": 27.9
+    },
+    {
+     "jenis": "bacaan",
+     "no": 1,
+     "judul_id": "Pemberitahuan Rapat",
+     "judul_zh": "会议通知",
+     "baris": 1,
+     "path": "buku/bab4/bacaan.mp3",
+     "detik": 37.2
+    },
+    {
+     "jenis": "latihan",
+     "no": 1,
+     "judul_id": "Latihan Listening Bagian A",
+     "isi": {
+      "benar_salah": 2,
+      "pilihan_ganda": 2,
+      "terbuka": 1
+     },
+     "path": "buku/bab4/latihan-a.mp3",
+     "detik": 102.9
+    }
+   ]
+  },
+  {
+   "no": 5,
+   "title_id": "Diskusi Bisnis",
+   "title_en": "Business Discussion",
+   "setara_hsk": 3,
+   "trek": [
+    {
+     "jenis": "dialog",
+     "no": 1,
+     "judul_id": "Dialog 1",
+     "situasi": "Membahas dua pilihan pemasok dalam rapat tim.",
+     "baris": 7,
+     "path": "buku/bab5/dialog1.mp3",
+     "detik": 32.9
+    },
+    {
+     "jenis": "dialog",
+     "no": 2,
+     "judul_id": "Dialog 2",
+     "situasi": "Tidak setuju dengan usulan atasan, tapi tetap sopan.",
+     "baris": 7,
+     "path": "buku/bab5/dialog2.mp3",
+     "detik": 28.1
+    },
+    {
+     "jenis": "dialog",
+     "no": 3,
+     "judul_id": "Dialog 3",
+     "situasi": "Menyela sopan untuk menambahkan informasi.",
+     "baris": 5,
+     "path": "buku/bab5/dialog3.mp3",
+     "detik": 22.3
+    },
+    {
+     "jenis": "dialog",
+     "no": 4,
+     "judul_id": "Dialog 4",
+     "situasi": "Menutup diskusi yang belum selesai.",
+     "baris": 5,
+     "path": "buku/bab5/dialog4.mp3",
+     "detik": 23.7
+    },
+    {
+     "jenis": "bacaan",
+     "no": 1,
+     "judul_id": "Rapat yang Belum Ada Kesimpulannya",
+     "judul_zh": "一次没有结论的会",
+     "baris": 1,
+     "path": "buku/bab5/bacaan.mp3",
+     "detik": 43.1
+    },
+    {
+     "jenis": "latihan",
+     "no": 1,
+     "judul_id": "Latihan Listening Bagian A",
+     "isi": {
+      "benar_salah": 2,
+      "pilihan_ganda": 2,
+      "terbuka": 1
+     },
+     "path": "buku/bab5/latihan-a.mp3",
+     "detik": 123.3
+    }
+   ]
+  },
+  {
+   "no": 6,
+   "title_id": "Komunikasi Kerja: Telepon, Chat, dan Email",
+   "title_en": "Business Communication",
+   "setara_hsk": 3,
+   "trek": [
+    {
+     "jenis": "dialog",
+     "no": 1,
+     "judul_id": "Dialog 1",
+     "situasi": "Menerima telepon masuk dan menyambungkan.",
+     "baris": 7,
+     "path": "buku/bab6/dialog1.mp3",
+     "detik": 28.5
+    },
+    {
+     "jenis": "dialog",
+     "no": 2,
+     "judul_id": "Dialog 2",
+     "situasi": "Sinyal buruk saat menelepon supplier.",
+     "baris": 6,
+     "path": "buku/bab6/dialog2.mp3",
+     "detik": 28.4
+    },
+    {
+     "jenis": "dialog",
+     "no": 3,
+     "judul_id": "Dialog 3",
+     "situasi": "Percakapan chat kerja yang singkat.",
+     "baris": 5,
+     "path": "buku/bab6/dialog3.mp3",
+     "detik": 19.8
+    },
+    {
+     "jenis": "dialog",
+     "no": 4,
+     "judul_id": "Dialog 4",
+     "situasi": "Follow up penawaran yang belum dibalas.",
+     "baris": 6,
+     "path": "buku/bab6/dialog4.mp3",
+     "detik": 27.3
+    },
+    {
+     "jenis": "bacaan",
+     "no": 1,
+     "judul_id": "Sepucuk Email Permintaan Penawaran",
+     "judul_zh": "一封询价邮件",
+     "baris": 9,
+     "path": "buku/bab6/bacaan.mp3",
+     "detik": 50.0
+    },
+    {
+     "jenis": "latihan",
+     "no": 1,
+     "judul_id": "Latihan Listening Bagian A",
+     "isi": {
+      "benar_salah": 2,
+      "pilihan_ganda": 2,
+      "terbuka": 1
+     },
+     "path": "buku/bab6/latihan-a.mp3",
+     "detik": 127.5
+    }
+   ]
+  },
+  {
+   "no": 7,
+   "title_id": "Melayani Pelanggan",
+   "title_en": "Customer Handling",
+   "setara_hsk": 4,
+   "trek": [
+    {
+     "jenis": "dialog",
+     "no": 1,
+     "judul_id": "Dialog 1",
+     "situasi": "Pelanggan menanyakan spesifikasi produk di pameran.",
+     "baris": 6,
+     "path": "buku/bab7/dialog1.mp3",
+     "detik": 20.3
+    },
+    {
+     "jenis": "dialog",
+     "no": 2,
+     "judul_id": "Dialog 2",
+     "situasi": "Menjelaskan harga dan diskon.",
+     "baris": 7,
+     "path": "buku/bab7/dialog2.mp3",
+     "detik": 24.1
+    },
+    {
+     "jenis": "dialog",
+     "no": 3,
+     "judul_id": "Dialog 3",
+     "situasi": "Pelanggan menanyakan stok dan waktu tunggu.",
+     "baris": 6,
+     "path": "buku/bab7/dialog3.mp3",
+     "detik": 24.9
+    },
+    {
+     "jenis": "dialog",
+     "no": 4,
+     "judul_id": "Dialog 4",
+     "situasi": "Menangani komplain barang kurang dan rusak.",
+     "baris": 7,
+     "path": "buku/bab7/dialog4.mp3",
+     "detik": 34.7
+    },
+    {
+     "jenis": "bacaan",
+     "no": 1,
+     "judul_id": "Menangani Satu Komplain",
+     "judul_zh": "一次投诉的处理",
+     "baris": 4,
+     "path": "buku/bab7/bacaan.mp3",
+     "detik": 49.2
+    },
+    {
+     "jenis": "latihan",
+     "no": 1,
+     "judul_id": "Latihan Listening Bagian A",
+     "isi": {
+      "benar_salah": 2,
+      "pilihan_ganda": 2,
+      "terbuka": 1
+     },
+     "path": "buku/bab7/latihan-a.mp3",
+     "detik": 110.9
+    }
+   ]
+  },
+  {
+   "no": 8,
+   "title_id": "Negosiasi Bisnis",
+   "title_en": "Business Negotiation",
+   "setara_hsk": 4,
+   "trek": [
+    {
+     "jenis": "dialog",
+     "no": 1,
+     "judul_id": "Dialog 1",
+     "situasi": "Membuka negosiasi harga untuk pesanan besar pertama.",
+     "baris": 6,
+     "path": "buku/bab8/dialog1.mp3",
+     "detik": 28.8
+    },
+    {
+     "jenis": "dialog",
+     "no": 2,
+     "judul_id": "Dialog 2",
+     "situasi": "Menukar diskon dengan syarat pembayaran.",
+     "baris": 5,
+     "path": "buku/bab8/dialog2.mp3",
+     "detik": 25.1
+    },
+    {
+     "jenis": "dialog",
+     "no": 3,
+     "judul_id": "Dialog 3",
+     "situasi": "Menyepakati cara pembayaran dan waktu kirim.",
+     "baris": 6,
+     "path": "buku/bab8/dialog3.mp3",
+     "detik": 26.4
+    },
+    {
+     "jenis": "dialog",
+     "no": 4,
+     "judul_id": "Dialog 4",
+     "situasi": "Menutup kesepakatan.",
+     "baris": 5,
+     "path": "buku/bab8/dialog4.mp3",
+     "detik": 25.7
+    },
+    {
+     "jenis": "bacaan",
+     "no": 1,
+     "judul_id": "Satu Negosiasi yang Berhasil",
+     "judul_zh": "一次成功的谈判",
+     "baris": 4,
+     "path": "buku/bab8/bacaan.mp3",
+     "detik": 61.6
+    },
+    {
+     "jenis": "latihan",
+     "no": 1,
+     "judul_id": "Latihan Listening Bagian A",
+     "isi": {
+      "benar_salah": 2,
+      "pilihan_ganda": 2,
+      "terbuka": 1
+     },
+     "path": "buku/bab8/latihan-a.mp3",
+     "detik": 134.2
+    }
+   ]
+  },
+  {
+   "no": 9,
+   "title_id": "Presentasi Bisnis Sederhana",
+   "title_en": "Simple Business Presentation",
+   "setara_hsk": 4,
+   "trek": [
+    {
+     "jenis": "dialog",
+     "no": 1,
+     "judul_id": "Dialog 1",
+     "situasi": "Membuka presentasi di depan calon mitra.",
+     "baris": 4,
+     "path": "buku/bab9/dialog1.mp3",
+     "detik": 23.5
+    },
+    {
+     "jenis": "dialog",
+     "no": 2,
+     "judul_id": "Dialog 2",
+     "situasi": "Memperkenalkan perusahaan dengan angka.",
+     "baris": 6,
+     "path": "buku/bab9/dialog2.mp3",
+     "detik": 30.6
+    },
+    {
+     "jenis": "dialog",
+     "no": 3,
+     "judul_id": "Dialog 3",
+     "situasi": "Memperkenalkan produk dan keunggulannya.",
+     "baris": 6,
+     "path": "buku/bab9/dialog3.mp3",
+     "detik": 28.2
+    },
+    {
+     "jenis": "dialog",
+     "no": 4,
+     "judul_id": "Dialog 4",
+     "situasi": "Menutup presentasi dan menjawab pertanyaan sulit.",
+     "baris": 6,
+     "path": "buku/bab9/dialog4.mp3",
+     "detik": 33.6
+    },
+    {
+     "jenis": "bacaan",
+     "no": 1,
+     "judul_id": "Profil Perusahaan",
+     "judul_zh": "公司介绍",
+     "baris": 5,
+     "path": "buku/bab9/bacaan.mp3",
+     "detik": 66.3
+    },
+    {
+     "jenis": "latihan",
+     "no": 1,
+     "judul_id": "Latihan Listening Bagian A",
+     "isi": {
+      "benar_salah": 2,
+      "pilihan_ganda": 2,
+      "terbuka": 1
+     },
+     "path": "buku/bab9/latihan-a.mp3",
+     "detik": 141.4
+    }
+   ]
+  },
+  {
+   "no": 10,
+   "title_id": "Ekspor dan Impor",
+   "title_en": "Import & Export",
+   "setara_hsk": 4,
+   "trek": [
+    {
+     "jenis": "dialog",
+     "no": 1,
+     "judul_id": "Dialog 1",
+     "situasi": "Menentukan cara kirim dengan forwarder.",
+     "baris": 6,
+     "path": "buku/bab10/dialog1.mp3",
+     "detik": 29.4
+    },
+    {
+     "jenis": "dialog",
+     "no": 2,
+     "judul_id": "Dialog 2",
+     "situasi": "Memeriksa kelengkapan dokumen sebelum kapal berangkat.",
+     "baris": 6,
+     "path": "buku/bab10/dialog2.mp3",
+     "detik": 22.8
+    },
+    {
+     "jenis": "dialog",
+     "no": 3,
+     "judul_id": "Dialog 3",
+     "situasi": "Menanyakan status pengiriman yang tertunda.",
+     "baris": 6,
+     "path": "buku/bab10/dialog3.mp3",
+     "detik": 26.6
+    },
+    {
+     "jenis": "dialog",
+     "no": 4,
+     "judul_id": "Dialog 4",
+     "situasi": "Membahas siapa menanggung apa.",
+     "baris": 6,
+     "path": "buku/bab10/dialog4.mp3",
+     "detik": 25.7
+    },
+    {
+     "jenis": "bacaan",
+     "no": 1,
+     "judul_id": "Perjalanan Satu Batch Barang",
+     "judul_zh": "一批货的旅程",
+     "baris": 5,
+     "path": "buku/bab10/bacaan.mp3",
+     "detik": 68.0
+    },
+    {
+     "jenis": "latihan",
+     "no": 1,
+     "judul_id": "Latihan Listening Bagian A",
+     "isi": {
+      "benar_salah": 2,
+      "pilihan_ganda": 2,
+      "terbuka": 1
+     },
+     "path": "buku/bab10/latihan-a.mp3",
+     "detik": 137.6
+    }
+   ]
+  }
+ ]
+}

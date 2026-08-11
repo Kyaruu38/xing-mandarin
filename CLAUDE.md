@@ -240,6 +240,41 @@ Rantainya, dari luar ke dalam:
 jalan melingkar: `is_admin()` membaca `profiles`, dan `profiles` hanya bisa diubah
 `is_admin()`.
 
+### Kunci jawaban dijaga GRANT per kolom, bukan RLS
+
+Seluruh rantai di atas row-level: menentukan BARIS mana yang boleh terlihat. Untuk platform
+ujian, lapis yang paling menentukan justru column-level, dan itu belum tertulis di mana pun
+sampai catatan ini.
+
+`authenticated` memang boleh membaca `question_bank`, tapi tidak seluruh kolomnya.
+Diverifikasi langsung ke produksi 11 Agustus 2026 lewat `has_column_privilege()`, kesebelas
+kolomnya:
+
+| Kolom | `authenticated` | `anon` |
+|---|---|---|
+| `id`, `set_id`, `hsk_level`, `section`, `question_type`, `order_index`, `payload`, `points` | boleh | tidak |
+| **`answer`, `explanation`** | **tidak** | tidak |
+| `created_at` | tidak | tidak |
+
+`anon` tidak boleh membaca satu kolom pun. Yang di-select app semuanya ada di dalam daftar
+yang boleh (`app/index.html`, dua query `from('question_bank')`: `id, question_type,
+order_index, payload, points`, satu di antaranya plus `set_id`) — `answer` dan `explanation`
+tidak pernah diminta, dan memang tidak akan bisa.
+
+Artinya kunci jawaban dan pembahasan **tidak pernah sampai ke browser, bahkan seandainya
+seluruh RLS jebol.** Pagarnya terpisah dan tidak bergantung pada policy mana pun.
+
+**Konsekuensi praktis: jangan pernah "merapikan" ini jadi `GRANT SELECT ON question_bank TO
+authenticated`.** Bentuk itu kelihatan lebih bersih, lolos semua pemeriksaan RLS, dan
+diam-diam membuka seluruh kunci jawaban ke setiap murid yang membuka devtools.
+
+**Alat ukurnya sendiri jebakan.** `information_schema.role_table_grants` dan
+`has_table_privilege()` dua-duanya TIDAK melihat grant per kolom. Diperiksa dengan keduanya,
+`authenticated` terbaca seolah tidak punya SELECT sama sekali di `question_bank` —
+kesimpulan yang salah, dan cukup meyakinkan untuk membuat orang melapor "produksi rusak"
+padahal aplikasinya jalan normal. Yang benar: `has_column_privilege()` atau
+`information_schema.column_privileges`.
+
 Bug `hsk_level <= 3` yang dulu kebobolan karena nol juga `<= 3` **sudah ditambal** —
 policy anon sekarang memuat `hsk_level >= 1`.
 

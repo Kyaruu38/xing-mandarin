@@ -115,6 +115,35 @@ bagian tersebut.
 
 ---
 
+## Audio buku (Business Mandarin Foundation)
+
+66 berkas mp3, 11 bab × 6 trek (dialog 1-4, bacaan, latihan-a), total 48,8 menit. Dibuat
+`scripts/audio_buku.py`, diunggah `scripts/upload_buku.py` ke bucket **`listening-audio`**
+prefiks **`buku/`** — bucket yang sama dengan audio soal HSK, sengaja, supaya app cukup
+punya satu penyelesai URL (`listeningAudioUrl()`).
+
+Daftar treknya **tidak ditulis di app**. `scripts/build_buku_manifest.py` membangun
+`buku/audio-manifest.json` dari `buku/ch*.json`, lengkap dengan judul bab, situasi tiap
+dialog, dan durasi hasil `ffprobe`. Halaman Audio Buku di `app/index.html` mem-fetch berkas
+itu. Kalau bukunya diperbaiki: jalankan ulang skripnya, jangan menyunting manifest atau app.
+Skrip itu **menolak menulis** kalau ada trek yang mp3-nya belum ada atau durasinya tidak
+terbaca — manifest setengah jadi yang sudah ter-commit tidak akan kelihatan salahnya lagi.
+
+**`buku/audio-manifest.json` WAJIB ikut ter-commit.** App mem-fetch-nya lewat path absolut
+`/buku/audio-manifest.json`; kalau tidak tayang, halamannya cuma menampilkan pesan gagal.
+
+### Pagarnya tampilan, bukan data
+
+Kartu "Audio Buku" dipagari paket `business` lewat `isTrackAllowed('business')` (keputusan
+Kyaru, 11 Agu 2026). **Pagar itu tampilan saja.** Bucket `listening-audio` PUBLIC, jadi
+siapa pun yang tahu URL-nya bisa memutar audionya tanpa login sama sekali — beda dengan
+deck kosakata Business yang dipagari beneran oleh RLS di server. Pagar sungguhan butuh
+bucket privat + signed URL dan **belum dikerjakan**. Jangan menjanjikan ke murid atau ke
+diri sendiri bahwa audio ini eksklusif secara teknis; yang benar, ia eksklusif secara
+tampilan.
+
+---
+
 ## Jebakan yang sudah pernah kena — jangan diulang
 
 **Skor dengan rumus berbeda tidak boleh diadu langsung.** Tone Coach versi pertama

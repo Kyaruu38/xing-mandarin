@@ -497,7 +497,14 @@ footer{box-shadow:0 -1px 0 var(--line);padding:34px 0 max(34px,env(safe-area-ins
         <svg class="nav-login-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
         <span class="nav-login-text" data-i18n="navLogin">Masuk</span>
       </a>
-      <a href="#harga" class="btn btn-gold btn-sm nav-cta" data-i18n="navCta">Coba Gratis</a>
+      <!-- Dulu tombol ini cuma menggulung ke daftar harga. Namanya "Coba Gratis" tapi yang
+           didapat malah tabel harga -- janji tombolnya tidak ditepati. Sekarang langsung ke
+           WhatsApp dengan pesan yang sudah tertulis. Jalan ke daftar harga tidak hilang:
+           menu "Paket" di sebelahnya sudah menuju #harga.
+           Catatan: .nav-cta disembunyikan di bawah 760px, jadi di HP jalan masuk trial cuma
+           tombol di penutup halaman. Itu disengaja, bukan kelupaan. -->
+      <a href="https://wa.me/6287886908357" target="_blank" rel="noopener"
+         class="btn btn-gold btn-sm nav-cta" data-wa="waTrial" data-i18n="navCta">Coba Gratis</a>
     </div>
   </div>
 </nav>
@@ -842,8 +849,7 @@ footer{box-shadow:0 -1px 0 var(--line);padding:34px 0 max(34px,env(safe-area-ins
          di atas: itu terbaca seperti template, dan yang dibalas admin jadi terasa
          seperti tiket, bukan orang. */
       waTrial:'Halo Kak, salam kenal! Saya lihat Xing Mandarin dari website. '
-            + 'Saya mau coba yang gratisan dulu dong, pengin ngerasain belajarnya '
-            + 'kayak gimana sebelum ambil kelas. Mulainya gimana ya?',
+            + 'Saya tertarik dan mau coba free trial-nya dulu, boleh?',
       waKonsul:'Halo Kak, salam kenal! Saya mau nanya-nanya dulu boleh? '
             + 'Saya masih bingung sebaiknya mulai dari HSK berapa, dan kelas mana '
             + 'yang paling cocok buat saya.',
@@ -891,9 +897,8 @@ footer{box-shadow:0 -1px 0 var(--line);padding:34px 0 max(34px,env(safe-area-ins
       seeAllBtn:'See all packages →', seeAllSub:'Intensive programs, group classes, private group, private and semi private, online or onsite.',
       ctaH2:'Start with one simulation.', ctaSub:'Fifteen minutes from now, you will know exactly where to begin.',
       ctaTrial:'Try it free first',
-      waTrial:"Hi! I found Xing Mandarin on your website. I'd love to try the free "
-            + "one first, just to get a feel for how the classes work before I sign "
-            + "up. How do I get started?",
+      waTrial:"Hi! I found Xing Mandarin on your website. I'm interested, and I'd "
+            + "like to try the free trial first — would that be okay?",
       waKonsul:"Hi! Could I ask a few questions first? I'm not sure which HSK level "
             + "I should start from, or which class would suit me best.",
       footContact:'Contact'
@@ -940,8 +945,8 @@ footer{box-shadow:0 -1px 0 var(--line);padding:34px 0 max(34px,env(safe-area-ins
       seeAllBtn:'查看所有套餐 →', seeAllSub:'强化课程、团体班、私人小组、一对一与半私人，线上或上门。',
       ctaH2:'从一次模拟开始。', ctaSub:'十五分钟后，你就会清楚该从哪里开始。',
       ctaTrial:'先免费体验',
-      waTrial:'你好！我在网站上看到了 Xing Mandarin。我想先免费体验一下，'
-            + '感受一下上课的方式再决定报名，请问要怎么开始呢？',
+      waTrial:'你好！我在网站上看到了 Xing Mandarin，挺感兴趣的。'
+            + '我想先试一下免费体验课，可以吗？',
       waKonsul:'你好！我想先问几个问题可以吗？我不太确定自己应该从 HSK 几开始，'
             + '也不知道哪个班比较适合我。',
       footContact:'联系我们'

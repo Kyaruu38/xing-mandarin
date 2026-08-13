@@ -23,3 +23,15 @@ docs/HANDOFF.md
 # PUBLIK ini. Isinya sudah dipindai: tidak ada kunci, tapi tetap bukan untuk umum.
 .claude/
 _to_delete/
+
+# Keluaran audit dan percobaan gambar. Semuanya dihasilkan ulang dari skrip di scripts/,
+# jadi bukan sumber kebenaran -- yang jadi sumber kebenaran itu isi database dan storage.
+# Ditulis di sini karena alasan yang sama dengan blok di atas: repo ini PUBLIK, dan satu
+# `git add -A` yang kelewat akan menerbitkan 500 KB berkas kerja yang tidak dipakai siapa pun.
+audit_vocab_hsk1-2.csv
+vocab_gap_candidates.csv
+clips.json
+images.json
+img_out/
+img_review/
+test_img/

@@ -1982,24 +1982,24 @@
        tingginya masih hampir sama dengan lebarnya, benda ini terbaca sebagai kartu nama,
        bukan tiket. Yang bikin sesuatu terbaca sebagai tiket itu proporsinya, bukan
        sobekannya. */
-    .kmTop{ padding:24px 24px 32px; position:relative; overflow:hidden; }
+    .kmTop{ padding:30px 26px 54px; position:relative; overflow:hidden; }
     .kmTop::after{ content:""; position:absolute; inset:0; pointer-events:none;
       background-image:
         radial-gradient(1.2px 1.2px at 22% 28%, rgba(242,176,30,.5), transparent),
         radial-gradient(1px 1px at 68% 16%, rgba(242,176,30,.35), transparent),
         radial-gradient(1px 1px at 84% 62%, rgba(242,176,30,.3), transparent),
         radial-gradient(1.4px 1.4px at 42% 74%, rgba(242,176,30,.28), transparent); }
-    .kmHead{ display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; }
+    .kmHead{ display:flex; align-items:center; justify-content:space-between; margin-bottom:52px; }
     .kmBrand{ display:flex; align-items:center; gap:8px; font-size:12px; font-weight:800;
       letter-spacing:.04em; color:var(--text); }
     .kmBrand img{ width:22px; height:22px; object-fit:contain; }
     .kmType{ font-family:var(--mono-font,'IBM Plex Mono',monospace); font-size:9.5px;
       letter-spacing:.12em; color:var(--gold-ink); border:1px solid rgba(242,176,30,.45);
       border-radius:999px; padding:4px 9px; }
-    .kmName{ font-family:var(--display-font); font-size:32px; line-height:1.1;
+    .kmName{ font-family:var(--display-font); font-size:36px; line-height:1.1;
       color:var(--text); margin:0; }
-    .kmSub{ font-size:12.5px; color:var(--muted); margin:6px 0 36px; }
-    .kmGrid{ display:grid; grid-template-columns:1fr 1fr; gap:32px 12px; }
+    .kmSub{ font-size:13px; color:var(--muted); margin:8px 0 66px; }
+    .kmGrid{ display:grid; grid-template-columns:1fr 1fr; gap:62px 12px; }
     .kmCell span{ display:block; font-family:var(--mono-font,'IBM Plex Mono',monospace);
       font-size:9px; letter-spacing:.12em; color:var(--muted); margin-bottom:4px; }
     .kmCell b{ display:block; font-size:13px; font-weight:700; color:var(--text); }
@@ -2011,17 +2011,17 @@
     .kmPerf i.kiri{ left:-12px; } .kmPerf i.kanan{ right:-12px; }
     .kmPerfLine{ position:absolute; left:14px; right:14px; top:0;
       border-top:2px dashed var(--line); }
-    .kmStub{ display:flex; align-items:center; gap:16px; padding:24px; background:var(--panel); }
+    .kmStub{ display:flex; align-items:center; gap:16px; padding:34px 26px; background:var(--panel); }
     .kmCode{ flex:1; min-width:0; }
-    .kmBars{ display:flex; align-items:flex-end; gap:1.5px; height:42px; margin-bottom:8px; }
+    .kmBars{ display:flex; align-items:flex-end; gap:1.5px; height:52px; margin-bottom:9px; }
     .kmBars i{ display:block; background:var(--text); opacity:.85; }
     .kmId{ font-family:var(--mono-font,'IBM Plex Mono',monospace); font-size:11px;
       letter-spacing:.14em; color:var(--muted); }
     .kmLevel{ text-align:right; flex:0 0 auto; }
     .kmLevel span{ display:block; font-family:var(--mono-font,'IBM Plex Mono',monospace);
       font-size:9px; letter-spacing:.12em; color:var(--muted); }
-    .kmLevel b{ display:block; font-family:var(--display-font); font-size:31px; line-height:1;
-      color:var(--gold); margin-top:4px; }
+    .kmLevel b{ display:block; font-family:var(--display-font); font-size:34px; line-height:1;
+      color:var(--gold); margin-top:5px; }
     .kmBtns{ display:flex; gap:9px; margin-top:14px; }
     .kmBtn{ flex:1; min-height:44px; font:inherit; font-size:12.5px; font-weight:700;
       padding:11px; border-radius:12px; border:1px solid var(--line); background:transparent;
@@ -3629,7 +3629,7 @@
      Kalau keduanya beda, user yang masih buka tab lama bakal dikasih
      banner "ada versi baru".
      ============================================================ */
-  const APP_VERSION = '5.1';
+  const APP_VERSION = '5.2';
 
   const SUPABASE_URL  = 'https://xzgvhzmmqbijpbrhagjf.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6Z3Zoem1tcWJpanBicmhhZ2pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0OTA4NjMsImV4cCI6MjA5OTA2Njg2M30.9OtBJIBDDUhhSsvtz9Pql12hWToGzmULOGh7Tj-vzNs';
@@ -8613,7 +8613,7 @@
       if(document.fonts && document.fonts.ready) await document.fonts.ready;
       const logo = await muatGambar(currentTheme === 'dark' ? '/logo-landing.png' : '/logo_transparent.png');
 
-      const S = 2, PAD = 14 * S, KW = 360 * S, KH = 456 * S;
+      const S = 2, PAD = 14 * S, KW = 360 * S, KH = 551 * S;   // 551 = tinggi kartu di layar, diukur
       const W = KW + PAD * 2, H = KH + PAD * 2;
       const c = document.createElement('canvas');
       c.width = W; c.height = H;
@@ -8623,7 +8623,7 @@
         ? { bg:'#141F45', stub:'#1C2B58', line:'#2A3763', teks:'#EAF0FF', redup:'#8D96C4' }
         : { bg:'#FCF8EC', stub:'#FFFFFF', line:'#EEE7D4', teks:'#1C2A5E', redup:'#6B7192' };
       const emas = '#F2B01E';
-      const potong = PAD + 336 * S;
+      const potong = PAD + 408 * S;
 
       g.save();
       jalurKartu(g, PAD, PAD, KW, KH, 18 * S);
@@ -8650,29 +8650,29 @@
         g.fillText(teks, x, y);
       };
       const M = "'IBM Plex Mono',monospace", B = "'Plus Jakarta Sans',sans-serif", D = "'Baloo 2',cursive";
-      const L = PAD + 20 * S, R = PAD + KW - 20 * S;
+      const L = PAD + 27 * S, R = PAD + KW - 27 * S;
 
       let xJudul = L;
-      if(logo){ g.drawImage(logo, L, PAD + 22 * S, 22 * S, 22 * S); xJudul = L + 30 * S; }
-      tulis('XING MANDARIN', xJudul, PAD + 38 * S, `800 ${12 * S}px ${B}`, warna.teks);
+      if(logo){ g.drawImage(logo, L, PAD + 31 * S, 22 * S, 22 * S); xJudul = L + 30 * S; }
+      tulis('XING MANDARIN', xJudul, PAD + 46 * S, `800 ${12 * S}px ${B}`, warna.teks);
 
       // Pil bertepi seperti di layar, bukan tulisan telanjang.
       g.font = `${9.5 * S}px ${M}`;
       const labelTipe = t('kmType');
       const lebarPil = g.measureText(labelTipe).width + 18 * S;
       g.strokeStyle = 'rgba(242,176,30,.45)'; g.lineWidth = 1 * S;
-      jalurKartu(g, R - lebarPil, PAD + 24 * S, lebarPil, 21 * S, 10.5 * S); g.stroke();
-      tulis(labelTipe, R - lebarPil / 2, PAD + 39 * S, `${9.5 * S}px ${M}`, emas, 'center');
+      jalurKartu(g, R - lebarPil, PAD + 32 * S, lebarPil, 21 * S, 10.5 * S); g.stroke();
+      tulis(labelTipe, R - lebarPil / 2, PAD + 47 * S, `${9.5 * S}px ${M}`, emas, 'center');
 
-      tulis($('kmName').textContent, L, PAD + 112 * S, `700 ${32 * S}px ${D}`, warna.teks);
-      tulis($('kmSub').textContent, L, PAD + 136 * S, `${12.5 * S}px ${B}`, warna.redup);
+      tulis($('kmName').textContent, L, PAD + 136 * S, `700 ${36 * S}px ${D}`, warna.teks);
+      tulis($('kmSub').textContent, L, PAD + 165 * S, `${13 * S}px ${B}`, warna.redup);
 
-      const sel = [[t('kmNo'), no, 20], [t('kmStatus'), $('kmStatus').textContent, 195],
-                   [t('kmJoin'), $('kmJoin').textContent, 20], [t('kmUntil'), $('kmUntil').textContent, 195]];
+      const sel = [[t('kmNo'), no, 27], [t('kmStatus'), $('kmStatus').textContent, 195],
+                   [t('kmJoin'), $('kmJoin').textContent, 27], [t('kmUntil'), $('kmUntil').textContent, 195]];
       sel.forEach(([lbl, val, x], i) => {
-        const y = 200 + Math.floor(i / 2) * 76;
+        const y = 242 + Math.floor(i / 2) * 91;
         tulis(lbl, PAD + x * S, PAD + y * S, `${9 * S}px ${M}`, warna.redup);
-        tulis(val, PAD + x * S, PAD + (y + 17) * S, `700 ${13 * S}px ${i === 0 ? M : B}`, warna.teks);
+        tulis(val, PAD + x * S, PAD + (y + 18) * S, `700 ${13 * S}px ${i === 0 ? M : B}`, warna.teks);
       });
 
       let x = 0;
@@ -8681,14 +8681,14 @@
       g.fillStyle = warna.teks; g.globalAlpha = .85;
       for(let j = 0; j < 46; j++){
         x = (x * 1103515245 + 12345) >>> 0;
-        const w = (1 + (x % 3)) * S, tinggi = (60 + ((x >>> 8) % 41)) / 100 * 42 * S;
-        g.fillRect(bx, PAD + (402 * S) - tinggi, w, tinggi);
+        const w = (1 + (x % 3)) * S, tinggi = (60 + ((x >>> 8) % 41)) / 100 * 52 * S;
+        g.fillRect(bx, PAD + (494 * S) - tinggi, w, tinggi);
         bx += w + 1.5 * S;
       }
       g.globalAlpha = 1;
-      tulis(no, L, PAD + 419 * S, `${11 * S}px ${M}`, warna.redup);
-      tulis(t('kmTarget'), R, PAD + 386 * S, `${9 * S}px ${M}`, warna.redup, 'right');
-      tulis($('kmTarget').textContent, R, PAD + 418 * S, `700 ${31 * S}px ${D}`, emas, 'right');
+      tulis(no, L, PAD + 513 * S, `${11 * S}px ${M}`, warna.redup);
+      tulis(t('kmTarget'), R, PAD + 462 * S, `${9 * S}px ${M}`, warna.redup, 'right');
+      tulis($('kmTarget').textContent, R, PAD + 496 * S, `700 ${34 * S}px ${D}`, emas, 'right');
 
       const a = document.createElement('a');
       a.download = 'kartu-murid-' + no + '.png';

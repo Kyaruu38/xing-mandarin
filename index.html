@@ -764,7 +764,8 @@ footer{box-shadow:0 -1px 0 var(--line);padding:34px 0 max(34px,env(safe-area-ins
     <div class="cta-hz"><ruby><rb>摘星</rb><rt>ZHĀI XĪNG</rt></ruby></div>
     <h2 data-i18n="ctaH2">Mulai dari satu simulasi.</h2>
     <p class="sec-sub" data-i18n="ctaSub">Lima belas menit dari sekarang, kamu tahu persis harus mulai dari mana.</p>
-    <a href="#harga" class="btn btn-gold" data-i18n="ctaFree">Mulai simulasi gratis</a>
+    <a href="https://wa.me/6287886908357" target="_blank" rel="noopener"
+       class="btn btn-gold" data-wa="waTrial" data-i18n="ctaTrial">Coba gratis dulu</a>
   </div>
 </section>
 
@@ -778,7 +779,8 @@ footer{box-shadow:0 -1px 0 var(--line);padding:34px 0 max(34px,env(safe-area-ins
     <div class="foot-links">
       <a href="#fitur" data-i18n="navFeat">Fitur</a>
       <a href="#harga" data-i18n="navPrice">Paket</a>
-      <a href="https://wa.me/6287886908357" data-i18n="footContact">Kontak</a>
+      <a href="https://wa.me/6287886908357" target="_blank" rel="noopener"
+         data-wa="waKonsul" data-i18n="footContact">Kontak</a>
     </div>
     <span class="mono">XINGMANDARIN.COM · 星图 · © 2026</span>
   </div>
@@ -831,6 +833,20 @@ footer{box-shadow:0 -1px 0 var(--line);padding:34px 0 max(34px,env(safe-area-ins
       clsBeginner:'Kelas Beginner', perMeetA:'Rp53.625 per pertemuan', perMeetB:'Rp62.375 per pertemuan',
       seeAllBtn:'Lihat semua paket →', seeAllSub:'Program intensif, kelas grup, private group, private dan semi private, online maupun onsite.',
       ctaH2:'Mulai dari satu simulasi.', ctaSub:'Lima belas menit dari sekarang, kamu tahu persis harus mulai dari mana.',
+      ctaTrial:'Coba gratis dulu',
+      /* Dua pesan WhatsApp siap kirim. Dipisah karena dua orang yang berbeda:
+         yang satu sudah mau mencoba, yang satu masih menimbang. Ditulis dari sudut
+         pandang CALON MURID, bukan dari sudut pandang toko -- yang kebuka di HP-nya
+         adalah kolom ketik miliknya sendiri, jadi kalimatnya harus terdengar seperti
+         dia yang menulis. Jangan diawali "Halo Xing Mandarin," seperti tombol kelas
+         di atas: itu terbaca seperti template, dan yang dibalas admin jadi terasa
+         seperti tiket, bukan orang. */
+      waTrial:'Halo Kak, salam kenal! Saya lihat Xing Mandarin dari website. '
+            + 'Saya mau coba yang gratisan dulu dong, pengin ngerasain belajarnya '
+            + 'kayak gimana sebelum ambil kelas. Mulainya gimana ya?',
+      waKonsul:'Halo Kak, salam kenal! Saya mau nanya-nanya dulu boleh? '
+            + 'Saya masih bingung sebaiknya mulai dari HSK berapa, dan kelas mana '
+            + 'yang paling cocok buat saya.',
       footContact:'Kontak'
     },
     en: {
@@ -874,6 +890,12 @@ footer{box-shadow:0 -1px 0 var(--line);padding:34px 0 max(34px,env(safe-area-ins
       clsBeginner:'Beginner class', perMeetA:'Rp53.625 per session', perMeetB:'Rp62.375 per session',
       seeAllBtn:'See all packages →', seeAllSub:'Intensive programs, group classes, private group, private and semi private, online or onsite.',
       ctaH2:'Start with one simulation.', ctaSub:'Fifteen minutes from now, you will know exactly where to begin.',
+      ctaTrial:'Try it free first',
+      waTrial:"Hi! I found Xing Mandarin on your website. I'd love to try the free "
+            + "one first, just to get a feel for how the classes work before I sign "
+            + "up. How do I get started?",
+      waKonsul:"Hi! Could I ask a few questions first? I'm not sure which HSK level "
+            + "I should start from, or which class would suit me best.",
       footContact:'Contact'
     },
     zh: {
@@ -917,6 +939,11 @@ footer{box-shadow:0 -1px 0 var(--line);padding:34px 0 max(34px,env(safe-area-ins
       clsBeginner:'Beginner 班', perMeetA:'每次课 Rp53.625', perMeetB:'每次课 Rp62.375',
       seeAllBtn:'查看所有套餐 →', seeAllSub:'强化课程、团体班、私人小组、一对一与半私人，线上或上门。',
       ctaH2:'从一次模拟开始。', ctaSub:'十五分钟后，你就会清楚该从哪里开始。',
+      ctaTrial:'先免费体验',
+      waTrial:'你好！我在网站上看到了 Xing Mandarin。我想先免费体验一下，'
+            + '感受一下上课的方式再决定报名，请问要怎么开始呢？',
+      waKonsul:'你好！我想先问几个问题可以吗？我不太确定自己应该从 HSK 几开始，'
+            + '也不知道哪个班比较适合我。',
       footContact:'联系我们'
     }
   };
@@ -926,6 +953,13 @@ footer{box-shadow:0 -1px 0 var(--line);padding:34px 0 max(34px,env(safe-area-ins
   function applyI18n(){
     document.querySelectorAll('[data-i18n]').forEach(function(el){ el.textContent = t(el.dataset.i18n); });
     document.querySelectorAll('[data-i18n-html]').forEach(function(el){ el.innerHTML = t(el.dataset.i18nHtml); });
+    /* Tombol yang membuka WhatsApp dengan pesan yang sudah tertulis, tinggal dikirim.
+       Pesannya ikut bahasa yang sedang dipilih. Ditaruh di JS, bukan langsung di href,
+       karena href tidak bisa ikut berganti waktu bahasanya diganti -- tombol WA lain di
+       halaman ini masih memakai pesan Indonesia yang ditulis mati di href-nya. */
+    document.querySelectorAll('[data-wa]').forEach(function(el){
+      el.href = 'https://wa.me/6287886908357?text=' + encodeURIComponent(t(el.dataset.wa));
+    });
     document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : currentLang;
     document.querySelectorAll('.lang button').forEach(function(b){ b.classList.toggle('on', b.dataset.lang === currentLang); });
   }

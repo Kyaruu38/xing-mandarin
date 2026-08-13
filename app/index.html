@@ -1508,32 +1508,63 @@
       font-size:10.5px; letter-spacing:.08em; color:var(--muted); opacity:.75; }
     .appVersionLine.inMenu{ margin:10px 4px 2px; text-align:left; }
 
-    /* z-index 150: di ATAS konten & bottom nav (20), tapi di BAWAH modal overlay (200).
-       bottom pakai calc + inset (bukan max) supaya di HP berponi tetap naik dari home bar. */
-    #updateBanner{ position:fixed; left:50%; transform:translateX(-50%) translateY(140%);
-      bottom:calc(18px + env(safe-area-inset-bottom, 0px)); z-index:150;
-      display:flex; align-items:center; gap:12px; max-width:min(520px, calc(100vw - 24px));
+    /* Bentuk kartunya TIDAK diubah -- ini banner "ada versi baru" yang sudah jalan, cuma
+       pindah dari BAWAH ke ATAS. Di bawah, dia duduk dekat bottom nav dan banyak yang tidak
+       menyadarinya sama sekali; mata orang mencari kabar di atas. Turun dari atas juga
+       membuat gerakannya searah dengan cara kabar itu datang.
+       Sekarang dua banner (versi baru + masa aktif) berbagi satu tumpukan, jadi aturannya
+       pindah dari #updateBanner ke .topAlert supaya dua-duanya persis sama.
+       z-index 150: di ATAS konten & bottom nav (20), tapi di BAWAH modal overlay (200). */
+    #topAlerts{ position:fixed; left:50%; transform:translateX(-50%);
+      top:calc(14px + env(safe-area-inset-top, 0px)); z-index:150;
+      display:flex; flex-direction:column; gap:9px; align-items:center;
+      width:min(520px, calc(100vw - 24px)); pointer-events:none; }
+    /* wadahnya selebar layar dan selalu ada; tanpa ini dia menelan klik di bawahnya */
+    #topAlerts > *{ pointer-events:auto; }
+    .topAlert{ width:100%; transform:translateY(-160%);
+      display:flex; align-items:center; gap:12px;
       padding:12px 14px 12px 16px; border-radius:14px;
       background:var(--panel); color:var(--text);
       border:1px solid var(--line); box-shadow:0 18px 44px -12px rgba(0,0,0,.45);
       transition:transform .38s cubic-bezier(.22,1,.36,1); }
-    #updateBanner.show{ transform:translateX(-50%) translateY(0); }
-    #updateBannerText{ flex:1 1 auto; min-width:0; font-size:13px; line-height:1.45; }
-    #updateBannerText b{ font-weight:800; }
+    .topAlert.show{ transform:translateY(0); }
+    /* Jam di ujung paling kanan, penanda bahwa ini soal waktu. Sengaja SVG, bukan emoji:
+       emoji beda bentuk di Windows, Android, dan iOS, dan yang di mock sebelumnya malah
+       gagal render jadi kotak kosong di layar Kyaru. */
+    .topAlertClock{ flex:0 0 auto; display:flex; align-items:center; color:var(--gold-ink); }
+    /* satu lambang untuk ketiga tahap, yang naik cuma warnanya: emas -> oranye -> merah */
+    #expiryBanner.h3 .topAlertClock{ color:#D9821A; }
+    #expiryBanner.h1 .topAlertClock{ color:var(--danger); }
+    #expiryBanner.h1 #expiryBannerBtn{ background:var(--danger); color:#fff; }
+    .topAlertText{ flex:1 1 auto; min-width:0; font-size:13px; line-height:1.45; }
+    .topAlertText b{ font-weight:800; }
     /* WAJIB reset width/margin: ada aturan global `button{ width:100%; margin-top:22px }`
        (lihat catatan di blok .attemptCard) -- tanpa ini tombol banner ke-stretch. */
-    #updateBannerBtn{ flex:0 0 auto; width:auto; margin:0; padding:8px 15px; border:0; border-radius:999px;
+    .topAlertBtn{ flex:0 0 auto; width:auto; margin:0; padding:8px 15px; border:0; border-radius:999px;
       background:linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#241a08;
-      font-size:12.5px; font-weight:800; cursor:pointer; white-space:nowrap; }
-    #updateBannerClose{ flex:0 0 auto; width:26px; height:26px; margin:0; padding:0; border:0;
+      font-size:12.5px; font-weight:800; cursor:pointer; white-space:nowrap;
+      /* #expiryBannerBtn itu <a>, bukan <button>: tanpa dua baris ini dia bergaris bawah
+         dan tingginya sedikit beda dari tombol Refresh di banner sebelahnya. */
+      text-decoration:none; display:inline-flex; align-items:center; }
+    .topAlertClose{ flex:0 0 auto; width:26px; height:26px; margin:0; padding:0; border:0;
       border-radius:50%; background:transparent; color:var(--muted); font-size:17px;
       line-height:1; cursor:pointer; }
-    #updateBannerClose:hover{ color:var(--text); }
-    @media (max-width:520px){
-      /* naikkan di atas .bottomNav (tinggi ~59px + inset) supaya nav tetap bisa ditekan */
-      #updateBanner{ left:12px; right:12px; transform:translateY(140%); max-width:none;
-        bottom:calc(78px + env(safe-area-inset-bottom, 0px)); }
-      #updateBanner.show{ transform:translateY(0); }
+    .topAlertClose:hover{ color:var(--text); }
+    @media (max-width:760px){
+      /* .mobileHeader itu sticky setinggi ~54px di z-40. Banner harus turun di BAWAHnya,
+         kalau tidak dia menutupi logo dan tombol akun. */
+      #topAlerts{ left:12px; right:12px; transform:none; width:auto;
+        top:calc(62px + env(safe-area-inset-top, 0px)); }
+    }
+    /* Di 375px, "Hubungi admin" + jam + tombol X cuma menyisakan ~150px buat teksnya dan
+       kalimatnya pecah jadi lima baris. Di bawah 420px teksnya dapat satu baris penuh
+       sendiri, tombolnya turun ke baris kedua rata kanan, jamnya tetap paling kanan. */
+    @media (max-width:420px){
+      .topAlert{ flex-wrap:wrap; row-gap:10px; position:relative; padding-right:40px; }
+      .topAlertText{ flex:1 0 100%; order:1; }
+      .topAlertBtn{ order:2; margin-left:auto; }
+      .topAlertClock{ order:3; }
+      .topAlertClose{ position:absolute; top:8px; right:8px; }
     }
     /* .hubCard = shared shape for both the real (button, clickable-later) and coming-soon (div,
        genuinely inert -- a button that does nothing is the same dead-affordance issue as #6/#8)
@@ -2634,11 +2665,21 @@
     </div>
   </div>
 
-  <!-- Banner "ada versi baru" -- disuntik sekali, dipakai baik di layar login maupun dashboard. -->
-  <div id="updateBanner" role="status" aria-live="polite">
-    <span id="updateBannerText"></span>
-    <button type="button" id="updateBannerBtn"></button>
-    <button type="button" id="updateBannerClose" aria-label="Tutup">&times;</button>
+  <!-- Tumpukan pemberitahuan di ATAS layar. Disuntik sekali, dipakai baik di layar login
+       maupun dashboard. Dua-duanya bisa tampil barengan; yang lama cuma punya satu tempat. -->
+  <div id="topAlerts">
+    <div id="updateBanner" class="topAlert" role="status" aria-live="polite">
+      <span id="updateBannerText" class="topAlertText"></span>
+      <button type="button" id="updateBannerBtn" class="topAlertBtn"></button>
+      <button type="button" id="updateBannerClose" class="topAlertClose" aria-label="Tutup">&times;</button>
+    </div>
+    <!-- pengingat masa aktif. tombolnya <a>, bukan <button>, karena tujuannya WhatsApp -->
+    <div id="expiryBanner" class="topAlert" role="status" aria-live="polite">
+      <span id="expiryBannerText" class="topAlertText"></span>
+      <a id="expiryBannerBtn" class="topAlertBtn" target="_blank" rel="noopener"></a>
+      <span class="topAlertClock" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="19" height="19"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+      <button type="button" id="expiryBannerClose" class="topAlertClose" aria-label="Tutup">&times;</button>
+    </div>
   </div>
 
   <!-- ============ APP SHELL ============ -->
@@ -3629,7 +3670,7 @@
      Kalau keduanya beda, user yang masih buka tab lama bakal dikasih
      banner "ada versi baru".
      ============================================================ */
-  const APP_VERSION = '5.2';
+  const APP_VERSION = '5.3';
 
   const SUPABASE_URL  = 'https://xzgvhzmmqbijpbrhagjf.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6Z3Zoem1tcWJpanBicmhhZ2pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0OTA4NjMsImV4cCI6MjA5OTA2Njg2M30.9OtBJIBDDUhhSsvtz9Pql12hWToGzmULOGh7Tj-vzNs';
@@ -3917,6 +3958,11 @@
           levelLockedShort:'Terkunci',
           versionLabel:'Versi', updateTitle:'Versi baru tersedia', updateBody:'Refresh biar dapat yang terbaru.',
           updateBtn:'Refresh',
+          expTitle0:'Paketmu habis hari ini', expTitle1:'Paketmu habis besok',
+          expTitleN:'Paketmu habis {n} hari lagi',
+          expBody:'Masa aktifmu sampai {tgl}. Kabari admin kalau mau lanjut.',
+          expBtn:'Hubungi admin',
+          expWa:'Halo Kak, saya {nama} ({no}). Paket saya habis tanggal {tgl}, saya mau perpanjang. Boleh info caranya?',
           raportHeader:'Raport Belajar', vocabDictionary:'Kamus Kosakata',
           searchPlaceholder:'Cari hanzi, pinyin, atau arti...', loadMore:'Muat Lebih Banyak',
           hubSubtitle:'Semua yang kamu butuhin — deck kosakata, grammar, drill, dan paket mock test.',
@@ -4127,6 +4173,11 @@
           levelLockedShort:'Locked',
           versionLabel:'Version', updateTitle:'New version available', updateBody:'Refresh to get the latest.',
           updateBtn:'Refresh',
+          expTitle0:'Your package ends today', expTitle1:'Your package ends tomorrow',
+          expTitleN:'Your package ends in {n} days',
+          expBody:'Your access runs until {tgl}. Let the admin know if you want to continue.',
+          expBtn:'Contact admin',
+          expWa:'Hi, this is {nama} ({no}). My package ends on {tgl} and I would like to extend it. Could you tell me how?',
           raportHeader:'Learning Report', vocabDictionary:'Vocabulary Dictionary',
           searchPlaceholder:'Search hanzi, pinyin, or meaning...', loadMore:'Load More',
           hubSubtitle:'Everything you need — decks, grammar, drills & mock papers.',
@@ -4337,6 +4388,11 @@
           levelLockedShort:'已锁定',
           versionLabel:'版本', updateTitle:'有新版本', updateBody:'刷新即可获取最新版。',
           updateBtn:'刷新',
+          expTitle0:'你的课程今天到期', expTitle1:'你的课程明天到期',
+          expTitleN:'你的课程还有 {n} 天到期',
+          expBody:'有效期到 {tgl}。想继续的话请联系管理员。',
+          expBtn:'联系管理员',
+          expWa:'你好，我是 {nama}（{no}）。我的课程 {tgl} 到期，想续期，请问怎么办理？',
           raportHeader:'学习报告', vocabDictionary:'词汇词典',
           searchPlaceholder:'搜索汉字、拼音或释义...', loadMore:'加载更多',
           hubSubtitle:'你需要的一切——词汇卡组、语法、听力练习和模拟试卷。',
@@ -4701,6 +4757,7 @@
     currentLang = lang;
     localStorage.setItem('xingLang', lang);
     applyStaticI18n();
+    tampilkanPengingatPaket();   // judul, tanggal, dan pesan WA-nya ikut bahasa
     // jangan re-render (navigasi ulang) kalau lagi di tengah attempt/result — bisa
     // ilangin progres jawaban murid yang belum di-submit.
     const attemptVisible = !$('attemptCard').classList.contains('hidden');
@@ -5023,6 +5080,7 @@
 
     currentUser = userId; currentProfile = profile;
     renderDash(profile);
+    tampilkanPengingatPaket();
     watchSession(userId);
 
     // heartbeat: perbarui last_seen tiap 2 menit
@@ -10994,6 +11052,73 @@
   $('updateBannerClose').addEventListener('click', ()=>{
     updateDismissed = true;
     $('updateBanner').classList.remove('show');
+  });
+
+  /* ==========================================================
+     PENGINGAT MASA AKTIF PAKET -- H-7, H-3, H-1
+     Bentuknya sengaja sama persis dengan banner versi di atas: satu kartu, satu tombol,
+     satu tanda silang. Yang membedakan cuma jam di ujung kanan dan warnanya.
+     ========================================================== */
+  const TAHAP_INGAT = [7, 3, 1];
+
+  function sisaHariPaket(){
+    if(!currentProfile || !currentProfile.subscription_end) return null;
+    const habis = new Date(currentProfile.subscription_end + 'T00:00:00');
+    if(isNaN(habis)) return null;
+    // Dihitung dari TANGGAL ke TANGGAL, bukan dari selisih jam. Versi pertama memakai
+    // Math.ceil atas selisih milidetik dan hasilnya meleset satu hari: paket yang habis
+    // HARI INI dilaporkan sebagai "habis besok". Bergantung jam berapa murid membuka
+    // aplikasinya, angkanya juga bisa berbeda untuk tanggal yang sama.
+    const kini = new Date();
+    const hariIni   = new Date(kini.getFullYear(), kini.getMonth(), kini.getDate());
+    const hariHabis = new Date(habis.getFullYear(), habis.getMonth(), habis.getDate());
+    return Math.round((hariHabis - hariIni) / 86400000);
+  }
+
+  function tampilkanPengingatPaket(){
+    const el = $('expiryBanner');
+    if(!el) return;
+    const sisa = sisaHariPaket();
+    // sisa < 0 = sudah lewat. Belum ditangani di sini: bentuk pemberitahuan untuk paket
+    // yang sudah habis masih menunggu keputusan Kyaru (tetap muncul terus atau berhenti).
+    if(sisa === null || sisa < 0){ el.classList.remove('show'); return; }
+    // Tahap terkecil yang masih >= sisa hari. Murid yang baru login di H-2 tetap kebagian
+    // pengingat H-3, bukan tidak dapat apa-apa cuma karena harinya kelewat.
+    const tahap = TAHAP_INGAT.filter(x => sisa <= x).pop();
+    if(!tahap){ el.classList.remove('show'); return; }
+
+    // Kuncinya dibikin per tahap DAN per tanggal habis. Per tahap: menutup yang H-7 tidak
+    // mematikan yang H-3. Per tanggal: begitu paketnya diperpanjang, ketiganya hidup lagi.
+    const kunci = 'xingExp:' + (currentProfile.student_id || currentProfile.id) + ':' +
+      currentProfile.subscription_end + ':' + tahap;
+    if(localStorage.getItem(kunci) === '1'){ el.classList.remove('show'); return; }
+
+    const tgl = new Date(currentProfile.subscription_end + 'T00:00:00')
+      .toLocaleDateString(currentLang === 'zh' ? 'zh-CN' : (currentLang === 'en' ? 'en-GB' : 'id-ID'),
+        { day:'numeric', month:'long', year:'numeric' });
+    const judul = sisa === 0 ? t('expTitle0')
+                : sisa === 1 ? t('expTitle1')
+                : t('expTitleN').replace('{n}', sisa);
+    $('expiryBannerText').innerHTML = '<b>' + escapeHtml(judul) + '</b><br>' +
+      escapeHtml(t('expBody').replace('{tgl}', tgl));
+    const btn = $('expiryBannerBtn');
+    btn.textContent = t('expBtn');
+    // pesannya membawa nama dan nomor murid, jadi admin tidak perlu bertanya "ini siapa ya"
+    btn.href = 'https://wa.me/6287886908357?text=' + encodeURIComponent(
+      t('expWa').replace('{nama}', (currentProfile.display_name || '').trim())
+                .replace('{no}', currentProfile.student_id || '-')
+                .replace('{tgl}', tgl));
+    el.classList.remove('h3', 'h1');
+    if(tahap === 3) el.classList.add('h3');
+    if(tahap === 1) el.classList.add('h1');
+    el.dataset.kunci = kunci;
+    el.classList.add('show');
+  }
+
+  $('expiryBannerClose').addEventListener('click', ()=>{
+    const el = $('expiryBanner');
+    if(el.dataset.kunci) localStorage.setItem(el.dataset.kunci, '1');
+    el.classList.remove('show');
   });
   document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) checkAppVersion(); });
   setTimeout(checkAppVersion, 60000);

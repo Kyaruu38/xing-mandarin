@@ -587,7 +587,7 @@
       background:rgba(242,176,30,.15); border:1px solid rgba(242,176,30,.4); color:#C7900F;
     }
     .packageBadge .packageBadgeIcon{ display:flex; }
-    .packageBadge .crownIcon{ display:none; font-size:15px; }
+    .packageBadge .crownIcon{ display:none; align-items:center; }
     /* dashboard-rebuild B2: gold solid pill besar dinetralkan (budget emas) -- background netral
        (--dv4-panel), border gold TIPIS (1px, warisan dari .packageBadge base), teks gold. Padding
        dikecilkan dari base (8px 16px) biar bedanya bukan cuma warna tapi juga ukuran. */
@@ -596,7 +596,7 @@
       box-shadow:none; padding:6px 14px;
     }
     .packageBadge.vip .planIcon{ display:none; }
-    .packageBadge.vip .crownIcon{ display:inline; }
+    .packageBadge.vip .crownIcon{ display:inline-flex; }
     /* dashboard-rebuild: avatar dari mockup .ava (nilai disalin persis), dipasangkan di
        samping packageBadge lewat wrapper flex row baru (mockup nempatkannya di .top-right
        terpisah, layout app ini beda jadi butuh wrapper -- bukan bagian dari nilai mockup itu
@@ -2749,7 +2749,7 @@
       <div class="mobileHeaderActions">
         <span class="packageBadge" id="packageBadgeMobile">
           <span class="packageBadgeIcon planIcon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 5.5A2 2 0 0 1 6 3.5h13v15H6a2 2 0 0 0-2 2z"/><path d="M8 5v14"/></svg></span>
-          <span class="packageBadgeIcon crownIcon">👑</span>
+          <span class="packageBadgeIcon crownIcon"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M12 0c1 6 5 10 12 12-7 2-11 6-12 12-1-6-5-10-12-12 7-2 11-6 12-12z"/></svg></span>
           <span id="packageBadgeTextMobile">HSK 1&ndash;4</span>
         </span>
         <button type="button" class="sbThemeToggle" id="themeToggleMobile" aria-label="Switch to dark mode">☀️</button>
@@ -2852,7 +2852,7 @@
             <div class="dashV4-planRow">
               <span class="packageBadge" id="packageBadge">
                 <span class="packageBadgeIcon planIcon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 5.5A2 2 0 0 1 6 3.5h13v15H6a2 2 0 0 0-2 2z"/><path d="M8 5v14"/></svg></span>
-                <span class="packageBadgeIcon crownIcon">👑</span>
+                <span class="packageBadgeIcon crownIcon"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M12 0c1 6 5 10 12 12-7 2-11 6-12 12-1-6-5-10-12-12 7-2 11-6 12-12z"/></svg></span>
                 <span id="packageBadgeText">HSK 1&ndash;4</span>
               </span>
               <button type="button" class="dashV4-ava" id="dashV4Ava" aria-haspopup="true" aria-expanded="false">—</button>
@@ -3724,7 +3724,7 @@
      Kalau keduanya beda, user yang masih buka tab lama bakal dikasih
      banner "ada versi baru".
      ============================================================ */
-  const APP_VERSION = '5.6';
+  const APP_VERSION = '5.7';
 
   const SUPABASE_URL  = 'https://xzgvhzmmqbijpbrhagjf.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6Z3Zoem1tcWJpanBicmhhZ2pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0OTA4NjMsImV4cCI6MjA5OTA2Njg2M30.9OtBJIBDDUhhSsvtz9Pql12hWToGzmULOGh7Tj-vzNs';

@@ -1971,6 +1971,60 @@
     .scBarT i{ display:block; height:100%; border-radius:4px; }
     .scBarV{ font-size:12px; font-weight:700; color:var(--text); flex:0 0 28px; text-align:right; }
     .scNote{ font-size:11px; color:var(--muted); margin:9px 0 0; line-height:1.5; }
+    /* ---- kartu murid ----
+       Bentuk tiket: badan, sobekan bertakik, lalu potongan bawah. Takiknya dua lingkaran
+       yang warnanya sama dengan LATAR HALAMAN, bukan transparan, supaya bentuk gigitannya
+       tetap kelihatan waktu kartunya ditumpuk di atas apa pun. */
+    .kmWrap{ max-width:360px; margin:0 auto; }
+    .km{ background:var(--panel-2); border:1px solid var(--line); border-radius:18px;
+      overflow:hidden; position:relative; box-shadow:var(--shadow-lg); }
+    .kmTop{ padding:18px 20px 20px; position:relative; overflow:hidden; }
+    .kmTop::after{ content:""; position:absolute; inset:0; pointer-events:none;
+      background-image:
+        radial-gradient(1.2px 1.2px at 22% 28%, rgba(242,176,30,.5), transparent),
+        radial-gradient(1px 1px at 68% 16%, rgba(242,176,30,.35), transparent),
+        radial-gradient(1px 1px at 84% 62%, rgba(242,176,30,.3), transparent),
+        radial-gradient(1.4px 1.4px at 42% 74%, rgba(242,176,30,.28), transparent); }
+    .kmHead{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+    .kmBrand{ display:flex; align-items:center; gap:8px; font-size:12px; font-weight:800;
+      letter-spacing:.04em; color:var(--text); }
+    .kmBrand img{ width:22px; height:22px; object-fit:contain; }
+    .kmType{ font-family:var(--mono-font,'IBM Plex Mono',monospace); font-size:9.5px;
+      letter-spacing:.12em; color:var(--gold-ink); border:1px solid rgba(242,176,30,.45);
+      border-radius:999px; padding:4px 9px; }
+    .kmName{ font-family:var(--display-font); font-size:27px; line-height:1.1;
+      color:var(--text); margin:0; }
+    .kmSub{ font-size:12px; color:var(--muted); margin:4px 0 18px; }
+    .kmGrid{ display:grid; grid-template-columns:1fr 1fr; gap:14px 12px; }
+    .kmCell span{ display:block; font-family:var(--mono-font,'IBM Plex Mono',monospace);
+      font-size:9px; letter-spacing:.12em; color:var(--muted); margin-bottom:4px; }
+    .kmCell b{ display:block; font-size:13px; font-weight:700; color:var(--text); }
+    .kmCell b.mono{ font-family:var(--mono-font,'IBM Plex Mono',monospace); font-size:12.5px;
+      letter-spacing:.04em; }
+    .kmPerf{ position:relative; height:0; }
+    .kmPerf i{ position:absolute; top:-11px; width:22px; height:22px; border-radius:50%;
+      background:var(--bg); border:1px solid var(--line); }
+    .kmPerf i.kiri{ left:-12px; } .kmPerf i.kanan{ right:-12px; }
+    .kmPerfLine{ position:absolute; left:14px; right:14px; top:0;
+      border-top:2px dashed var(--line); }
+    .kmStub{ display:flex; align-items:center; gap:16px; padding:18px 20px; background:var(--panel); }
+    .kmCode{ flex:1; min-width:0; }
+    .kmBars{ display:flex; align-items:flex-end; gap:1.5px; height:34px; margin-bottom:7px; }
+    .kmBars i{ display:block; background:var(--text); opacity:.85; }
+    .kmId{ font-family:var(--mono-font,'IBM Plex Mono',monospace); font-size:11px;
+      letter-spacing:.14em; color:var(--muted); }
+    .kmLevel{ text-align:right; flex:0 0 auto; }
+    .kmLevel span{ display:block; font-family:var(--mono-font,'IBM Plex Mono',monospace);
+      font-size:9px; letter-spacing:.12em; color:var(--muted); }
+    .kmLevel b{ display:block; font-family:var(--display-font); font-size:28px; line-height:1;
+      color:var(--gold); }
+    .kmBtns{ display:flex; gap:9px; margin-top:14px; }
+    .kmBtn{ flex:1; min-height:44px; font:inherit; font-size:12.5px; font-weight:700;
+      padding:11px; border-radius:12px; border:1px solid var(--line); background:transparent;
+      color:var(--muted); cursor:pointer; }
+    .kmBtn.utama{ background:var(--gold); border-color:transparent; color:#1C2A5E; }
+    .kmNote{ font-size:11.5px; color:var(--muted); line-height:1.6; margin:14px 0 0; }
+
     /* ---- panel moderasi testimoni (admin) ---- */
     .adminTabs{ display:flex; gap:4px; background:var(--panel-2); border-radius:10px; padding:3px;
       margin-bottom:16px; }
@@ -2729,6 +2783,9 @@
                 </div>
 
                 <div class="dashV4-avaMenuDivider"></div>
+                <button type="button" class="dashV4-avaMenuItem" id="dashV4AvaKartuBtn" role="menuitem">
+                  <span>🎫</span><span id="avaMenuKartuLabel">Kartu Murid</span>
+                </button>
                 <a class="dashV4-avaMenuItem" id="dashV4AvaWaBtn" href="https://wa.me/6287886908357" target="_blank" rel="noopener">
                   <span>💬</span><span id="avaMenuWaLabel">Hubungi Admin</span>
                 </a>
@@ -3449,6 +3506,45 @@
            Nav item hidden unless profile.role === 'admin'. Create user + email column both go
            through the admin-users Edge Function (service_role-gated, is_admin() checked
            server-side before any privileged call). ============ -->
+      <!-- ============ KARTU MURID ============
+           Bentuk tiket: badan + sobekan + potongan bawah. Isinya semua dari profiles;
+           satu-satunya kolom yang dibuat khusus untuk ini student_id (sql/15). -->
+      <div id="kartuCard" class="pageCard hidden">
+        <p class="sub" id="kartuHeader">Kartu Murid</p>
+        <div class="kmWrap">
+          <div class="km" id="kmCard">
+            <div class="kmTop">
+              <div class="kmHead">
+                <div class="kmBrand"><img id="kmLogo" src="/logo-landing.png" alt="" /><span>XING MANDARIN</span></div>
+                <div class="kmType" id="kmType">KARTU MURID</div>
+              </div>
+              <p class="kmName" id="kmName">—</p>
+              <p class="kmSub" id="kmSub">—</p>
+              <div class="kmGrid">
+                <div class="kmCell"><span id="kmLblNo">NOMOR MURID</span><b class="mono" id="kmNo">—</b></div>
+                <div class="kmCell"><span id="kmLblStatus">STATUS</span><b id="kmStatus">—</b></div>
+                <div class="kmCell"><span id="kmLblJoin">BERGABUNG</span><b id="kmJoin">—</b></div>
+                <div class="kmCell"><span id="kmLblUntil">BERLAKU SAMPAI</span><b id="kmUntil">—</b></div>
+              </div>
+            </div>
+            <div class="kmPerf"><i class="kiri"></i><i class="kanan"></i><span class="kmPerfLine"></span></div>
+            <div class="kmStub">
+              <div class="kmCode">
+                <div class="kmBars" id="kmBars"></div>
+                <div class="kmId" id="kmIdText">—</div>
+              </div>
+              <div class="kmLevel"><span id="kmLblTarget">TARGET</span><b id="kmTarget">—</b></div>
+            </div>
+          </div>
+          <div class="kmBtns">
+            <button type="button" class="kmBtn utama" id="kmSaveBtn">Simpan gambar</button>
+            <button type="button" class="kmBtn" id="kmCopyBtn">Salin nomor</button>
+          </div>
+          <p class="kmNote" id="kmNote"></p>
+        </div>
+        <button id="kartuExitBtn" class="practiceExit">Kembali ke Dashboard</button>
+      </div>
+
       <div id="adminCard" class="pageCard admin hidden">
         <!-- Dua tab di dalam satu kartu, bukan kartu baru. Kartu baru harus didaftarkan di
              daftar penyembunyi halaman (lihat showOnly) dan gampang terlewat waktu ada
@@ -3529,7 +3625,7 @@
      Kalau keduanya beda, user yang masih buka tab lama bakal dikasih
      banner "ada versi baru".
      ============================================================ */
-  const APP_VERSION = '4.9';
+  const APP_VERSION = '5.0';
 
   const SUPABASE_URL  = 'https://xzgvhzmmqbijpbrhagjf.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6Z3Zoem1tcWJpanBicmhhZ2pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0OTA4NjMsImV4cCI6MjA5OTA2Njg2M30.9OtBJIBDDUhhSsvtz9Pql12hWToGzmULOGh7Tj-vzNs';
@@ -3791,6 +3887,13 @@
           tsReply:'Tanggapan Xing Mandarin',
           tsNeedBoth:'Dua kalimatnya diisi dulu ya.', tsSaved:'Ceritamu sudah terkirim.',
           tsNoData:'Kamu belum pernah mengerjakan simulasi apa pun. Kerjakan satu dulu, nanti bagian ini terbuka.',
+          kmMenu:'Kartu Murid', kmTitle:'Kartu Murid', kmType:'KARTU MURID',
+          kmNo:'NOMOR MURID', kmStatus:'STATUS', kmJoin:'BERGABUNG', kmUntil:'BERLAKU SAMPAI',
+          kmActive:'Aktif', kmExpired:'Berakhir',
+          kmTarget:'TARGET', kmSave:'Simpan gambar', kmCopy:'Salin nomor',
+          kmCopied:'Nomor murid sudah disalin.', kmBack:'Kembali ke Dashboard',
+          kmNoNumber:'Nomor muridmu belum dibuat. Hubungi admin ya.',
+          kmNote:'Tunjukkan kartu ini kalau admin menanyakan nomor muridmu.',
           practiceLevelPrompt:'Pilih level HSK buat latihan', back:'Kembali', showAnswer:'Lihat jawaban',
           gradeAgain:'Lupa', gradeHard:'Susah', gradeGood:'Oke', gradeEasy:'Gampang',
           exampleSentence:'Contoh Kalimat', doneBack:'Selesai / Kembali',
@@ -3994,6 +4097,13 @@
           tsReply:'From Xing Mandarin',
           tsNeedBoth:'Please fill in both sentences.', tsSaved:'Your story has been sent.',
           tsNoData:'You have not taken any simulation yet. Take one and this section will open up.',
+          kmMenu:'Student Card', kmTitle:'Student Card', kmType:'STUDENT CARD',
+          kmNo:'STUDENT NO.', kmStatus:'STATUS', kmJoin:'JOINED', kmUntil:'VALID UNTIL',
+          kmActive:'Active', kmExpired:'Ended',
+          kmTarget:'TARGET', kmSave:'Save image', kmCopy:'Copy number',
+          kmCopied:'Student number copied.', kmBack:'Back to Dashboard',
+          kmNoNumber:'Your student number has not been issued yet. Please contact the admin.',
+          kmNote:'Show this card whenever the admin asks for your student number.',
           practiceLevelPrompt:'Choose an HSK level to practice', back:'Back', showAnswer:'Show answer',
           gradeAgain:'Forgot', gradeHard:'Hard', gradeGood:'Good', gradeEasy:'Easy',
           exampleSentence:'Example Sentence', doneBack:'Done / Back',
@@ -4197,6 +4307,13 @@
           tsReply:'星图的回复',
           tsNeedBoth:'请把两句话都填一下。', tsSaved:'你的分享已提交。',
           tsNoData:'你还没有做过任何模拟测试。先做一次，这一部分就会开放。',
+          kmMenu:'学员卡', kmTitle:'学员卡', kmType:'学员卡',
+          kmNo:'学员编号', kmStatus:'状态', kmJoin:'加入时间', kmUntil:'有效期至',
+          kmActive:'有效', kmExpired:'已结束',
+          kmTarget:'目标', kmSave:'保存图片', kmCopy:'复制编号',
+          kmCopied:'学员编号已复制。', kmBack:'返回主页',
+          kmNoNumber:'你的学员编号还没有生成，请联系管理员。',
+          kmNote:'管理员询问学员编号时，出示这张卡即可。',
           practiceLevelPrompt:'选择HSK等级开始练习', back:'返回', showAnswer:'显示答案',
           gradeAgain:'忘记', gradeHard:'困难', gradeGood:'良好', gradeEasy:'简单',
           exampleSentence:'例句', doneBack:'完成 / 返回',
@@ -4650,7 +4767,7 @@
 
   /* ---------- navigasi appShell (Task: reskin) ---------- */
   function hideAllPages(){
-    ['dashCard','practiceCard','raportCard','browseCard','radicalsCard','strokePracticeCard','pinyinGuideCard','sandhiGuideCard','toneCoachCard','grammarCard','mockListCard','attemptCard','resultCard','riwayatCard','materialsHubCard','bukuAudioCard','adminCard']
+    ['dashCard','practiceCard','raportCard','browseCard','radicalsCard','strokePracticeCard','pinyinGuideCard','sandhiGuideCard','toneCoachCard','grammarCard','mockListCard','attemptCard','resultCard','riwayatCard','materialsHubCard','bukuAudioCard','adminCard','kartuCard']
       .forEach(id => $(id).classList.add('hidden'));
   }
 
@@ -8382,6 +8499,144 @@
   }
 
   /* ==========================================================
+     KARTU MURID
+
+     Nomornya TIDAK dibuat di sini. Dia datang dari profiles.student_id yang diisi
+     trigger di database (sql/15). Membuatnya di klien berarti dua murid yang membuka
+     kartunya bersamaan bisa melihat nomor yang sama, dan nomor yang bisa berbeda
+     antar layar itu bukan nomor.
+     ========================================================== */
+  function barisKode(kode){
+    // Pola batang diturunkan dari nomor muridnya: tiap murid beda, dan gambarnya sama
+    // tiap kali dibuka. BUKAN barcode sungguhan dan tidak bisa dipindai -- kalau suatu
+    // saat perlu dipindai, ganti dengan Code 128 sungguhan, jangan tambal pola ini.
+    let x = 0;
+    for(let i = 0; i < kode.length; i++) x = (x * 31 + kode.charCodeAt(i)) >>> 0;
+    let out = '';
+    for(let j = 0; j < 46; j++){
+      x = (x * 1103515245 + 12345) >>> 0;
+      out += `<i style="width:${1 + (x % 3)}px;height:${60 + ((x >>> 8) % 41)}%"></i>`;
+    }
+    return out;
+  }
+
+  function tanggalKartu(s){
+    if(!s) return '—';
+    const d = new Date(String(s).length <= 10 ? s + 'T00:00:00' : s);
+    return isNaN(d) ? '—' : formatMockDate(d.toISOString());
+  }
+
+  function gambarKartu(){
+    const pr = currentProfile || {};
+    const no = pr.student_id || '';
+    $('kmType').textContent = t('kmType');
+    $('kmLblNo').textContent = t('kmNo');
+    $('kmLblStatus').textContent = t('kmStatus');
+    $('kmLblJoin').textContent = t('kmJoin');
+    $('kmLblUntil').textContent = t('kmUntil');
+    $('kmLblTarget').textContent = t('kmTarget');
+    $('kartuHeader').textContent = t('kmTitle');
+    $('kartuExitBtn').textContent = t('kmBack');
+    $('kmSaveBtn').textContent = t('kmSave');
+    $('kmCopyBtn').textContent = t('kmCopy');
+    $('kmNote').textContent = no ? t('kmNote') : t('kmNoNumber');
+
+    // Logo navy+emas hilang di latar navy, logo putih+emas hilang di latar krem.
+    // Jadi berkasnya ikut tema, bukan satu berkas dipaksa jalan di dua-duanya.
+    $('kmLogo').src = currentTheme === 'dark' ? '/logo-landing.png' : '/logo_transparent.png';
+
+    $('kmName').textContent = (pr.display_name || t('genericStudent')).trim();
+    // Paketnya jadi subjudul, bukan sel tersendiri: kalau dua-duanya ada, isinya sama
+    // persis dan satu sel terbuang. active_track sengaja TIDAK dipakai -- isinya kode
+    // mentah ('hsk'), dan kode mentah di kartu yang bakal difoto itu bocoran istilah
+    // dalam, bukan informasi.
+    $('kmSub').textContent = PACKAGE_BADGE_LABEL[pr.package] || pr.package || '';
+    $('kmNo').textContent = no || '—';
+    $('kmIdText').textContent = no || '—';
+    // Status diambil dari kolom yang diatur admin, bukan dihitung dari tanggalnya:
+    // admin bisa menonaktifkan akun sebelum masa berlakunya habis, dan kartu harus
+    // ikut yang admin tetapkan.
+    $('kmStatus').textContent = pr.status === 'active' ? t('kmActive') : t('kmExpired');
+    $('kmJoin').textContent = tanggalKartu(pr.package_started_at || pr.created_at);
+    $('kmUntil').textContent = tanggalKartu(pr.subscription_end);
+    $('kmTarget').textContent = pr.target_level ? 'HSK ' + pr.target_level : '—';
+    $('kmBars').innerHTML = no ? barisKode(no) : '';
+    $('kmCopyBtn').disabled = !no;
+    $('kmSaveBtn').disabled = !no;
+  }
+
+  function openKartu(){
+    hideAllPages();
+    $('kartuCard').classList.remove('hidden');
+    gambarKartu();
+  }
+
+  /* Kartu digambar ULANG di canvas, bukan disalin dari DOM. Menyalin DOM ke gambar
+     butuh pustaka tambahan (html2canvas dkk) dan tetap sering salah soal font.
+     Ukurannya dibuat 2x supaya tidak pecah waktu dilihat di layar HP. */
+  async function simpanKartu(){
+    const pr = currentProfile || {};
+    const no = pr.student_id;
+    if(!no) return;
+    const S = 2, W = 360 * S, H = 300 * S;
+    const c = document.createElement('canvas');
+    c.width = W; c.height = H;
+    const g = c.getContext('2d');
+    const gelap = currentTheme === 'dark';
+    const warna = gelap
+      ? { bg:'#141F45', stub:'#1C2B58', line:'#2A3763', teks:'#EAF0FF', redup:'#8D96C4' }
+      : { bg:'#FCF8EC', stub:'#FFFFFF', line:'#EEE7D4', teks:'#1C2A5E', redup:'#6B7192' };
+    const emas = '#F2B01E';
+    const potong = 216 * S;
+
+    g.fillStyle = warna.bg; g.fillRect(0, 0, W, potong);
+    g.fillStyle = warna.stub; g.fillRect(0, potong, W, H - potong);
+    g.strokeStyle = warna.line; g.lineWidth = 2 * S;
+    g.setLineDash([6 * S, 6 * S]);
+    g.beginPath(); g.moveTo(14 * S, potong); g.lineTo(W - 14 * S, potong); g.stroke();
+    g.setLineDash([]);
+
+    const tulis = (teks, x, y, font, fill, align) => {
+      g.font = font; g.fillStyle = fill; g.textAlign = align || 'left';
+      g.fillText(teks, x, y);
+    };
+    const M = "'IBM Plex Mono',monospace", B = "'Plus Jakarta Sans',sans-serif", D = "'Baloo 2',cursive";
+
+    tulis('XING MANDARIN', 20 * S, 30 * S, `800 ${12 * S}px ${B}`, warna.teks);
+    tulis(t('kmType'), W - 20 * S, 30 * S, `${9.5 * S}px ${M}`, emas, 'right');
+    tulis($('kmName').textContent, 20 * S, 74 * S, `700 ${27 * S}px ${D}`, warna.teks);
+    tulis($('kmSub').textContent, 20 * S, 94 * S, `${12 * S}px ${B}`, warna.redup);
+
+    const sel = [[t('kmNo'), no, 20], [t('kmStatus'), $('kmStatus').textContent, 195],
+                 [t('kmJoin'), $('kmJoin').textContent, 20], [t('kmUntil'), $('kmUntil').textContent, 195]];
+    sel.forEach(([lbl, val, x], i) => {
+      const y = 128 + Math.floor(i / 2) * 42;
+      tulis(lbl, x * S, y * S, `${9 * S}px ${M}`, warna.redup);
+      tulis(val, x * S, (y + 17) * S, `700 ${13 * S}px ${i === 0 ? M : B}`, warna.teks);
+    });
+
+    let x = 0;
+    for(let i = 0; i < no.length; i++) x = (x * 31 + no.charCodeAt(i)) >>> 0;
+    let bx = 20 * S;
+    g.fillStyle = warna.teks; g.globalAlpha = .85;
+    for(let j = 0; j < 46; j++){
+      x = (x * 1103515245 + 12345) >>> 0;
+      const w = (1 + (x % 3)) * S, tinggi = (60 + ((x >>> 8) % 41)) / 100 * 34 * S;
+      g.fillRect(bx, (250 * S) - tinggi, w, tinggi);
+      bx += w + 1.5 * S;
+    }
+    g.globalAlpha = 1;
+    tulis(no, 20 * S, 265 * S, `${11 * S}px ${M}`, warna.redup);
+    tulis(t('kmTarget'), W - 20 * S, 240 * S, `${9 * S}px ${M}`, warna.redup, 'right');
+    tulis($('kmTarget').textContent, W - 20 * S, 266 * S, `700 ${28 * S}px ${D}`, emas, 'right');
+
+    const a = document.createElement('a');
+    a.download = 'kartu-murid-' + no + '.png';
+    a.href = c.toDataURL('image/png');
+    a.click();
+  }
+
+  /* ==========================================================
      MODERASI TESTIMONI (admin)
 
      Semua lewat fungsi SECURITY DEFINER, bukan select/update langsung ke tabel:
@@ -10621,6 +10876,14 @@
   $('browseSearch').addEventListener('input', applyBrowseFilter);
   $('browseMoreBtn').addEventListener('click', renderBrowseChunk);
   $('adminExitBtn').addEventListener('click', closeAdmin);
+  $('kartuExitBtn').addEventListener('click', ()=>{ hideAllPages(); $('dashCard').classList.remove('hidden'); setActiveNav('beranda'); });
+  $('kmSaveBtn').addEventListener('click', simpanKartu);
+  $('kmCopyBtn').addEventListener('click', async ()=>{
+    const no = currentProfile && currentProfile.student_id;
+    if(!no) return;
+    try { await navigator.clipboard.writeText(no); showAlertModal(t('kmCopied')); }
+    catch(_e){ showAlertModal(no); }   // clipboard butuh HTTPS; tampilkan supaya tetap bisa disalin manual
+  });
   $('adminTabUsers').addEventListener('click', ()=> pilihTabAdmin('users'));
   $('adminTabTesti').addEventListener('click', ()=> pilihTabAdmin('testi'));
   $('adminSearch').addEventListener('input', applyAdminFilter);
@@ -10882,6 +11145,7 @@
       $('avaNewPassLabel').textContent = t('avaNewPassLabel');
       $('avaNewPass2Label').textContent = t('avaNewPass2Label');
       $('avaPassSubmitBtn').textContent = t('avaPassSubmit');
+      $('avaMenuKartuLabel').textContent = t('kmMenu');
       $('avaMenuWaLabel').textContent = t('avaMenuWa');
       $('dashV4AvaThemeLightBtn').textContent = t('themeLight');
       $('dashV4AvaThemeDarkBtn').textContent = t('themeDark');
@@ -10918,6 +11182,7 @@
     });
     $('dashV4AvaThemeLightBtn').addEventListener('click', ()=>{ setTheme('light'); syncLabels(); });
     $('dashV4AvaThemeDarkBtn').addEventListener('click', ()=>{ setTheme('dark'); syncLabels(); });
+    $('dashV4AvaKartuBtn').addEventListener('click', ()=>{ closeMenu(); openKartu(); });
     $('dashV4AvaLogoutBtn').addEventListener('click', ()=> $('logoutBtn').click());
     document.addEventListener('click', (e)=>{
       if(!menu.classList.contains('hidden') && !menu.contains(e.target) && e.target !== ava) closeMenu();

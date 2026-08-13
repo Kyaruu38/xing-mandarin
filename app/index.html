@@ -33,6 +33,8 @@
       --bg:#F7F1DE; --bg2:#FBF6E8; --panel:#FFFFFF; --panel-2:#FCF8EC;
       --track:#EADFC4; --line:#EEE7D4; --text:#1C2A5E; --text-rgb:28,42,94; --muted:#6B7192; --muted-rgb:107,113,146;
       --gold:#F2B01E; --gold-soft:#F7C657; --danger:#D64545; --ok:#2F9E5B;
+      /* --ok apa adanya kurang terbaca di atas panel gelap; ikut pola --gold-ink di atas. */
+      --ok-ink:#2F9E5B;
       --navy:#1C2A5E;
       --shadow-sm:0 2px 8px rgba(28,42,94,.06);
       --shadow-md:0 8px 24px rgba(28,42,94,.08);
@@ -61,6 +63,7 @@
     }
     [data-theme="dark"]{
       --gold-ink:var(--gold);
+      --ok-ink:#43B583;
       --bg:#0B1128; --bg2:#121A38; --panel:#1C2B58; --panel-2:#141F45;
       --track:rgba(255,255,255,.12); --line:#2A3763; --text:#EAF0FF; --text-rgb:234,240,255; --muted:#8D96C4; --muted-rgb:141,150,196;
       --shadow-sm:0 2px 8px rgba(0,0,0,.24);
@@ -614,6 +617,20 @@
       text-decoration:none;
     }
     .dashV4-avaMenuItem:hover{ background:rgba(var(--text-rgb),.06); }
+    /* Ikonnya SVG, bukan emoji. Emoji itu font: bentuknya beda di tiap sistem (yang jadi
+       kartu kuning di Windows itu U+1F3AB admission ticket, di Android karcis robek), dan
+       yang lambang peringatan malah pernah gagal render jadi kotak kosong di layar Kyaru.
+       SVG satu bentuk di semua layar, ikut currentColor, dan tingginya bisa dipas sama teks. */
+    .dashV4-avaMenuIco{
+      flex:0 0 auto; display:flex; align-items:center; justify-content:center;
+      width:28px; height:28px; border-radius:9px;
+    }
+    .dashV4-avaMenuIco.kartu{ color:var(--gold-ink); background:rgba(242,176,30,.15); }
+    .dashV4-avaMenuIco.wa{ color:var(--ok-ink); background:rgba(47,158,91,.16); }
+    /* Keluar SENGAJA tidak merah. Merah dipakai #expiryBanner.h1 sebagai penanda mendesak;
+       begitu dipakai juga buat menu biasa, warnanya berhenti berarti apa-apa dan pengingat
+       H-1 kehilangan satu-satunya cara bilang "ini genting". */
+    .dashV4-avaMenuIco.keluar{ color:var(--muted); background:rgba(var(--text-rgb),.08); }
     /* B (dashboard-rebuild sesi ini): menu akun 4 bagian -- bahasa/tampilan/ganti password/
        hubungi admin. .dashV4-avaMenuSegRow generik dipakai buat 2 baris pilihan (bahasa 3
        opsi, tampilan 2 opsi), bukan cuma bahasa lagi (nama lama -LangRow diganti generik). */
@@ -2829,13 +2846,13 @@
 
                 <div class="dashV4-avaMenuDivider"></div>
                 <button type="button" class="dashV4-avaMenuItem" id="dashV4AvaKartuBtn" role="menuitem">
-                  <span>🎫</span><span id="avaMenuKartuLabel">Kartu Murid</span>
+                  <span class="dashV4-avaMenuIco kartu" aria-hidden="true"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><circle cx="8.5" cy="11" r="2"/><path d="M5.3 16.1c.5-1.3 1.8-2.1 3.2-2.1s2.7.8 3.2 2.1"/><path d="M15 10.5h4M15 14h2.5"/></svg></span><span id="avaMenuKartuLabel">Kartu Murid</span>
                 </button>
                 <a class="dashV4-avaMenuItem" id="dashV4AvaWaBtn" href="https://wa.me/6287886908357" target="_blank" rel="noopener">
-                  <span>💬</span><span id="avaMenuWaLabel">Hubungi Admin</span>
+                  <span class="dashV4-avaMenuIco wa" aria-hidden="true"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 11.8a7.7 7.7 0 0 1-8.3 7.7 8.6 8.6 0 0 1-2.5-.4L4.5 20.5l1.4-4.3a7.7 7.7 0 0 1-1.4-4.4 7.7 7.7 0 0 1 8-7.7 7.7 7.7 0 0 1 8 7.7z"/></svg></span><span id="avaMenuWaLabel">Hubungi Admin</span>
                 </a>
                 <button type="button" class="dashV4-avaMenuItem" id="dashV4AvaLogoutBtn" role="menuitem">
-                  <span>🚪</span><span id="dashV4AvaLogoutLabel">Keluar</span>
+                  <span class="dashV4-avaMenuIco keluar" aria-hidden="true"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 21H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.5"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9.5"/></svg></span><span id="dashV4AvaLogoutLabel">Keluar</span>
                 </button>
                 <p class="appVersionLine inMenu" id="dashVersionLine"></p>
               </div>
@@ -3670,7 +3687,7 @@
      Kalau keduanya beda, user yang masih buka tab lama bakal dikasih
      banner "ada versi baru".
      ============================================================ */
-  const APP_VERSION = '5.3';
+  const APP_VERSION = '5.4';
 
   const SUPABASE_URL  = 'https://xzgvhzmmqbijpbrhagjf.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6Z3Zoem1tcWJpanBicmhhZ2pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0OTA4NjMsImV4cCI6MjA5OTA2Njg2M30.9OtBJIBDDUhhSsvtz9Pql12hWToGzmULOGh7Tj-vzNs';

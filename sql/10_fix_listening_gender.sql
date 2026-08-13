@@ -127,6 +127,16 @@ where q.question_type='listening_mc'
 -- ✅ APPLIED ke prod 2026-07-28. UPDATE + verifikasi ulang (0 baris) sudah
 --    dikonfirmasi. Audio 147/147 sudah diregenerate & diupload, 0 gagal.
 --
+-- CATATAN 12 AGU 2026 -- hasil audit ulang, baca sebelum percaya dua PENDING di bawah.
+--   * PENDING #2 (verifikasi dengar) sudah DITUTUP dengan cara lain: metadata
+--     storage.objects di-join ke question_bank. 149/149 berkas ada, 149/149
+--     updated_at 2026-07-28 12:54-13:03, terkecil 70.509 byte. Lihat
+--     RELEASE_CHECKLIST.md seksi (i).
+--   * PENDING #1 sudah diaudit paparannya: anon 401, authenticated 403, RLS nyala
+--     dengan 0 policy, SELECT cuma postgres + service_role. Aman untuk di-drop.
+--   * BATCH 2 butir (d) di bawah TERNYATA TIDAK PERNAH MASUK ke prod. Baris B di
+--     kedua set masih '我来。'. Lihat catatan di bagian batch 2.
+--
 -- ⏳ PENDING #1: DROP TABLE question_bank_bak_20260728 setelah QA konfirmasi.
 --    Tabel ini `select * from question_bank` -- salinan LENGKAP termasuk
 --    kolom `answer` (kunci jawaban) untuk 160 soal. Jangan dibiarkan lama --
@@ -188,6 +198,11 @@ update question_bank set payload = payload
   || jsonb_build_object('prompt','天气冷了，我穿这个。')
 where set_id='H1XING008' and order_index=10;
 
+-- (d) ⚠️ TIDAK PERNAH MASUK KE PROD -- dicek ulang 12 Agu 2026, baris B di kedua
+-- set masih '我来。', bukan '我去。'. Dan sebaiknya memang dibiarkan: kalau ajakannya
+-- berpola 来, jawaban 我来。 justru yang wajar (deiksis ikut sudut pandang yang
+-- mengajak, bukan yang bergerak -- bandingkan 快来吃饭! dijawab 我来了!).
+-- Yang perlu diperbaiki dokumennya, bukan datanya, kecuali tim konten punya alasan lain.
 -- (d) Listening 来/去, set h1-listening-3 & h1-listening-7 order 17:
 -- speaker A tanya "明天你来吗？" ke B, B jawab "我来。" -- salah
 -- perspektif, sebab B yang BERGERAK ke tempat A (harusnya 去 dari sudut

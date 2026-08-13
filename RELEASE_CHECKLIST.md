@@ -193,11 +193,18 @@ toolbar atau HP asli), cek console (F12) bersih sepanjang interaksi.
 
 ---
 
-## (g) TODO keamanan (nanti, tidak blocking)
+## (g) TODO keamanan — SUDAH DIKERJAKAN & SUDAH LIVE, diverifikasi 12 Agu 2026
 
-- Batasi panjang semua input tak-terpercaya di grade-essay (scene_cn, word,
-  article, student_text) — mis. maxlength 2000 char + tolak jika melebihi.
-  Cegah abuse token API. Berlaku untuk field lama juga, bukan hanya picture_essay.
+~~Batasi panjang semua input tak-terpercaya di grade-essay.~~ Sudah ada di
+`supabase/functions/grade-essay/index.ts` sebagai satu loop generik atas tabel
+`MAX_LEN`, bukan pengecekan per-field: `scene_cn` 200, `word` 100, `prompt` 1000,
+`required_words` 500, `article` 2000, `student_text` 3000.
+
+Diverifikasi ke fungsi yang BENAR-BENAR jalan di prod, bukan cuma dibaca kodenya:
+POST ke `/functions/v1/grade-essay` dengan `word` sepanjang 300 karakter membalas
+`400 {"error":"Input terlalu panjang: word (maks 100 karakter)"}`. Penolakannya
+terjadi SEBELUM panggilan ke API Anthropic, jadi tujuan aslinya (cegah abuse token)
+memang tercapai.
 
 ---
 
@@ -268,7 +275,24 @@ sementara pilihan jawaban yang benar 男的.
 - Run tanpa `--keep`, jadi tidak ada salinan mp3 lokal — jejak audio baru
   cuma ada di Supabase Storage (`listening-audio`) prod.
 
-**⏳ PENDING #1 — hapus `question_bank_bak_20260728` setelah QA konfirmasi.**
+**⏳ PENDING #1 — hapus `question_bank_bak_20260728`. Sudah diaudit 12 Agu 2026,
+tinggal dieksekusi.**
+
+Audit paparan (semua diuji, bukan ditaksir):
+- RLS nyala, **0 policy** → tolak semua kecuali peran yang bypass RLS.
+- SELECT cuma dipegang `postgres` dan `service_role`. `anon` dan `authenticated`
+  tidak punya SELECT sama sekali.
+- Diuji lewat HTTP dengan anon key: **401 permission denied**.
+- Diuji lewat HTTP dengan token sesi asli (role `authenticated`): **403 permission denied**.
+
+Artinya paparannya LEBIH KECIL dari yang ditulis catatan lama: yang bisa membacanya
+cuma pemegang service_role key, dan service_role sudah bisa membaca `question_bank`
+aslinya. Tabel ini tidak menambah pintu masuk baru. Tetap harus dihapus, tapi
+alasannya kebersihan, bukan darurat.
+
+Rollback tidak butuh tabel ini: isinya bisa dibangun ulang dari `question_bank`
+karena perbaikannya cuma penggantian 女的 -> 男的 yang bisa dibalik.
+
 Tabel ini `select * from question_bank` — salinan LENGKAP 160 baris termasuk
 kolom `answer` (kunci jawaban), sudah di-`grant select ... to service_role`.
 Bukan tabel yang ke-cover RLS `question_bank` biasa — jangan dibiarkan lama.
@@ -277,11 +301,27 @@ Bukan tabel yang ke-cover RLS `question_bank` biasa — jangan dibiarkan lama.
 lagi) dan masih dipakai aktif sebagai daftar target oleh batch 2 — jangan
 drop sampai section (j) juga selesai di-QA.**
 
-**⏳ PENDING #2 — verifikasi dengar oleh tim konten.** Putar beberapa dari 147
-klip langsung di app (bukan cuma percaya log "upload sukses"), terutama yang
-`audio_url`-nya dipakai >1 soal. CDN/browser cache bisa bikin klip lama
-(versi 女的) masih kedengeran beberapa jam meski file di Storage sudah
-ketimpa.
+**✅ PENDING #2 — SELESAI dengan cara lain, 12 Agu 2026.**
+
+Verifikasi dengar tidak jadi jalannya. Yang dipakai: join `question_bank` ke
+`storage.objects` di database yang sama, jadi yang dibaca metadata berkasnya
+sendiri, bukan log upload.
+
+```
+total klip target            149
+ketemu di Storage            149
+updated_at >= 2026-07-28     149
+jendela waktu   2026-07-28 12:54:18  ->  13:03:17  (9 menit, satu batch)
+ukuran terkecil              70.509 byte   (tidak ada berkas kosong/rusak)
+```
+
+Angka 149 cocok: 147 dari batch gender + 2 dari batch 2 seksi (j).
+
+**Yang cara ini TIDAK bisa lihat:** isi suaranya. Yang dibuktikan cuma "berkasnya
+benar-benar berganti pada jam regenerasi, tidak ada yang terlewat, tidak ada yang
+rusak". Isi ucapannya dijamin secara tidak langsung: mp3-nya dirender dari
+transkrip di DB, dan transkrip itu sudah diverifikasi nol baris yang masih 女的.
+Sisa risikonya tinggal cache di sisi murid, dan itu terbatas waktu.
 
 ---
 
@@ -302,12 +342,25 @@ di section (i). Detail query lengkap: `sql/10_fix_listening_gender.sql`
   ubah opsi akan ikut mengubah order 11 (di luar scope QA ini).
 - **(c) `H1XING008` order 10** — `天冷了` → `天气冷了` (`冷` butuh subjek
   `天气`, bukan `天` — versi lama gramatikal janggal untuk HSK 1).
-- **(d) Listening `来`/`去`, set `h1-listening-3` & `h1-listening-7` order
-  17** — speaker B jawab `我来。` ke ajakan A, padahal B yang bergerak ke
-  tempat A (harusnya `去` dari sudut pandang B). Pertanyaan & pilihan
-  jawaban **tetap** pakai `来` (sudut pandang narator/A, sesuai pola HSK
-  asli) — cuma baris jawaban B di `transcript` yang diperbaiki, kunci
-  jawaban (`answer`) tidak berubah.
+- **(d) Listening `来`/`去`, set `h1-listening-3` & `h1-listening-7` order 17 —
+  ⚠️ TIDAK PERNAH MASUK KE PROD. Dicek ulang 12 Agu 2026.**
+
+  Isi transcript di prod sekarang, apa adanya:
+
+  ```
+  h1-listening-3  A: 明天你来吗?  //  B: 我来。  //  Q: 男的明天来吗?
+  h1-listening-7  A: 明天你来吗?  //  B: 我来。  //  Q: 男的明天来吗?
+  ```
+
+  Usulan tim adalah mengganti baris B jadi `我去。`. Itu tidak terjadi, padahal
+  seksi ini menyatakan semuanya sudah di-apply.
+
+  **Dan sebaiknya memang jangan diterapkan.** Kalau ajakannya berpola `来`,
+  jawaban `我来。` justru yang wajar dalam bahasa Mandarin: deiksisnya mengikuti
+  sudut pandang yang mengajak, bukan yang bergerak. Pola yang sama dipakai
+  sehari-hari: dipanggil `快来吃饭!` dijawab `我来了!` walaupun yang menjawab
+  belum sampai di meja makan. Jadi yang perlu diperbaiki dokumen ini, bukan
+  datanya — kecuali ada pertimbangan lain dari tim konten.
 
 **Audio**: 2 baris dari (d) ditambahkan ke `question_bank_bak_20260728`,
 diregenerate bareng lewat `scripts/regen_fixed_audio.py`. Run terakhir:

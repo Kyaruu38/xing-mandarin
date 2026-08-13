@@ -6441,9 +6441,11 @@
      kalau salah satu diubah, ubah yang satu lagi (nama file audio harus cocok dengan yang
      digenerate). j/q/x sengaja pakai final 'u'/'ue'/'uan'/'un' polos (bukan 'v') -- konvensi
      ejaan pinyin baku membuang umlaut sepenuhnya setelah j/q/x/y (ju bukan jü/jv), beda dari
-     n/l yang butuh pembeda nu/nü, lu/lü. Audio belum ada di storage (prefix pinyin/ belum
-     diupload) -- semua playback lewat audioExistsAndPlay(), tombol yang gagal exist-check
-     didisable + tooltip, TIDAK ada alert popup ataupun console error.
+     n/l yang butuh pembeda nu/nü, lu/lü. Audio SUDAH ada di storage sejak sebelum 11
+     Agustus 2026 (prefix pinyin/, 1.636 berkas, sha256 dicocokkan dengan out/pinyin/) --
+     komentar lama di sini menulis sebaliknya dan itu tidak benar lagi. Playback tetap lewat
+     audioExistsAndPlay(): jaringnya dipertahankan supaya suku kata yang kebetulan tidak
+     punya berkas tetap mendisable tombolnya, tanpa alert popup ataupun console error.
      ========================================================== */
   const PINYIN_INITIAL_FINALS = {
     b:['a','o','ai','ei','ao','an','en','ang','eng','i','ie','iao','ian','in','ing','u'],
@@ -8642,9 +8644,12 @@
     return sb.storage.from('listening-images').getPublicUrl(path).data.publicUrl;
   }
 
-  // Shared by Pinyin Guide / Tone Sandhi / Survival Kit / Tone Coach -- all of them play audio
-  // that doesn't exist in storage yet (pinyin/ and sandhi/ prefixes not uploaded, see
-  // RELEASE_CHECKLIST.md). A plain `new Audio(url).play()` against a 404 makes the BROWSER
+  // Shared by Pinyin Guide / Tone Sandhi / Survival Kit / Tone Coach. NOTE: the original
+  // comment here said the pinyin/ and sandhi/ prefixes were not uploaded yet -- that is no
+  // longer true. Verified 11 Aug 2026: both prefixes are live in listening-audio (1.636 +
+  // 30 files, sha256 matched against out/pinyin and out/sandhi). The guard below stays
+  // anyway, because it is what keeps a missing file quiet rather than noisy:
+  // a plain `new Audio(url).play()` against a 404 makes the BROWSER
   // itself log a "Failed to load resource: 404" console entry, independent of any JS try/catch --
   // that's a real console error this batch's "zero console error" rule can't allow. HEAD-checking
   // existence via fetch() first avoids it entirely: a fetch() that resolves with !ok is a normal

@@ -142,9 +142,14 @@ toolbar atau HP asli), cek console (F12) bersih sepanjang interaksi.
   Silakan review/commit terpisah sesuai konteks task itu sendiri.
 - File untracked lain yang juga sudah ada sebelum sesi ini (tidak disentuh): `audio_pipeline.py`,
   `audit_vocab_hsk1-2.csv`, `check_audio.py`, `check_images.py`, `clips.json`,
-  `generate_images.py`, `images.json`, `logo_transparent.png`, `test_images.py`, `test_img/`,
+  `generate_images.py`, `images.json`, `test_images.py`, `test_img/`,
   `tools/generate_listening_audio.py`, `upload_audio.py`, `vocab_gap_candidates.csv`,
   `supabase/.temp/`.
+- **Sudah tidak berlaku, 13 Agu 2026:** sebagian besar berkas di daftar itu sekarang masuk
+  `.gitignore` (keluaran audit dan percobaan gambar, semuanya bisa dihasilkan ulang dari
+  `scripts/`). `logo_transparent.png` dikeluarkan dari daftar itu dan sudah di-commit sebagai
+  aset merek atas permintaan Kyaru. Catatan: berkas itu belum dirujuk dari HTML/CSS/JS mana pun
+  (sudah dicek `grep`); yang dipakai halaman depan `logo-landing.png`.
 - **`CLAUDE.md`** — sudah diupdate (rule commit-lokal/no-push) tapi masih untracked, belum
   di-commit (lihat bagian (a)).
 

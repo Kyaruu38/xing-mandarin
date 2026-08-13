@@ -331,7 +331,12 @@
     .msg{margin-top:16px; font-size:13px; padding:10px 12px; border-radius:9px; display:none}
     .msg.err{display:flex; align-items:flex-start; gap:8px; background:#FDEDEE; color:#A03A44; border:1px solid #F6CFD2; animation:lgShake .45s;}
     [data-theme="dark"] .msg.err{ background:rgba(214,69,69,.15); color:#FF9C9C; border-color:rgba(214,69,69,.4); }
-    .msg.err::before{ content:'⚠️'; flex-shrink:0; }
+    /* Bentuknya dari SVG lewat mask, bukan emoji: `content` tidak bisa memuat <svg>, dan
+       emoji peringatan inilah yang gagal render jadi kotak kosong di layar Kyaru.
+       background:currentColor bikin warnanya tetap ikut warna teks pesannya. */
+    .msg.err::before{ content:''; flex-shrink:0; width:16px; height:16px; margin-top:1px;
+      background:currentColor;
+      -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z'/%3E%3Cpath d='M12 9.5v4'/%3E%3Cpath d='M12 17.2h.01'/%3E%3C/svg%3E") center/contain no-repeat; mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z'/%3E%3Cpath d='M12 9.5v4'/%3E%3Cpath d='M12 17.2h.01'/%3E%3C/svg%3E") center/contain no-repeat; }
     .msg.ok{display:block; background:rgba(47,158,91,.08); color:var(--ok); border:1px solid rgba(47,158,91,.25)}
     /* Locked-content note (DECISIONS_NEEDED #22) -- deliberately NOT .err: this isn't a mistake
        the user made, it's an upsell ("you don't have this yet"), so no red/warning language.
@@ -342,7 +347,9 @@
        pattern) -- not needed now, only 3 usages. Only browseLevelLockedMsg uses this modifier;
        login's .msg stays .err/.ok only. */
     .msg.lock{display:flex; align-items:flex-start; gap:8px; background:rgba(242,176,30,.14); color:var(--navy); border:1px solid rgba(242,176,30,.4);}
-    .msg.lock::before{ content:'🔒'; flex-shrink:0; }
+    .msg.lock::before{ content:''; flex-shrink:0; width:15px; height:15px; margin-top:1px;
+      background:currentColor;
+      -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4.5' y='10.5' width='15' height='10' rx='2'/%3E%3Cpath d='M8 10.5V7a4 4 0 0 1 8 0v3.5'/%3E%3C/svg%3E") center/contain no-repeat; mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4.5' y='10.5' width='15' height='10' rx='2'/%3E%3Cpath d='M8 10.5V7a4 4 0 0 1 8 0v3.5'/%3E%3C/svg%3E") center/contain no-repeat; }
     [data-theme="dark"] .msg.lock{ background:rgba(242,176,30,.18); color:var(--gold); border-color:rgba(242,176,30,.45); }
     .foot{margin-top:22px; text-align:center; color:var(--muted); font-size:13px}
     .foot b{ color:var(--text); }
@@ -2197,6 +2204,17 @@
     .strokeTab{ flex:1; margin-top:0; padding:9px 4px; border-radius:9px; background:transparent; border:none; color:var(--muted); font-weight:700; font-size:12.5px; cursor:pointer; }
     .strokeTab.active{ background:var(--panel); color:var(--text); box-shadow:var(--shadow-sm); }
     .strokeTab.locked{ opacity:.55; }
+    /* Gembok dipasang dari CSS lewat kelas .locked yang sudah ada, bukan disisipkan ke
+       textContent. Dengan begitu JS tetap memakai textContent (tidak ada perakitan HTML,
+       tidak ada peluang injeksi) dan lambangnya tetap satu bentuk di semua sistem. */
+    .hubCard.locked .hubCardTitle::before{
+      content:''; display:inline-block; width:12px; height:12px; margin-right:6px;
+      vertical-align:-1px; background:currentColor;
+      -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4.5' y='10.5' width='15' height='10' rx='2'/%3E%3Cpath d='M8 10.5V7a4 4 0 0 1 8 0v3.5'/%3E%3C/svg%3E") center/contain no-repeat; mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4.5' y='10.5' width='15' height='10' rx='2'/%3E%3Cpath d='M8 10.5V7a4 4 0 0 1 8 0v3.5'/%3E%3C/svg%3E") center/contain no-repeat; }
+    button.levelBtn.locked::before, .strokeTab.locked::before{
+      content:''; display:inline-block; width:11px; height:11px; margin-right:6px;
+      vertical-align:-1px; background:currentColor;
+      -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4.5' y='10.5' width='15' height='10' rx='2'/%3E%3Cpath d='M8 10.5V7a4 4 0 0 1 8 0v3.5'/%3E%3C/svg%3E") center/contain no-repeat; mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4.5' y='10.5' width='15' height='10' rx='2'/%3E%3Cpath d='M8 10.5V7a4 4 0 0 1 8 0v3.5'/%3E%3C/svg%3E") center/contain no-repeat; }
     .strokeGridWrap{
       position:relative; width:min(72vw, 320px); height:min(72vw, 320px); margin:0 auto;
       background:var(--panel-2); border:1px solid var(--line); border-radius:12px; overflow:hidden;
@@ -2302,7 +2320,10 @@
     .sandhiAudioBtn{
       width:auto; margin-top:0; padding:6px 8px; border-radius:8px; background:var(--panel-2);
       border:1px solid var(--line); color:var(--text); font-size:11px; cursor:pointer;
+      display:inline-flex; align-items:center; gap:6px;
     }
+    /* lambangnya jangan ikut menyusut waktu teksnya panjang */
+    .tcListenBtn svg, .tcRecordBtn svg, .sandhiAudioBtn svg{ flex:0 0 auto; }
     .sandhiAudioBtn:disabled{ opacity:.35; cursor:not-allowed; }
     .sandhiQuizBlock{ background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:12px; }
     .sandhiQuizTitle{ font-size:12.5px; font-weight:800; color:var(--muted); margin-bottom:8px; }
@@ -2323,7 +2344,7 @@
     .tcHanzi{ font-family:var(--hanzi-serif-font); font-size:64px; color:var(--text); line-height:1; }
     .tcPinyin{ font-size:18px; font-weight:800; color:#C7900F; margin-top:4px; }
     .tcMeaning{ font-size:13px; color:rgba(var(--text-rgb),.7); margin-top:2px; }
-    .tcListenBtn{ width:auto; margin:10px auto 0; padding:8px 16px; border-radius:99px; background:var(--panel-2); border:1px solid var(--line); color:var(--text); font-size:12.5px; cursor:pointer; display:block; }
+    .tcListenBtn{ width:auto; margin:10px auto 0; padding:8px 16px; border-radius:99px; background:var(--panel-2); border:1px solid var(--line); color:var(--text); font-size:12.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:7px; }
     .tcListenBtn:disabled{ opacity:.35; cursor:not-allowed; }
     .tcCanvasWrap{ background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:10px; margin-bottom:14px; }
     .tcCanvas{ width:100%; height:140px; display:block; }
@@ -2334,6 +2355,7 @@
     .tcRecordBtn{
       width:auto; margin-top:0; padding:16px 36px; border-radius:99px; font-size:15px; font-weight:800;
       background:linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#241a08; cursor:pointer;
+      display:inline-flex; align-items:center; justify-content:center; gap:9px;
     }
     .tcRecordBtn.recording{ background:var(--danger); color:#fff; animation:tcPulse 1.2s ease-in-out infinite; }
     @keyframes tcPulse{ 0%,100%{ opacity:1 } 50%{ opacity:.6 } }
@@ -2680,7 +2702,7 @@
         <div class="inputWrap">
           <span class="inputIcon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span>
           <input id="password" type="password" autocomplete="current-password" placeholder="" />
-          <button type="button" class="passwordToggle" id="passwordToggle" aria-label="Show password">👁️</button>
+          <button type="button" class="passwordToggle" id="passwordToggle" aria-label="Show password"></button>
         </div>
 
         <div class="loginRow">
@@ -3070,7 +3092,7 @@
           </div>
           <div class="cardArea">
             <span class="cardBadge" id="cardBadge">—</span>
-            <button type="button" class="cardStrokeBtn" id="cardStrokeBtn" aria-label="Latihan Nulis">✍️</button>
+            <button type="button" class="cardStrokeBtn" id="cardStrokeBtn" aria-label="Latihan Nulis"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4z"/><path d="M14.5 5.5l3 3"/></svg></button>
             <button type="button" class="cardAudioBtn" id="cardAudioBtn" aria-label="Play audio"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a9 9 0 0 1 0 14"/></svg></button>
             <svg class="cardSparkle" width="14" height="14" viewBox="0 0 24 24" fill="rgba(242,176,30,.4)"><path d="M12 0c1 6 5 10 12 12-7 2-11 6-12 12-1-6-5-10-12-12 7-2 11-6 12-12z"/></svg>
             <div class="cardContent" id="cardContent">
@@ -3198,7 +3220,7 @@
           <div class="tcHanzi" id="tcHanzi">妈</div>
           <div class="tcPinyin" id="tcPinyin">mā</div>
           <div class="tcMeaning" id="tcMeaning">ibu</div>
-          <button type="button" class="tcListenBtn" id="tcListenBtn">🔊 Dengar contoh</button>
+          <button type="button" class="tcListenBtn" id="tcListenBtn"></button>
         </div>
 
         <div class="tcCanvasWrap">
@@ -3217,7 +3239,7 @@
         </div>
 
         <div class="tcRecordRow">
-          <button type="button" class="tcRecordBtn" id="tcRecordBtn">🎙️ Rekam</button>
+          <button type="button" class="tcRecordBtn" id="tcRecordBtn"></button>
           <div class="tcStatus" id="tcStatus"></div>
         </div>
 
@@ -3541,7 +3563,7 @@
           </button>
 
           <button type="button" class="hubCard" id="hubCardToneCoach" data-card="tonecoach">
-            <div class="hubCardCover stroke"><span class="hubCardCoverGlyph">🎙️</span></div>
+            <div class="hubCardCover stroke"><span class="hubCardCoverGlyph">声</span></div>
             <div class="hubCardBody">
               <div class="hubCardTitle" id="hubCardToneCoachTitle">Tone Coach</div>
               <div class="hubCardMeta" id="hubCardToneCoachMeta">Latihan nada pakai mic</div>
@@ -3702,7 +3724,7 @@
      Kalau keduanya beda, user yang masih buka tab lama bakal dikasih
      banner "ada versi baru".
      ============================================================ */
-  const APP_VERSION = '5.5';
+  const APP_VERSION = '5.6';
 
   const SUPABASE_URL  = 'https://xzgvhzmmqbijpbrhagjf.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6Z3Zoem1tcWJpanBicmhhZ2pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0OTA4NjMsImV4cCI6MjA5OTA2Njg2M30.9OtBJIBDDUhhSsvtz9Pql12hWToGzmULOGh7Tj-vzNs';
@@ -4088,7 +4110,7 @@
           wordOfDayLabel:'KATA HARI INI', yourPlanLabel:'Paket kamu',
           continueSubtitle:'Lanjutin dari terakhir kamu berhenti — {n} kartu jatuh tempo hari ini',
           hubCardStrokeTitle:'Latihan Goresan', hubCardStrokeMeta:'Latihan urutan goresan hanzi',
-          strokeHeader:'Latihan Goresan', strokeWriteBtn:'✍️ Latihan Nulis',
+          strokeHeader:'Latihan Goresan', strokeWriteBtn:'Latihan Nulis',
           strokeTabView:'Lihat', strokeTabTrace:'Jiplak', strokeTabTest:'Tes',
           strokeReplayBtn:'Putar Ulang', strokeNextCharBtn:'Karakter berikutnya ›',
           strokeMistakeLabel:'Kesalahan: {n}', strokeCompleteMsg:'Selesai! {n} kesalahan.',
@@ -4101,8 +4123,8 @@
           pinyinGuideHeader:'Panduan Pinyin', pinyinTabChart:'Chart', pinyinTabBasics:'Dasar',
           pinyinAudioNotReady:'Audio belum tersedia', pinyinPickTone:'Pilih nada',
           hubCardSandhiTitle:'Tone Sandhi', hubCardSandhiMeta:'Aturan perubahan nada',
-          sandhiGuideHeader:'Panduan Tone Sandhi', sandhiNaturalBtn:'🗣️ Ucapan asli',
-          sandhiDictBtn:'📖 Ejaan kamus', sandhiAudioNotReady:'Audio belum tersedia',
+          sandhiGuideHeader:'Panduan Tone Sandhi', sandhiNaturalBtn:'Ucapan asli',
+          sandhiDictBtn:'Ejaan kamus', sandhiAudioNotReady:'Audio belum tersedia',
           sandhiQuizTitle:'Kuis singkat', sandhiQuizCorrect:'Benar!', sandhiQuizWrong:'Coba lagi',
           hubCardSurvivalTitle:'Survival Kit', hubCardSurvivalMeta:'100 kata wajib pemula',
           survivalKitHeader:'Survival Kit', survivalNotReady:'Deck belum tersedia',
@@ -4111,8 +4133,8 @@
           survivalThemeNumbers:'Angka', survivalThemeSurvival:'Situasi Darurat',
           survivalThemeResponse:'Respon Percakapan',
           hubCardToneCoachTitle:'Tone Coach', hubCardToneCoachMeta:'Latihan nada pakai mic',
-          toneCoachHeader:'Tone Coach', toneCoachRecordBtn:'🎙️ Rekam', toneCoachStopBtn:'⏹️ Berhenti',
-          toneCoachListenBtn:'🔊 Dengar contoh', toneCoachMicDenied:'Akses mikrofon ditolak. Aktifkan lewat pengaturan browser lalu muat ulang halaman.',
+          toneCoachHeader:'Tone Coach', toneCoachRecordBtn:'Rekam', toneCoachStopBtn:'Berhenti',
+          toneCoachListenBtn:'Dengar contoh', toneCoachMicDenied:'Akses mikrofon ditolak. Aktifkan lewat pengaturan browser lalu muat ulang halaman.',
           toneCoachNoSound:'Nggak kedengeran suaranya. Coba lebih deket ke mic.',
           toneCoachTooNoisy:'Lingkungan terlalu berisik. Cari tempat yang lebih sepi lalu coba lagi.',
           toneCoachLimitReached:'Batas 10 cek gratis hari ini sudah tercapai. Coba lagi besok, atau upgrade paket buat unlimited.',
@@ -4303,7 +4325,7 @@
           wordOfDayLabel:'WORD OF THE DAY', yourPlanLabel:'Your plan',
           continueSubtitle:'Pick up where you left off — {n} cards due today',
           hubCardStrokeTitle:'Stroke Practice', hubCardStrokeMeta:'Practice hanzi stroke order',
-          strokeHeader:'Stroke Practice', strokeWriteBtn:'✍️ Practice Writing',
+          strokeHeader:'Stroke Practice', strokeWriteBtn:'Practice Writing',
           strokeTabView:'View', strokeTabTrace:'Trace', strokeTabTest:'Test',
           strokeReplayBtn:'Replay', strokeNextCharBtn:'Next character ›',
           strokeMistakeLabel:'Mistakes: {n}', strokeCompleteMsg:'Done! {n} mistakes.',
@@ -4316,8 +4338,8 @@
           pinyinGuideHeader:'Pinyin Guide', pinyinTabChart:'Chart', pinyinTabBasics:'Basics',
           pinyinAudioNotReady:'Audio not available yet', pinyinPickTone:'Pick a tone',
           hubCardSandhiTitle:'Tone Sandhi', hubCardSandhiMeta:'Tone change rules',
-          sandhiGuideHeader:'Tone Sandhi Guide', sandhiNaturalBtn:'🗣️ Natural speech',
-          sandhiDictBtn:'📖 Dictionary spelling', sandhiAudioNotReady:'Audio not available yet',
+          sandhiGuideHeader:'Tone Sandhi Guide', sandhiNaturalBtn:'Natural speech',
+          sandhiDictBtn:'Dictionary spelling', sandhiAudioNotReady:'Audio not available yet',
           sandhiQuizTitle:'Quick quiz', sandhiQuizCorrect:'Correct!', sandhiQuizWrong:'Try again',
           hubCardSurvivalTitle:'Survival Kit', hubCardSurvivalMeta:'100 essential beginner words',
           survivalKitHeader:'Survival Kit', survivalNotReady:'Deck not available yet',
@@ -4326,8 +4348,8 @@
           survivalThemeNumbers:'Numbers', survivalThemeSurvival:'Survival Situations',
           survivalThemeResponse:'Conversation Responses',
           hubCardToneCoachTitle:'Tone Coach', hubCardToneCoachMeta:'Practice tones with your mic',
-          toneCoachHeader:'Tone Coach', toneCoachRecordBtn:'🎙️ Record', toneCoachStopBtn:'⏹️ Stop',
-          toneCoachListenBtn:'🔊 Listen to example', toneCoachMicDenied:'Microphone access denied. Enable it in your browser settings, then reload the page.',
+          toneCoachHeader:'Tone Coach', toneCoachRecordBtn:'Record', toneCoachStopBtn:'Stop',
+          toneCoachListenBtn:'Listen to example', toneCoachMicDenied:'Microphone access denied. Enable it in your browser settings, then reload the page.',
           toneCoachNoSound:'No sound detected. Try speaking closer to the mic.',
           toneCoachTooNoisy:'Too much background noise. Find a quieter spot and try again.',
           toneCoachLimitReached:'You’ve reached today’s 10 free checks. Try again tomorrow, or upgrade for unlimited.',
@@ -4518,7 +4540,7 @@
           wordOfDayLabel:'每日一词', yourPlanLabel:'我的套餐',
           continueSubtitle:'从上次的地方继续 —— 今天有 {n} 张卡到期',
           hubCardStrokeTitle:'笔画练习', hubCardStrokeMeta:'练习汉字笔画顺序',
-          strokeHeader:'笔画练习', strokeWriteBtn:'✍️ 练字',
+          strokeHeader:'笔画练习', strokeWriteBtn:'练字',
           strokeTabView:'观看', strokeTabTrace:'描红', strokeTabTest:'测试',
           strokeReplayBtn:'重播', strokeNextCharBtn:'下一个字 ›',
           strokeMistakeLabel:'错误：{n}', strokeCompleteMsg:'完成！{n} 个错误。',
@@ -4531,8 +4553,8 @@
           pinyinGuideHeader:'拼音指南', pinyinTabChart:'表格', pinyinTabBasics:'基础',
           pinyinAudioNotReady:'音频暂不可用', pinyinPickTone:'选择声调',
           hubCardSandhiTitle:'变调规则', hubCardSandhiMeta:'声调变化规则',
-          sandhiGuideHeader:'变调指南', sandhiNaturalBtn:'🗣️ 自然发音',
-          sandhiDictBtn:'📖 词典拼读', sandhiAudioNotReady:'音频暂不可用',
+          sandhiGuideHeader:'变调指南', sandhiNaturalBtn:'自然发音',
+          sandhiDictBtn:'词典拼读', sandhiAudioNotReady:'音频暂不可用',
           sandhiQuizTitle:'小测验', sandhiQuizCorrect:'正确！', sandhiQuizWrong:'再试一次',
           hubCardSurvivalTitle:'生存词汇', hubCardSurvivalMeta:'100个初学者必备词',
           survivalKitHeader:'生存词汇', survivalNotReady:'词组暂不可用',
@@ -4541,8 +4563,8 @@
           survivalThemeNumbers:'数字', survivalThemeSurvival:'紧急情况',
           survivalThemeResponse:'对话回应',
           hubCardToneCoachTitle:'声调教练', hubCardToneCoachMeta:'用麦克风练习声调',
-          toneCoachHeader:'声调教练', toneCoachRecordBtn:'🎙️ 录音', toneCoachStopBtn:'⏹️ 停止',
-          toneCoachListenBtn:'🔊 听示范', toneCoachMicDenied:'麦克风权限被拒绝，请在浏览器设置中启用后刷新页面。',
+          toneCoachHeader:'声调教练', toneCoachRecordBtn:'录音', toneCoachStopBtn:'停止',
+          toneCoachListenBtn:'听示范', toneCoachMicDenied:'麦克风权限被拒绝，请在浏览器设置中启用后刷新页面。',
           toneCoachNoSound:'没有检测到声音，请靠近麦克风再试。',
           toneCoachTooNoisy:'周围噪音太大，请找安静的地方再试。',
           toneCoachLimitReached:'今日10次免费次数已用完，明天再来，或升级套餐无限使用。',
@@ -4744,9 +4766,9 @@
     $('grShelfLead').textContent = t('grShelfLead');
     $('grAllBooksLabel').textContent = t('grAllBooks');
     $('grSearchInput').setAttribute('placeholder', t('grSearchPlaceholder'));
-    $('tcListenBtn').textContent = t('toneCoachListenBtn');
+    tombolIkon($('tcListenBtn'), IKON.speaker, t('toneCoachListenBtn'));
     $('tcNextBtn').textContent = t('toneCoachNext');
-    if(!tcRecording) $('tcRecordBtn').textContent = t('toneCoachRecordBtn');
+    if(!tcRecording) tombolIkon($('tcRecordBtn'), IKON.mikrofon, t('toneCoachRecordBtn'));
 
     renderMockExitLabel();
 
@@ -4799,6 +4821,31 @@
 
   // dipakai buat teks yang bukan konten soal (mis. jawaban esai murid, hasil AI) —
   // supaya nggak bisa inject HTML/script pas ditaruh balik ke innerHTML.
+  /* Lambang dipakai dari JS. Sengaja SVG, bukan emoji: emoji itu font, bentuknya beda di
+     tiap sistem, dan kalau gagal render tombolnya jadi kosong melompong -- bukan cuma jelek,
+     tapi tidak ketahuan fungsinya. Semua ini tetap string TETAP (bukan dari data), jadi aman
+     dipakai lewat innerHTML; teks dinamis di sebelahnya tetap wajib lewat escapeHtml. */
+  const IKON = {
+    mikrofon: '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0"/><path d="M12 18v3.5"/></svg>',
+    speaker:  '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a9 9 0 0 1 0 14"/></svg>',
+    stop:     '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>',
+    mulut:    '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5h11a4.5 4.5 0 0 1 0 9h-2l-4 3.5v-3.5H4z"/><path d="M18.5 4.5a7 7 0 0 1 0 13"/></svg>',
+    buku:     '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2 2 0 0 1 6 3.5h13v15H6a2 2 0 0 0-2 2z"/><path d="M8 5v14"/></svg>',
+    pena:     '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4z"/><path d="M14.5 5.5l3 3"/></svg>',
+    main:     '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4.5 19 12 7 19.5z" fill="currentColor" stroke="none"/></svg>',
+    jeda:     '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6.5" y="5" width="3.6" height="14" rx="1" fill="currentColor" stroke="none"/><rect x="13.9" y="5" width="3.6" height="14" rx="1" fill="currentColor" stroke="none"/></svg>',
+    mata:     '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.6"/></svg>',
+    mataCoret:'<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-6.5 10-6.5c1.6 0 3 .3 4.2.8"/><path d="M20.4 9c1 1.2 1.6 2.2 1.6 2.2s-3.6 6.5-10 6.5c-1.9 0-3.5-.4-4.8-1"/><path d="M4 4l16 16"/></svg>',
+    peringatan:'<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9.5v4"/><path d="M12 17.2h.01"/></svg>'
+  };
+
+  /* pasang lambang di depan label tombol. Teks tetap di-escape walaupun sumbernya kamus
+     kita sendiri -- kalau nanti ada label yang datang dari database, ini sudah aman. */
+  function tombolIkon(el, ikon, teks){
+    if(!el) return;
+    el.innerHTML = ikon + '<span>' + escapeHtml(teks) + '</span>';
+  }
+
   function escapeHtml(s){
     return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
@@ -6379,7 +6426,7 @@
       const b = document.createElement('button');
       b.type = 'button';
       b.className = 'levelBtn' + (!locked && lv===defaultLevel ? ' active' : '') + (locked ? ' locked' : '');
-      b.textContent = (locked ? '🔒 ' : '') + 'HSK ' + lv;
+      b.textContent = 'HSK ' + lv;   // gembok digambar CSS lewat .locked
       if(locked){
         b.addEventListener('click', ()=>{
           const el = $('browseLevelLockedMsg');
@@ -6422,7 +6469,7 @@
       const b = document.createElement('button');
       b.type = 'button';
       b.className = 'levelBtn' + (locked ? ' locked' : '');
-      b.textContent = (locked ? '\uD83D\uDD12 ' : '') + t(tr.labelKey);
+      b.textContent = t(tr.labelKey);   // gembok digambar CSS lewat .locked
       b.addEventListener('click', ()=>{
         if(locked){
           const el = $('browseLevelLockedMsg');
@@ -6764,7 +6811,7 @@
       const btn = $(cfg.id);
       if(!btn) return;
       const isLocked = cfg.gated && locked;
-      btn.textContent = (isLocked ? '🔒 ' : '') + t(cfg.labelKey);
+      btn.textContent = t(cfg.labelKey);   // gembok digambar CSS lewat .locked
       btn.className = 'strokeTab' + (cfg.key === strokeCurrentTab ? ' active' : '') + (isLocked ? ' locked' : '');
     });
   }
@@ -6967,7 +7014,7 @@
       item.innerHTML = `<span class="browseHanzi">${v.hanzi}</span>
         <span class="browsePinyin">${v.pinyin}</span>
         <span class="browseMeaning">${v.meaning_id || v.meaning_en}</span>
-        <button type="button" class="browseStrokeBtn" data-hanzi="${v.hanzi}" aria-label="${t('strokeWriteBtn')}">✍️</button>`;
+        <button type="button" class="browseStrokeBtn" data-hanzi="${v.hanzi}" aria-label="${escapeHtml(t('strokeWriteBtn'))}">${IKON.pena}</button>`;
       wrap.appendChild(item);
     });
     strokeScreenShown += next.length;
@@ -7477,8 +7524,8 @@
       <div class="sandhiExampleHanzi">${ex.hanzi}</div>
       <div class="sandhiExamplePinyin">${pinyinDisplay}</div>
       <div class="sandhiExampleBtns">
-        <button type="button" class="sandhiAudioBtn" data-kind="natural" data-slug="${ex.slug}">${t('sandhiNaturalBtn')}</button>
-        <button type="button" class="sandhiAudioBtn" data-kind="dict" data-slug="${ex.slug}">${t('sandhiDictBtn')}</button>
+        <button type="button" class="sandhiAudioBtn" data-kind="natural" data-slug="${ex.slug}">${IKON.mulut}<span>${escapeHtml(t('sandhiNaturalBtn'))}</span></button>
+        <button type="button" class="sandhiAudioBtn" data-kind="dict" data-slug="${ex.slug}">${IKON.buku}<span>${escapeHtml(t('sandhiDictBtn'))}</span></button>
       </div>
     </div>`;
   }
@@ -8200,7 +8247,7 @@
     tcChunks = [];
     tcRecording = true;
     tcRecordStartAt = Date.now();
-    $('tcRecordBtn').textContent = t('toneCoachStopBtn');
+    tombolIkon($('tcRecordBtn'), IKON.stop, t('toneCoachStopBtn'));
     $('tcRecordBtn').classList.add('recording');
     $('tcStatus').textContent = t('toneCoachRecording');
     tcRecordTimer = setTimeout(()=> tcStopRecording(), TC_MAX_RECORD_MS);
@@ -8210,7 +8257,7 @@
     if(!tcRecording) return;
     tcRecording = false;
     clearTimeout(tcRecordTimer);
-    $('tcRecordBtn').textContent = t('toneCoachRecordBtn');
+    tombolIkon($('tcRecordBtn'), IKON.mikrofon, t('toneCoachRecordBtn'));
     $('tcRecordBtn').classList.remove('recording');
     $('tcStatus').textContent = t('toneCoachAnalyzing');
 
@@ -9005,10 +9052,10 @@
     // fall back to the first option (that would rewrite the user's real package on Save).
     // Show it literally, flagged, as an extra selected option instead.
     const pkgSelectExtra = (!knownPkg && profile.package)
-      ? `<option value="${escapeHTML(profile.package)}" selected>⚠ ${escapeHTML(profile.package)} (unknown)</option>`
+      ? `<option value="${escapeHTML(profile.package)}" selected>${escapeHTML(profile.package)} (unknown)</option>`
       : '';
     const unknownPkgWarning = (!knownPkg && profile.package)
-      ? `<p class="adminFieldWarning">⚠ Nilai package saat ini: "<b>${escapeHTML(profile.package)}</b>" — tidak dikenal sistem. Tidak diubah otomatis; pilih manual sebelum Save kalau ini perlu dikoreksi.</p>`
+      ? `<p class="adminFieldWarning">${IKON.peringatan} Nilai package saat ini: "<b>${escapeHTML(profile.package)}</b>" — tidak dikenal sistem. Tidak diubah otomatis; pilih manual sebelum Save kalau ini perlu dikoreksi.</p>`
       : '';
 
     // target_level NULL (never set, e.g. #30's "admin lupa isi saat create user" case) needs
@@ -9029,10 +9076,10 @@
       return `<option value="${s}"${selected}>${label}</option>`;
     }).join('');
     const statusSelectExtra = (!knownStatus && profile.status)
-      ? `<option value="${escapeHTML(profile.status)}" selected>⚠ ${escapeHTML(profile.status)} (unknown)</option>`
+      ? `<option value="${escapeHTML(profile.status)}" selected>${escapeHTML(profile.status)} (unknown)</option>`
       : '';
     const unknownStatusWarning = (!knownStatus && profile.status)
-      ? `<p class="adminFieldWarning">⚠ Nilai status saat ini: "<b>${escapeHTML(profile.status)}</b>" — tidak dikenal sistem. Tidak diubah otomatis.</p>`
+      ? `<p class="adminFieldWarning">${IKON.peringatan} Nilai status saat ini: "<b>${escapeHTML(profile.status)}</b>" — tidak dikenal sistem. Tidak diubah otomatis.</p>`
       : '';
 
     const roleOptionsHTML = ROLE_OPTIONS.map(r=>{
@@ -9428,7 +9475,7 @@
       b.innerHTML = `
         <div class="hubCardCover lv${lv}"><span class="hubCardCoverGlyph">${LEVEL_GLYPH[lv]}</span></div>
         <div class="hubCardBody">
-          <div class="hubCardTitle">${locked ? '\uD83D\uDD12 ' : ''}HSK ${lv}</div>
+          <div class="hubCardTitle">HSK ${lv}</div>
           <div class="hubCardMeta">${meta}</div>
         </div>`;
       b.addEventListener('click', ()=>{
@@ -9721,7 +9768,7 @@
     if(!path) return '';
     const url = listeningAudioUrl(path);
     return `<div class="audioPlayer" data-src="${url}">
-      <button type="button" class="audioPlayBtn" aria-label="Putar audio">▶</button>
+      <button type="button" class="audioPlayBtn" aria-label="Putar audio"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4.5 19 12 7 19.5z" fill="currentColor" stroke="none"/></svg></button>
       <div class="audioProgressTrack"><div class="audioProgressFill"></div></div>
       <span class="audioTime"></span>
     </div>`;
@@ -9761,7 +9808,7 @@
       const fill = p.querySelector('.audioProgressFill');
       const time = p.querySelector('.audioTime');
       if(!btn) return;
-      btn.textContent = (active && !audioEl.paused) ? '⏸' : '▶';
+      btn.innerHTML = (active && !audioEl.paused) ? IKON.jeda : IKON.main;
       if(active && isFinite(audioEl.duration) && audioEl.duration > 0){
         fill.style.width = ((audioEl.currentTime / audioEl.duration) * 100) + '%';
         time.textContent = formatAudioTime(audioEl.currentTime) + ' / ' + formatAudioTime(audioEl.duration);
@@ -9852,7 +9899,7 @@
         ${trek}
       </details>`;
     }).join('');
-    syncAudioPlayers(wrap, bukuAudio);   // tombol ▶/⏸ ikut keadaan kalau digambar ulang saat muter
+    syncAudioPlayers(wrap, bukuAudio);   // tombol putar/jeda ikut keadaan kalau digambar ulang saat muter
   }
 
   async function muatBukuManifest(){
@@ -9879,7 +9926,7 @@
     if(!card) return;
     const locked = !isTrackAllowed('business');
     card.classList.toggle('locked', locked);
-    $('hubCardBukuTitle').textContent = (locked ? '\uD83D\uDD12 ' : '') + t('hubCardBukuTitle');
+    $('hubCardBukuTitle').textContent = t('hubCardBukuTitle');   // gembok digambar CSS lewat .locked
   }
 
   function openBukuAudio(){
@@ -11872,11 +11919,12 @@
     $(id).addEventListener('click', toggleTheme);
   });
 
+  $('passwordToggle').innerHTML = IKON.mata;
   $('passwordToggle').addEventListener('click', ()=>{
     const pw = $('password');
     const willShow = pw.type === 'password';
     pw.type = willShow ? 'text' : 'password';
-    $('passwordToggle').textContent = willShow ? '🙈' : '👁️';
+    $('passwordToggle').innerHTML = willShow ? IKON.mataCoret : IKON.mata;
     $('passwordToggle').setAttribute('aria-label', willShow ? t('hidePassword') : t('showPassword'));
   });
 

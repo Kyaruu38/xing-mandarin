@@ -1538,13 +1538,28 @@
       width:min(520px, calc(100vw - 24px)); pointer-events:none; }
     /* wadahnya selebar layar dan selalu ada; tanpa ini dia menelan klik di bawahnya */
     #topAlerts > *{ pointer-events:auto; }
-    .topAlert{ width:100%; transform:translateY(-160%);
-      display:flex; align-items:center; gap:12px;
+    /* display:none, BUKAN sekadar digeser keluar layar pakai transform.
+       BUG 13 Agu 2026: versi pertama menyembunyikan banner cuma dengan translateY(-160%).
+       Banner yang tersembunyi begitu TETAP memakan ruang di tumpukan, jadi banner KEDUA
+       mulai 61px lebih rendah (tinggi banner pertama + gap) dan -160% tidak cukup jauh
+       untuk membawanya keluar layar: sisanya ~44px nyangkut di atas sebagai kotak kosong,
+       dan itu kelihatan oleh SETIAP murid yang masa aktifnya masih panjang. Dengan
+       display:none ruangnya ikut hilang, jadi seberapa jauh dia harus digeser tidak
+       pernah lagi bergantung pada tinggi banner di atasnya. */
+    .topAlert{ display:none; width:100%;
+      align-items:center; gap:12px;
       padding:12px 14px 12px 16px; border-radius:14px;
       background:var(--panel); color:var(--text);
-      border:1px solid var(--line); box-shadow:0 18px 44px -12px rgba(0,0,0,.45);
-      transition:transform .38s cubic-bezier(.22,1,.36,1); }
-    .topAlert.show{ transform:translateY(0); }
+      border:1px solid var(--line); box-shadow:0 18px 44px -12px rgba(0,0,0,.45); }
+    /* animasi masuk pakai @keyframes, bukan transition: elemen yang baru lahir dari
+       display:none tidak punya keadaan awal buat ditransisikan. Konsekuensinya menutup
+       banner sekarang langsung hilang tanpa animasi keluar; itu ditukar sadar dengan
+       jaminan bahwa yang tersembunyi benar-benar tidak bisa terlihat. */
+    .topAlert.show{ display:flex; animation:topAlertMasuk .38s cubic-bezier(.22,1,.36,1); }
+    @keyframes topAlertMasuk{
+      from{ transform:translateY(-160%); opacity:0; }
+      to{ transform:none; opacity:1; }
+    }
     /* Jam di ujung paling kanan, penanda bahwa ini soal waktu. Sengaja SVG, bukan emoji:
        emoji beda bentuk di Windows, Android, dan iOS, dan yang di mock sebelumnya malah
        gagal render jadi kotak kosong di layar Kyaru. */
@@ -3687,7 +3702,7 @@
      Kalau keduanya beda, user yang masih buka tab lama bakal dikasih
      banner "ada versi baru".
      ============================================================ */
-  const APP_VERSION = '5.4';
+  const APP_VERSION = '5.5';
 
   const SUPABASE_URL  = 'https://xzgvhzmmqbijpbrhagjf.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6Z3Zoem1tcWJpanBicmhhZ2pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0OTA4NjMsImV4cCI6MjA5OTA2Njg2M30.9OtBJIBDDUhhSsvtz9Pql12hWToGzmULOGh7Tj-vzNs';

@@ -1945,7 +1945,113 @@
     .modalCloseBtn{ width:32px; height:32px; margin-top:0; padding:0; border-radius:10px; background:transparent; color:var(--muted); font-size:16px; font-weight:400; }
     .modalCloseBtn:hover{ background:var(--panel-2); color:var(--text); }
     .modalBody label:first-child{ margin-top:4px; }
+    /* ---- grafik perkembangan nilai di Raport ----
+       Warna per bagian dikunci di sini dan dipakai ulang di grafik testimoni halaman depan.
+       Kalau warnanya beda antar layar, grafiknya harus dibaca ulang tiap kali. */
+    :root{ --sec-listening:#F2B01E; --sec-reading:#5AA9E6; --sec-writing:#C77DD6; --sec-all:#43B583; }
+    .scoreChart{ margin:10px 0 18px; }
+    .scChips{ display:flex; gap:4px; background:var(--panel-2); border-radius:10px; padding:3px;
+      margin-bottom:14px; }
+    /* min-width:0 wajib: tanpa itu tombol dengan teks panjang ("HSK Mocktest") menolak
+       menyusut, baris chip melebar, dan seluruh kartu bisa digeser ke samping di 375px. */
+    .scChip{ flex:1 1 0; min-width:0; min-height:38px; padding:6px 2px; border:none;
+      border-radius:8px; background:transparent; color:var(--muted); font:inherit;
+      font-size:11.5px; font-weight:600; cursor:pointer; line-height:1.18;
+      overflow-wrap:anywhere; }
+    .scChip[aria-selected="true"]{ background:var(--panel); color:var(--text); }
+    .scHead{ display:flex; align-items:baseline; gap:8px; margin:2px 0 12px; }
+    .scBig{ font-family:var(--display-font); font-size:27px; line-height:1; color:var(--text); }
+    .scUp{ font-size:12.5px; font-weight:700; color:var(--ok); }
+    .scDown{ font-size:12.5px; font-weight:700; color:var(--danger); }
+    .scSub{ font-size:11.5px; color:var(--muted); margin-left:auto; text-align:right; }
+    .scBars{ display:flex; flex-direction:column; gap:8px; margin-top:14px; }
+    .scBar{ display:flex; align-items:center; gap:9px; }
+    .scBarN{ font-size:11.5px; color:var(--muted); flex:0 0 66px; }
+    .scBarT{ flex:1; height:7px; border-radius:4px; background:var(--track); overflow:hidden; }
+    .scBarT i{ display:block; height:100%; border-radius:4px; }
+    .scBarV{ font-size:12px; font-weight:700; color:var(--text); flex:0 0 28px; text-align:right; }
+    .scNote{ font-size:11px; color:var(--muted); margin:9px 0 0; line-height:1.5; }
+    /* ---- panel moderasi testimoni (admin) ---- */
+    .adminTabs{ display:flex; gap:4px; background:var(--panel-2); border-radius:10px; padding:3px;
+      margin-bottom:16px; }
+    .adminTab{ flex:1 1 0; min-width:0; min-height:40px; border:none; border-radius:8px;
+      background:transparent; color:var(--muted); font:inherit; font-size:13px; font-weight:600;
+      cursor:pointer; }
+    .adminTab[aria-selected="true"]{ background:var(--panel); color:var(--text); }
+    .adminTestiCount{ font-size:12px; color:var(--muted); }
+    .mdCard{ background:var(--panel-2); border:1px solid var(--line); border-radius:14px;
+      padding:16px; margin-bottom:12px; }
+    .mdTop{ display:flex; justify-content:space-between; gap:12px; margin-bottom:10px; }
+    .mdWho{ font-size:14px; font-weight:700; color:var(--text); }
+    .mdWho i{ font-style:normal; font-weight:400; color:var(--muted); }
+    .mdSub{ font-size:11.5px; color:var(--muted); margin-top:2px; }
+    .mdPill{ font-size:11px; font-weight:700; padding:4px 10px; border-radius:999px;
+      white-space:nowrap; align-self:flex-start; }
+    .mdPill.pend{ background:rgba(224,160,48,.14); color:#D9A02A; border:1px solid rgba(224,160,48,.34); }
+    .mdPill.pub{ background:rgba(67,181,131,.14); color:#2F9E5B; border:1px solid rgba(67,181,131,.34); }
+    .mdPill.hid{ background:rgba(var(--muted-rgb),.14); color:var(--muted); border:1px solid var(--line); }
+    .mdQuote{ font-size:13px; line-height:1.6; color:var(--text); margin:0 0 12px;
+      padding-left:11px; border-left:2px solid var(--line); }
+    .mdFacts{ display:flex; flex-wrap:wrap; gap:7px; margin-bottom:12px; }
+    .mdFact{ font-size:11px; color:var(--muted); background:var(--panel); border-radius:7px; padding:5px 9px; }
+    .mdLbl{ font-size:11.5px; font-weight:700; color:var(--muted); margin:0 0 6px; }
+    .mdLbl i{ font-style:normal; font-weight:400; }
+    .mdReply{ width:100%; background:var(--panel); border:1px solid var(--line); border-radius:10px;
+      color:var(--text); font:inherit; font-size:12.5px; line-height:1.55; padding:9px 11px;
+      resize:vertical; min-height:64px; }
+    .mdBtns{ display:flex; gap:8px; margin-top:13px; flex-wrap:wrap; }
+    .mdBtn{ min-height:40px; font:inherit; font-size:12.5px; font-weight:700; padding:9px 15px;
+      border-radius:9px; border:1px solid transparent; cursor:pointer; }
+    .mdBtn.primary{ background:var(--gold); color:#1C2A5E; }
+    .mdBtn.ghost{ background:transparent; border-color:var(--line); color:var(--muted); }
+    .mdBtn.danger{ background:transparent; border-color:rgba(214,69,69,.4); color:var(--danger); }
+
+    /* ---- blok testimoni di Raport ---- */
+    .testiCard{ margin-top:18px; padding:15px; border-radius:var(--radius-md);
+      background:var(--panel-2); border:1px solid var(--line); }
+    .tsAuto{ display:inline-flex; align-items:center; gap:6px; font-size:11.5px; color:var(--muted);
+      background:rgba(242,176,30,.09); border:1px solid rgba(242,176,30,.22);
+      border-radius:999px; padding:5px 10px; margin-bottom:13px; }
+    .tsAuto b{ width:5px; height:5px; border-radius:50%; background:var(--gold); }
+    .tsFacts{ display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-bottom:14px; }
+    .tsFact{ background:var(--panel); border-radius:11px; padding:9px 11px; }
+    .tsFact.wide{ grid-column:1 / -1; }
+    .tsFact span{ display:block; font-size:10.5px; color:var(--muted); margin-bottom:3px; }
+    .tsFact b{ display:block; font-size:14px; color:var(--text); }
+    .tsField{ margin-bottom:12px; }
+    .tsField label{ display:block; font-size:12.5px; font-weight:600; color:var(--text); margin-bottom:6px; }
+    .tsField label i{ font-style:normal; font-weight:400; color:var(--muted); font-size:11.5px; }
+    .tsField textarea{ width:100%; background:var(--panel); border:1px solid var(--line);
+      border-radius:11px; color:var(--text); font:inherit; font-size:13px; line-height:1.55;
+      padding:10px 12px; resize:vertical; min-height:64px; }
+    .tsCount{ text-align:right; font-size:11px; color:var(--muted); margin:4px 0 0; }
+    .tsChips{ display:flex; gap:7px; flex-wrap:wrap; }
+    .tsChip{ font:inherit; font-size:12px; padding:7px 13px; min-height:36px; border-radius:999px;
+      border:1px solid var(--line); background:var(--panel); color:var(--muted); cursor:pointer; }
+    .tsChip[aria-pressed="true"]{ background:rgba(242,176,30,.14); border-color:rgba(242,176,30,.5);
+      color:var(--gold-ink); font-weight:600; }
+    .tsSwitch{ display:flex; align-items:center; justify-content:space-between; gap:12px;
+      padding:11px 0; border-top:1px solid var(--line); cursor:pointer; min-height:44px; }
+    .tsSwitch:first-of-type{ border-top:none; }
+    .tsSwitch span{ font-size:12.5px; font-weight:600; color:var(--text); }
+    .tsSwitch input{ width:18px; height:18px; accent-color:var(--gold); margin:0; flex:0 0 18px; }
+    .tsBtns{ display:flex; gap:9px; margin-top:14px; flex-wrap:wrap; }
+    .tsBtn{ flex:1 1 120px; min-height:44px; font:inherit; font-size:13.5px; font-weight:700;
+      border-radius:12px; border:1px solid transparent; cursor:pointer; }
+    .tsBtn.primary{ background:var(--gold); color:#1C2A5E; }
+    .tsBtn.ghost{ background:transparent; border-color:var(--line); color:var(--muted); }
+    .tsStatus{ font-size:11.5px; color:var(--muted); line-height:1.6; margin:12px 0 0;
+      background:var(--panel); border:1px solid var(--line); border-radius:11px; padding:10px 12px; }
+    .tsReply{ margin-top:12px; padding:12px 13px; border-radius:11px;
+      background:rgba(242,176,30,.07); border:1px solid rgba(242,176,30,.2); }
+    .tsReply b{ display:block; font-size:11.5px; color:var(--gold-ink); margin-bottom:5px; }
+    .tsReply p{ font-size:13px; line-height:1.6; color:var(--text); margin:0; }
     .adminFieldHint{ font-size:12px; color:var(--muted); margin:6px 0 0; line-height:1.5; }
+    /* Kotak centang di modal admin. Dibungkus <label> supaya tulisannya ikut bisa diklik --
+       target 44px yang sama dengan kontrol lain, penting karena modal ini juga dibuka di HP. */
+    .adminCheck{ display:flex; align-items:center; gap:10px; min-height:44px; cursor:pointer;
+      font-size:14px; color:var(--text); }
+    .adminCheck input{ width:18px; height:18px; accent-color:var(--gold); margin:0; }
     .adminFieldWarning{
       font-size:12.5px; color:var(--danger); background:rgba(214,69,69,.1);
       border:1px solid rgba(214,69,69,.3); border-radius:8px; padding:8px 10px; margin:6px 0 8px;
@@ -2873,8 +2979,15 @@
         <p class="sectionTitle" id="raportLabelWeak">Kata Terlemah</p>
         <div id="rWeak"></div>
 
+        <div id="rChartCard" class="scoreChart hidden">
+          <div class="scChips" id="rChartChips"></div>
+          <div id="rChartBody"></div>
+        </div>
+
         <p class="sectionTitle" id="raportLabelHistory">Riwayat Mock Test</p>
         <div id="rMockHistory"></div>
+
+        <div id="rTestiCard" class="testiCard hidden"></div>
 
         <button id="raportExitBtn" class="practiceExit">Kembali ke Dashboard</button>
       </div>
@@ -3337,6 +3450,15 @@
            through the admin-users Edge Function (service_role-gated, is_admin() checked
            server-side before any privileged call). ============ -->
       <div id="adminCard" class="pageCard admin hidden">
+        <!-- Dua tab di dalam satu kartu, bukan kartu baru. Kartu baru harus didaftarkan di
+             daftar penyembunyi halaman (lihat showOnly) dan gampang terlewat waktu ada
+             layar lain ditambah. -->
+        <div class="adminTabs" role="tablist">
+          <button type="button" class="adminTab" id="adminTabUsers" role="tab" aria-selected="true">Users</button>
+          <button type="button" class="adminTab" id="adminTabTesti" role="tab" aria-selected="false">Testimonials</button>
+        </div>
+
+        <div id="adminUsersPane">
         <div class="adminHeaderRow">
           <p class="sub" id="adminHeader">User Management</p>
           <button type="button" class="adminAddBtn" id="adminAddBtn">+ Add User</button>
@@ -3360,6 +3482,15 @@
         </div>
         <div class="adminList" id="adminList"></div>
         <p class="adminCount" id="adminCount"></p>
+        </div><!-- /adminUsersPane -->
+
+        <div id="adminTestiPane" class="hidden">
+          <div class="adminHeaderRow">
+            <p class="sub">Testimonials</p>
+            <span class="adminTestiCount" id="adminTestiCount"></span>
+          </div>
+          <div id="adminTestiList"></div>
+        </div>
 
         <button id="adminExitBtn" class="practiceExit">Back to Dashboard</button>
       </div>
@@ -3398,7 +3529,7 @@
      Kalau keduanya beda, user yang masih buka tab lama bakal dikasih
      banner "ada versi baru".
      ============================================================ */
-  const APP_VERSION = '4.8';
+  const APP_VERSION = '4.9';
 
   const SUPABASE_URL  = 'https://xzgvhzmmqbijpbrhagjf.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6Z3Zoem1tcWJpanBicmhhZ2pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0OTA4NjMsImV4cCI6MjA5OTA2Njg2M30.9OtBJIBDDUhhSsvtz9Pql12hWToGzmULOGh7Tj-vzNs';
@@ -3641,6 +3772,25 @@
           errSessionTakenOver:'Sesi kamu diambil alih perangkat lain. Silakan login ulang.',
           errLoggedInElsewhere:'Akun kamu login di perangkat lain. Kamu keluar otomatis.',
           dailyGoalProgress:'{count} / {total} kata direview hari ini', wordsUnit:'kata', scoreLabel:'Skor',
+          chartTitle:'Perkembangan Nilai', chartAll:'HSK Mocktest',
+          chartOf:'dari {max}', chartPass:'lulus 180', chartLast:'Nilai terakhir per bagian',
+          chartCorrect:'Jawaban benar', chartEmptySec:'Kamu belum pernah mengerjakan bagian ini.',
+          chartEmptyAll:'Kamu belum pernah mengerjakan simulasi lengkap. Coba satu kali yang semua bagiannya sekaligus, nanti nilai gabungannya muncul di sini.',
+          chartOnce:'Baru satu kali. Grafiknya muncul setelah kamu mengerjakan yang kedua.',
+          chartScale:'Tiap bagian dinilai 0 sampai 100, sama seperti rapor HSK asli.',
+          tsTitle:'Ceritakan perkembanganmu', tsAuto:'Diambil otomatis dari akunmu',
+          tsPkg:'Paket', tsDur:'Lama belajar', tsScore:'Nilai', tsMonths:'{n} bulan',
+          tsBefore:'Sebelum ikut, saya…', tsAfter:'Sekarang saya sudah bisa…',
+          tsHint:'satu kalimat aja', tsName:'Nama yang ditampilkan', tsAnon:'Anonim',
+          tsShowScore:'Tampilkan nilaiku', tsShowPkg:'Tampilkan paket dan lama belajar',
+          tsSend:'Kirim', tsSave:'Simpan perubahan', tsCancel:'Batal', tsEdit:'Ubah ceritaku',
+          tsWithdraw:'Tarik ceritaku', tsWithdrawAsk:'Yakin mau menarik ceritamu? Ceritanya dihapus dan hilang dari halaman depan.',
+          tsPending:'Ceritamu sedang ditinjau. Kamu bisa mengubah atau menariknya kapan saja dari halaman ini.',
+          tsPublished:'Ceritamu sudah tayang di halaman depan. Terima kasih ya.',
+          tsHidden:'Ceritamu sedang tidak ditampilkan. Kamu masih bisa mengubahnya.',
+          tsReply:'Tanggapan Xing Mandarin',
+          tsNeedBoth:'Dua kalimatnya diisi dulu ya.', tsSaved:'Ceritamu sudah terkirim.',
+          tsNoData:'Kamu belum pernah mengerjakan simulasi apa pun. Kerjakan satu dulu, nanti bagian ini terbuka.',
           practiceLevelPrompt:'Pilih level HSK buat latihan', back:'Kembali', showAnswer:'Lihat jawaban',
           gradeAgain:'Lupa', gradeHard:'Susah', gradeGood:'Oke', gradeEasy:'Gampang',
           exampleSentence:'Contoh Kalimat', doneBack:'Selesai / Kembali',
@@ -3825,6 +3975,25 @@
           errSessionTakenOver:'Your session was taken over on another device. Please sign in again.',
           errLoggedInElsewhere:'Your account signed in on another device. You were signed out automatically.',
           dailyGoalProgress:'{count} / {total} words reviewed today', wordsUnit:'words', scoreLabel:'Score',
+          chartTitle:'Score progress', chartAll:'HSK Mocktest',
+          chartOf:'of {max}', chartPass:'pass 180', chartLast:'Latest score per section',
+          chartCorrect:'Correct answers', chartEmptySec:'You have not tried this section yet.',
+          chartEmptyAll:'You have not taken a full simulation yet. Try one that covers all sections at once, and your combined score will show up here.',
+          chartOnce:'Just one attempt so far. The chart appears after your second one.',
+          chartScale:'Each section is scored 0 to 100, the same way a real HSK report does it.',
+          tsTitle:'Tell us how it went', tsAuto:'Taken from your account',
+          tsPkg:'Package', tsDur:'Time studying', tsScore:'Score', tsMonths:'{n} months',
+          tsBefore:'Before I joined, I…', tsAfter:'Now I can…',
+          tsHint:'one sentence is enough', tsName:'Name to show', tsAnon:'Anonymous',
+          tsShowScore:'Show my score', tsShowPkg:'Show my package and time studying',
+          tsSend:'Send', tsSave:'Save changes', tsCancel:'Cancel', tsEdit:'Edit my story',
+          tsWithdraw:'Take my story down', tsWithdrawAsk:'Take your story down? It will be deleted and removed from the homepage.',
+          tsPending:'Your story is being reviewed. You can edit or take it down any time from this page.',
+          tsPublished:'Your story is live on the homepage. Thank you.',
+          tsHidden:'Your story is not showing right now. You can still edit it.',
+          tsReply:'From Xing Mandarin',
+          tsNeedBoth:'Please fill in both sentences.', tsSaved:'Your story has been sent.',
+          tsNoData:'You have not taken any simulation yet. Take one and this section will open up.',
           practiceLevelPrompt:'Choose an HSK level to practice', back:'Back', showAnswer:'Show answer',
           gradeAgain:'Forgot', gradeHard:'Hard', gradeGood:'Good', gradeEasy:'Easy',
           exampleSentence:'Example Sentence', doneBack:'Done / Back',
@@ -4009,6 +4178,25 @@
           errSessionTakenOver:'您的账号已在其他设备登录，请重新登录',
           errLoggedInElsewhere:'您的账号已在其他设备登录，系统已自动将您登出',
           dailyGoalProgress:'今日已复习 {count} / {total} 词', wordsUnit:'词', scoreLabel:'得分',
+          chartTitle:'成绩变化', chartAll:'HSK 全套模拟',
+          chartOf:'满分 {max}', chartPass:'合格 180', chartLast:'最近一次各部分得分',
+          chartCorrect:'答对题数', chartEmptySec:'这一部分你还没有作答记录。',
+          chartEmptyAll:'你还没有完成过全套模拟。做一次三部分一起的完整模拟，总分就会出现在这里。',
+          chartOnce:'目前只有一次记录，做完第二次之后就会出现折线图。',
+          chartScale:'每部分满分 100，和真实 HSK 成绩报告一样。',
+          tsTitle:'说说你的变化', tsAuto:'自动取自你的账号',
+          tsPkg:'套餐', tsDur:'学习时长', tsScore:'成绩', tsMonths:'{n} 个月',
+          tsBefore:'报名前，我…', tsAfter:'现在我已经可以…',
+          tsHint:'一句话就够', tsName:'显示的名字', tsAnon:'匿名',
+          tsShowScore:'显示我的成绩', tsShowPkg:'显示套餐和学习时长',
+          tsSend:'提交', tsSave:'保存修改', tsCancel:'取消', tsEdit:'修改我的分享',
+          tsWithdraw:'撤回我的分享', tsWithdrawAsk:'确定要撤回吗？内容会被删除，也会从首页消失。',
+          tsPending:'你的分享正在审核中。你随时可以在这个页面修改或撤回。',
+          tsPublished:'你的分享已经在首页展示了，谢谢你。',
+          tsHidden:'你的分享目前没有展示，你仍然可以修改。',
+          tsReply:'星图的回复',
+          tsNeedBoth:'请把两句话都填一下。', tsSaved:'你的分享已提交。',
+          tsNoData:'你还没有做过任何模拟测试。先做一次，这一部分就会开放。',
           practiceLevelPrompt:'选择HSK等级开始练习', back:'返回', showAnswer:'显示答案',
           gradeAgain:'忘记', gradeHard:'困难', gradeGood:'良好', gradeEasy:'简单',
           exampleSentence:'例句', doneBack:'完成 / 返回',
@@ -5257,6 +5445,8 @@
     $('rLevels').innerHTML = '';
     $('rWeak').innerHTML = '';
     $('rMockHistory').innerHTML = '';
+    chartData = null; $('rChartCard').classList.add('hidden');
+    testiRow = null; testiMode = 'view'; $('rTestiCard').classList.add('hidden');
     await Promise.all([ loadRaport(), loadMockHistory() ]);
   }
 
@@ -5364,6 +5554,310 @@
     return streak;
   }
 
+  /* ==========================================================
+     GRAFIK PERKEMBANGAN NILAI (Raport)
+
+     Kenapa nilai 0-100 per bagian dan 0-300 untuk mock test utuh, bukan skor mentah:
+     total_points di test_attempts BEDA-BEDA. Diperiksa 13 Agu 2026 di prod -- listening
+     HSK 4 maks 45, writing maks 10, dan di dua tempat berbeda di dalam bagian yang sama
+     (HSK 2 reading ada yang 20 ada yang 25; HSK 4 writing ada yang 10 ada yang 5).
+     Dengan skor mentah, murid yang dapat 8/10 lalu 4/5 kelihatan TURUN padahal nilainya
+     sama. Skala 0-100 juga yang dipakai rapor HSK asli, jadi angkanya langsung berarti
+     buat murid -- dan bikin garis "lulus 180" punya makna.
+
+     Kenapa bukan persen: sama hitungannya, beda bahasanya. "69" terbaca sebagai nilai
+     ujian, "69%" terbaca sebagai statistik.
+     ========================================================== */
+  const CHART_SECTIONS = ['listening','reading','writing','all'];
+  let chartData = null;      // {level, bySection:{sec:[{d,v,benar,dari}]}}
+  let chartActive = 'all';
+
+  function nilaiHSK(a){
+    // 0-100 per bagian, 0-300 untuk mock test utuh -- konvensi rapor HSK.
+    if(!a.total_points) return 0;
+    const skala = a.section === 'all' ? 300 : 100;
+    return Math.round((a.score / a.total_points) * skala);
+  }
+
+  function siapkanChart(history){
+    if(!history || !history.length) return null;
+    // Level yang ditampilkan = level percobaan TERAKHIR. Bukan level tertinggi: kalau
+    // murid iseng sekali membuka HSK 6 lalu balik latihan HSK 3, grafiknya jangan pindah
+    // ke level yang cuma disentuh sekali.
+    const urut = [...history].sort((x,y)=> new Date(x.created_at) - new Date(y.created_at));
+    const level = urut[urut.length - 1].hsk_level;
+    const bySection = {};
+    urut.forEach(a => {
+      if(a.hsk_level !== level || !a.total_points) return;
+      (bySection[a.section] = bySection[a.section] || []).push({
+        d: a.created_at, v: nilaiHSK(a),
+        benar: a.correct_count, dari: a.total_questions
+      });
+    });
+    if(!Object.keys(bySection).length) return null;
+    return { level, bySection };
+  }
+
+  function garisSVG(titik, maks, warna, lulus){
+    // Sumbu Y dikunci 0..maks, tidak menyesuaikan data. Sumbu yang menyesuaikan bikin
+    // kenaikan 2 poin kelihatan sedahsyat kenaikan 50.
+    // R sengaja 322, bukan 340: titik terakhir digambar r=4.6 dan label tanggalnya lebih
+    // lebar lagi, jadi kalau garisnya menyentuh tepi viewBox dua-duanya terpotong.
+    const W = 340, H = 150, L = 34, R = 322, T = 10, B = 150;
+    const y = v => T + (maks - v) / maks * (B - T);
+    const x = i => titik.length === 1 ? (L + R) / 2
+                 : L + 14 + i * ((R - L - 14) / (titik.length - 1));
+    const kisi = [0.25, 0.5, 0.75, 1].map(f =>
+      `<line x1="${L}" y1="${y(maks*f)}" x2="${R}" y2="${y(maks*f)}" stroke="var(--line)" stroke-width="1"/>`
+    ).join('');
+    const label = [0.25, 0.5, 0.75, 1].map(f =>
+      `<text x="0" y="${y(maks*f)+3}" fill="var(--muted)" font-size="9">${Math.round(maks*f)}</text>`
+    ).join('');
+    const garisLulus = lulus ? `<line x1="${L}" y1="${y(lulus)}" x2="${R}" y2="${y(lulus)}"
+        stroke="var(--sec-all)" stroke-width="1.2" stroke-dasharray="4 4" opacity=".75"/>
+      <text x="${L+6}" y="${y(lulus)-4}" fill="var(--sec-all)" font-size="8.5">${escapeHTML(t('chartPass'))}</text>` : '';
+    const pts = titik.map((p,i)=> `${x(i)},${y(p.v)}`).join(' ');
+    const bulat = titik.map((p,i)=>
+      `<circle cx="${x(i)}" cy="${y(p.v)}" r="${i === titik.length-1 ? 4.6 : 3.4}" fill="${warna}"/>`
+    ).join('');
+    const tgl = titik.map((p,i)=>{
+      const anchor = i === 0 ? 'start' : (i === titik.length - 1 ? 'end' : 'middle');
+      return `<text x="${x(i)}" y="${B-3}" fill="var(--muted)" font-size="8.5" text-anchor="${anchor}">${escapeHTML(formatMockDate(p.d).slice(0,6))}</text>`;
+    }).join('');
+    return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block" role="img"
+      aria-label="${escapeHTML(t('chartTitle'))}">
+      ${kisi}${label}${garisLulus}
+      <polyline fill="none" stroke="${warna}" stroke-width="2.8" stroke-linejoin="round"
+        stroke-linecap="round" points="${pts}"/>
+      ${bulat}${tgl}</svg>`;
+  }
+
+  function gambarChart(){
+    const card = $('rChartCard'), chips = $('rChartChips'), body = $('rChartBody');
+    if(!chartData){ card.classList.add('hidden'); return; }
+    card.classList.remove('hidden');
+
+    chips.innerHTML = CHART_SECTIONS.map(s =>
+      `<button type="button" class="scChip" role="tab" data-sec="${s}"
+        aria-selected="${s === chartActive}">${escapeHTML(s === 'all' ? t('chartAll') : (SECTION_LABEL[s] || s))}</button>`
+    ).join('');
+    chips.querySelectorAll('.scChip').forEach(b =>
+      b.addEventListener('click', ()=>{ chartActive = b.dataset.sec; gambarChart(); }));
+
+    const titik = chartData.bySection[chartActive] || [];
+    const maks = chartActive === 'all' ? 300 : 100;
+    const warna = `var(--sec-${chartActive})`;
+
+    if(!titik.length){
+      body.innerHTML = `<p class="emptyState">${escapeHTML(t(chartActive === 'all' ? 'chartEmptyAll' : 'chartEmptySec'))}</p>`;
+      return;
+    }
+
+    const akhir = titik[titik.length - 1], awal = titik[0];
+    const beda = akhir.v - awal.v;
+    const bedaHTML = titik.length > 1
+      ? `<span class="${beda >= 0 ? 'scUp' : 'scDown'}">${beda >= 0 ? '▲' : '▼'} ${Math.abs(beda)}</span>` : '';
+    const sub = chartActive === 'all'
+      ? `${t('chartOf').replace('{max}', 300)} · ${t('chartPass')}`
+      : t('chartOf').replace('{max}', 100);
+
+    // Satu titik tidak membentuk garis. Menggambarnya sebagai garis datar bikin murid
+    // mengira dia tidak maju-maju, padahal dia memang baru mulai.
+    const grafik = titik.length > 1
+      ? garisSVG(titik, maks, warna, chartActive === 'all' ? 180 : 0)
+      : `<p class="scNote">${escapeHTML(t('chartOnce'))}</p>`;
+
+    let bars = '';
+    if(chartActive === 'all'){
+      const per = ['listening','reading','writing'].filter(s => (chartData.bySection[s]||[]).length);
+      if(per.length){
+        bars = `<p class="sectionTitle" style="margin-top:16px">${escapeHTML(t('chartLast'))}</p>
+        <div class="scBars">` + per.map(s => {
+          const p = chartData.bySection[s][chartData.bySection[s].length - 1];
+          return `<div class="scBar"><span class="scBarN">${escapeHTML(SECTION_LABEL[s]||s)}</span>
+            <span class="scBarT"><i style="width:${Math.max(2, Math.min(100, p.v))}%;background:var(--sec-${s})"></i></span>
+            <span class="scBarV">${p.v}</span></div>`;
+        }).join('') + `</div>
+        <p class="scNote">${escapeHTML(t('chartScale'))} ${escapeHTML(t('chartCorrect'))}: `
+          + per.map(s => { const p = chartData.bySection[s][chartData.bySection[s].length-1];
+              return `${p.benar}/${p.dari}`; }).join(' · ') + `.</p>`;
+      }
+    } else {
+      bars = `<p class="scNote">${escapeHTML(t('chartCorrect'))}: ${akhir.benar}/${akhir.dari}.</p>`;
+    }
+
+    body.innerHTML = `
+      <p class="sectionTitle" style="margin:0 0 10px">${escapeHTML(t('chartTitle'))} · HSK ${chartData.level}</p>
+      <div class="scHead"><span class="scBig">${akhir.v}</span>${bedaHTML}
+        <span class="scSub">${escapeHTML(sub)}</span></div>
+      ${grafik}${bars}`;
+  }
+
+  /* ==========================================================
+     TESTIMONI MURID (Raport)
+
+     Yang dikirim ke server CUMA dua kalimat dan tiga pilihan tampilan. Nilai, paket,
+     dan lama belajar dihitung ulang di dalam submit_testimonial() -- klien tidak punya
+     cara mengirim angka. Ringkasan di layar ini murni tampilan; kalau ada yang
+     mengubahnya lewat DevTools, yang tersimpan tetap angka dari database.
+
+     Blok ini tidak muncul sama sekali untuk akun yang ditandai murid anak.
+     ========================================================== */
+  let testiRow = null, testiMode = 'view', testiNama = 'first';
+
+  function testiBoleh(){
+    return currentProfile && !currentProfile.is_minor;
+  }
+
+  function testiBulan(){
+    if(!currentProfile || !currentProfile.package_started_at) return null;
+    const mulai = new Date(currentProfile.package_started_at + 'T00:00:00Z');
+    const kini = new Date();
+    let n = (kini.getUTCFullYear() - mulai.getUTCFullYear()) * 12
+          + (kini.getUTCMonth() - mulai.getUTCMonth());
+    if(kini.getUTCDate() < mulai.getUTCDate()) n--;
+    return Math.max(1, n);
+  }
+
+  function gambarTestimoni(){
+    const card = $('rTestiCard');
+    if(!card) return;
+    if(!testiBoleh()){ card.classList.add('hidden'); return; }
+    card.classList.remove('hidden');
+
+    // Ringkasan otomatis. chartData sudah dihitung dari riwayat yang sama.
+    const bulan = testiBulan();
+    const pkg = PACKAGE_BADGE_LABEL[currentProfile.package] || currentProfile.package || '';
+    let nilai = null, bagian = null;
+    if(chartData){
+      const urut = ['all','listening','reading','writing']
+        .filter(s => (chartData.bySection[s] || []).length);
+      // Bagian yang paling sering dikerjakan, 'all' menang kalau ada. Cerminan
+      // aturan yang sama di submit_testimonial(); kalau salah satu diubah, ubah dua-duanya.
+      bagian = urut.sort((x,y)=> (y === 'all') - (x === 'all')
+        || chartData.bySection[y].length - chartData.bySection[x].length)[0];
+      if(bagian){
+        const d = chartData.bySection[bagian];
+        nilai = { awal:d[0].v, akhir:d[d.length-1].v };
+      }
+    }
+
+    if(!nilai && !testiRow){
+      card.innerHTML = `<p class="sectionTitle" style="margin:0 0 8px">${escapeHTML(t('tsTitle'))}</p>
+        <p class="emptyState">${escapeHTML(t('tsNoData'))}</p>`;
+      return;
+    }
+
+    const fakta = `
+      <span class="tsAuto"><b></b>${escapeHTML(t('tsAuto'))}</span>
+      <div class="tsFacts">
+        ${pkg ? `<div class="tsFact"><span>${escapeHTML(t('tsPkg'))}</span><b>${escapeHTML(pkg)}</b></div>` : ''}
+        ${bulan ? `<div class="tsFact"><span>${escapeHTML(t('tsDur'))}</span><b>${escapeHTML(t('tsMonths').replace('{n}', bulan))}</b></div>` : ''}
+        ${nilai ? `<div class="tsFact wide"><span>${escapeHTML(t('tsScore'))} HSK ${chartData.level} · ${escapeHTML(bagian === 'all' ? t('chartAll') : (SECTION_LABEL[bagian] || bagian))}</span>
+          <b>${nilai.awal} → ${nilai.akhir}</b></div>` : ''}
+      </div>`;
+
+    // ---- sudah kirim dan tidak sedang menyunting: tampilkan apa adanya ----
+    if(testiRow && testiMode === 'view'){
+      const pesan = testiRow.status === 'published' ? t('tsPublished')
+                  : testiRow.status === 'hidden' ? t('tsHidden') : t('tsPending');
+      card.innerHTML = `
+        <p class="sectionTitle" style="margin:0 0 10px">${escapeHTML(t('tsTitle'))}</p>
+        ${fakta}
+        <p style="font-size:13px;line-height:1.65;margin:0">${escapeHTML(testiRow.before_text)}<br>${escapeHTML(testiRow.after_text)}</p>
+        ${testiRow.admin_reply ? `<div class="tsReply"><b>${escapeHTML(t('tsReply'))}</b><p>${escapeHTML(testiRow.admin_reply)}</p></div>` : ''}
+        <p class="tsStatus">${escapeHTML(pesan)}</p>
+        <div class="tsBtns">
+          <button type="button" class="tsBtn primary" id="tsEditBtn">${escapeHTML(t('tsEdit'))}</button>
+          <button type="button" class="tsBtn ghost" id="tsDelBtn">${escapeHTML(t('tsWithdraw'))}</button>
+        </div>`;
+      $('tsEditBtn').addEventListener('click', ()=>{ testiMode = 'edit'; testiNama = testiRow.name_mode; gambarTestimoni(); });
+      $('tsDelBtn').addEventListener('click', tarikTestimoni);
+      return;
+    }
+
+    // ---- form ----
+    const namaDepan = String(currentProfile.display_name || '').trim().split(/\s+/)[0] || '';
+    const inisial = namaDepan ? namaDepan[0] + '.' : '';
+    const pilihan = [['first', namaDepan || t('tsAnon')], ['initial', inisial || '—'], ['anon', t('tsAnon')]]
+      .filter(o => o[1] && o[1] !== '—');
+    if(testiMode === 'edit' && testiRow) testiNama = testiNama || testiRow.name_mode;
+
+    card.innerHTML = `
+      <p class="sectionTitle" style="margin:0 0 10px">${escapeHTML(t('tsTitle'))}</p>
+      ${fakta}
+      <div class="tsField">
+        <label for="tsBefore">${escapeHTML(t('tsBefore'))} <i>${escapeHTML(t('tsHint'))}</i></label>
+        <textarea id="tsBefore" maxlength="140" rows="2">${escapeHTML(testiRow ? testiRow.before_text : '')}</textarea>
+        <p class="tsCount" id="tsBeforeCount"></p>
+      </div>
+      <div class="tsField">
+        <label for="tsAfter">${escapeHTML(t('tsAfter'))} <i>${escapeHTML(t('tsHint'))}</i></label>
+        <textarea id="tsAfter" maxlength="140" rows="2">${escapeHTML(testiRow ? testiRow.after_text : '')}</textarea>
+        <p class="tsCount" id="tsAfterCount"></p>
+      </div>
+      <div class="tsField">
+        <label>${escapeHTML(t('tsName'))}</label>
+        <div class="tsChips" id="tsNameChips">
+          ${pilihan.map(o => `<button type="button" class="tsChip" data-mode="${o[0]}"
+            aria-pressed="${o[0] === testiNama}">${escapeHTML(o[1])}</button>`).join('')}
+        </div>
+      </div>
+      <label class="tsSwitch"><span>${escapeHTML(t('tsShowScore'))}</span>
+        <input type="checkbox" id="tsShowScore"${(!testiRow || testiRow.show_score) ? ' checked' : ''}></label>
+      <label class="tsSwitch"><span>${escapeHTML(t('tsShowPkg'))}</span>
+        <input type="checkbox" id="tsShowPkg"${(!testiRow || testiRow.show_package) ? ' checked' : ''}></label>
+      <div class="tsBtns">
+        ${testiRow ? `<button type="button" class="tsBtn ghost" id="tsCancelBtn">${escapeHTML(t('tsCancel'))}</button>` : ''}
+        <button type="button" class="tsBtn primary" id="tsSendBtn">${escapeHTML(testiRow ? t('tsSave') : t('tsSend'))}</button>
+      </div>`;
+
+    const hitung = (idTa, idOut) => {
+      const ta = $(idTa); $(idOut).textContent = ta.value.length + ' / 140';
+      ta.addEventListener('input', ()=> $(idOut).textContent = ta.value.length + ' / 140');
+    };
+    hitung('tsBefore', 'tsBeforeCount'); hitung('tsAfter', 'tsAfterCount');
+    $('tsNameChips').querySelectorAll('.tsChip').forEach(b =>
+      b.addEventListener('click', ()=>{ testiNama = b.dataset.mode; gambarTestimoni(); }));
+    if($('tsCancelBtn')) $('tsCancelBtn').addEventListener('click', ()=>{ testiMode = 'view'; gambarTestimoni(); });
+    $('tsSendBtn').addEventListener('click', kirimTestimoni);
+  }
+
+  async function muatTestimoni(){
+    testiRow = null; testiMode = 'view';
+    if(!testiBoleh()){ gambarTestimoni(); return; }
+    const { data } = await sb.from('testimonials')
+      .select('before_text,after_text,name_mode,show_score,show_package,status,admin_reply')
+      .eq('user_id', currentUser).maybeSingle();
+    testiRow = data || null;
+    testiNama = testiRow ? testiRow.name_mode : 'first';
+    gambarTestimoni();
+  }
+
+  async function kirimTestimoni(){
+    const btn = $('tsSendBtn');
+    const sebelum = $('tsBefore').value.trim(), sesudah = $('tsAfter').value.trim();
+    if(!sebelum || !sesudah){ showAlertModal(t('tsNeedBoth')); return; }
+    btn.disabled = true;
+    const { data, error } = await sb.rpc('submit_testimonial', {
+      p_before: sebelum, p_after: sesudah, p_name_mode: testiNama,
+      p_show_score: $('tsShowScore').checked, p_show_package: $('tsShowPkg').checked
+    });
+    btn.disabled = false;
+    if(error){ showAlertModal(error.message); return; }
+    testiRow = Array.isArray(data) ? data[0] : data;
+    testiMode = 'view';
+    gambarTestimoni();
+  }
+
+  async function tarikTestimoni(){
+    if(!confirm(t('tsWithdrawAsk'))) return;
+    const { error } = await sb.rpc('withdraw_testimonial');
+    if(error){ showAlertModal(error.message); return; }
+    testiRow = null; testiMode = 'view';
+    gambarTestimoni();
+  }
+
   async function loadMockHistory(targetId){
     targetId = targetId || 'rMockHistory';
     const wrap = $(targetId);
@@ -5382,6 +5876,16 @@
     const setIds = [...new Set(history.map(h => h.set_id))];
     const { data: setsInfo } = await sb.from('test_sets').select('set_id,title').in('set_id', setIds);
     const titleMap = new Map((setsInfo || []).map(s => [s.set_id, s.title]));
+
+    // Grafik dibangun dari data yang SAMA -- tidak ada permintaan kedua ke server.
+    // Cuma di layar Raport; ringkasan riwayat di Beranda memakai fungsi ini juga.
+    if(targetId === 'rMockHistory'){
+      chartData = siapkanChart(history);
+      chartActive = (chartData && (chartData.bySection.all || []).length) ? 'all'
+                  : (chartData ? (CHART_SECTIONS.find(s => (chartData.bySection[s]||[]).length) || 'all') : 'all');
+      gambarChart();
+      muatTestimoni();
+    }
 
     wrap.innerHTML = '';
     history.forEach(h => {
@@ -7867,8 +8371,114 @@
     $('adminSearch').value = '';
     $('adminPkgFilter').value = 'all';
     $('adminStatusFilter').value = 'all';
+    pilihTabAdmin('users');
     loadAdminUsers();
     loadAdminEmails();
+  }
+
+  /* ==========================================================
+     MODERASI TESTIMONI (admin)
+
+     Semua lewat fungsi SECURITY DEFINER, bukan select/update langsung ke tabel:
+     admin juga role `authenticated`, jadi memberinya policy "baca semua baris"
+     otomatis membuka kolom yang sama untuk SETIAP murid yang login -- termasuk
+     nama asli murid yang memilih tampil anonim. Policy menyaring baris, GRANT
+     menyaring kolom, dan keduanya tidak bisa saling menggantikan.
+     ========================================================== */
+  let mdCache = [];
+
+  function mdStatusPill(s){
+    const peta = { pending:['pend','Pending'], published:['pub','Live'], hidden:['hid','Hidden'] };
+    const x = peta[s] || ['hid', s];
+    return `<span class="mdPill ${x[0]}">${escapeHTML(x[1])}</span>`;
+  }
+
+  function gambarModerasi(){
+    const wrap = $('adminTestiList');
+    const nMenunggu = mdCache.filter(r => r.status === 'pending').length;
+    $('adminTestiCount').textContent = mdCache.length
+      ? `${mdCache.length} total · ${nMenunggu} pending` : '';
+    if(!mdCache.length){
+      wrap.innerHTML = `<p class="emptyState">Belum ada testimoni yang masuk.</p>`;
+      return;
+    }
+    wrap.innerHTML = mdCache.map((r, i) => {
+      const seksi = r.snap_section === 'all' ? 'HSK Mocktest'
+        : (SECTION_LABEL[r.snap_section] || r.snap_section || '');
+      const fakta = [
+        r.snap_package ? (PACKAGE_BADGE_LABEL[r.snap_package] || r.snap_package) : null,
+        r.snap_months ? r.snap_months + ' bulan' : null,
+        r.snap_level ? ('HSK ' + r.snap_level + (seksi ? ' · ' + seksi : '')) : null,
+        (r.snap_score_first != null && r.snap_score_last != null)
+          ? ('nilai ' + r.snap_score_first + ' → ' + r.snap_score_last) : null,
+        'Nilai: ' + (r.show_score ? 'tampil' : 'disembunyikan'),
+        'Paket: ' + (r.show_package ? 'tampil' : 'disembunyikan')
+      ].filter(Boolean);
+      const namaAsli = r.snap_display_name || '(tanpa nama)';
+      return `<div class="mdCard" data-i="${i}">
+        <div class="mdTop">
+          <div>
+            <div class="mdWho">${escapeHTML(namaAsli)} <i>tampil sebagai "${escapeHTML(r.public_name || '')}"</i></div>
+            <div class="mdSub">Dikirim ${escapeHTML(formatMockDate(r.created_at))}${
+              r.updated_at && r.updated_at !== r.created_at ? ' · diperbarui ' + escapeHTML(formatMockDate(r.updated_at)) : ''}</div>
+          </div>
+          ${mdStatusPill(r.status)}
+        </div>
+        <p class="mdQuote">${escapeHTML(r.before_text)} ${escapeHTML(r.after_text)}</p>
+        <div class="mdFacts">${fakta.map(f => `<span class="mdFact">${escapeHTML(f)}</span>`).join('')}</div>
+        <p class="mdLbl">Tanggapan kamu <i>(tampil di bawah ceritanya, maks 400 karakter)</i></p>
+        <textarea class="mdReply" id="mdReply${i}" maxlength="400" rows="3">${escapeHTML(r.admin_reply || '')}</textarea>
+        <div class="mdBtns">
+          <button type="button" class="mdBtn primary" data-aksi="publish" data-i="${i}">${
+            r.status === 'published' ? 'Simpan tanggapan' : 'Setujui & tayangkan'}</button>
+          ${r.status === 'published'
+            ? `<button type="button" class="mdBtn danger" data-aksi="hide" data-i="${i}">Sembunyikan</button>`
+            : `<button type="button" class="mdBtn ghost" data-aksi="reply" data-i="${i}">Simpan tanggapan</button>`}
+        </div>
+      </div>`;
+    }).join('');
+    wrap.querySelectorAll('.mdBtn').forEach(b =>
+      b.addEventListener('click', ()=> aksiModerasi(b.dataset.aksi, Number(b.dataset.i), b)));
+  }
+
+  async function aksiModerasi(aksi, i, btn){
+    const r = mdCache[i];
+    if(!r) return;
+    btn.disabled = true;
+    // Tanggapan selalu disimpan lebih dulu, termasuk waktu tombolnya "Setujui & tayangkan".
+    // Kalau urutannya dibalik, testimoni sempat tayang tanpa tanggapan yang barusan diketik.
+    const teks = $('mdReply' + i).value;
+    if(teks !== (r.admin_reply || '')){
+      const { error } = await sb.rpc('admin_reply_testimonial', { p_user_id: r.user_id, p_reply: teks });
+      if(error){ btn.disabled = false; showAlertModal('Gagal menyimpan tanggapan: ' + error.message); return; }
+    }
+    if(aksi === 'publish' && r.status !== 'published'){
+      const { error } = await sb.rpc('admin_set_testimonial_status', { p_user_id: r.user_id, p_status: 'published' });
+      if(error){ btn.disabled = false; showAlertModal('Gagal menayangkan: ' + error.message); return; }
+    }
+    if(aksi === 'hide'){
+      const { error } = await sb.rpc('admin_set_testimonial_status', { p_user_id: r.user_id, p_status: 'hidden' });
+      if(error){ btn.disabled = false; showAlertModal('Gagal menyembunyikan: ' + error.message); return; }
+    }
+    await loadAdminTesti();
+  }
+
+  async function loadAdminTesti(){
+    const wrap = $('adminTestiList');
+    wrap.innerHTML = `<p class="emptyState">${t('loading')}</p>`;
+    const { data, error } = await sb.rpc('admin_list_testimonials', { p_status: null });
+    if(error){ wrap.innerHTML = `<p class="emptyState">Gagal memuat: ${escapeHTML(error.message)}</p>`; return; }
+    mdCache = data || [];
+    gambarModerasi();
+  }
+
+  function pilihTabAdmin(tab){
+    const users = tab === 'users';
+    $('adminTabUsers').setAttribute('aria-selected', String(users));
+    $('adminTabTesti').setAttribute('aria-selected', String(!users));
+    $('adminUsersPane').classList.toggle('hidden', !users);
+    $('adminTestiPane').classList.toggle('hidden', users);
+    if(!users) loadAdminTesti();
   }
 
   function closeAdmin(){
@@ -8037,6 +8647,19 @@
       <label for="editSubEnd">Subscription end</label>
       <input type="date" id="editSubEnd" value="${escapeHTML(profile.subscription_end || '')}" />
 
+      <label for="editPkgStart">Package start</label>
+      <input type="date" id="editPkgStart" value="${escapeHTML(profile.package_started_at || '')}" />
+      <p class="adminFieldHint">Tanggal murid mulai paket berjalan. Dipakai menghitung "lama
+        belajar" di testimoni. Sengaja kosong untuk murid lama. Kalau tidak diisi, baris lama
+        belajar tidak ditampilkan sama sekali, bukan ditaksir dari Subscription end.</p>
+
+      <label class="adminCheck" for="editIsMinor">
+        <input type="checkbox" id="editIsMinor"${profile.is_minor ? ' checked' : ''} />
+        <span>Murid anak (kelas Kids)</span>
+      </label>
+      <p class="adminFieldHint">Memblokir fitur testimoni untuk akun ini. Tidak ada data umur di
+        sistem dan kode paket tidak membedakan kelas Kids, jadi ini harus dicentang manual.</p>
+
       <label for="editRole">Role</label>
       <select id="editRole"${isSelf ? ' disabled' : ''}>${roleOptionsHTML}</select>
       ${isSelf ? `<p class="adminFieldHint">Kamu tidak bisa mengubah role akun sendiri lewat sini — kamu satu-satunya admin saat ini, mengganti ke Student akan mengunci akses admin secara permanen (recovery cuma lewat Supabase SQL Editor).</p>` : ''}
@@ -8063,7 +8686,12 @@
       package: $('editPackage').value,
       target_level: $('editLevel').value ? Number($('editLevel').value) : null,
       status: $('editStatus').value,
-      subscription_end: $('editSubEnd').value || null
+      subscription_end: $('editSubEnd').value || null,
+      // Kosong disimpan sebagai NULL, bukan string kosong: NULL yang dibaca sebagai
+      // "tidak diketahui" oleh submit_testimonial, dan itu yang bikin baris lama
+      // belajar hilang alih-alih menampilkan angka karangan.
+      package_started_at: $('editPkgStart').value || null,
+      is_minor: $('editIsMinor').checked
     };
     // Self-demotion guard (DECISIONS_NEEDED #31): role <select> is disabled when editing your
     // own row, so it's simply never included in the update -- role can't change via a disabled
@@ -8151,6 +8779,10 @@
 
       <label for="createRole">Role</label>
       <select id="createRole">${roleOptionsHTML}</select>
+
+      <p class="adminFieldHint">Tanggal mulai paket dan penanda murid anak diatur lewat tombol
+        Edit setelah akunnya jadi. Form ini lewat Edge Function admin-users yang sumbernya tidak
+        ada di repo, jadi tidak diubah dari sini.</p>
 
       <p class="adminFieldWarning hidden" id="createError"></p>
 
@@ -9984,6 +10616,8 @@
   $('browseSearch').addEventListener('input', applyBrowseFilter);
   $('browseMoreBtn').addEventListener('click', renderBrowseChunk);
   $('adminExitBtn').addEventListener('click', closeAdmin);
+  $('adminTabUsers').addEventListener('click', ()=> pilihTabAdmin('users'));
+  $('adminTabTesti').addEventListener('click', ()=> pilihTabAdmin('testi'));
   $('adminSearch').addEventListener('input', applyAdminFilter);
   $('adminPkgFilter').addEventListener('change', applyAdminFilter);
   $('adminStatusFilter').addEventListener('change', applyAdminFilter);

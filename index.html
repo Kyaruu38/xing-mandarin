@@ -399,6 +399,25 @@ h2 .hz-in{font-family:var(--f-hanzi);font-weight:900;color:var(--star-core)}
 .cta-hz rb{background:linear-gradient(125deg,var(--tiger) 10%,var(--gold) 50%,var(--gold-soft));-webkit-background-clip:text;background-clip:text;color:transparent}
 .cta-hz rt{font-family:var(--f-mono);font-size:12px;letter-spacing:.4em;color:var(--muted);padding-bottom:14px}
 .cta-sec .sec-sub{max-width:460px;margin:0 auto 36px}
+/* ---- testimoni murid ---- */
+.testi-sec{padding:0 0 40px}
+.testi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(288px,1fr));gap:16px}
+.tsCard{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;
+  display:flex;flex-direction:column}
+.tsCardTop{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.tsCardName{font-size:15.5px;font-weight:700;color:var(--text)}
+.tsCardPkg{font-size:11.5px;color:var(--gold);font-weight:600;text-align:right;line-height:1.35}
+.tsCardMeta{font-size:12px;color:var(--muted);margin:2px 0 0}
+.tsCardChart{border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  padding:14px 0 8px;margin:14px 0}
+.tsCardQuote{font-size:14px;line-height:1.68;color:var(--text);margin:0}
+.tsCardReply{margin-top:15px;padding:13px 14px;border-radius:12px;
+  background:rgba(242,176,30,.07);border:1px solid rgba(242,176,30,.2)}
+.tsCardReply b{display:block;font-size:11.5px;font-weight:700;color:var(--gold);margin-bottom:5px}
+.tsCardReply p{font-size:13px;line-height:1.6;color:var(--text);margin:0}
+.tsCardFoot{margin-top:auto;padding-top:14px;display:flex;align-items:center;gap:7px;
+  font-size:11.5px;color:var(--muted)}
+.tsCardFoot svg{flex:0 0 15px}
 footer{box-shadow:0 -1px 0 var(--line);padding:34px 0 max(34px,env(safe-area-inset-bottom))}
 .foot{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap}
 .foot .mono{font-size:11px;letter-spacing:.14em;color:var(--muted)}
@@ -692,10 +711,25 @@ footer{box-shadow:0 -1px 0 var(--line);padding:34px 0 max(34px,env(safe-area-ins
 </section>
 
 <!-- PRICING -->
+<!-- TESTIMONI
+     Diisi dari database saat halaman dimuat. Kalau belum ada yang disetujui, seluruh
+     bagian ini tidak pernah muncul: dinding testimoni yang isinya satu kartu lebih
+     buruk daripada tidak ada sama sekali. -->
+<section id="testi" class="testi-sec hidden">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="node"><span class="node-line"></span><span class="node-star">&#10022;</span><span class="node-tag" data-i18n="tsTag">05 &middot; CERITA MURID</span></div>
+      <h2 data-i18n="tsH2">Mereka mulai dari nol juga.</h2>
+      <p class="sec-sub" data-i18n="tsSub">Angka dan grafiknya diambil langsung dari hasil simulasi di platform ini.</p>
+    </div>
+    <div class="testi-grid" id="testiGrid"></div>
+  </div>
+</section>
+
 <section id="harga">
   <div class="wrap">
     <div class="sec-head reveal">
-      <div class="node"><span class="node-line"></span><span class="node-star">✦</span><span class="node-tag" data-i18n="priceTag">05 · PILIHAN PAKET</span></div>
+      <div class="node"><span class="node-line"></span><span class="node-star">✦</span><span class="node-tag" data-i18n="priceTag">06 · PILIHAN PAKET</span></div>
       <h2 data-i18n="priceH2">Berlatih dulu, sampai rapormu menunjukkan siap.</h2>
       <p class="sec-sub" data-i18n="priceSub">Belajar bareng pengajar, atau berlatih sendiri di platform. Biaya ujian HSK tidak bisa dikembalikan, jadi pastikan kesiapanmu terukur dulu.</p>
     </div>
@@ -825,7 +859,7 @@ footer{box-shadow:0 -1px 0 var(--line);padding:34px 0 max(34px,env(safe-area-ins
       dawnTag:'04 · DI DALAM SIMULASI', dawnH2:'Berlatih dalam suasana yang sama dengan hari ujian.',
       dawnSub:'Berikut tampilan simulasi yang akan kamu kerjakan, sama persis hingga pembagian waktunya.',
       examPart:'BAGIAN 1', examQ:'Dengarkan dialog, lalu jawab:', examProg:'SOAL', examNext:'Soal berikutnya →',
-      priceTag:'05 · PILIHAN PAKET', priceH2:'Berlatih dulu, sampai rapormu menunjukkan siap.',
+      priceTag:'06 · PILIHAN PAKET', priceH2:'Berlatih dulu, sampai rapormu menunjukkan siap.',
       priceSub:'Belajar bareng pengajar, atau berlatih sendiri di platform. Biaya ujian HSK tidak bisa dikembalikan, jadi pastikan kesiapanmu terukur dulu.',
       clsMeetA:'1×8 pertemuan', clsSizeA:'Kelas 3 sampai 7', clsMeetB:'1×8 pertemuan', clsSizeB:'Kelas 3 sampai 7',
       clsF1a:'Listening, writing, reading, speaking dari nol', clsF1b:'Kelas kecil, 3 sampai 7 peserta', clsF1c:'Selasa dan Kamis 20:00 WIB', clsF1d:'Kuota terbatas per angkatan',
@@ -841,6 +875,10 @@ footer{box-shadow:0 -1px 0 var(--line);padding:34px 0 max(34px,env(safe-area-ins
       seeAllBtn:'Lihat semua paket →', seeAllSub:'Program intensif, kelas grup, private group, private dan semi private, online maupun onsite.',
       ctaH2:'Mulai dari satu simulasi.', ctaSub:'Lima belas menit dari sekarang, kamu tahu persis harus mulai dari mana.',
       ctaTrial:'Coba gratis dulu',
+      tsTag:'05 · CERITA MURID', tsH2:'Mereka mulai dari nol juga.',
+      tsSub:'Angka dan grafiknya diambil langsung dari hasil simulasi di platform ini.',
+      tsVerified:'Murid terdaftar, nilainya terverifikasi', tsReplyWho:'Tanggapan Xing Mandarin',
+      tsMonths:'{n} bulan', tsScoreFrom:'nilai {a}', tsScoreTo:'nilai {b}',
       /* Dua pesan WhatsApp siap kirim. Dipisah karena dua orang yang berbeda:
          yang satu sudah mau mencoba, yang satu masih menimbang. Ditulis dari sudut
          pandang CALON MURID, bukan dari sudut pandang toko -- yang kebuka di HP-nya
@@ -887,7 +925,7 @@ footer{box-shadow:0 -1px 0 var(--line);padding:34px 0 max(34px,env(safe-area-ins
       dawnTag:'04 · INSIDE THE SIMULATION', dawnH2:'Practice in the same setting as exam day.',
       dawnSub:'This is the simulation you will work on, identical down to the time allocation.',
       examPart:'PART 1', examQ:'Listen to the dialogue, then answer:', examProg:'QUESTION', examNext:'Next question →',
-      priceTag:'05 · PLANS', priceH2:'Practice first, until your report says ready.',
+      priceTag:'06 · PLANS', priceH2:'Practice first, until your report says ready.',
       priceSub:'HSK registration fees are nonrefundable. Make sure your readiness is measured before you register.',
       clsMeetA:'1×8 sessions', clsSizeA:'Class of 3 to 7', clsMeetB:'1×8 sessions', clsSizeB:'Class of 3 to 7',
       clsF1a:'Listening, writing, reading and speaking from zero', clsF1b:'Small class, 3 to 7 students', clsF1c:'Tuesday and Thursday, 20:00 WIB', clsF1d:'Limited seats per batch',
@@ -903,6 +941,10 @@ footer{box-shadow:0 -1px 0 var(--line);padding:34px 0 max(34px,env(safe-area-ins
       seeAllBtn:'See all packages →', seeAllSub:'Intensive programs, group classes, private group, private and semi private, online or onsite.',
       ctaH2:'Start with one simulation.', ctaSub:'Fifteen minutes from now, you will know exactly where to begin.',
       ctaTrial:'Try it free first',
+      tsTag:'05 · STUDENT STORIES', tsH2:'They started from zero too.',
+      tsSub:'The numbers and the chart come straight from their simulations on this platform.',
+      tsVerified:'Enrolled student, score verified', tsReplyWho:'From Xing Mandarin',
+      tsMonths:'{n} months', tsScoreFrom:'score {a}', tsScoreTo:'score {b}',
       waTrial:"Hi! I found Xing Mandarin on your website. I'm interested, and I'd "
             + "like to try the free trial first — would that be okay?",
       waKonsul:"Hi! Could I ask a few questions first? I'm not sure which HSK level "
@@ -941,7 +983,7 @@ footer{box-shadow:0 -1px 0 var(--line);padding:34px 0 max(34px,env(safe-area-ins
       dawnTag:'04 · 模拟考试内部', dawnH2:'在与考试当天相同的环境中练习。',
       dawnSub:'这就是你将要完成的模拟界面，连时间分配都完全一致。',
       examPart:'第一部分', examQ:'听对话，然后作答：', examProg:'题目', examNext:'下一题 →',
-      priceTag:'05 · 套餐选择', priceH2:'先练习，直到成绩报告说你准备好了。',
+      priceTag:'06 · 套餐选择', priceH2:'先练习，直到成绩报告说你准备好了。',
       priceSub:'HSK 报名费不可退还。报名前，先确认你的准备程度。',
       clsMeetA:'1×8次课', clsSizeA:'3 至 7 人小班', clsMeetB:'1×8次课', clsSizeB:'3 至 7 人小班',
       clsF1a:'零基础听说读写', clsF1b:'小班教学，3 至 7 人', clsF1c:'周二、周四 20:00 印尼西部时间', clsF1d:'每期名额有限',
@@ -957,6 +999,10 @@ footer{box-shadow:0 -1px 0 var(--line);padding:34px 0 max(34px,env(safe-area-ins
       seeAllBtn:'查看所有套餐 →', seeAllSub:'强化课程、团体班、私人小组、一对一与半私人，线上或上门。',
       ctaH2:'从一次模拟开始。', ctaSub:'十五分钟后，你就会清楚该从哪里开始。',
       ctaTrial:'先免费体验',
+      tsTag:'05 · 学员故事', tsH2:'他们也是从零开始的。',
+      tsSub:'这里的分数和折线，都直接来自他们在本平台的模拟测试记录。',
+      tsVerified:'在读学员，成绩已验证', tsReplyWho:'星图的回复',
+      tsMonths:'{n} 个月', tsScoreFrom:'{a} 分', tsScoreTo:'{b} 分',
       waTrial:'你好！我在网站上看到了 Xing Mandarin，挺感兴趣的。'
             + '我想先试一下免费体验课，可以吗？',
       waKonsul:'你好！我想先问几个问题可以吗？我不太确定自己应该从 HSK 几开始，'
@@ -998,9 +1044,99 @@ footer{box-shadow:0 -1px 0 var(--line);padding:34px 0 max(34px,env(safe-area-ins
       currentLang = b.dataset.lang;
       localStorage.setItem('xingLang', currentLang);
       applyI18n();
+      gambarTesti();   // kartu testimoni dibangun di JS, tidak ikut applyI18n
     });
   });
   applyI18n();
+
+  /* ---------- testimoni murid ----------
+     Ditarik lewat REST biasa, bukan SDK Supabase. Menambahkan supabase-js ke halaman ini
+     berarti menambah paket besar demi satu permintaan, padahal keluhan utama halaman ini
+     memang beratnya.
+
+     Tidak ada penyaring status=published di URL, dan itu disengaja: kolom `status` memang
+     TIDAK diberikan ke pengunjung, dan tidak perlu -- RLS di server sudah cuma mengembalikan
+     baris yang sudah disetujui. Menyaring dari sisi klien berarti mempercayai klien.
+     Kunci anon di bawah memang publik (dipakai halaman aplikasi juga) dan tidak memberi
+     akses apa pun di luar yang sudah dibuka RLS. */
+  var SB_URL = 'https://xzgvhzmmqbijpbrhagjf.supabase.co';
+  var SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6Z3Zoem1tcWJpanBicmhhZ2pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0OTA4NjMsImV4cCI6MjA5OTA2Njg2M30.9OtBJIBDDUhhSsvtz9Pql12hWToGzmULOGh7Tj-vzNs';
+  var SEKSI_NAMA = { listening:'Listening', reading:'Reading', writing:'Writing', all:'HSK Mocktest' };
+  var SEKSI_WARNA = { listening:'#F2B01E', reading:'#5AA9E6', writing:'#C77DD6', all:'#43B583' };
+
+  function esc(s){ return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  function garisTesti(titik, maks, warna){
+    if(!titik || titik.length < 2) return '';
+    var W = 500, H = 96, T = 12, B = 68, L = 16, R = 484;
+    var y = function(v){ return T + (maks - v) / maks * (B - T); };
+    var x = function(i){ return L + i * ((R - L) / (titik.length - 1)); };
+    var pts = titik.map(function(p,i){ return x(i) + ',' + y(p.v); }).join(' ');
+    var bulat = titik.map(function(p,i){
+      return '<circle cx="' + x(i) + '" cy="' + y(p.v) + '" r="' +
+        (i === titik.length - 1 ? 5.5 : 4) + '" fill="' + warna + '"/>'; }).join('');
+    var awal = titik[0], akhir = titik[titik.length - 1];
+    return '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" style="display:block" aria-hidden="true">' +
+      '<line x1="0" y1="' + T + '" x2="' + W + '" y2="' + T + '" stroke="var(--line)" stroke-width="1"/>' +
+      '<line x1="0" y1="' + B + '" x2="' + W + '" y2="' + B + '" stroke="var(--line)" stroke-width="1"/>' +
+      '<polyline fill="none" stroke="' + warna + '" stroke-width="2.6" stroke-linejoin="round" points="' + pts + '"/>' +
+      bulat +
+      '<text x="' + L + '" y="90" font-size="12" font-weight="700" fill="var(--muted)">' +
+        esc(t('tsScoreFrom').replace('{a}', awal.v)) + '</text>' +
+      '<text x="' + R + '" y="90" font-size="12" font-weight="700" fill="' + warna + '" text-anchor="end">' +
+        esc(t('tsScoreTo').replace('{b}', akhir.v)) + '</text></svg>';
+  }
+
+  function kartuTesti(r){
+    var seksi = r.snap_section || 'all';
+    var maks = seksi === 'all' ? 300 : 100;
+    var warna = SEKSI_WARNA[seksi] || '#F2B01E';
+    var deret = (r.snap_series && r.snap_series[seksi]) || [];
+    var judulKanan = '';
+    if(r.show_package){
+      var baris = [];
+      if(r.snap_package) baris.push(esc(r.snap_package));
+      if(r.snap_months) baris.push(esc(t('tsMonths').replace('{n}', r.snap_months)));
+      judulKanan = baris.join('<br>');
+    }
+    var meta = r.show_score && r.snap_level
+      ? 'HSK ' + r.snap_level + ' · ' + esc(SEKSI_NAMA[seksi] || seksi) : '';
+    var grafik = (r.show_score && deret.length > 1)
+      ? '<div class="tsCardChart">' + garisTesti(deret, maks, warna) + '</div>' : '';
+    return '<article class="tsCard reveal">' +
+      '<div class="tsCardTop"><span class="tsCardName">' + esc(r.public_name) + '</span>' +
+      (judulKanan ? '<span class="tsCardPkg">' + judulKanan + '</span>' : '') + '</div>' +
+      (meta ? '<p class="tsCardMeta">' + meta + '</p>' : '') +
+      (grafik || '<div style="height:14px"></div>') +
+      '<p class="tsCardQuote">' + esc(r.before_text) + ' ' + esc(r.after_text) + '</p>' +
+      (r.admin_reply ? '<div class="tsCardReply"><b>' + esc(t('tsReplyWho')) + '</b><p>' +
+        esc(r.admin_reply) + '</p></div>' : '') +
+      '<div class="tsCardFoot"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" ' +
+      'stroke="#43B583" stroke-width="2.6" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg>' +
+      esc(t('tsVerified')) + '</div></article>';
+  }
+
+  var testiData = null;
+  function gambarTesti(){
+    if(!testiData || !testiData.length) return;
+    document.getElementById('testiGrid').innerHTML = testiData.map(kartuTesti).join('');
+    document.getElementById('testi').classList.remove('hidden');
+    // Kartu ikut animasi masuk yang sama dengan bagian lain; kalau IntersectionObserver
+    // sudah lewat, .reveal tidak akan pernah dapat .in, jadi dinyalakan langsung.
+    document.querySelectorAll('#testiGrid .reveal').forEach(function(el){ el.classList.add('in'); });
+  }
+
+  (function muatTesti(){
+    var kolom = 'public_name,before_text,after_text,show_score,show_package,snap_package,' +
+      'snap_months,snap_level,snap_section,snap_score_first,snap_score_last,snap_series,' +
+      'admin_reply,published_at';
+    fetch(SB_URL + '/rest/v1/testimonials?select=' + kolom + '&order=published_at.desc&limit=6', {
+      headers: { apikey: SB_ANON, Authorization: 'Bearer ' + SB_ANON }
+    }).then(function(r){ return r.ok ? r.json() : []; })
+      .then(function(rows){ testiData = rows || []; gambarTesti(); })
+      .catch(function(){ /* halaman tetap jalan tanpa bagian ini */ });
+  })();
 
   /* ---------- theme (production-aligned: data-theme + localStorage xingTheme) ---------- */
   var tgl = document.getElementById('themeTgl');

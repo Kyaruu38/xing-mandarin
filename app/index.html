@@ -5603,8 +5603,13 @@
     // kenaikan 2 poin kelihatan sedahsyat kenaikan 50.
     // R sengaja 322, bukan 340: titik terakhir digambar r=4.6 dan label tanggalnya lebih
     // lebar lagi, jadi kalau garisnya menyentuh tepi viewBox dua-duanya terpotong.
-    const W = 340, H = 150, L = 34, R = 322, T = 10, B = 150;
-    const y = v => T + (maks - v) / maks * (B - T);
+    //
+    // BP (dasar area gambar) DIPISAH dari B (baris tanggal). Sebelumnya dua-duanya 150,
+    // dan itu kelihatan begitu ada murid bernilai 2 dari 100: garisnya duduk persis di
+    // atas tulisan tanggalnya. Nilai rendah justru yang paling sering muncul di awal,
+    // jadi kasus ini bukan pengecualian langka.
+    const W = 340, H = 150, L = 34, R = 322, T = 10, BP = 126, B = 150;
+    const y = v => T + (maks - v) / maks * (BP - T);
     const x = i => titik.length === 1 ? (L + R) / 2
                  : L + 14 + i * ((R - L - 14) / (titik.length - 1));
     const kisi = [0.25, 0.5, 0.75, 1].map(f =>

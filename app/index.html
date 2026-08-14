@@ -1851,6 +1851,14 @@
     .historyItem:last-child{border-bottom:none}
     .historyTitle{font-weight:700; margin-bottom:2px}
     .historyMeta{color:var(--muted); font-size:12px}
+    /* Baris riwayat yang bisa dibuka lagi. Padding kiri-kanan + radius baru muncul saat
+       hover/fokus supaya daftar dalam keadaan diam tetap serapi versi lamanya. */
+    .historyItemClickable{cursor:pointer; padding-left:10px; padding-right:10px; margin:0 -10px;
+      border-radius:10px; transition:background .15s ease}
+    .historyItemClickable:hover{background:rgba(var(--text-rgb),.05)}
+    .historyItemClickable:focus-visible{outline:2px solid var(--gold); outline-offset:2px}
+    .historyItemClickable .historyTitle::after{content:'›'; color:var(--muted); font-weight:700;
+      margin-left:6px; display:inline-block}
 
     /* listening: audio player. Shared by 4 renderers (listening_tf/image_tf/listening_mc/
        image_mc) via the one renderAudioPlayer() helper -- source only shows this in the
@@ -3724,7 +3732,7 @@
      Kalau keduanya beda, user yang masih buka tab lama bakal dikasih
      banner "ada versi baru".
      ============================================================ */
-  const APP_VERSION = '5.7';
+  const APP_VERSION = '5.8';
 
   const SUPABASE_URL  = 'https://xzgvhzmmqbijpbrhagjf.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6Z3Zoem1tcWJpanBicmhhZ2pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0OTA4NjMsImV4cCI6MjA5OTA2Njg2M30.9OtBJIBDDUhhSsvtz9Pql12hWToGzmULOGh7Tj-vzNs';
@@ -6127,7 +6135,7 @@
     wrap.innerHTML = `<p class="emptyState">${t('loading')}</p>`;
 
     const { data: history, error } = await sb
-      .from('test_attempts').select('set_id,hsk_level,section,score,total_points,correct_count,total_questions,created_at')
+      .from('test_attempts').select('id,set_id,hsk_level,section,score,total_points,correct_count,total_questions,time_taken_seconds,created_at')
       .eq('user_id', currentUser)
       .order('created_at', { ascending:false });
     if(error){ wrap.innerHTML = `<p class="emptyState">${t('errFetchHistory')}</p>`; return; }
@@ -6154,13 +6162,58 @@
     history.forEach(h => {
       const pct = h.total_points ? Math.round((h.score / h.total_points) * 100) : 0;
       const row = document.createElement('div');
-      row.className = 'historyItem';
+      row.className = 'historyItem historyItemClickable';
+      /* Baris riwayat sekarang bisa dibuka lagi. Sebelumnya cuma div mati: murid lihat skornya
+         tapi tidak bisa balik ke pembahasan -- satu-satunya cara ya mengulang tesnya, yang
+         justru menimpa riwayat itu sendiri. Jawaban lamanya sudah tersimpan di
+         test_attempts.answers, jadi yang kurang cuma jalan buat menampilkannya kembali. */
+      row.dataset.attemptId = h.id;
+      row.dataset.setId = h.set_id;
+      row.setAttribute('role', 'button');
+      row.setAttribute('tabindex', '0');
       row.innerHTML = `
         <div class="historyTitle">${titleMap.get(h.set_id) || h.set_id}</div>
         <div class="historyMeta">HSK ${h.hsk_level} · ${SECTION_LABEL[h.section] || h.section} · ${t('scoreLabel')} ${pct}% · ${t('benar')} ${h.correct_count}/${h.total_questions} · ${formatMockDate(h.created_at)}</div>
       `;
+      row.addEventListener('click', ()=> bukaReviewRiwayat(h));
+      row.addEventListener('keydown', e=>{
+        if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); bukaReviewRiwayat(h); }
+      });
       wrap.appendChild(row);
     });
+  }
+
+  /* Buka ulang layar review dari sebuah attempt lama.
+
+     Kunci jawaban TIDAK diambil dari sini -- sama seperti waktu submit, yang mengembalikan
+     answer/explanation adalah RPC `review_attempt` (SECURITY DEFINER, dan di dalamnya sudah
+     memfilter `user_id = auth.uid()`, jadi id attempt milik orang lain ditolak). Yang di-load
+     dari klien cuma payload soalnya -- persis kolom yang sama dengan startAttempt(). */
+  async function bukaReviewRiwayat(h){
+    const { data: setRow, error: setErr } = await sb
+      .from('test_sets').select('set_id,hsk_level,section,title,time_limit_seconds,total_questions')
+      .eq('set_id', h.set_id).single();
+    if(setErr || !setRow){ showAlertModal(t('errFetchSet') + ' ' + (setErr?.message || t('notFound'))); return; }
+
+    const { data: qRows, error: qErr } = await sb
+      .from('question_bank').select('id,question_type,order_index,payload,points')
+      .eq('set_id', h.set_id)
+      .order('order_index', { ascending:true });
+    if(qErr){ showAlertModal(t('errFetchQuestions') + ' ' + qErr.message); return; }
+
+    const { data: hasil, error: rpcErr } = await sb.rpc('review_attempt', { p_attempt_id: h.id });
+    if(rpcErr || !hasil){ showAlertModal(t('errFetchAttemptHistory') + ' ' + (rpcErr?.message || '')); return; }
+
+    attemptGroupSets = null;
+    attemptSectionBreaks = new Map();
+    attemptSet = setRow;
+    attemptQuestions = qRows || [];
+    // Esai dinilai AI dan hasilnya nggak ikut disimpan di test_attempts.answers, jadi jawaban
+    // esai lama memang tidak bisa ditampilkan ulang -- sisanya tampil apa adanya.
+    attemptAnswers = {};
+    (hasil.review || []).forEach(item => { if(item.user_answer != null) attemptAnswers[item.id] = item.user_answer; });
+
+    showResult(hasil, hasil.time_taken_seconds || 0);
   }
 
   /* ==========================================================
@@ -10906,6 +10959,16 @@
     });
   }
 
+  /* Blok penjelasan di layar review. Kalau soalnya memang belum punya penjelasan, barisnya
+     DIHILANGKAN sama sekali -- bukan dirender jadi tanda strip "-". Strip itu kelihatan seperti
+     penjelasan yang isinya kosong/rusak, padahal artinya cuma "belum ditulis". Lebih baik tidak
+     ada baris sama sekali daripada baris yang bikin murid mikir ada yang error. */
+  function blokPenjelasan(teks){
+    const isi = String(teks ?? '').trim();
+    if(!isi || isi === '-') return '';
+    return `<div class="reviewExplain"><span class="reviewExplainLabel">${t('explanationLabel')}</span>${escapeHtml(isi)}</div>`;
+  }
+
   // Review selalu nampilin pinyin & terjemahan (nggak ngikut toggle attemptShowPinyin/Translation),
   // karena murid udah selesai ngerjain -- beda dari attemptBody yang default nyembunyiin buat simulasi ujian.
   function buildReviewHTML(item, q){
@@ -10921,7 +10984,7 @@
     let html = `<div class="reviewHead"><span>${t('questionNumber').replace('{n}', item.order_index)}</span>${badge}</div>`;
 
     if(!q || !q.payload){
-      html += `<div class="reviewExplain"><span class="reviewExplainLabel">${t('explanationLabel')}</span>${escapeHtml(item.explanation || '-')}</div>`;
+      html += blokPenjelasan(item.explanation);
       return html;
     }
 
@@ -10960,7 +11023,7 @@
       html += buildReviewImageMatchChoices(p.image_choices, item.user_answer, item.correct_answer);
     }
 
-    html += `<div class="reviewExplain"><span class="reviewExplainLabel">${t('explanationLabel')}</span>${escapeHtml(item.explanation || '-')}</div>`;
+    html += blokPenjelasan(item.explanation);
     return html;
   }
 

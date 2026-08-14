@@ -3732,7 +3732,7 @@
      Kalau keduanya beda, user yang masih buka tab lama bakal dikasih
      banner "ada versi baru".
      ============================================================ */
-  const APP_VERSION = '5.8';
+  const APP_VERSION = '5.9';
 
   const SUPABASE_URL  = 'https://xzgvhzmmqbijpbrhagjf.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6Z3Zoem1tcWJpanBicmhhZ2pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0OTA4NjMsImV4cCI6MjA5OTA2Njg2M30.9OtBJIBDDUhhSsvtz9Pql12hWToGzmULOGh7Tj-vzNs';
@@ -5634,6 +5634,8 @@
     // kembalikan reveal supaya tombol nilai bisa ditekan lagi setelah gagal simpan
     if(error){ revealed = true; showAlertModal(t('errSaveProgress') + ' ' + error.message); return; }
 
+    lupakanTanggalAktif();   // hari ini baru jadi hari aktif -> streak wajib dihitung ulang
+
     sessionIndex += 1;
     if(sessionIndex >= sessionQueue.length){
       $('sessionView').classList.add('hidden');
@@ -5738,8 +5740,7 @@
     const dueCount = mastery.filter(m => m.srs_due && m.srs_due <= todayStr()).length;
     $('rDue').textContent = dueCount;
 
-    const dateSet = new Set(mastery.filter(m=>m.last_reviewed).map(m=>m.last_reviewed.slice(0,10)));
-    $('rStreak').textContent = computeStreak(dateSet);
+    $('rStreak').textContent = computeStreak((await ambilTanggalAktif()).dates);
 
     let levelOf = new Map();
     try{
@@ -5818,6 +5819,54 @@
       d.setUTCDate(d.getUTCDate() - 1);
     }
     return streak;
+  }
+
+  /* ---- SATU sumber kebenaran buat "hari aktif" / streak ----------------------------
+     BUG 14 Agu 2026: ada DUA definisi streak yang jalan bareng di layar Beranda.
+       - kartu sidebar + statCard  : cuma hari review kosakata (user_mastery.last_reviewed)
+       - label di grafik Activity  : hari review ATAU hari ngerjain mock test
+     Akibatnya murid yang rajin mock test tapi belum sentuh flashcard lihat
+     "STREAK 0 days" persis di sebelah "✦ 2 day streak". Dua-duanya "bener" menurut
+     rumusnya masing-masing, yang salah justru ada dua rumus.
+
+     Yang dipakai sekarang = definisi grafik Activity, alasannya: angkanya harus cocok
+     sama titik-titik yang KELIHATAN di grafik itu. Kalau pakai definisi lama, murid
+     lihat titik nyala di grafik tapi streaknya nol -- itu yang bikin bingung.
+
+     Jendela 400 hari, bukan 84 seperti grafik: grafik cuma perlu 12 minggu terakhir buat
+     digambar, streak perlu mundur sejauh apa pun rantainya masih nyambung.
+
+     Cache-nya dibuang tiap kali ada aktivitas baru (submit mock test / review kartu) --
+     lihat pemanggilan lupakanTanggalAktif() di bawah. */
+  let cacheTanggalAktif = null;
+
+  function lupakanTanggalAktif(){ cacheTanggalAktif = null; }
+
+  async function ambilTanggalAktif(){
+    const HARI = 400;
+    if(cacheTanggalAktif && cacheTanggalAktif.userId === currentUser) return cacheTanggalAktif;
+
+    const sejak = new Date(); sejak.setUTCHours(0,0,0,0);
+    sejak.setUTCDate(sejak.getUTCDate() - (HARI - 1));
+    const sejakIso = sejak.toISOString();
+
+    const counts = new Map();
+    const bump = s => { if(!s) return; const d = String(s).slice(0,10); counts.set(d, (counts.get(d) || 0) + 1); };
+    try{
+      const [{ data: attempts, error: e1 }, { data: reviews, error: e2 }] = await Promise.all([
+        sb.from('test_attempts').select('created_at').eq('user_id', currentUser).gte('created_at', sejakIso),
+        sb.from('user_mastery').select('last_reviewed').eq('user_id', currentUser).gte('last_reviewed', sejakIso)
+      ]);
+      if(!e1 && attempts) attempts.forEach(a => bump(a.created_at));
+      if(!e2 && reviews) reviews.forEach(r => bump(r.last_reviewed));
+    }catch(e){
+      // Sengaja diam: streak 0 masih bisa dibaca, layar error nggak. Hasilnya juga
+      // TIDAK di-cache di jalur ini, biar percobaan berikutnya coba ambil lagi.
+      return { userId: currentUser, counts, dates: new Set() };
+    }
+
+    cacheTanggalAktif = { userId: currentUser, counts, dates: new Set(counts.keys()) };
+    return cacheTanggalAktif;
   }
 
   /* ==========================================================
@@ -6246,8 +6295,7 @@
     lastDueCount = dueCount;
     renderContinueSubtitle();
 
-    const dateSet = new Set(mastery.filter(m=>m.last_reviewed).map(m=>m.last_reviewed.slice(0,10)));
-    const streak = computeStreak(dateSet);
+    const streak = computeStreak((await ambilTanggalAktif()).dates);
     $('dashStreak').textContent = streak;
     $('sideStreak').textContent = streak;
 
@@ -10742,6 +10790,7 @@
         id: q.id,
         order_index: i + 1
       }));
+      lupakanTanggalAktif();   // sama seperti submit satu section: hari ini jadi hari aktif
       showResult({
         score: totalScore,
         total_points: totalPoints,
@@ -10768,6 +10817,7 @@
       return;
     }
 
+    lupakanTanggalAktif();   // attempt baru masuk -> hari ini jadi hari aktif, streak dihitung ulang
     showResult(data, timeTaken);
   }
 
@@ -11915,23 +11965,23 @@
     const today = new Date(); today.setUTCHours(0,0,0,0);
     const windowStart = new Date(today); windowStart.setUTCDate(windowStart.getUTCDate() - (DAYS - 1));
 
-    const counts = new Map();
-    function bump(dateStr){
-      if(!dateStr) return;
-      const d = dateStr.slice(0,10);
-      counts.set(d, (counts.get(d) || 0) + 1);
-    }
-    try{
-      const sinceIso = windowStart.toISOString();
-      const [{ data: attempts, error: e1 }, { data: reviews, error: e2 }] = await Promise.all([
-        sb.from('test_attempts').select('created_at').eq('user_id', currentUser).gte('created_at', sinceIso),
-        sb.from('user_mastery').select('last_reviewed').eq('user_id', currentUser).gte('last_reviewed', sinceIso)
-      ]);
-      if(!e1 && attempts) attempts.forEach(a => bump(a.created_at));
-      if(!e2 && reviews) reviews.forEach(r => bump(r.last_reviewed));
-    }catch(e){ /* diam -- card tetap render dengan grid kosong, bukan error state */ }
+    /* Ambil dari sumber yang SAMA dengan kartu streak di sidebar (ambilTanggalAktif),
+       supaya angka "✦ N day streak" di bawah grafik ini nggak pernah beda lagi sama
+       "STREAK N days" di sidebar -- dulu dua-duanya punya query sendiri-sendiri dengan
+       definisi berbeda. Jendelanya lebih lebar dari grafik (400 hari vs 84), tapi
+       counts cuma dibaca untuk tanggal di dalam window, jadi gambarnya tetap sama. */
+    const aktif = await ambilTanggalAktif();
+    const counts = aktif.counts;
+    const activeDateSetPenuh = aktif.dates;
 
-    const activeDateSet = new Set([...counts.keys()].filter(k => counts.get(k) > 0));
+    // Ringkasan "N hari aktif" tetap dihitung dari window 12 minggu yang digambar,
+    // bukan dari 400 hari -- biar angkanya sesuai sama yang kelihatan.
+    const activeDateSet = new Set();
+    for(let i = 0; i < DAYS; i++){
+      const d = new Date(windowStart); d.setUTCDate(d.getUTCDate() + i);
+      const key = isoDay(d);
+      if((counts.get(key) || 0) > 0) activeDateSet.add(key);
+    }
     const R = [0, 1.1, 1.5, 2, 2.6];
     for(let i = 0; i < DAYS; i++){
       const w = Math.floor(i / ROWS), d = i % ROWS;
@@ -11962,7 +12012,9 @@
     }
 
     if(sumEl) sumEl.textContent = t('skyActiveDays').replace('{n}', activeDateSet.size);
-    if(streakEl) streakEl.textContent = '✦ ' + t('daysStreak').replace('{n}', computeStreak(activeDateSet));
+    // Streak dihitung dari set PENUH (400 hari), bukan set 12 minggu di atas -- kalau pakai
+    // yang 12 minggu, streak yang lebih panjang dari window bakal kepotong di angka 84.
+    if(streakEl) streakEl.textContent = '✦ ' + t('daysStreak').replace('{n}', computeStreak(activeDateSetPenuh));
   });
 
   // Mobile bottom nav (fase 1) -- separate registrations, same target functions as the

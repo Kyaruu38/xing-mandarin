@@ -1519,6 +1519,11 @@
     .mockSetGrid .hubCardBody{ display:flex; flex-direction:column; gap:2px; }
     .mockSetGrid .mockSetMeta{ font-size:11.5px; color:var(--muted); line-height:1.5; }
     .mockSetGrid .mockSetScore{ margin-top:5px; font-size:11.5px; font-weight:700; color:var(--gold-soft); }
+    /* Set yang lagi ditinggal separuh jalan. Warnanya hijau, beda dari emas "sudah pernah
+       dinilai", supaya "masih nunggu dilanjut" nggak ketuker sama "sudah selesai". */
+    .mockSetGrid .mockSetLanjut{ margin-top:5px; font-size:11.5px; font-weight:700; color:var(--ok-ink); }
+    .mockSetGrid .mockSetLanjut::before{ content:'\2022 '; }
+    .mockSetBtn.lanjut{ background:var(--ok-ink); border-color:var(--ok-ink); color:#fff; }
     /* width/margin di-reset: aturan global button{width:100%;margin-top:22px} */
     .mockSetGrid .mockSetBtn{ width:100%; margin:11px 0 0; padding:9px; border:0; border-radius:9px;
       background:linear-gradient(180deg,var(--gold-soft),var(--gold)); color:#241a08;
@@ -1701,6 +1706,12 @@
     .attemptTimer{display:flex; align-items:center; gap:8px; background:rgba(242,176,30,.14); border:1px solid rgba(242,176,30,.35); border-radius:12px; padding:8px 15px; flex:none}
     .attemptTimer span{font-family:ui-monospace,Menlo,monospace; font-weight:800; font-size:17px; color:var(--text); letter-spacing:.02em}
     .attemptTimer.low span{color:var(--danger)}
+    /* Mode latihan: jam naik, bukan turun. Warnanya sengaja dibedakan dari emas "ujian"
+       supaya sekali lihat ketahuan ini bukan hitung mundur. */
+    .attemptTimer.latihan{background:rgba(47,158,91,.13); border-color:rgba(47,158,91,.34)}
+    .attemptTimerMode{font-family:'Plus Jakarta Sans',sans-serif !important; font-size:9.5px !important;
+      font-weight:800 !important; letter-spacing:.09em; color:var(--ok-ink) !important;
+      background:rgba(47,158,91,.16); border-radius:5px; padding:2px 5px; line-height:1}
     .attemptToolbar{margin-top:20px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap}
     .attemptToggles{display:flex; gap:10px}
     /* checkbox+label kept as real form controls (not a styled div) so the toggle stays
@@ -3354,7 +3365,7 @@
               <div class="attemptSubtitle" id="attemptSubtitle">—</div>
             </div>
           </div>
-          <div class="attemptTimer" id="attemptTimer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C7900F" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5l3 2"/></svg><span id="attemptTimerText">00:00</span></div>
+          <div class="attemptTimer" id="attemptTimer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C7900F" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5l3 2"/></svg><span id="attemptTimerText">00:00</span><span class="attemptTimerMode hidden" id="attemptTimerMode"></span></div>
         </div>
 
         <div class="attemptToolbar">
@@ -3732,7 +3743,7 @@
      Kalau keduanya beda, user yang masih buka tab lama bakal dikasih
      banner "ada versi baru".
      ============================================================ */
-  const APP_VERSION = '5.9';
+  const APP_VERSION = '5.10';
 
   const SUPABASE_URL  = 'https://xzgvhzmmqbijpbrhagjf.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6Z3Zoem1tcWJpanBicmhhZ2pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0OTA4NjMsImV4cCI6MjA5OTA2Njg2M30.9OtBJIBDDUhhSsvtz9Pql12hWToGzmULOGh7Tj-vzNs';
@@ -4071,6 +4082,11 @@
           filledCount:'Terisi {filled}/{total}', submitBtn:'Submit', exitCancel:'Keluar (batal)',
           modalOk:'OK', modalCancel:'Batal',
           exitAttemptConfirm:'Keluar sekarang? Progres jawaban bakal ilang (belum di-submit).',
+          modeLatihan:'LATIHAN', judulLanjutkan:'Lanjutkan latihan?',
+          pesanLanjutkan:'Kamu berhenti di soal {n} dari {total}, {jawab} jawaban sudah terisi, waktu terpakai {waktu}.',
+          tombolLanjutkan:'Lanjutkan', tombolMulaiUlang:'Mulai dari awal', lanjutkan:'Lanjutkan',
+          progresTersimpan:'Progres tersimpan otomatis \u2014 boleh ditinggal, waktunya ikut berhenti.',
+          soalKe:'soal {n}',
           timeLabel:'Waktu', answerReview:'Review Jawaban', backToMockList:'Kembali ke Daftar Mock Test',
           accuracyLabel:'Akurasi',
           resultSublinePass:'Kamu skor {score}/{max} — di atas garis lulus HSK {level} ({line}).',
@@ -4286,6 +4302,11 @@
           filledCount:'Filled {filled}/{total}', submitBtn:'Submit', exitCancel:'Exit (cancel)',
           modalOk:'OK', modalCancel:'Cancel',
           exitAttemptConfirm:'Exit now? Your unsubmitted answers will be lost.',
+          modeLatihan:'PRACTICE', judulLanjutkan:'Continue practice?',
+          pesanLanjutkan:'You stopped at question {n} of {total}, {jawab} answers filled, time spent {waktu}.',
+          tombolLanjutkan:'Continue', tombolMulaiUlang:'Start over', lanjutkan:'Continue',
+          progresTersimpan:'Progress saves automatically \u2014 you can leave anytime, the clock stops too.',
+          soalKe:'question {n}',
           timeLabel:'Time', answerReview:'Answer Review', backToMockList:'Back to Mock Test List',
           accuracyLabel:'Accuracy',
           resultSublinePass:'You scored {score}/{max} — above the HSK {level} passing line ({line}).',
@@ -4501,6 +4522,11 @@
           filledCount:'已填 {filled}/{total}', submitBtn:'提交', exitCancel:'退出（取消）',
           modalOk:'确定', modalCancel:'取消',
           exitAttemptConfirm:'现在退出？未提交的答案将会丢失',
+          modeLatihan:'练习', judulLanjutkan:'继续练习？',
+          pesanLanjutkan:'你停在第 {n} 题（共 {total} 题），已填 {jawab} 个答案，用时 {waktu}。',
+          tombolLanjutkan:'继续', tombolMulaiUlang:'重新开始', lanjutkan:'继续',
+          progresTersimpan:'进度会自动保存 \u2014 可随时离开，计时也会暂停。',
+          soalKe:'第 {n} 题',
           timeLabel:'用时', answerReview:'答案回顾', backToMockList:'返回模拟考试列表',
           accuracyLabel:'正确率',
           resultSublinePass:'你得了 {score}/{max} 分 — 高于 HSK {level} 及格线（{line}）。',
@@ -9735,11 +9761,22 @@
     const lastAttempt = new Map();
     (attempts||[]).forEach(a=>{ if(!lastAttempt.has(a.set_id)) lastAttempt.set(a.set_id, a); });
 
+    /* Progres latihan yang belum di-submit. Cuma dipakai di daftar per-bagian: tab "Semua"
+       itu exam gabungan yang memang nggak bisa dilanjut, jadi jangan sampai kartunya
+       nawarin "Lanjutkan" untuk sesuatu yang nggak pernah disimpan. */
+    const progresMap = new Map();
+    if(mockSection !== 'all'){
+      const { data: progres } = await sb
+        .from('attempt_progress').select('set_id,current_index,answers')
+        .eq('user_id', currentUser).in('set_id', setIds);
+      (progres||[]).forEach(pr=>{ progresMap.set(pr.set_id, pr); });
+    }
+
     wrap.innerHTML = '';
     if(mockSection === 'all'){
       renderMockGroupedList(wrap, sets, lastAttempt);
     } else {
-      renderMockFlatList(wrap, sets, lastAttempt);
+      renderMockFlatList(wrap, sets, lastAttempt, progresMap);
     }
   }
 
@@ -9751,11 +9788,16 @@
     return String(n).padStart(2, '0');
   }
 
-  function renderMockFlatList(wrap, sets, lastAttempt){
+  function renderMockFlatList(wrap, sets, lastAttempt, progresMap){
     wrap.className = 'mockSetGrid';
     sets.forEach((s, i)=>{
       const attempt = lastAttempt.get(s.set_id);
+      const progres = progresMap && progresMap.get(s.set_id);
       const minutes = Math.round(s.time_limit_seconds / 60);
+      // Label tombol punya 3 keadaan, bukan 2 lagi: belum pernah / pernah selesai /
+      // lagi ditinggal separuh jalan. Yang ketiga paling penting kelihatan, karena itu
+      // satu-satunya petunjuk bahwa jawaban lamanya masih nunggu.
+      const labelTombol = progres ? t('lanjutkan') : (attempt ? t('ulangi') : t('mulai'));
       const card = document.createElement('div');
       card.className = 'hubCard';
       card.innerHTML = `
@@ -9766,8 +9808,9 @@
         <div class="hubCardBody">
           <div class="hubCardTitle">${escapeHtml(s.title)}</div>
           <div class="mockSetMeta">HSK ${s.hsk_level} · ${escapeHtml(SECTION_LABEL[s.section] || s.section)}<br>${s.total_questions} ${t('soal')} · ${minutes} ${t('menit')}</div>
-          ${attempt ? `<div class="mockSetScore">${t('terakhir')} ${formatMockDate(attempt.created_at)}</div>` : ''}
-          <button class="mockSetBtn" data-set="${escapeHtml(s.set_id)}">${attempt ? t('ulangi') : t('mulai')}</button>
+          ${progres ? `<div class="mockSetLanjut">${escapeHtml(t('soalKe').replace('{n}', (Number(progres.current_index)||0) + 1))}</div>`
+                    : (attempt ? `<div class="mockSetScore">${t('terakhir')} ${formatMockDate(attempt.created_at)}</div>` : '')}
+          <button class="mockSetBtn${progres ? ' lanjut' : ''}" data-set="${escapeHtml(s.set_id)}">${labelTombol}</button>
         </div>`;
       wrap.appendChild(card);
     });
@@ -10263,6 +10306,19 @@
   let attemptSubmitting = false;
   let attemptShowPinyin = false;
   let attemptShowTranslation = false;
+  /* Mode attempt. Ditentukan di pintu masuk, bukan ditebak belakangan:
+       'ujian'   -> exam gabungan (tab Semua). Hitung mundur, habis waktu auto-submit,
+                    TIDAK disimpan, TIDAK bisa dilanjut. Ini simulasi ujian betulan.
+       'latihan' -> set per-bagian (Listening/Reading/Writing sendiri-sendiri). Stopwatch
+                    naik, nggak ada batas waktu, progres disimpan otomatis ke
+                    attempt_progress dan bisa dilanjut lain hari/lain device.
+     Dipisah begini karena dua-duanya pakai layar attempt yang sama persis; yang beda cuma
+     aturan waktu + apakah progresnya diingat. */
+  let attemptMode = 'ujian';
+  let attemptElapsed = 0;        // detik yang SUDAH dibukukan (mode latihan)
+  let attemptStartedAt = 0;      // Date.now() saat stopwatch terakhir jalan; 0 = lagi berhenti
+  let simpanProgresTimer = null; // debounce autosave
+  let simpanProgresTick = 0;     // penghitung detik buat autosave berkala
   let attemptGroupSets = null;              // != null kalau ini exam gabungan (tab Semua)
   let attemptSectionBreaks = new Map();      // index soal -> label section, buat pemisah antar bagian
   let attemptLastReviewArr = [];             // cache reviewArr terakhir, buat re-render pas retry grading esai
@@ -10290,13 +10346,29 @@
     if(qErr){ showAlertModal(t('errFetchQuestions') + ' ' + qErr.message); return; }
     if(!qRows || qRows.length === 0){ showAlertModal(t('errSetNoQuestions')); return; }
 
+    /* Set per-bagian = mode latihan. Cek dulu apakah ada progres yang ditinggal.
+       Ditanya, bukan langsung dilanjut -- lihat alasannya di tanyaLanjutProgres(). */
+    const progres = await muatProgres(setId);
+    const adaIsi = progres && (Object.keys(progres.answers || {}).length > 0 || (Number(progres.current_index) || 0) > 0);
+    let lanjut = false;
+    if(adaIsi){
+      const pilih = await tanyaLanjutProgres(setRow, progres, qRows.length);
+      // Esc/backdrop/X -> closeModal() me-resolve false. Apa pun selain dua pilihan resmi
+      // artinya murid nggak jadi -- jangan masuk ke layar attempt, jangan hapus apa pun.
+      if(pilih !== 'lanjut' && pilih !== 'ulang') return;
+      lanjut = (pilih === 'lanjut');
+      if(!lanjut) await hapusProgres(setId);
+    }
+
     attemptGroupSets = null;
     attemptSectionBreaks = new Map();
     attemptSet = setRow;
     attemptQuestions = qRows;
-    attemptAnswers = {};
-    flaggedQuestions = new Set();
-    attemptIndex = 0;
+    attemptAnswers = lanjut ? (progres.answers || {}) : {};
+    flaggedQuestions = new Set(lanjut ? (progres.flagged || []) : []);
+    // Dijaga ke rentang yang valid: kalau isi set-nya berubah sejak progres disimpan
+    // (soal dihapus/ditambah), current_index lama bisa nunjuk ke luar array.
+    attemptIndex = lanjut ? Math.min(Math.max(0, Number(progres.current_index) || 0), qRows.length - 1) : 0;
     attemptShowPinyin = false;
     attemptShowTranslation = false;
     $('togglePinyin').checked = false;
@@ -10307,10 +10379,11 @@
     hideAllPages();
     $('attemptCard').classList.remove('hidden');
     $('attemptTitle').textContent = setRow.title;
-    $('attemptSubtitle').textContent = `HSK ${setRow.hsk_level} · ${SECTION_LABEL[setRow.section] || setRow.section} · ${setRow.total_questions} ${t('soal')}`;
+    $('attemptSubtitle').textContent = `HSK ${setRow.hsk_level} · ${SECTION_LABEL[setRow.section] || setRow.section} · ${setRow.total_questions} ${t('soal')} · ${t('progresTersimpan')}`;
 
+    setModeChipTimer(true);
     renderAttemptQuestion();
-    startAttemptTimer(setRow.time_limit_seconds);
+    startAttemptStopwatch(lanjut ? (Number(progres.elapsed_seconds) || 0) : 0);
   }
 
   // Tab "Semua": gabungkan semua set yang berbagi kode dasar jadi satu attempt berkelanjutan.
@@ -10381,8 +10454,19 @@
     const combinedSectionLabels = groupSets.map(s => SECTION_LABEL[s.section] || s.section).join(' + ');
     $('attemptSubtitle').textContent = `HSK ${attemptSet.hsk_level} · ${combinedSectionLabels} · ${attemptSet.total_questions} ${t('soal')}`;
 
+    setModeChipTimer(false);   // exam gabungan: tetap hitung mundur, tanpa penanda latihan
     renderAttemptQuestion();
     startAttemptTimer(attemptSet.time_limit_seconds);
+  }
+
+  /* Penanda kecil di sebelah jam. Tanpa ini dua mode kelihatan identik, padahal angkanya
+     jalan ke arah berlawanan -- murid bisa salah kira waktunya lagi habis padahal lagi naik. */
+  function setModeChipTimer(latihan){
+    const el = $('attemptTimerMode');
+    if(!el) return;
+    el.textContent = latihan ? t('modeLatihan') : '';
+    el.classList.toggle('hidden', !latihan);
+    $('attemptTimer').classList.toggle('latihan', !!latihan);
   }
 
   function startAttemptTimer(seconds){
@@ -10390,16 +10474,58 @@
     // sisa waktu sudah <=0 (mis. time_limit_seconds null/0) ia memanggil stopAttemptTimer()
     // SEBELUM setInterval terpasang -> interval yatim yang auto-submit untuk kedua kalinya.
     stopAttemptTimer();
+    attemptMode = 'ujian';
     attemptDeadline = Date.now() + (Number(seconds) || 0) * 1000;
     attemptTimerInterval = setInterval(updateAttemptTimer, 1000);
     updateAttemptTimer();
   }
 
+  /* Stopwatch buat mode latihan. Naik, bukan turun, dan nggak pernah auto-submit --
+     set per-bagian sekarang posisinya "belajar", bukan ujian. Angka mulainya diambil dari
+     progres tersimpan, jadi murid yang balik lagi lanjut dari detik terakhir, bukan nol. */
+  function startAttemptStopwatch(mulaiDariDetik){
+    stopAttemptTimer();
+    attemptMode = 'latihan';
+    attemptElapsed = Math.max(0, Number(mulaiDariDetik) || 0);
+    attemptStartedAt = Date.now();
+    simpanProgresTick = 0;
+    attemptTimerInterval = setInterval(updateAttemptTimer, 1000);
+    updateAttemptTimer();
+  }
+
+  /* stopAttemptTimer dipanggil di BANYAK tempat (submit, keluar, ganti attempt, waktu habis).
+     Di mode latihan, tiap berhenti kita bukukan dulu detik yang sudah jalan ke attemptElapsed
+     -- kalau tidak, waktu antara start terakhir dan berhenti ini hilang, dan murid yang
+     keluar-masuk berkali-kali kelihatan seperti tidak pernah menghabiskan waktu sama sekali. */
   function stopAttemptTimer(){
+    if(attemptMode === 'latihan' && attemptStartedAt){
+      attemptElapsed += Math.max(0, Math.round((Date.now() - attemptStartedAt) / 1000));
+      attemptStartedAt = 0;
+    }
     if(attemptTimerInterval){ clearInterval(attemptTimerInterval); attemptTimerInterval = null; }
   }
 
+  // Berapa detik yang sudah dipakai murid -- satu-satunya sumber angka waktu yang dikirim
+  // ke submit_attempt, dua mode pakai fungsi yang sama biar nggak ada dua cara hitung.
+  function detikTerpakai(){
+    if(attemptMode === 'latihan'){
+      return attemptElapsed + (attemptStartedAt ? Math.max(0, Math.round((Date.now() - attemptStartedAt) / 1000)) : 0);
+    }
+    const batas = Number(attemptSet && attemptSet.time_limit_seconds) || 0;
+    return Math.max(0, batas - Math.max(0, Math.round((attemptDeadline - Date.now()) / 1000)));
+  }
+
   function updateAttemptTimer(){
+    if(attemptMode === 'latihan'){
+      const s = detikTerpakai();
+      $('attemptTimerText').textContent = `${String(Math.floor(s / 60)).padStart(2,'0')}:${String(s % 60).padStart(2,'0')}`;
+      $('attemptTimer').classList.remove('low');
+      // Autosave berkala: nutupi kasus murid nutup tab tanpa lewat tombol Keluar sama sekali.
+      // 20 detik dipilih supaya paling banyak segitu waktu yang bisa hilang, tanpa bikin
+      // satu tulis per detik.
+      if(++simpanProgresTick % 20 === 0) simpanProgres();
+      return;
+    }
     const remainSec = Math.max(0, Math.round((attemptDeadline - Date.now()) / 1000));
     const mm = String(Math.floor(remainSec / 60)).padStart(2,'0');
     const ss = String(remainSec % 60).padStart(2,'0');
@@ -10409,6 +10535,80 @@
       stopAttemptTimer();
       submitAttempt(true);
     }
+  }
+
+  /* ================= PROGRES LATIHAN (attempt_progress) =========================
+     Cuma aktif di mode latihan. Yang disimpan murni milik murid sendiri (jawaban, posisi
+     soal, detik terpakai, tanda flag) -- tidak ada kunci jawaban di sini, jadi tabelnya
+     aman dibaca klien selama RLS-nya mengunci ke user_id sendiri.
+
+     Kenapa di database, bukan localStorage: murid sering mulai di laptop lalu lanjut di HP.
+     localStorage nggak ikut pindah, dan hilang begitu clear browsing data. */
+
+  async function muatProgres(setId){
+    const { data, error } = await sb
+      .from('attempt_progress')
+      .select('answers,current_index,elapsed_seconds,flagged')
+      .eq('user_id', currentUser).eq('set_id', setId)
+      .maybeSingle();
+    if(error) return null;      // gagal baca progres != gagal mulai latihan, jangan hadang murid
+    return data || null;
+  }
+
+  async function simpanProgres(){
+    if(attemptMode !== 'latihan' || !attemptSet || !currentUser) return;
+    try{
+      await sb.from('attempt_progress').upsert({
+        user_id: currentUser,
+        set_id: attemptSet.set_id,
+        answers: attemptAnswers,
+        current_index: attemptIndex,
+        elapsed_seconds: detikTerpakai(),
+        flagged: [...flaggedQuestions],
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'user_id,set_id' });
+    }catch(e){ /* diam: gagal simpan progres nggak boleh ganggu murid yang lagi ngerjain */ }
+  }
+
+  // Ditunda sebentar biar klik beruntun (mis. nyusun kalimat) nggak jadi satu tulis per klik.
+  function jadwalkanSimpanProgres(){
+    if(attemptMode !== 'latihan') return;
+    clearTimeout(simpanProgresTimer);
+    simpanProgresTimer = setTimeout(simpanProgres, 1200);
+  }
+
+  async function hapusProgres(setId){
+    if(!currentUser) return;
+    try{
+      await sb.from('attempt_progress').delete().eq('user_id', currentUser).eq('set_id', setId);
+    }catch(e){ /* diam, sama alasannya */ }
+  }
+
+  /* Tanya dulu, jangan auto-lanjut: murid yang sebenarnya mau ngulang dari nol nggak boleh
+     diam-diam dibawa balik ke soal 13 dengan jawaban lama masih nempel. Balikannya
+     'lanjut' | 'ulang' | null (null = batal, jangan masuk ke layar attempt sama sekali). */
+  function tanyaLanjutProgres(setRow, progres, totalSoal){
+    const jumlahJawab = Object.keys(progres.answers || {}).length;
+    const detik = Number(progres.elapsed_seconds) || 0;
+    const pesan = t('pesanLanjutkan')
+      .replace('{n}', (Number(progres.current_index) || 0) + 1)
+      .replace('{total}', totalSoal)
+      .replace('{jawab}', jumlahJawab)
+      .replace('{waktu}', formatDuration(detik));
+    return new Promise(resolve => {
+      modalPendingResolve = resolve;
+      openModal(t('judulLanjutkan'), `
+        <p>${escapeHtml(pesan)}</p>
+        <div class="modalActions">
+          <div class="modalActionsRight">
+            <button type="button" class="modalBtn ghost" id="progresUlangBtn">${t('tombolMulaiUlang')}</button>
+            <button type="button" class="modalBtn primary" id="progresLanjutBtn">${t('tombolLanjutkan')}</button>
+          </div>
+        </div>
+      `);
+      $('progresUlangBtn').addEventListener('click', ()=>{ modalPendingResolve = null; closeModal(); resolve('ulang'); });
+      $('progresLanjutBtn').addEventListener('click', ()=>{ modalPendingResolve = null; closeModal(); resolve('lanjut'); });
+    });
   }
 
   function isQuestionAnswered(q){
@@ -10685,9 +10885,20 @@
     countEl.classList.toggle('done', filled === total);
   }
 
+  /* Submit gagal / murid batal di modal "masih ada yang kosong" -> waktunya harus jalan lagi,
+     tapi caranya beda per mode. Dulu satu baris yang sama dipakai di 3 tempat dan selalu
+     memanggil startAttemptTimer(sisa) -- di mode latihan itu salah: stopwatch-nya bakal
+     berubah jadi hitung mundur dan detik yang sudah terkumpul hilang. */
+  function lanjutkanWaktuSetelahGagalSubmit(){
+    if(attemptMode === 'latihan'){ startAttemptStopwatch(attemptElapsed); return; }
+    const remain = Math.max(0, Math.round((attemptDeadline - Date.now()) / 1000));
+    if(remain > 0) startAttemptTimer(remain);
+  }
+
   function goToAttemptQuestion(idx){
     if(idx < 0 || idx >= attemptQuestions.length) return;
     attemptIndex = idx;
+    jadwalkanSimpanProgres();   // posisi soal ikut disimpan, biar balik lagi ke soal yang sama
     renderAttemptQuestion();
   }
 
@@ -10718,7 +10929,7 @@
     const unanswered = attemptQuestions.filter(q => !isQuestionAnswered(q)).length;
     if(!force && unanswered > 0){
       const ok = await showConfirmModal(t('confirmUnanswered').replace('{count}', unanswered));
-      if(!ok){ attemptSubmitting = false; startAttemptTimer(Math.max(0, Math.round((attemptDeadline - Date.now())/1000))); return; }
+      if(!ok){ attemptSubmitting = false; lanjutkanWaktuSetelahGagalSubmit(); return; }
     }
     $('attemptSubmitBtn').disabled = true;
 
@@ -10734,7 +10945,7 @@
     }
 
     const answers = gatherAttemptAnswers();
-    const timeTaken = attemptSet.time_limit_seconds - Math.max(0, Math.round((attemptDeadline - Date.now()) / 1000));
+    const timeTaken = detikTerpakai();
 
     // Exam gabungan (tab Semua): submit_attempt tetap dipanggil per set_id asli (RPC-nya
     // cuma tau satu set_id sekaligus), lalu hasilnya dijumlahin di sini jadi satu skor.
@@ -10753,8 +10964,7 @@
           showAlertModal(t('errSubmitFailedNamed').replace('{title}', s.title) + ' ' + error.message);
           $('attemptSubmitBtn').disabled = false;
           attemptSubmitting = false;          // lepas kunci: murid harus bisa mencoba submit lagi
-          const remain = Math.max(0, Math.round((attemptDeadline - Date.now()) / 1000));
-          if(remain > 0) startAttemptTimer(remain);
+          lanjutkanWaktuSetelahGagalSubmit();
           return;
         }
         totalScore += data.score || 0;
@@ -10812,12 +11022,14 @@
       showAlertModal(t('errSubmitFailed') + ' ' + error.message);
       $('attemptSubmitBtn').disabled = false;
       attemptSubmitting = false;            // lepas kunci: submit boleh dicoba lagi
-      const remain = Math.max(0, Math.round((attemptDeadline - Date.now()) / 1000));
-      if(remain > 0) startAttemptTimer(remain);
+      lanjutkanWaktuSetelahGagalSubmit();
       return;
     }
 
     lupakanTanggalAktif();   // attempt baru masuk -> hari ini jadi hari aktif, streak dihitung ulang
+    // Sudah di-submit = latihan ini selesai. Progresnya dibuang supaya kartu di daftar
+    // balik ke "Ulangi", bukan "Lanjutkan" yang nunjuk ke sesi yang sudah dinilai.
+    if(attemptMode === 'latihan') await hapusProgres(attemptSet.set_id);
     showResult(data, timeTaken);
   }
 
@@ -10831,6 +11043,16 @@
   }
 
   async function exitAttempt(){
+    /* Mode latihan: nggak ada yang hilang, jadi nggak perlu konfirmasi yang nakut-nakutin.
+       stopAttemptTimer() dipanggil DULUAN biar detik terakhir kebukukan sebelum disimpan --
+       kalau kebalik, sisa detik sejak tick terakhir ikut hilang tiap kali murid keluar. */
+    if(attemptMode === 'latihan'){
+      stopAttemptTimer();
+      clearTimeout(simpanProgresTimer);
+      await simpanProgres();
+      closeAttempt();
+      return;
+    }
     const answered = attemptQuestions.filter(isQuestionAnswered).length;
     if(answered > 0 && !(await showConfirmModal(t('exitAttemptConfirm')))) return;
     closeAttempt();
@@ -11378,6 +11600,7 @@
     const q = attemptQuestions[attemptIndex];
     if(!q) return;
     if(e.target.checked) flaggedQuestions.add(q.id); else flaggedQuestions.delete(q.id);
+    jadwalkanSimpanProgres();
     e.target.closest('.toggleChip').classList.toggle('active', e.target.checked);
     renderQuestionGrid();
   });
@@ -11385,6 +11608,27 @@
   $('attemptNextBtn').addEventListener('click', ()=> goToAttemptQuestion(attemptIndex + 1));
   $('attemptSubmitBtn').addEventListener('click', ()=> submitAttempt(false));
   $('attemptExitBtn').addEventListener('click', exitAttempt);
+
+  /* Kasus yang paling sering kejadian: murid nggak klik Keluar, dia langsung nutup tab atau
+     pindah aplikasi. Dua hal yang dilakukan di sini:
+       1. stopwatch DIHENTIKAN -- waktu nganggur nggak boleh kehitung sebagai waktu belajar;
+       2. progres langsung disimpan, nggak nunggu debounce.
+     Cuma berlaku di mode latihan; exam gabungan sengaja tetap jalan biar nggak bisa dicurangi
+     dengan pindah tab. */
+  function bekukanLatihanSaatDitinggal(){
+    if(attemptMode !== 'latihan') return;
+    if($('attemptCard').classList.contains('hidden')) return;
+    stopAttemptTimer();
+    clearTimeout(simpanProgresTimer);
+    simpanProgres();
+  }
+  document.addEventListener('visibilitychange', ()=>{
+    if(attemptMode !== 'latihan') return;
+    if($('attemptCard').classList.contains('hidden')) return;
+    if(document.hidden) bekukanLatihanSaatDitinggal();
+    else startAttemptStopwatch(attemptElapsed);   // balik lagi -> lanjut dari detik terakhir
+  });
+  window.addEventListener('pagehide', bekukanLatihanSaatDitinggal);
   $('resultCloseBtn').addEventListener('click', closeResult);
   $('resultReviewBtn').addEventListener('click', ()=> $('resultReviewHeader').scrollIntoView({behavior:'smooth', block:'start'}));
   $('resultRetakeBtn').addEventListener('click', retakeAttempt);
@@ -11396,12 +11640,14 @@
     const tfEl = e.target.closest('.tfBtn');
     if(tfEl){
       attemptAnswers[q.id] = { correct: tfEl.dataset.value === 'true' };
+      jadwalkanSimpanProgres();
       renderAttemptQuestion();
       return;
     }
     const choiceEl = e.target.closest('.choiceItem');
     if(choiceEl){
       attemptAnswers[q.id] = { correct: choiceEl.dataset.key };
+      jadwalkanSimpanProgres();
       renderAttemptQuestion();
       return;
     }
@@ -11414,6 +11660,7 @@
       else current.push(key);
       if(current.length === 0) delete attemptAnswers[q.id];
       else attemptAnswers[q.id] = { order: current };
+      jadwalkanSimpanProgres();
       renderAttemptQuestion();
       return;
     }
@@ -11425,6 +11672,7 @@
       if(!q || String(q.id) !== ta.dataset.qid) return;
       const prev = attemptAnswers[q.id] || {};
       attemptAnswers[q.id] = { ...prev, essay_text: ta.value };
+      jadwalkanSimpanProgres();
       const countEl = $('essayCharCount-' + q.id);
       if(countEl){
         const { label, cls } = essayCharCountEl(ta.value, q.payload);
@@ -11439,6 +11687,7 @@
       const q = attemptQuestions[attemptIndex];
       if(!q || String(q.id) !== ci.dataset.qid) return;
       attemptAnswers[q.id] = { correct: ci.value };
+      jadwalkanSimpanProgres();
       renderQuestionGrid();
     }
   });

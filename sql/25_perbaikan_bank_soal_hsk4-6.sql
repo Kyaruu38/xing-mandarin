@@ -1,0 +1,216 @@
+-- 25_perbaikan_bank_soal_hsk4-6.sql
+-- SUDAH DIJALANKAN KE PROD: 18 Agustus 2026, lewat SQL Editor.
+-- File ini ARSIP (biar riwayatnya kebaca di repo), bukan pending action.
+--
+-- Sumber temuan: QA manual seluruh bank soal HSK 4-6 yang TAYANG
+-- (30 set per level, 2.530 soal berkunci) dikerjain satu per satu lewat UI
+-- asli -- baca soalnya, putusin jawabannya sendiri, isi lewat klik beneran,
+-- submit lewat RPC yang sama dengan yang dipakai murid, lalu bandingin sama
+-- layar review. Hasil akhir 2.515/2.530.
+--
+-- Yang di bawah ini yang gak cocok, plus masalah lain yang ketemu di jalan.
+
+-- =====================================================================
+-- (1) KUNCI JAWABAN SALAH -- 1 soal (satu-satunya di seluruh bank)
+-- =====================================================================
+-- H6XING002 no.4 (id 5048), tipe error_sentence "pilih kalimat yang SALAH".
+--   A. 这家餐厅的服务态度和菜的质量都很好。   <- kunci lama
+--   B. 我们要提高对环境保护的认识。
+--   C. 他不但学习好，而且性格也很开朗。
+--   D. 能否取得好成绩，关键在于平时的努力。   <- ini yang beneran salah
+--
+-- A tidak punya cacat apa pun (态度好 / 质量好 dua-duanya kolokasi wajar).
+-- D itu 两面对一面 klasik: depan dua sisi (能否), belakang satu sisi (努力).
+-- Bukti tambahan: H6XING001 no.2 memakai pola yang SAMA PERSIS dan di sana
+-- pola itu justru dijadikan kunci.
+--
+--   update public.question_bank set answer='{"correct":"D"}'::jsonb, explanation=...
+--    where id = 5048;
+--
+-- Verifikasi: 110 soal error_sentence discan buat 6 pola kesalahan baku
+-- (两面对一面, 避免+不再, 大约+左右, 通过...使, negasi bertingkat,
+-- 基本上+全部) yang muncul sebagai opsi TAPI bukan kunci -> cuma 1 hit,
+-- yaitu ini. Setelah diperbaiki: 0.
+
+-- =====================================================================
+-- (2) Soal susun-kalimat yang punya DUA jawaban sama-sama benar -- 4 soal
+-- =====================================================================
+-- Grader-nya cocok-persis (v_user_ans = r.answer), jadi susunan yang secara
+-- grammar benar tapi beda dari kunci tetap dihitung salah. Keempatnya
+-- DIBUKTIKAN LIVE: dijawab dengan versi yang wajar -> dinilai salah.
+--
+-- Polanya satu: konjungsi yang boleh naik-turun relatif ke subjek.
+--
+--   id 6267 hsk4-writing-2 no.8
+--     妹妹|一边|做作业|听音乐|一边
+--     「妹妹一边做作业一边听音乐」 dan 「...一边听音乐一边做作业」 dua-duanya benar.
+--     一边...一边... memang komutatif -- gak bisa dikunci dengan digabung.
+--     -> soalnya DIGANTI ke pola yang berurutan: 妹妹 | 先做完作业 | 再 | 听音乐
+--
+--   id 6304 hsk4-writing-9 no.10   不但|价格|便宜|而且|质量很好
+--     -> 不但价格 | 便宜 | 而且 | 质量很好      (不但 dikunci ke 价格)
+--
+--   id 6326 hsk5-writing-5 no.5    即使|再忙|他|也坚持|锻炼
+--     -> 即使 | 再忙 | 他也坚持 | 锻炼          (他 dikunci ke 也坚持)
+--
+--   id 6345 hsk5-writing-9 no.8    无论如何|我们|都要|按时|完成
+--     -> 无论如何我们 | 都要 | 按时 | 完成      (我们 dikunci ke 无论如何)
+--
+-- Grader TIDAK disentuh. Keempatnya dikasih penjelasan grammar beneran.
+-- Diverifikasi ulang lewat UI: 4 set itu balik ke skor penuh.
+--
+-- CATATAN buat soal ordering baru: kalau kalimatnya memuat 因为/不但/即使/
+-- 无论/虽然/除了, konjungsi itu WAJIB digabung sama kata yang mengikutinya
+-- jadi satu chip. Kalau dipisah, selalu ada minimal dua susunan yang benar.
+
+-- =====================================================================
+-- (3) 18 penjelasan HSK 5 listening nyalin teks opsi dari soal LAIN
+-- =====================================================================
+-- Hurufnya benar, tapi teks di belakang titik dua diambil dari soal berbeda.
+-- Contoh h5-listening-1 no.43 (soal 理财): kunci C = 看书和实践, tapi
+-- penjelasannya nulis 「Jawaban C: 亲情和成长」 -- itu punya soal film.
+--
+-- Digenerate ulang dari (kunci, teks opsi kunci, kalimat B di transcript),
+-- jadi hurufnya DAN teksnya mustahil meleset lagi.
+--
+-- Verifikasi:
+--   select count(*) from question_bank q join test_sets t on t.set_id=q.set_id
+--    where t.hsk_level=5 and t.section='listening' and q.explanation ~ 'Jawaban [A-D]'
+--      and (substring(q.explanation from 'Jawaban ([A-D])') <> q.answer->>'correct'
+--        or substring(q.explanation from 'Jawaban [A-D]: ([^.]*)')
+--           <> (q.payload->'options'->>(q.answer->>'correct')));
+--   -- harus 0
+
+-- =====================================================================
+-- (4) Dua opsi yang artinya sama, salah satunya kunci -- 7 baris
+-- =====================================================================
+-- Transcript: 「主动跟同事交流是关键。」
+-- Opsinya memuat 主动交流 (kunci) DAN 主动找人聊天 -- dua-duanya benar.
+-- Murid yang paham malah bisa kena.
+--
+--   update public.question_bank
+--      set payload = replace(payload::text,'主动找人聊天','等同事来找自己')::jsonb
+--    where payload::text like '%主动找人聊天%';   -- 7 baris, h5-listening-1..8
+--
+-- Distraktor barunya sekarang justru kebalikan dari kuncinya.
+--
+-- Pola "opsi kembar" lain yang kescan (低价/产品价格低, 宣传到位/宣传做得好)
+-- SENGAJA DIBIARKAN: di situ dua-duanya sama-sama bukan kunci, jadi gak
+-- bikin soal punya dua jawaban benar -- cuma bikin distraktornya kurang
+-- kerja. Catatan kualitas, bukan bug.
+
+-- =====================================================================
+-- (5) Penjelasan yang bocor sebagai catatan internal -- 1 baris
+-- =====================================================================
+-- H6XING005 no.24 penjelasannya diawali kata "Hmm —", jelas monolog penulis
+-- soal yang kelolosan ke produksi. Ditulis ulang jadi kalimat penjelasan.
+-- Discan seluruh bank buat pola serupa (hmm/wkwk/gw/lu/gue): sekarang 0.
+
+-- =====================================================================
+-- (6) 755 soal HSK 4-6 penjelasannya kosong -> barisnya hilang di review
+-- =====================================================================
+-- Pecahannya (khusus set yang is_published):
+--   reading_mc     330  (HSK 5: 270, HSK 6: 60)
+--   fill_blank     255  (HSK 4: 100, HSK 5: 135, HSK 6: 20)
+--   ordering        91  (HSK 4: 51,  HSK 5: 40)
+--   essay           70  (HSK 4: 50,  HSK 5: 10, HSK 6: 10)
+--   error_sentence   9  (HSK 6)
+--
+-- Semuanya digenerate dari data yang MEMANG SUDAH ADA di baris itu sendiri,
+-- bukan dikarang:
+--
+--   ordering    -> kalimat hasil susunan kunci direkonstruksi dari
+--                  segments + answer.order, plus catatan pola grammar
+--                  kalau kalimatnya memuat penanda (把/被/得/比/不但/即使/...).
+--                  Contoh: 「Susunan yang benar: 「他把错误改正过来了」.
+--                  Pola 把: subjek + 把 + objek + kata kerja + pelengkap.」
+--
+--   fill_blank  -> kata kunci disisipkan balik ke kalimat/paragraf rumpang,
+--                  jadi murid lihat kalimat UTUHNYA, bukan cuma huruf.
+--                  Terjemahan Indonesianya ikut diisi dari choices[].id.
+--                  Contoh: 「Jawaban A: 发展 (fāzhǎn) → 显著 (xiǎnzhù) →
+--                  关注 (guānzhù). Kalimat utuhnya: 「近年来，随着经济的
+--                  （发展）...」 — "..."」
+--
+--   reading_mc  -> kalimat pendukung di bacaan dicari otomatis dengan
+--                  skor overlap bigram (stopword Mandarin dibuang), lalu
+--                  DIKUTIP. 273 dari 330 dapat kutipan; sisanya (soal
+--                  inferensi/judul yang memang tidak punya satu kalimat
+--                  bukti) pakai kalimat penutup yang jujur bilang begitu.
+--                  Tipe sisip-kalimat (【1】...【5】) dikasih penjelasan
+--                  koherensi, bukan kutipan.
+--
+--   error_sentence -> ditulis tangan satu per satu: nama jenis kesalahannya
+--                  (成分残缺 / 重复累赘 / 否定不当 / 两面对一面 / 语序不当 /
+--                  关联词搭配不当 / 搭配不当) plus versi kalimat yang benar.
+--
+--   essay       -> bukan "kunci" (dinilai AI), jadi diisi RUBRIK: apa yang
+--                  dinilai, dan apa yang paling memotong nilai. Beda teks
+--                  per task_type (make_sentence / short_essay / summary).
+--
+-- Verifikasi:
+--   select count(*) from question_bank q join test_sets t on t.set_id=q.set_id
+--    where t.is_published and (q.explanation is null or btrim(q.explanation) in ('','-'));
+--   -- 0 untuk SELURUH bank HSK 1-6
+
+-- =====================================================================
+-- (7) MASIH TERBUKA -- perlu keputusan lu, belum gw sentuh
+-- =====================================================================
+-- (a) FORMAT HSK 6 WRITING SALAH, 10 set sekaligus.
+--     Tipe soalnya 缩写 (meringkas). Di HSK 6 asli: artikel ~1.000 karakter,
+--     dibaca 10 menit, artikelnya DIAMBIL, lalu nulis ringkasan ~400 karakter
+--     dalam 35 menit.
+--     Punya kita: artikel 117-176 karakter, target 110-130 karakter, artikel
+--     tetap kelihatan di layar, batas waktu 2400 detik.
+--     Artinya murid disuruh "meringkas" 138 karakter jadi 120 karakter sambil
+--     teksnya nempel di layar -- itu latihan nyalin, bukan meringkas.
+--     Butuh: 10 artikel baru yang jauh lebih panjang dari targetnya, dan
+--     keputusan apakah artikelnya disembunyikan setelah N menit (perubahan app).
+--
+-- (b) HSK 6 WRITING SELALU TERCATAT 0/0.
+--     Set-nya cuma berisi 1 soal essay, dan submit_attempt sengaja
+--     mengeluarkan essay dari correct_count/total_questions. Akibatnya
+--     test_attempts nyimpen total_questions=0, dan app menghitung
+--     pct = total_points ? ... : 0  (app/index.html ~6238 dan ~6371).
+--     Murid yang nulis 缩写 sempurna tetap lihat "Score 0% · Benar 0/0"
+--     di Riwayat dan di kartu dashboard.
+--     Diuji live: submit 缩写 lengkap -> baris test_attempts 0/0/0/0.
+--     Perbaikannya di sisi app (tampilkan "Dinilai AI" alih-alih 0%),
+--     bukan di bank soal -- makanya belum gw ubah.
+--
+-- (c) 49 SET SILUMAN (is_published=false) masih nyangkut di test_sets.
+--     Tiap level cuma 10 set per bagian yang tayang; sisanya legacy
+--     (cloze/comp/match/tf, H4XING011, H3XING011). RLS menyembunyikannya
+--     dari murid, TAPI kalau ada link yang nyasar ke sana, .single() dapat
+--     0 baris dan app nyembur pesan mentah Supabase ke muka murid:
+--       "Could not load test set. Cannot coerce the result to a single JSON object"
+--     Perlu: hapus set-nya, atau tambal pesan errornya di app.
+--
+-- (d) DAUR ULANG LISTENING PARAH.
+--     HSK 4: 450 slot -> 80 soal unik.
+--     HSK 5: 450 slot -> 55 soal unik  (8,2x pengulangan).
+--     HSK 6: 500 slot -> 175 soal unik.
+--     Reading justru bersih: HSK 6 reading 500 slot -> 500 unik.
+--     Murid yang selesai set 1 HSK 5 sudah lihat ~82% isi set 10.
+--     Ini keputusan konten, bukan bug -- perlu soal listening baru.
+--
+-- (e) TIPE SOAL SISIP-KALIMAT (【1】...【5】) rawan ambigu.
+--     9 soal (H6XING005 no.22-24, H6XING007 no.23-24, H6XING008 no.23-24 &
+--     27-28) urutannya bisa dibaca dua arah karena penanda wacananya lemah;
+--     dua-duanya menghasilkan paragraf yang masuk akal. Setelah ditinjau,
+--     kunci resminya sama bagus atau lebih bagus di sekitar separuh kasus,
+--     jadi TIDAK gw ubah. Perbaikannya bukan ganti kunci, tapi pertajam
+--     penanda (然而/换句话说/更重要的是) supaya cuma satu urutan yang jalan.
+
+-- =====================================================================
+-- (8) YANG DICEK DAN BERSIH (nol temuan)
+-- =====================================================================
+--   sebaran huruf jawaban HSK 4-6 per tipe   -> wajar, tidak ada yang bisa dieksploitasi
+--   kebocoran payload (transcript/question)  -> 0
+--   order_index mulai dari 1                 -> 209/209 set
+--   kunci di luar daftar opsi                -> 0
+--   opsi duplikat persis dalam satu soal     -> 0
+--   segments duplikat dalam satu soal        -> 0 (setelah id 6267 diganti)
+--   baris "Q" transcript vs pertanyaan tersimpan -> 1.300/1.300 cocok
+--   test_sets.total_questions vs jumlah asli -> 209/209 cocok
+--   nama file aset non-ASCII                 -> 0
